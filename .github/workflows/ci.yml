@@ -2,9 +2,9 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**"]
+    branches: [main, "deploy/**", "research/**"]
   pull_request:
-    branches: [main]
+    branches: [main, "deploy/**"]
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
       - name: Install analysis dependencies
         working-directory: user/analysis-engine
         run: python -m pip install -r requirements-dev.txt
-      - name: Test analysis API
+      - name: Test analysis API and research backtests
         working-directory: user/analysis-engine
         run: pytest -q
 
