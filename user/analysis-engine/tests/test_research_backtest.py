@@ -40,4 +40,4 @@ def test_future_perturbation_does_not_change_earlier_results():
 
 def test_insufficient_history_fails():
     with pytest.raises(ValueError, match="need more than"):
-        run_monthly_momentum_backtest(make_prices(8), BacktestConfig(volatility_months=6))
+        run_monthly_momentum_backtest(make_prices(7), BacktestConfig(volatility_months=6))
