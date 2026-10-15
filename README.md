@@ -29,7 +29,7 @@ uvicorn price_service:app --reload --host 127.0.0.1 --port 8000
 pytest -q
 ```
 
-For the separate ML research/backtest scripts that use scikit-learn or XGBoost, also install `pip install -r requirements-research.txt`. Those heavier libraries are not included in the production API image.
+For research methodology, input requirements, limitations, and the new leakage-aware backtest baseline, read [the research protocol](user/analysis-engine/research/README.md). For the separate ML research scripts that use scikit-learn or XGBoost, also install `pip install -r requirements-research.txt`. Those heavier libraries are not included in the production API image.
 
 ### User backend and frontend
 
