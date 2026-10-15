@@ -44,7 +44,7 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Test
-        run: pnpm test -- --runInBand
+        run: pnpm exec jest --runInBand
 
   user-frontend:
     runs-on: ubuntu-latest
