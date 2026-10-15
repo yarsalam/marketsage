@@ -7,7 +7,7 @@ import { RiskAnalysis } from "@/components/RiskAnalysis";
 import { InvestmentDecision } from "@/components/InvestmentDecision";
 
 // سایر importها...
-type TabComponent = React.FC<{ onNavigate?: (tab: string) => void }>;
+type TabComponent = React.FC<{ onNavigate: (tab: string) => void }>;
 const tabComponents: Record<string, TabComponent> = {
   decision: InvestmentDecision,
   risk: RiskAnalysis,
