@@ -29,6 +29,8 @@ uvicorn price_service:app --reload --host 127.0.0.1 --port 8000
 pytest -q
 ```
 
+For the separate ML research/backtest scripts that use scikit-learn or XGBoost, also install `pip install -r requirements-research.txt`. Those heavier libraries are not included in the production API image.
+
 ### User backend and frontend
 
 Install dependencies from each project using its committed lockfile, then run `pnpm start:dev` in `user/user-backend` and `pnpm dev` in `user/user-frontend`. For local frontend-to-API requests, set `NEXT_PUBLIC_API_URL=http://localhost:4500` before starting/building the frontend.
