@@ -103,8 +103,8 @@ def calculate_scores(monthly_prices: pd.DataFrame) -> pd.Series:
     returns = monthly_prices.pct_change(fill_method=None)
     momentum = monthly_prices.iloc[-1].div(monthly_prices.iloc[-4]).sub(1)
     trailing = returns.iloc[-12:]
-    volatility = trailing.std().replace(0, np.nan)
-    sharpe_like = trailing.mean().div(volatility)
+    volatility = trailing.std().fillna(0)
+    sharpe_like = trailing.mean().div(volatility.replace(0, np.nan)).fillna(0)
 
     def scale(values: pd.Series) -> pd.Series:
         values = values.replace([np.inf, -np.inf], np.nan)
