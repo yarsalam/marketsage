@@ -91,8 +91,28 @@ Do not imply every item is directly tradable for every user. The global universe
 
 ### Implementation order after this PR
 1. Stabilize and test the temporal store plus the FRED/ALFRED vintage adapter.
-2. ~~Add a versioned provider registry and data-quality status endpoint for every instrument family.~~ A versioned candidate/approval registry and `/sources` endpoint are now present; operational freshness/quality status remains pending.
+2. ~~Add a versioned provider registry and data-quality status endpoint for every instrument family.~~ A versioned candidate/approval registry and `/sources` endpoint are now present; the `/data-quality` endpoint now reports captured coverage and a limited freshness heuristic.
 3. ~~Connect the existing price collector to the temporal store and persist raw snapshot metadata, source and retrieval time.~~ Daily adjusted-close rows now append to SQLite with source ID, retrieval time, snapshot checksum and explicit adjustment/unit metadata. Durable raw provider response retention and production database migration remain pending.
 4. Add one validated source adapter per family, beginning with the sources that have legal access, sufficient historical depth, and reliable timestamps.
-5. ~~Build a daily data-quality report~~ `/data-quality` now reports captured coverage and a limited freshness heuristic. Add a scheduled report/alert and explicit scoring quarantine before new source families can affect scoring.
+5. ~~Build a daily data-quality report~~ `/data-quality` reports captured coverage and a limited freshness heuristic; `data_quality_report.py` turns it into a deterministic JSON report with severity and process exit codes. Host scheduling and an alert destination still require deployment configuration. Keep explicit scoring quarantine before new source families can affect scoring.
 6. Rebuild walk-forward baseline/ablation runs on the selected universes; do not enable model-driven live allocation before acceptance.
+
+## Operational data-quality report (CLI)
+
+Run the report against the live `/data-quality` endpoint:
+
+```bash
+cd user/analysis-engine
+export MARKET_SAGE_DATA_QUALITY_URL="http://127.0.0.1:8100/data-quality"
+python data_quality_report.py --output /var/lib/marketsage/data-quality-latest.json
+```
+
+The CLI fetches the endpoint, atomically writes a machine-readable JSON report when `--output` is set, and also prints it to stdout. Exit codes are **0** for no detected issues, **1** for stale/unknown-freshness warnings, **2** when a research-wired source has no captured records, and **3** for configuration/fetch/report errors. Unconnected candidate providers with no records do not page.
+
+Example daily cron entry (adjust paths/user to deployment):
+
+```cron
+15 6 * * * cd /opt/marketsage/user/analysis-engine && MARKET_SAGE_DATA_QUALITY_URL=http://127.0.0.1:8100/data-quality /opt/marketsage/.venv/bin/python data_quality_report.py --output /var/lib/marketsage/data-quality-latest.json >> /var/log/marketsage/data-quality.log 2>&1
+```
+
+Cron alone does not send alerts; connect non-zero exit codes/log matches to the deployment's monitoring or alerting system. The freshness thresholds are inherited from the current `/data-quality` heuristic (3 days for crypto symbols ending `-USD`, 7 days for other global proxies), not a validated market calendar. This is a deployment recipe, not a live scheduled job: no production host or alert destination is configured yet.
