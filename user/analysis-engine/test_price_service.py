@@ -81,7 +81,9 @@ def test_backtest_endpoint_uses_real_calculation_and_reports_benchmarks(monkeypa
     assert response.status_code == 200, response.text
     payload = response.json()
     assert payload["periods"] > 36
-    assert payload["metrics"]["historical_var_95_monthly"] >= 0
+    assert payload["holdout"]["periods"] >= 12
+    assert payload["holdout"]["start"] > payload["start"]
+    assert payload["holdout"]["metrics"]["historical_var_95_monthly"] >= 0
     assert "equal_weight_monthly_rebalanced" in payload["benchmarks"]
     assert "SPY_buy_and_hold" in payload["benchmarks"]
     assert "60_40_SPY_GLD_monthly_rebalanced" in payload["benchmarks"]
