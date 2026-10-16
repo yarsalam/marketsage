@@ -146,3 +146,25 @@ def test_summary_reports_series_coverage_without_exposing_payloads(tmp_path):
     assert series["stored_versions"] == 2
     assert series["latest_retrieved_at"] == "2024-01-03T00:00:00+00:00"
     assert "payload" not in series
+
+
+def test_source_as_of_quarantines_records_without_publication_timestamp(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(TemporalRecord(
+        record_key="event:issuer:2024-01-10",
+        source_id="unverified-news-index",
+        market="global",
+        data_kind="candidate_event",
+        observed_at=dt("2024-01-10T00:00:00Z"),
+        published_at=None,
+        retrieved_at=dt("2024-01-10T12:00:00Z"),
+        payload={"headline": "unverified candidate"},
+    ))
+
+    cutoff = dt("2024-01-11T00:00:00Z")
+    # Captured replay can reproduce what the system had ingested, but it
+    # cannot establish when the publisher made this candidate available.
+    assert len(store.as_of(as_of=cutoff, availability_basis="captured")) == 1
+    # Source-vintage replay fails closed when publication time is unknown.
+    assert store.as_of(as_of=cutoff, availability_basis="source") == []
+
