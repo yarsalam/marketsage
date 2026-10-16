@@ -317,6 +317,65 @@ def data_status() -> dict:
         return dict(_cache_metadata)
 
 
+@app.get("/data-quality")
+def data_quality() -> dict:
+    """Combine the declared source registry with actual persisted temporal coverage."""
+    catalog = source_catalog()
+    configured_path = os.getenv("TEMPORAL_STORE_PATH")
+    store_path = Path(configured_path) if configured_path else DATA_SNAPSHOT_DIR / "temporal.sqlite3"
+    if store_path.exists():
+        temporal_summary = PointInTimeStore(store_path).summary()
+    else:
+        temporal_summary = {"record_versions": 0, "series": []}
+
+    now = datetime.now(timezone.utc)
+    series_by_source: dict[str, list[dict]] = {}
+    for series in temporal_summary["series"]:
+        latest = series.get("latest_observed_at")
+        age_days = None
+        freshness = "unknown"
+        if latest:
+            observed = datetime.fromisoformat(latest.replace("Z", "+00:00"))
+            age_days = max(0, (now - observed.astimezone(timezone.utc)).total_seconds() / 86400)
+            symbol = series.get("series_key", "")
+            max_age_days = 3 if symbol.endswith("-USD") else 7
+            freshness = "fresh" if age_days <= max_age_days else "stale"
+        series_by_source.setdefault(series["source_id"], []).append({
+            **series,
+            "observed_age_days": round(age_days, 2) if age_days is not None else None,
+            "freshness": freshness,
+            "freshness_rule": "3 days for crypto symbols ending -USD; 7 days for other global price proxies",
+        })
+
+    sources = []
+    for source in catalog["sources"]:
+        observed_series = series_by_source.get(source["source_id"], [])
+        sources.append({
+            **source,
+            "runtime_status": "data_present" if observed_series else "no_data_captured",
+            "runtime_series_count": len(observed_series),
+            "runtime_series": observed_series,
+        })
+    return {
+        "generated_at": now.isoformat(),
+        "registry_version": catalog["registry_version"],
+        "storage": {
+            "kind": "sqlite",
+            "path_configured": bool(configured_path),
+            "store_exists": store_path.exists(),
+            "record_versions": temporal_summary["record_versions"],
+            "series_count": len(temporal_summary["series"]),
+        },
+        "sources": sources,
+        "limitations": [
+            "Freshness is based on latest observed date, not provider publication time.",
+            "Yahoo historical prices do not provide a verified original publication timestamp; published_at remains null.",
+            "A registry entry with no captured records is not evidence that the provider is unavailable; it means this store has no records for it.",
+            "Provider licensing, correctness, corporate actions and point-in-time availability require separate validation.",
+        ],
+    }
+
+
 @app.get("/decision", response_model=DecisionResponse)
 def get_decision(
     horizon: Literal["1W", "1M", "3M", "6M"] = Query("1M"),
