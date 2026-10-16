@@ -119,6 +119,9 @@ class PointInTimeStore:
         with self._connect() as conn:
             rows = conn.execute("""
                 SELECT source_id, market, data_kind,
+                       CASE WHEN instr(record_key, ':') > 0
+                            THEN substr(record_key, 1, instr(record_key, ':') - 1)
+                            ELSE record_key END AS series_key,
                        COUNT(*) AS stored_versions,
                        COUNT(DISTINCT record_key) AS distinct_records,
                        MIN(observed_at) AS first_observed_at,
@@ -127,8 +130,8 @@ class PointInTimeStore:
                        MAX(retrieved_at) AS latest_retrieved_at,
                        MAX(published_at) AS latest_published_at
                 FROM temporal_records
-                GROUP BY source_id, market, data_kind
-                ORDER BY source_id, market, data_kind
+                GROUP BY source_id, market, data_kind, series_key
+                ORDER BY source_id, market, data_kind, series_key
             """).fetchall()
             total = conn.execute(
                 "SELECT COUNT(*) AS count FROM temporal_records"
@@ -140,6 +143,7 @@ class PointInTimeStore:
                     "source_id": row["source_id"],
                     "market": row["market"],
                     "data_kind": row["data_kind"],
+                    "series_key": row["series_key"],
                     "stored_versions": int(row["stored_versions"]),
                     "distinct_records": int(row["distinct_records"]),
                     "first_observed_at": row["first_observed_at"],
