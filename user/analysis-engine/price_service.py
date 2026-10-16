@@ -173,10 +173,22 @@ def get_prices() -> pd.DataFrame:
 
 
 def completed_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
-    """Return completed calendar months only; do not forward-fill gaps."""
+    """Return completed months, rejecting stale month-end observations without filling."""
     monthly = prices.resample("ME").last()
     if monthly.empty:
         return monthly
+    for column in prices.columns:
+        valid = prices[column].dropna()
+        observed_by_month = pd.Series(
+            valid.index, index=valid.index.to_period("M")
+        ).groupby(level=0).last()
+        max_age_days = 3 if column.endswith("-USD") else 7
+        for month_end in monthly.index:
+            observed_at = observed_by_month.get(month_end.to_period("M"))
+            if observed_at is None or pd.isna(observed_at):
+                monthly.loc[month_end, column] = np.nan
+            elif (month_end - observed_at).days > max_age_days:
+                monthly.loc[month_end, column] = np.nan
     current_month = pd.Timestamp.now(tz="UTC").tz_localize(None).to_period("M")
     return monthly.loc[monthly.index.to_period("M") < current_month]
 
