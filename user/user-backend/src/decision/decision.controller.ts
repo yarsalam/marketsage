@@ -36,7 +36,7 @@ export class DecisionController {
     try {
       const { data } = await axios.get(`${baseUrl}/decision`, {
         params: { horizon, capital, top_n: topN },
-        timeout: 12_000,
+        timeout: 45_000,
         headers: { Accept: 'application/json' },
       });
       return data;
