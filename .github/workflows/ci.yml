@@ -2,7 +2,7 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**"]
+    branches: [main, "deploy/**", "research/**", "ci/**"]
   pull_request:
     branches: [main, "deploy/**"]
 
@@ -65,6 +65,28 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ""
         run: pnpm build
+
+  admin-workspace:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin-panel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install admin workspace dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build admin web
+        run: pnpm --filter web build
+      - name: Build admin API starter
+        run: pnpm --filter server build
+      - name: Test admin API starter
+        run: pnpm --filter server exec jest --runInBand
 
   production-images:
     needs: [analysis, user-backend, user-frontend]
