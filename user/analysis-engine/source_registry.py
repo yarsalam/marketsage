@@ -189,6 +189,30 @@ SOURCES: tuple[SourceDefinition, ...] = (
 )
 
 
+def source_scoring_gate(source_id: str) -> dict:
+    """Fail-closed production scoring gate; registry presence is never approval."""
+    source = next((item for item in SOURCES if item.source_id == source_id), None)
+    if source is None:
+        return {
+            "source_id": source_id,
+            "eligible_for_production_scoring": False,
+            "blocked_reasons": ["source_not_registered"],
+        }
+
+    blocked_reasons: list[str] = []
+    if not source.approved_for_production:
+        blocked_reasons.append("production_approval_missing")
+    if source.status != "production_approved":
+        blocked_reasons.append("source_status_not_production_approved")
+    if source.timestamp_quality in {"not_verified", "not_available"}:
+        blocked_reasons.append("timestamp_quality_not_verified")
+    return {
+        "source_id": source.source_id,
+        "eligible_for_production_scoring": not blocked_reasons,
+        "blocked_reasons": blocked_reasons,
+    }
+
+
 def source_catalog() -> dict:
     """Return JSON-serializable registry entries for API/UI and audit tooling."""
     entries = []
@@ -196,6 +220,7 @@ def source_catalog() -> dict:
         item = asdict(source)
         item["data_kinds"] = list(source.data_kinds)
         item["required_checks"] = list(source.required_checks)
+        item["scoring_gate"] = source_scoring_gate(source.source_id)
         entries.append(item)
     return {
         "registry_version": REGISTRY_VERSION,
