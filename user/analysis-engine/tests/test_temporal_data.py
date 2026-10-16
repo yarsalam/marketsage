@@ -77,3 +77,40 @@ def test_non_finite_json_payload_is_rejected(tmp_path):
     item = record(retrieved="2024-01-02T09:01:00Z", value=float("nan"))
     with pytest.raises(ValueError):
         store.append(item)
+
+
+
+def test_historical_source_vintages_can_be_replayed_after_later_download(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    # Both vintages were downloaded in 2026, but the publisher says they became
+    # available in January and February 2024 respectively.
+    store.append(TemporalRecord(
+        record_key="macro:us:inflation:2024-01",
+        source_id="fred:TEST",
+        market="US",
+        data_kind="macro_release",
+        observed_at=dt("2024-01-01T00:00:00Z"),
+        published_at=dt("2024-01-10T23:59:59Z"),
+        retrieved_at=dt("2026-10-16T10:00:00Z"),
+        source_revision="2024-01-10",
+        payload={"value": 3.1},
+    ))
+    store.append(TemporalRecord(
+        record_key="macro:us:inflation:2024-01",
+        source_id="fred:TEST",
+        market="US",
+        data_kind="macro_release",
+        observed_at=dt("2024-01-01T00:00:00Z"),
+        published_at=dt("2024-02-15T23:59:59Z"),
+        retrieved_at=dt("2026-10-16T10:00:00Z"),
+        source_revision="2024-02-15",
+        payload={"value": 3.2},
+    ))
+
+    # Captured replay correctly has no record in 2024; source-vintage replay
+    # can reconstruct what the provider says was available at each cutoff.
+    assert store.as_of(as_of=dt("2024-01-31T00:00:00Z")) == []
+    jan = store.as_of(as_of=dt("2024-01-31T00:00:00Z"), availability_basis="source")
+    feb = store.as_of(as_of=dt("2024-02-20T00:00:00Z"), availability_basis="source")
+    assert jan[0]["payload"]["value"] == 3.1
+    assert feb[0]["payload"]["value"] == 3.2
