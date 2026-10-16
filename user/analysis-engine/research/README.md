@@ -4,30 +4,29 @@ This directory contains an auditable baseline, not evidence of profitability or 
 
 ## Data contract
 
-- Backtest input is a monthly adjusted-close panel with unique, increasing DatetimeIndex values.
-- Values must be numeric, finite, strictly positive, and complete. The engine refuses to silently forward-fill or treat missing returns as zero.
-- Record provider, retrieval timestamp, observation timestamp, adjustment policy, timezone/calendar, symbol mapping, and raw-data checksum for every research run. The current Yahoo Finance integration does not persist immutable raw snapshots, so provider revisions limit reproducibility.
-- Current universe is US-listed ETF proxies and crypto symbols, not direct Tehran Stock Exchange, Iranian FX, Iranian gold/coin, or Iran macro/news feeds.
-- Align different asset calendars to a documented monthly calendar; do not fill across unbounded gaps.
+- Backtest input is a monthly adjusted-close panel with unique, increasing dates and strictly positive finite prices. Missing values are rejected; never forward-fill missing observations for backtesting.
+- The live feed preserves the expected symbol universe and keeps missing observations missing. An asset is eligible for live scoring only when its latest 13 completed monthly closes are all present.
+- Live ranking uses completed calendar months only, avoiding a partial current month being compared with complete historical monthly returns.
+- The first successful price snapshot per UTC day is stored as CSV in the persistent `market_data` volume. A JSON manifest records source, retrieval time, latest observation, symbols, row count, adjustment policy and SHA-256. This improves reproducibility but does not certify provider accuracy or licensing.
+- Current universe is global-market proxies and crypto, not direct Tehran Stock Exchange, Iranian FX, Iranian gold/coin, or Iran macro/news feeds.
 
 ## Backtest conventions
 
-`backtest.py` is a monthly, long-only, equal-weight top-momentum baseline. Signals use only observations through the prior month-end; holdings earn the following month's return. Turnover is the sum of absolute weight changes; cost = turnover × bps / 10,000. Initial entry is charged from cash (zero weights). Metrics include gross/net returns, total return, CAGR, annualized volatility, Sharpe-like ratio, max drawdown, turnover, and estimated costs.
+`backtest.py` is a monthly, long-only, equal-weight top-momentum baseline. Signals use observations through the prior month-end. Previous holdings are marked to market and their weights drift before turnover is measured against the new target. Costs are `turnover × bps / 10,000`, deducted from capital before applying the following month's return. Initial entry is charged from cash.
 
-Not modeled: taxes, borrow, market impact, liquidity, FX conversion, survivorship, delistings, execution, or cash yield. Costs are sensitivity parameters, not calibrated estimates. Parameter tuning requires an untouched final test period and walk-forward/out-of-sample reporting.
+The `/backtest` API uses the longest common complete monthly window available among eligible assets and requires at least 36 monthly observations. It reports strategy metrics and compares against monthly-rebalanced equal weight, SPY buy-and-hold when available, and monthly-rebalanced 60/40 SPY/GLD when both assets are available. Benchmark returns currently exclude transaction costs. The API exposes only the latest 36 monthly rows while calculating metrics over the full window.
+
+Metrics include gross/net returns, total return, CAGR, annualized volatility, Sharpe-like ratio without a risk-free rate, maximum drawdown, historical monthly 95% VaR, beta versus SPY when available, turnover and estimated costs. Cost assumptions are sensitivity parameters, not calibrated broker fees. Taxes, market impact, liquidity, FX conversion, survivorship/delistings and execution are not modeled. Parameter tuning requires an untouched final test period and walk-forward/out-of-sample reporting.
 
 ## Run locally
 
-From `user/analysis-engine`:
-
 ```bash
+cd user/analysis-engine
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
 pytest -q
 ```
-
-Tests cover missing/duplicate data rejection, transaction-cost accounting, insufficient history, and a future-data perturbation check.
 
 ## Sources
 
