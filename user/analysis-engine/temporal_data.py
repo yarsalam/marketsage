@@ -115,45 +115,57 @@ class PointInTimeStore:
             return int(cur.lastrowid)
 
     def summary(self) -> dict[str, Any]:
-        """Summarize persisted coverage and timestamps without exposing price payloads."""
+        """Summarize coverage per logical series without exposing payloads."""
         with self._connect() as conn:
             rows = conn.execute("""
-                SELECT source_id, market, data_kind,
-                       CASE WHEN instr(record_key, ':') > 0
-                            THEN substr(record_key, 1, instr(record_key, ':') - 1)
-                            ELSE record_key END AS series_key,
+                SELECT source_id, market, data_kind, record_key,
                        COUNT(*) AS stored_versions,
-                       COUNT(DISTINCT record_key) AS distinct_records,
                        MIN(observed_at) AS first_observed_at,
                        MAX(observed_at) AS latest_observed_at,
                        MIN(retrieved_at) AS first_retrieved_at,
                        MAX(retrieved_at) AS latest_retrieved_at,
                        MAX(published_at) AS latest_published_at
                 FROM temporal_records
-                GROUP BY source_id, market, data_kind, series_key
-                ORDER BY source_id, market, data_kind, series_key
+                GROUP BY source_id, market, data_kind, record_key
+                ORDER BY source_id, market, data_kind, record_key
             """).fetchall()
             total = conn.execute(
                 "SELECT COUNT(*) AS count FROM temporal_records"
             ).fetchone()["count"]
+
+        # Record keys include the observation date. Macro keys use
+        # macro:<market>:<series-id>:<observation-date>, so their logical
+        # series is the third segment rather than the generic "macro" prefix.
+        grouped: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+        for row in rows:
+            parts = row["record_key"].split(":")
+            series_key = parts[2] if len(parts) >= 4 and parts[0] == "macro" else parts[0]
+            key = (row["source_id"], row["market"], row["data_kind"], series_key)
+            item = grouped.setdefault(key, {
+                "source_id": row["source_id"],
+                "market": row["market"],
+                "data_kind": row["data_kind"],
+                "series_key": series_key,
+                "stored_versions": 0,
+                "distinct_records": 0,
+                "first_observed_at": row["first_observed_at"],
+                "latest_observed_at": row["latest_observed_at"],
+                "first_retrieved_at": row["first_retrieved_at"],
+                "latest_retrieved_at": row["latest_retrieved_at"],
+                "latest_published_at": row["latest_published_at"],
+            })
+            item["stored_versions"] += int(row["stored_versions"])
+            item["distinct_records"] += 1
+            for field in ("first_observed_at", "first_retrieved_at"):
+                if row[field] < item[field]:
+                    item[field] = row[field]
+            for field in ("latest_observed_at", "latest_retrieved_at", "latest_published_at"):
+                if row[field] is not None and (item[field] is None or row[field] > item[field]):
+                    item[field] = row[field]
+
         return {
             "record_versions": int(total),
-            "series": [
-                {
-                    "source_id": row["source_id"],
-                    "market": row["market"],
-                    "data_kind": row["data_kind"],
-                    "series_key": row["series_key"],
-                    "stored_versions": int(row["stored_versions"]),
-                    "distinct_records": int(row["distinct_records"]),
-                    "first_observed_at": row["first_observed_at"],
-                    "latest_observed_at": row["latest_observed_at"],
-                    "first_retrieved_at": row["first_retrieved_at"],
-                    "latest_retrieved_at": row["latest_retrieved_at"],
-                    "latest_published_at": row["latest_published_at"],
-                }
-                for row in rows
-            ],
+            "series": [grouped[key] for key in sorted(grouped)],
         }
 
     def as_of(

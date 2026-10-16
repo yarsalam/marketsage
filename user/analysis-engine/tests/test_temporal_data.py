@@ -168,3 +168,26 @@ def test_source_as_of_quarantines_records_without_publication_timestamp(tmp_path
     # Source-vintage replay fails closed when publication time is unknown.
     assert store.as_of(as_of=cutoff, availability_basis="source") == []
 
+
+
+
+def test_summary_keeps_distinct_macro_series_separate(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    for key, observed, retrieved, value in [
+        ("macro:US:CPIAUCSL:2024-01-01", "2024-01-01T00:00:00Z", "2024-01-10T00:00:00Z", 3.1),
+        ("macro:US:CPIAUCSL:2024-02-01", "2024-02-01T00:00:00Z", "2024-02-10T00:00:00Z", 3.2),
+        ("macro:US:UNRATE:2024-01-01", "2024-01-01T00:00:00Z", "2024-01-10T00:00:00Z", 3.7),
+    ]:
+        store.append(TemporalRecord(
+            record_key=key, source_id="fred:TEST", market="US", data_kind="macro_release",
+            observed_at=dt(observed), published_at=dt(retrieved), retrieved_at=dt(retrieved),
+            payload={"value": value},
+        ))
+
+    summary = store.summary()
+    series = {item["series_key"]: item for item in summary["series"]}
+    assert set(series) == {"CPIAUCSL", "UNRATE"}
+    assert series["CPIAUCSL"]["distinct_records"] == 2
+    assert series["CPIAUCSL"]["stored_versions"] == 2
+    assert series["UNRATE"]["distinct_records"] == 1
+    assert summary["record_versions"] == 3

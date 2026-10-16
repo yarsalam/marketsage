@@ -80,3 +80,20 @@ def test_source_replay_never_promotes_record_with_unknown_publication_time(tmp_p
     cutoff = dt("2025-01-04T00:00:00Z")
     assert len(store.as_of(as_of=cutoff, availability_basis="captured")) == 1
     assert store.as_of(as_of=cutoff, availability_basis="source") == []
+
+
+
+def test_source_replay_breaks_same_publication_time_ties_by_latest_capture(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(item(
+        key="macro:US:TEST:2025-01", value=10,
+        published="2025-01-02T00:00:00Z", retrieved="2025-01-03T00:00:00Z",
+    ))
+    store.append(item(
+        key="macro:US:TEST:2025-01", value=11,
+        published="2025-01-02T00:00:00Z", retrieved="2025-01-04T00:00:00Z",
+    ))
+
+    rows = store.as_of(as_of=dt("2025-01-05T00:00:00Z"), availability_basis="source")
+    assert len(rows) == 1
+    assert rows[0]["payload"]["value"] == 11
