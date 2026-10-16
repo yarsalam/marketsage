@@ -181,3 +181,36 @@ def test_extract_close_masks_non_positive_and_non_finite_prices():
     assert pd.isna(result.loc[raw.index[3], "SOL-USD"])
     assert pd.isna(result.loc[raw.index[4], "BTC-USD"])
     assert (result.stack(future_stack=True).dropna() > 0).all()
+
+
+def test_backtest_endpoint_applies_and_reports_slippage(monkeypatch):
+    dates = pd.date_range("2020-01-31", periods=72, freq="ME")
+    t = np.arange(len(dates), dtype=float)
+    prices = pd.DataFrame({
+        "SPY": 100 * (1.006 ** t) * (1 + .02 * np.sin(t)),
+        "GLD": 100 * (1.003 ** t) * (1 + .01 * np.cos(t)),
+        "BTC-USD": 100 * (1.012 ** t) * (1 + .04 * np.sin(t / 2)),
+    }, index=dates)
+    monkeypatch.setattr(price_service, "get_prices", lambda: prices)
+
+    no_slippage = client.get("/backtest?slippage_bps=0")
+    with_slippage = client.get("/backtest?slippage_bps=50")
+
+    assert no_slippage.status_code == 200, no_slippage.text
+    assert with_slippage.status_code == 200, with_slippage.text
+    free_payload, costly_payload = no_slippage.json(), with_slippage.json()
+    assert costly_payload["config"]["slippage_bps"] == 50
+    assert costly_payload["metrics"]["total_return"] <= free_payload["metrics"]["total_return"]
+    assert costly_payload["monthly"]
+    assert "slippage_cost" in costly_payload["monthly"][-1]
+    assert "total_cost" in costly_payload["monthly"][-1]
+    assert costly_payload["holdout"]["start"] > costly_payload["start"]
+
+
+def test_backtest_endpoint_rejects_negative_slippage_before_fetch(monkeypatch):
+    monkeypatch.setattr(
+        price_service, "get_prices",
+        lambda: (_ for _ in ()).throw(AssertionError("prices should not be fetched")),
+    )
+    response = client.get("/backtest?slippage_bps=-1")
+    assert response.status_code == 422

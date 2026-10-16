@@ -11,12 +11,15 @@ class BacktestConfig:
     momentum_months: int = 3
     volatility_months: int = 12
     transaction_cost_bps: float = 10.0
+    slippage_bps: float = 0.0
     annualization_periods: int = 12
     def validate(self):
         if self.top_n < 1 or self.momentum_months < 1 or self.volatility_months < 2:
             raise ValueError("top_n and lookbacks must be positive; volatility lookback >= 2")
         if not 0 <= self.transaction_cost_bps <= 1000:
             raise ValueError("transaction_cost_bps must be between 0 and 1000")
+        if not 0 <= self.slippage_bps <= 1000:
+            raise ValueError("slippage_bps must be between 0 and 1000")
 
 def validate_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
     if not isinstance(prices, pd.DataFrame) or prices.empty:
@@ -94,14 +97,17 @@ def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: Backtest
             pretrade = pretrade / total
 
         turnover = float((target - pretrade).abs().sum())
-        cost = turnover * cfg.transaction_cost_bps / 10000
+        transaction_cost = turnover * cfg.transaction_cost_bps / 10000
+        slippage_cost = turnover * cfg.slippage_bps / 10000
+        total_cost = transaction_cost + slippage_cost
         next_returns = asset_returns.iloc[i]
         if next_returns.loc[selected].isna().any():
             raise ValueError(f"missing next-period return for selected assets at {prices.index[i].date()}")
         gross = float((target.loc[selected] * next_returns.loc[selected]).sum())
-        net = float((1 - cost) * (1 + gross) - 1)
+        net = float((1 - total_cost) * (1 + gross) - 1)
         rows.append({"date": prices.index[i], "gross_return": gross, "turnover": turnover,
-                     "transaction_cost": cost, "net_return": net,
+                     "transaction_cost": transaction_cost, "slippage_cost": slippage_cost,
+                     "total_cost": total_cost, "net_return": net,
                      "selected_assets": ",".join(map(str, selected))})
         previous_target = target
     result = pd.DataFrame(rows).set_index("date")
@@ -113,6 +119,7 @@ def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: Backtest
     return {"config": {"top_n": cfg.top_n, "momentum_months": cfg.momentum_months,
                        "volatility_months": cfg.volatility_months,
                        "transaction_cost_bps": cfg.transaction_cost_bps,
+                       "slippage_bps": cfg.slippage_bps,
                        "annualization_periods": cfg.annualization_periods},
             "metrics": metrics, "periods": len(result),
             "start": result.index.min().date().isoformat(),

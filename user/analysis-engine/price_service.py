@@ -427,6 +427,7 @@ def get_decision(
 def get_backtest(
     top_n: int = Query(3, ge=1, le=10),
     transaction_cost_bps: float = Query(10.0, ge=0, le=1000),
+    slippage_bps: float = Query(0.0, ge=0, le=1000),
 ) -> dict:
     prices = get_prices()
     monthly = completed_monthly_prices(prices)
@@ -445,6 +446,7 @@ def get_backtest(
         momentum_months=3,
         volatility_months=12,
         transaction_cost_bps=transaction_cost_bps,
+        slippage_bps=slippage_bps,
     )
     try:
         result = run_monthly_momentum_backtest(common, config)
@@ -476,9 +478,9 @@ def get_backtest(
     else:
         metrics["beta_vs_spy"] = None
 
-    # Chronological untouched holdout: the strategy has fixed parameters and no
-    # parameter search. All signals remain strictly trailing, including during
-    # the holdout, but the displayed holdout metrics are separated from full history.
+    # Chronological holdout: the strategy has fixed parameters and no parameter search.
+    # Signals remain strictly trailing during the holdout. This single split is not
+    # a substitute for repeated walk-forward validation.
     split_index = max(1, int(len(common) * 0.70))
     holdout_start = common.index[split_index]
     holdout_returns = strategy_returns.loc[strategy_returns.index >= holdout_start]
@@ -517,6 +519,8 @@ def get_backtest(
             "drawdown": float(row["drawdown"]),
             "turnover": float(row["turnover"]),
             "transaction_cost": float(row["transaction_cost"]),
+            "slippage_cost": float(row["slippage_cost"]),
+            "total_cost": float(row["total_cost"]),
             "selected_assets": row["selected_assets"],
         }
         for name, returns in benchmark_returns.items():
@@ -541,9 +545,9 @@ def get_backtest(
             "Research-only historical simulation; not a forecast or personalized advice.",
             "Assets are restricted to those with complete monthly observations over the common test window.",
             "Equal-weight and 60/40 benchmarks are monthly rebalanced and exclude transaction costs; SPY buy-and-hold is not rebalanced.",
-            "Transaction costs are sensitivity assumptions, not calibrated broker fees or market impact.",
+            "Transaction costs and slippage are sensitivity assumptions, not calibrated broker fees or market impact.",
             "Taxes, liquidity, slippage, FX conversion, survivorship/delistings, and execution are not modeled.",
-            "No parameter tuning or untouched holdout test has been performed.",
+            "The holdout is one chronological split; repeated walk-forward validation and parameter-search correction have not been performed.",
         ] + (["Provider refresh failed; cached prices may be stale."] if metadata.get("stale") else []),
     }
 
