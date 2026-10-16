@@ -31,6 +31,16 @@ def _aware_timestamp(value: Any) -> bool:
 
 def evaluate_acceptance(source_id: str, evidence: dict[str, Any]) -> dict[str, Any]:
     """Evaluate a human-maintained evidence document without promoting a source."""
+    if not isinstance(evidence, dict):
+        return {
+            "source_id": source_id if isinstance(source_id, str) else None,
+            "evidence_complete": False,
+            "missing_items": ["evidence_object"],
+            "failed_items": [],
+            "production_scoring_gate": {"eligible_for_production_scoring": False, "blocked_reasons": ["invalid_evidence"]},
+            "production_scoring_allowed": False,
+            "note": "Evidence must be a JSON object.",
+        }
     source = next((item for item in SOURCES if item.source_id == source_id), None)
     if source is None:
         return {
@@ -39,6 +49,8 @@ def evaluate_acceptance(source_id: str, evidence: dict[str, Any]) -> dict[str, A
             "missing_items": ["source_not_registered"],
             "failed_items": [],
             "production_scoring_gate": source_scoring_gate(source_id),
+            "production_scoring_allowed": False,
+            "note": "Unknown sources are blocked by default; evidence cannot register a source.",
         }
 
     missing: list[str] = []

@@ -62,3 +62,18 @@ def test_unknown_check_names_are_not_silently_accepted():
     report = evaluate_acceptance("iran.tsetmc", evidence)
     assert "unexpected_check:made_up_check" in report["missing_items"]
     assert report["evidence_complete"] is False
+
+
+def test_non_object_evidence_fails_closed_without_exception():
+    report = evaluate_acceptance("iran.tsetmc", None)
+    assert report["evidence_complete"] is False
+    assert report["production_scoring_allowed"] is False
+    assert report["missing_items"] == ["evidence_object"]
+
+
+def test_pending_top_level_review_is_not_treated_as_passed():
+    evidence = _complete_evidence("iran.codal")
+    evidence["rights_review"] = "pending"
+    report = evaluate_acceptance("iran.codal", evidence)
+    assert "rights_review" in report["failed_items"]
+    assert report["evidence_complete"] is False
