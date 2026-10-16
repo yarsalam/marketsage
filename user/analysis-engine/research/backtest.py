@@ -53,7 +53,13 @@ def _metrics(r: pd.Series, periods: int) -> dict:
     }
 
 def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: BacktestConfig | None = None) -> dict:
-    """Use prior-month data for signals; apply returns only in the following month."""
+    """Long-only top momentum with drift-aware turnover and rebalance costs.
+
+    Signal uses data through the prior month-end. Target weights are formed at
+    that close, turnover is measured against prior holdings after their weights
+    have drifted with the just-completed month, and the next month's return is
+    then applied. Costs are deducted from capital before that next-period return.
+    """
     cfg = config or BacktestConfig()
     cfg.validate()
     prices = validate_monthly_prices(monthly_prices)
@@ -61,7 +67,7 @@ def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: Backtest
     if len(prices) <= warmup:
         raise ValueError(f"need more than {warmup} monthly observations")
     asset_returns = prices.pct_change(fill_method=None)
-    previous_weights = pd.Series(0.0, index=prices.columns)
+    previous_target = pd.Series(0.0, index=prices.columns)
     rows = []
     for i in range(warmup, len(prices)):
         past_prices, past_returns = prices.iloc[:i], asset_returns.iloc[:i]
@@ -72,24 +78,38 @@ def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: Backtest
         selected = scores.head(cfg.top_n).index
         if len(selected) == 0:
             raise ValueError(f"no eligible assets at {prices.index[i - 1].date()}")
-        weights = pd.Series(0.0, index=prices.columns)
-        weights.loc[selected] = 1 / len(selected)
-        turnover = float((weights - previous_weights).abs().sum())
+        target = pd.Series(0.0, index=prices.columns)
+        target.loc[selected] = 1 / len(selected)
+
+        if previous_target.sum() == 0:
+            pretrade = previous_target
+        else:
+            drift_returns = asset_returns.iloc[i - 1]
+            if drift_returns.loc[previous_target > 0].isna().any():
+                raise ValueError(f"missing held-asset return at {prices.index[i - 1].date()}")
+            pretrade = previous_target * (1 + drift_returns.fillna(0))
+            total = float(pretrade.sum())
+            if not np.isfinite(total) or total <= 0:
+                raise ValueError("invalid pre-trade portfolio value")
+            pretrade = pretrade / total
+
+        turnover = float((target - pretrade).abs().sum())
         cost = turnover * cfg.transaction_cost_bps / 10000
         next_returns = asset_returns.iloc[i]
         if next_returns.loc[selected].isna().any():
             raise ValueError(f"missing next-period return for selected assets at {prices.index[i].date()}")
-        gross = float((weights.loc[selected] * next_returns.loc[selected]).sum())
+        gross = float((target.loc[selected] * next_returns.loc[selected]).sum())
+        net = float((1 - cost) * (1 + gross) - 1)
         rows.append({"date": prices.index[i], "gross_return": gross, "turnover": turnover,
-                     "transaction_cost": cost, "net_return": gross - cost,
+                     "transaction_cost": cost, "net_return": net,
                      "selected_assets": ",".join(map(str, selected))})
-        previous_weights = weights
+        previous_target = target
     result = pd.DataFrame(rows).set_index("date")
     result["equity"] = (1 + result["net_return"]).cumprod()
     result["drawdown"] = result["equity"] / result["equity"].cummax() - 1
     metrics = _metrics(result["net_return"], cfg.annualization_periods)
     metrics["average_monthly_turnover"] = float(result["turnover"].mean())
-    metrics["total_transaction_cost"] = float(result["transaction_cost"].sum())
+    metrics["sum_of_period_cost_fractions"] = float(result["transaction_cost"].sum())
     return {"config": {"top_n": cfg.top_n, "momentum_months": cfg.momentum_months,
                        "volatility_months": cfg.volatility_months,
                        "transaction_cost_bps": cfg.transaction_cost_bps,
