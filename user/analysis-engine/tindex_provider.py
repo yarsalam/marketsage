@@ -24,7 +24,7 @@ MAX_REQUESTS_PER_MINUTE = 3
 _DISABLED_TERMS = (
     "equity", "equities", "stock", "stocks", "tse", "bors",
     "news", "article", "inflation", "macro", "housing", "calendar",
-    "car", "khodro", "مسکن", "بورس", "خبر", "تورم", "اقتصاد", "خودرو",
+    "khodro", "مسکن", "بورس", "خبر", "تورم", "اقتصاد", "خودرو",
 )
 
 
@@ -87,7 +87,6 @@ class TindexClient:
         timeout: float = DEFAULT_TIMEOUT_SECONDS,
         transport: httpx.BaseTransport | None = None,
         clock=time.monotonic,
-        sleeper=time.sleep,
     ) -> None:
         configured_url = (base_url or os.getenv("TINDEX_API_BASE_URL", "")).strip()
         configured_token = (token or os.getenv("TINDEX_API_TOKEN", "")).strip()
@@ -115,7 +114,6 @@ class TindexClient:
             transport=transport,
         )
         self._clock = clock
-        self._sleeper = sleeper
         self._request_times: deque[float] = deque()
         self._lock = threading.Lock()
 
@@ -199,12 +197,10 @@ class TindexClient:
         slug = _assert_allowed_slug(slug, "indicator slug")
         return self._get_json(f"/api/public/indicators/{quote(slug, safe='')}/history")
 
-    def indicator_candles(self, slug: str, *, interval: str | None = None) -> Any:
+    def indicator_candles(self, slug: str) -> Any:
+        """Fetch provider-defined resampled candles without guessing query parameters."""
         slug = _assert_allowed_slug(slug, "indicator slug")
-        params = {"interval": interval} if interval else None
-        return self._get_json(
-            f"/api/public/indicators/{quote(slug, safe='')}/candles", params=params
-        )
+        return self._get_json(f"/api/public/indicators/{quote(slug, safe='')}/candles")
 
     def indicators_by_category(self, category_slug: str) -> Any:
         category_slug = _assert_allowed_slug(category_slug, "category slug")
