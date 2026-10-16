@@ -65,9 +65,10 @@ def test_slippage_costs_reduce_net_returns_and_are_reported():
     assert with_slippage["config"]["slippage_bps"] == 25
     monthly = with_slippage["monthly"]
     assert (monthly["slippage_cost"] >= 0).all()
-    assert (monthly["total_cost"] == pytest.approx(
-        monthly["transaction_cost"] + monthly["slippage_cost"]
-    )).all()
+    assert np.allclose(
+        monthly["total_cost"],
+        monthly["transaction_cost"] + monthly["slippage_cost"],
+    )
     assert (monthly["net_return"] <= monthly["gross_return"] + 1e-12).all()
 
 

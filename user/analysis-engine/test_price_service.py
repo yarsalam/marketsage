@@ -168,7 +168,7 @@ def test_data_quality_reports_captured_series_and_unconfigured_sources(tmp_path,
 
 
 def test_extract_close_masks_non_positive_and_non_finite_prices():
-    raw = provider_frame()
+    raw = provider_frame().astype(float)
     raw.loc[raw.index[1], ("Close", "BTC-USD")] = 0
     raw.loc[raw.index[2], ("Close", "ETH-USD")] = -1
     raw.loc[raw.index[3], ("Close", "SOL-USD")] = np.inf
