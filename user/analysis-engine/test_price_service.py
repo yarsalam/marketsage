@@ -91,3 +91,11 @@ def test_backtest_endpoint_rejects_too_short_common_history(monkeypatch):
     monkeypatch.setattr(price_service, "get_prices", lambda: prices)
     response = client.get("/backtest")
     assert response.status_code == 503
+
+def test_monthly_prices_reject_stale_month_end_observations():
+    dates = pd.date_range("2024-01-01", "2024-04-30", freq="D")
+    prices = pd.DataFrame({"SPY": 100 + np.arange(len(dates), dtype=float)}, index=dates)
+    prices.loc["2024-04-16":, "SPY"] = np.nan
+    monthly = price_service.completed_monthly_prices(prices)
+    assert pd.isna(monthly.loc[pd.Timestamp("2024-04-30"), "SPY"])
+    assert monthly.loc[pd.Timestamp("2024-03-31"), "SPY"] > 0
