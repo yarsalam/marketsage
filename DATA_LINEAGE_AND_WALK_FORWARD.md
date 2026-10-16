@@ -1,6 +1,6 @@
 # MarketSage point-in-time data foundation and source selection
 
-Status: implementation steps 1–3 are in progress. The FRED/ALFRED adapter ingests historical macro vintages into the point-in-time store; the existing global-proxy price snapshot now appends daily adjusted-close records to SQLite, and `/sources` exposes a versioned candidate/approval registry. These are local research foundations, not a scheduled production collector or production database service.
+Status: the local point-in-time store, FRED/ALFRED vintage adapter, global-proxy snapshot ingestion, versioned source registry, and `/data-quality` runtime endpoint are implemented with CI coverage. This is a research foundation only: collection is not scheduled, source approval remains false for all providers, and SQLite is not yet a production persistence service.
 
 ## Objective
 
@@ -60,13 +60,13 @@ Report net returns, benchmark-relative returns, volatility, Sharpe/Sortino with 
 - Versioned raw fixtures and parser/unit tests.
 - Historical reconciliation and timestamp/revision audit.
 - Data quality and freshness dashboards with explicit quarantine.
-- Leakage tests, including future perturbation and revision-as-of tests.
+- Leakage tests, including future perturbation and revision-as-of tests; source-vintage replay must exclude records with unknown publication timestamps.
 - Walk-forward ablation report signed off before any live recommendation mode.
 - Deployment only after persistent volume, backup/restore drill, monitoring, secrets, firewall and TLS checks.
 
 ## Current limitation
 
-The yfinance snapshot path now appends captured price records to SQLite using the snapshot retrieval time and checksum. Yahoo does not provide a trustworthy original publication timestamp per historical row, so `published_at` remains null: the records support captured-as-of replay only, not a claim that the price was available at its market observation time. The `/sources` registry is versioned and records research wiring separately from production approval; all providers remain unapproved for production. The new `/data-quality` endpoint joins this registry to actual SQLite coverage by source and series, reporting record versions, distinct records, latest observed/retrieved timestamps and a basic freshness indicator for global proxy price series. A source with no records is reported as `no_data_captured`, not assumed unavailable; freshness does not certify publication-time correctness, licensing or data accuracy. Iranian providers remain disabled for scoring. Passing unit tests does not certify source quality or strategy performance.
+The yfinance snapshot path now appends captured price records to SQLite using the snapshot retrieval time and checksum. Yahoo does not provide a trustworthy original publication timestamp per historical row, so `published_at` remains null: the records support captured-as-of replay only, not a claim that the price was available at its market observation time. The `/sources` registry is versioned and records research wiring separately from production approval; all providers remain unapproved for production. The new `/data-quality` endpoint joins this registry to actual SQLite coverage by source and series, reporting record versions, distinct records, latest observed/retrieved timestamps and a basic freshness indicator for global proxy price series. A source with no records is reported as `no_data_captured`, not assumed unavailable; freshness does not certify publication-time correctness, licensing or data accuracy. Iranian providers remain disabled for scoring. Source-vintage replay explicitly excludes records whose publication timestamp is unknown; captured replay can still reproduce records the system had ingested, but this does not prove original publisher availability. Passing unit tests does not certify source quality or strategy performance.
 
 
 ## Version-one scope decision
@@ -94,5 +94,5 @@ Do not imply every item is directly tradable for every user. The global universe
 2. ~~Add a versioned provider registry and data-quality status endpoint for every instrument family.~~ A versioned candidate/approval registry and `/sources` endpoint are now present; operational freshness/quality status remains pending.
 3. ~~Connect the existing price collector to the temporal store and persist raw snapshot metadata, source and retrieval time.~~ Daily adjusted-close rows now append to SQLite with source ID, retrieval time, snapshot checksum and explicit adjustment/unit metadata. Durable raw provider response retention and production database migration remain pending.
 4. Add one validated source adapter per family, beginning with the sources that have legal access, sufficient historical depth, and reliable timestamps.
-5. Build a daily data-quality report and explicit quarantine behavior before a record can affect scoring.
+5. ~~Build a daily data-quality report~~ `/data-quality` now reports captured coverage and a limited freshness heuristic. Add a scheduled report/alert and explicit scoring quarantine before new source families can affect scoring.
 6. Rebuild walk-forward baseline/ablation runs on the selected universes; do not enable model-driven live allocation before acceptance.
