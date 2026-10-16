@@ -345,6 +345,37 @@ def get_backtest(
         )
     else:
         metrics["beta_vs_spy"] = None
+
+    # Chronological untouched holdout: the strategy has fixed parameters and no
+    # parameter search. All signals remain strictly trailing, including during
+    # the holdout, but the displayed holdout metrics are separated from full history.
+    split_index = max(1, int(len(common) * 0.70))
+    holdout_start = common.index[split_index]
+    holdout_returns = strategy_returns.loc[strategy_returns.index >= holdout_start]
+    if len(holdout_returns) < 12:
+        raise HTTPException(status_code=503, detail="Not enough out-of-sample monthly returns after chronological split")
+    holdout_benchmarks = {
+        name: summarize_returns(returns.loc[returns.index >= holdout_start], 12)
+        for name, returns in benchmark_returns.items()
+    }
+    holdout_metrics = summarize_returns(holdout_returns, 12)
+    holdout_metrics["historical_var_95_monthly"] = float(max(0.0, -holdout_returns.quantile(0.05)))
+    if "SPY" in asset_returns:
+        holdout_spy = asset_returns.loc[holdout_returns.index, "SPY"]
+        variance = float(holdout_spy.var(ddof=1))
+        holdout_metrics["beta_vs_spy"] = (
+            float(holdout_returns.cov(holdout_spy) / variance) if variance > 0 else None
+        )
+    else:
+        holdout_metrics["beta_vs_spy"] = None
+    holdout = {
+        "method": "chronological 70/30 split; fixed strategy parameters; no hyperparameter search",
+        "start": holdout_returns.index.min().date().isoformat(),
+        "end": holdout_returns.index.max().date().isoformat(),
+        "periods": len(holdout_returns),
+        "metrics": holdout_metrics,
+        "benchmarks": holdout_benchmarks,
+    }
     recent = result["monthly"].tail(36)
     monthly_rows = []
     for date, row in recent.iterrows():
@@ -373,6 +404,7 @@ def get_backtest(
         "config": result["config"],
         "metrics": metrics,
         "benchmarks": benchmarks,
+        "holdout": holdout,
         "monthly": monthly_rows,
         "confidence_status": "not_calibrated",
         "warnings": [
