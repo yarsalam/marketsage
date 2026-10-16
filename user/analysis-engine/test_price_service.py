@@ -7,6 +7,9 @@ import pytest
 from fastapi import HTTPException
 
 import price_service
+from fastapi.testclient import TestClient
+
+client = TestClient(price_service.app)
 
 
 def provider_frame():
