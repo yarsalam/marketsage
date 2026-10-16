@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { MarketsService } from './markets.service';
 
 @Controller('api/markets')
@@ -23,10 +23,10 @@ export class MarketsController {
     const topNValue = Number(topN);
     const costValue = Number(transactionCostBps);
     if (!Number.isInteger(topNValue) || topNValue < 1 || topNValue > 10) {
-      throw new Error('top_n must be an integer between 1 and 10');
+      throw new BadRequestException('top_n must be an integer between 1 and 10');
     }
     if (!Number.isFinite(costValue) || costValue < 0 || costValue > 1000) {
-      throw new Error('transaction_cost_bps must be between 0 and 1000');
+      throw new BadRequestException('transaction_cost_bps must be between 0 and 1000');
     }
     return this.marketsService.getBacktest(String(topNValue), String(costValue));
   }
