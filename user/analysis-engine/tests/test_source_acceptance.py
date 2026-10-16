@@ -77,3 +77,55 @@ def test_pending_top_level_review_is_not_treated_as_passed():
     report = evaluate_acceptance("iran.codal", evidence)
     assert "rights_review" in report["failed_items"]
     assert report["evidence_complete"] is False
+
+def test_cli_prints_json_and_returns_one_when_evidence_is_complete_but_source_is_blocked(tmp_path, capsys):
+    import json
+    from source_acceptance import main
+
+    evidence = _complete_evidence("iran.tsetmc")
+    path = tmp_path / "evidence.json"
+    path.write_text(json.dumps(evidence), encoding="utf-8")
+
+    assert main([str(path)]) == 1
+    output = json.loads(capsys.readouterr().out)
+    assert output["evidence_complete"] is True
+    assert output["production_scoring_allowed"] is False
+
+
+def test_cli_returns_two_for_incomplete_evidence(tmp_path, capsys):
+    import json
+    from source_acceptance import main
+
+    path = tmp_path / "evidence.json"
+    path.write_text(json.dumps({"source_id": "iran.tsetmc"}), encoding="utf-8")
+
+    assert main([str(path)]) == 2
+    output = json.loads(capsys.readouterr().out)
+    assert output["evidence_complete"] is False
+    assert output["missing_items"]
+
+
+def test_cli_returns_three_for_malformed_json(tmp_path, capsys):
+    from source_acceptance import main
+
+    path = tmp_path / "evidence.json"
+    path.write_text("{not-json", encoding="utf-8")
+
+    assert main([str(path)]) == 3
+    output = capsys.readouterr().out
+    assert '"error"' in output
+
+
+def test_cli_returns_three_for_missing_file(tmp_path, capsys):
+    from source_acceptance import main
+
+    assert main([str(tmp_path / "missing.json")]) == 3
+    assert '"error"' in capsys.readouterr().out
+
+
+def test_cli_requires_exactly_one_argument(capsys):
+    from source_acceptance import main
+
+    assert main([]) == 3
+    assert "Usage:" in capsys.readouterr().err
+
