@@ -140,3 +140,28 @@ def test_monthly_prices_reject_stale_month_end_observations():
     monthly = price_service.completed_monthly_prices(prices)
     assert pd.isna(monthly.loc[pd.Timestamp("2024-04-30"), "SPY"])
     assert monthly.loc[pd.Timestamp("2024-03-31"), "SPY"] > 0
+
+
+def test_data_quality_reports_captured_series_and_unconfigured_sources(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    prices = pd.DataFrame(
+        {"SPY": [100.0, 101.0], "BTC-USD": [200.0, 202.0]},
+        index=pd.date_range(pd.Timestamp.now().normalize() - pd.Timedelta(days=1), periods=2, freq="D"),
+    )
+    price_service.write_daily_snapshot(prices, now, tmp_path)
+
+    response = client.get("/data-quality")
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["storage"]["store_exists"] is True
+    assert payload["storage"]["record_versions"] == 4
+    entries = {entry["source_id"]: entry for entry in payload["sources"]}
+    yahoo = entries["global.yahoo_finance.yfinance"]
+    assert yahoo["runtime_status"] == "data_present"
+    assert yahoo["runtime_series_count"] == 2
+    assert {row["series_key"] for row in yahoo["runtime_series"]} == {"SPY", "BTC-USD"}
+    assert entries["iran.tsetmc"]["runtime_status"] == "no_data_captured"
+    assert entries["iran.gold_fx"]["runtime_series_count"] == 0
+    assert any("published_at remains null" in note for note in payload["limitations"])
