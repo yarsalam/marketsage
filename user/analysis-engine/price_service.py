@@ -16,6 +16,8 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
+from source_registry import source_catalog
+from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -108,7 +110,15 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
     csv_path = target / f"prices-{day}.csv"
     meta_path = target / f"prices-{day}.json"
     if csv_path.exists() and meta_path.exists():
-        return json.loads(meta_path.read_text(encoding="utf-8"))
+        existing_metadata = json.loads(meta_path.read_text(encoding="utf-8"))
+        # Re-ingest the immutable canonical snapshot if the process restarted.
+        # The original retrieval timestamp and checksum make this idempotent.
+        canonical = pd.read_csv(csv_path, index_col="date", parse_dates=True)
+        _persist_temporal_prices(
+            canonical, datetime.fromisoformat(existing_metadata["retrieved_at"]),
+            existing_metadata["sha256"], target,
+        )
+        return existing_metadata
     csv_bytes = prices.to_csv(index_label="date", date_format="%Y-%m-%dT%H:%M:%S").encode("utf-8")
     metadata = {
         "source": "Yahoo Finance via yfinance",
@@ -125,7 +135,55 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
     meta_tmp.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     os.replace(csv_tmp, csv_path)
     os.replace(meta_tmp, meta_path)
+    _persist_temporal_prices(prices, retrieved_at, metadata["sha256"], target)
     return metadata
+
+
+def _persist_temporal_prices(
+    prices: pd.DataFrame, retrieved_at: datetime, snapshot_sha256: str, directory: Path,
+) -> int:
+    """Append each observed daily adjusted close to the point-in-time store.
+
+    Yahoo's historical response does not provide a trustworthy original publication
+    timestamp for each row. We therefore leave published_at unset: captured-as-of
+    replay is supported, but source-publication replay must not treat these prices
+    as historically known at their observation date.
+    """
+    configured_path = os.getenv("TEMPORAL_STORE_PATH")
+    store_path = Path(configured_path) if configured_path else directory / "temporal.sqlite3"
+    store = PointInTimeStore(store_path)
+    source_id = "global.yahoo_finance.yfinance"
+    count = 0
+    for timestamp, row in prices.iterrows():
+        observed = pd.Timestamp(timestamp)
+        if observed.tzinfo is None:
+            observed = observed.tz_localize("UTC")
+        else:
+            observed = observed.tz_convert("UTC")
+        observed_at = observed.to_pydatetime()
+        for symbol, value in row.items():
+            if pd.isna(value) or not np.isfinite(float(value)) or float(value) <= 0:
+                continue
+            store.append(TemporalRecord(
+                record_key=f"{symbol}:{observed.date().isoformat()}",
+                source_id=source_id,
+                market="global_proxy",
+                data_kind="adjusted_close",
+                observed_at=observed_at,
+                retrieved_at=retrieved_at,
+                published_at=None,
+                source_revision=snapshot_sha256,
+                payload={
+                    "symbol": str(symbol),
+                    "close": float(value),
+                    "currency": "USD",
+                    "price_unit": "adjusted_close_usd_per_unit",
+                    "adjustment_policy": "yfinance auto_adjust=True; Close field",
+                    "snapshot_sha256": snapshot_sha256,
+                },
+            ))
+            count += 1
+    return count
 
 
 def download_prices() -> pd.DataFrame:
@@ -239,6 +297,12 @@ def markets() -> dict:
         "assets": [{"ticker": t, "name": n} for t, n in TICKERS.items()],
         "limitations": ["No direct Tehran Stock Exchange, Iranian gold/coin, or Iranian FX feed is configured."],
     }
+
+
+@app.get("/sources")
+def sources() -> dict:
+    """Versioned source registry with explicit readiness and validation gates."""
+    return source_catalog()
 
 
 @app.get("/iran-market/providers")
