@@ -97,3 +97,64 @@ def test_source_replay_breaks_same_publication_time_ties_by_latest_capture(tmp_p
     rows = store.as_of(as_of=dt("2025-01-05T00:00:00Z"), availability_basis="source")
     assert len(rows) == 1
     assert rows[0]["payload"]["value"] == 11
+
+
+def test_captured_replay_does_not_backdate_late_ingestion(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(item(
+        key="macro:US:CPI:2025-01", value=3.1,
+        published="2025-01-02T00:00:00Z",
+        retrieved="2025-02-01T00:00:00Z",
+    ))
+
+    cutoff = dt("2025-01-31T23:59:59Z")
+    assert store.as_of(as_of=cutoff, availability_basis="captured") == []
+    source_rows = store.as_of(as_of=cutoff, availability_basis="source")
+    assert [row["payload"]["value"] for row in source_rows] == [3.1]
+
+
+def test_captured_replay_does_not_use_a_revision_retrieved_after_cutoff(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(item(
+        key="macro:US:CPI:2025-01", value=3.1,
+        published="2025-01-02T00:00:00Z",
+        retrieved="2025-01-03T00:00:00Z",
+    ))
+    store.append(item(
+        key="macro:US:CPI:2025-01", value=3.4,
+        published="2025-01-10T00:00:00Z",
+        retrieved="2025-01-11T00:00:00Z",
+    ))
+
+    rows = store.as_of(
+        as_of=dt("2025-01-05T00:00:00Z"),
+        availability_basis="captured",
+    )
+    assert len(rows) == 1
+    assert rows[0]["payload"]["value"] == 3.1
+
+
+def test_source_replay_normalizes_non_utc_publication_timestamps(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(item(
+        key="event:issuer:2025-01-02", value=7,
+        published="2025-01-02T00:00:00+03:00",
+        retrieved="2025-01-03T00:00:00Z",
+    ))
+
+    rows = store.as_of(
+        as_of=dt("2025-01-01T22:00:00Z"),
+        availability_basis="source",
+    )
+    assert len(rows) == 1
+    assert rows[0]["published_at"] == "2025-01-01T21:00:00+00:00"
+
+
+def test_same_record_key_from_different_sources_remains_separate(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(item(key="SPY:2025-01-02", source="provider-a", value=100))
+    store.append(item(key="SPY:2025-01-02", source="provider-b", value=101))
+
+    rows = store.as_of(as_of=dt("2025-01-04T00:00:00Z"))
+    assert {row["source_id"] for row in rows} == {"provider-a", "provider-b"}
+    assert {row["payload"]["value"] for row in rows} == {100, 101}
