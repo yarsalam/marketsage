@@ -1,6 +1,6 @@
 # Deployment checklist
 
-This runbook prepares the **user stack** for controlled deployment. It does not claim the full application is production-approved.
+This runbook prepares the **user research stack** for controlled deployment. It does not approve the full application or the admin service for production.
 
 ## 1. Before the server
 
@@ -38,9 +38,9 @@ cd ../..
 docker compose --env-file .env.production -f docker-compose.production.yml build
 ```
 
-The production Python image intentionally installs runtime dependencies only. Run frontend and backend builds and tests before starting services as well.
+The production Python image intentionally installs runtime dependencies only. Run frontend and backend builds and tests before starting services as well. The CI workflow also builds/tests the tracked admin workspace, but this only checks code quality; it does **not** mean the admin server has production authentication or authorization.
 
-## 4. Start the user stack
+## 4. Start the user research stack
 
 ```bash
 docker compose --env-file .env.production -f docker-compose.production.yml up -d
@@ -81,8 +81,9 @@ Never run `docker compose down -v` on a server unless deleting every attached na
 
 ## 7. Explicit launch blockers
 
-- The admin frontend source is not tracked here; `admin-panel/apps/web` is an embedded Git repository pointer.
-- The admin NestJS server is a starter skeleton. Do not expose it as a functioning admin service.
-- The analysis service is a global-proxy research prototype, not an Iran-market engine. Do not claim calibrated probabilities, minimum risk, or verified outperformance.
+- The admin UI source is tracked, but the admin NestJS server is only a starter skeleton and is not included in production Compose. Do not expose it as a functioning admin service.
+- Admin authentication, authorization, audit logging, persistence and actual admin operations remain unimplemented/unverified.
+- The analysis service is a global-proxy research prototype, not an Iran-market engine. A draft provider-contract change does not add a live Iranian data feed. Do not claim calibrated probabilities, minimum risk, or verified outperformance.
+- News, political events and sentiment are not currently ingested into production scoring. Macro variables used in research experiments are not equivalent to a publication-time-aware macro pipeline.
 - Daily snapshots are first-seen immutable provider snapshots, not certified exchange data; verify source licensing, symbol coverage, and snapshot retention/backups.
-- Deployment has not been run or validated by these changes. Review generated Compose configuration and test on the target environment before production.
+- Deployment has not been run or validated on the target server. Review generated Compose configuration and test on the target environment before production.
