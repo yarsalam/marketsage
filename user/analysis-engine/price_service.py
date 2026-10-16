@@ -205,7 +205,9 @@ def calculate_scores(monthly_prices: pd.DataFrame) -> pd.Series:
     momentum = clean.iloc[-1].div(clean.iloc[-4]).sub(1)
     volatility = returns.std(ddof=1)
     mean_return = returns.mean()
-    sharpe_like = mean_return.div(volatility.replace(0, np.nan))
+    # A zero-volatility series has undefined Sharpe; assign neutral 0 for ranking,
+    # rather than dropping an otherwise complete asset or calling it risk-free.
+    sharpe_like = mean_return.div(volatility.replace(0, np.nan)).fillna(0.0)
 
     def scale(values: pd.Series) -> pd.Series:
         values = values.replace([np.inf, -np.inf], np.nan)
