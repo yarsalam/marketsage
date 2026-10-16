@@ -1,11 +1,14 @@
-"""Research-only MarketSage API using global-market proxies, not Iran-market feeds."""
+"""Research-only MarketSage API using global proxies, not Iran-market feeds."""
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 import os
 import threading
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Literal
 
 import numpy as np
@@ -16,7 +19,7 @@ from pydantic import BaseModel, Field
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("marketsage.analysis")
-app = FastAPI(title="MarketSage Analysis API", version="0.2.0")
+app = FastAPI(title="MarketSage Analysis API", version="0.3.0")
 
 TICKERS = {
     "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana",
@@ -26,9 +29,11 @@ TICKERS = {
     "XLF": "US Financials ETF", "XLE": "US Energy ETF",
 }
 CACHE_TTL = max(60, int(os.getenv("PRICE_CACHE_TTL_SECONDS", "900")))
+DATA_SNAPSHOT_DIR = Path(os.getenv("DATA_SNAPSHOT_DIR", "/data/snapshots"))
 _cache_lock = threading.Lock()
 _cache_frame: pd.DataFrame | None = None
 _cache_time = 0.0
+_cache_metadata: dict = {"loaded": False, "stale": False}
 
 
 class AllocationItem(BaseModel):
@@ -54,32 +59,84 @@ class DecisionResponse(BaseModel):
     warnings: list[str]
 
 
+def _extract_close(data: pd.DataFrame) -> pd.DataFrame:
+    """Extract adjusted close values without guessing or filling missing observations."""
+    if data is None or data.empty:
+        raise RuntimeError("Market-data provider returned no prices")
+    if isinstance(data.columns, pd.MultiIndex):
+        close_level = next(
+            (level for level in range(data.columns.nlevels)
+             if "Close" in data.columns.get_level_values(level)),
+            None,
+        )
+        if close_level is None:
+            raise RuntimeError("Price response has no Close field")
+        prices = data.xs("Close", axis=1, level=close_level, drop_level=True).copy()
+        if isinstance(prices.columns, pd.MultiIndex):
+            raise RuntimeError("Unexpected multi-level ticker columns in price response")
+    elif len(TICKERS) == 1 and "Close" in data.columns:
+        prices = data[["Close"]].rename(columns={"Close": next(iter(TICKERS))})
+    else:
+        raise RuntimeError("Unexpected price response format; expected ticker/Close columns")
+
+    prices = prices.sort_index()
+    prices.index = pd.to_datetime(prices.index, utc=True).tz_convert(None)
+    if prices.index.has_duplicates:
+        raise RuntimeError("Market-data provider returned duplicate observations")
+    prices = prices.loc[:, ~prices.columns.duplicated()]
+    # Keep the complete expected universe. Missing observations remain missing and
+    # make the affected asset ineligible; never forward-fill provider gaps.
+    prices = prices.reindex(columns=list(TICKERS))
+    prices = prices.apply(pd.to_numeric, errors="coerce").astype(float)
+    prices = prices.replace([np.inf, -np.inf], np.nan)
+    prices = prices.mask(prices <= 0)
+    if len(prices.dropna(how="all")) < 260:
+        raise RuntimeError("Not enough usable price history")
+    if prices.dropna(how="all").empty:
+        raise RuntimeError("No usable prices after data-quality checks")
+    return prices
+
+
+def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
+                         directory: Path | None = None) -> dict:
+    """Persist the first successful provider snapshot per UTC day, atomically."""
+    target = directory or DATA_SNAPSHOT_DIR
+    target.mkdir(parents=True, exist_ok=True)
+    day = retrieved_at.astimezone(timezone.utc).date().isoformat()
+    csv_path = target / f"prices-{day}.csv"
+    meta_path = target / f"prices-{day}.json"
+    if csv_path.exists() and meta_path.exists():
+        return json.loads(meta_path.read_text(encoding="utf-8"))
+    csv_bytes = prices.to_csv(index_label="date", date_format="%Y-%m-%dT%H:%M:%S").encode("utf-8")
+    metadata = {
+        "source": "Yahoo Finance via yfinance",
+        "retrieved_at": retrieved_at.astimezone(timezone.utc).isoformat(),
+        "data_as_of": pd.Timestamp(prices.dropna(how="all").index.max()).isoformat(),
+        "symbols": list(prices.columns),
+        "rows": int(len(prices)),
+        "sha256": hashlib.sha256(csv_bytes).hexdigest(),
+        "adjustment_policy": "yfinance auto_adjust=True; Close field",
+        "snapshot_policy": "first successful fetch per UTC date; immutable once written",
+    }
+    csv_tmp, meta_tmp = csv_path.with_suffix(".csv.tmp"), meta_path.with_suffix(".json.tmp")
+    csv_tmp.write_bytes(csv_bytes)
+    meta_tmp.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    os.replace(csv_tmp, csv_path)
+    os.replace(meta_tmp, meta_path)
+    return metadata
+
+
 def download_prices() -> pd.DataFrame:
     end = (pd.Timestamp.now(tz="UTC").normalize().tz_localize(None) + pd.Timedelta(days=1))
     data = yf.download(
         list(TICKERS), start="2015-01-01", end=end.strftime("%Y-%m-%d"),
         auto_adjust=True, progress=False, threads=False, group_by="column",
     )
-    if data is None or data.empty:
-        raise RuntimeError("Market-data provider returned no prices")
-    if isinstance(data.columns, pd.MultiIndex):
-        if "Close" not in data.columns.get_level_values(0):
-            raise RuntimeError("Price response has no Close field")
-        prices = data["Close"].copy()
-    elif "Close" in data.columns:
-        prices = data[["Close"]].rename(columns={"Close": next(iter(TICKERS))})
-    else:
-        prices = data.copy()
-    prices = prices.sort_index().loc[:, ~prices.columns.duplicated()]
-    prices = prices.replace([np.inf, -np.inf], np.nan).ffill().dropna(axis=1, how="all")
-    prices = prices.dropna(how="all")
-    if prices.empty or len(prices) < 260:
-        raise RuntimeError("Not enough usable price history")
-    return prices
+    return _extract_close(data)
 
 
 def get_prices() -> pd.DataFrame:
-    global _cache_frame, _cache_time
+    global _cache_frame, _cache_time, _cache_metadata
     with _cache_lock:
         if _cache_frame is not None and time.monotonic() - _cache_time < CACHE_TTL:
             return _cache_frame.copy()
@@ -89,22 +146,53 @@ def get_prices() -> pd.DataFrame:
         logger.exception("Market data refresh failed")
         with _cache_lock:
             if _cache_frame is not None and not _cache_frame.empty:
-                logger.warning("Returning stale cached prices")
+                _cache_metadata = {**_cache_metadata, "stale": True, "last_refresh_error": type(exc).__name__}
+                logger.warning("Returning stale cached prices after refresh failure")
                 return _cache_frame.copy()
         raise HTTPException(status_code=503, detail="Market data unavailable; no decision generated.") from exc
+
+    retrieved_at = datetime.now(timezone.utc)
+    snapshot = None
+    try:
+        snapshot = write_daily_snapshot(frame, retrieved_at)
+    except OSError:
+        logger.exception("Unable to persist daily market-data snapshot")
     with _cache_lock:
         _cache_frame, _cache_time = frame, time.monotonic()
+        _cache_metadata = {
+            "loaded": True, "stale": False, "source": "Yahoo Finance via yfinance",
+            "retrieved_at": retrieved_at.isoformat(),
+            "data_as_of": pd.Timestamp(frame.dropna(how="all").index.max()).date().isoformat(),
+            "row_count": int(len(frame)),
+            "available_symbols": [symbol for symbol in frame if frame[symbol].notna().any()],
+            "snapshot_sha256": snapshot.get("sha256") if snapshot else None,
+            "snapshot_policy": "first successful fetch per UTC date",
+        }
     return frame.copy()
 
 
+def completed_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
+    """Return completed calendar months only; do not forward-fill gaps."""
+    monthly = prices.resample("ME").last()
+    if monthly.empty:
+        return monthly
+    current_month = pd.Timestamp.now(tz="UTC").tz_localize(None).to_period("M")
+    return monthly.loc[monthly.index.to_period("M") < current_month]
+
+
 def calculate_scores(monthly_prices: pd.DataFrame) -> pd.Series:
-    if len(monthly_prices) < 7:
-        raise HTTPException(status_code=503, detail="Insufficient monthly history")
-    returns = monthly_prices.pct_change(fill_method=None)
-    momentum = monthly_prices.iloc[-1].div(monthly_prices.iloc[-4]).sub(1)
-    trailing = returns.iloc[-12:]
-    volatility = trailing.std().fillna(0)
-    sharpe_like = trailing.mean().div(volatility.replace(0, np.nan)).fillna(0)
+    if len(monthly_prices) < 13:
+        raise HTTPException(status_code=503, detail="At least 13 completed monthly observations are required")
+    # Require 13 contiguous monthly closes per asset for 12 complete returns.
+    eligible = monthly_prices.iloc[-13:].notna().all(axis=0)
+    clean = monthly_prices.loc[:, eligible]
+    if clean.empty:
+        raise HTTPException(status_code=503, detail="No assets have 13 complete recent monthly observations")
+    returns = clean.pct_change(fill_method=None).iloc[-12:]
+    momentum = clean.iloc[-1].div(clean.iloc[-4]).sub(1)
+    volatility = returns.std(ddof=1)
+    mean_return = returns.mean()
+    sharpe_like = mean_return.div(volatility.replace(0, np.nan))
 
     def scale(values: pd.Series) -> pd.Series:
         values = values.replace([np.inf, -np.inf], np.nan)
@@ -113,10 +201,8 @@ def calculate_scores(monthly_prices: pd.DataFrame) -> pd.Series:
             return pd.Series(0.5, index=values.index, dtype=float)
         return (values - low) / (high - low)
 
-    return (
-        0.50 * scale(momentum) + 0.25 * scale(sharpe_like)
-        + 0.25 * (1 - scale(volatility))
-    ).replace([np.inf, -np.inf], np.nan).dropna().sort_values(ascending=False)
+    return (0.50 * scale(momentum) + 0.25 * scale(sharpe_like)
+            + 0.25 * (1 - scale(volatility))).replace([np.inf, -np.inf], np.nan).dropna().sort_values(ascending=False)
 
 
 @app.get("/health")
@@ -139,6 +225,12 @@ def markets() -> dict:
     }
 
 
+@app.get("/data-status")
+def data_status() -> dict:
+    with _cache_lock:
+        return dict(_cache_metadata)
+
+
 @app.get("/decision", response_model=DecisionResponse)
 def get_decision(
     horizon: Literal["1W", "1M", "3M", "6M"] = Query("1M"),
@@ -146,13 +238,14 @@ def get_decision(
     top_n: int = Query(5, ge=1, le=10),
 ) -> DecisionResponse:
     prices = get_prices()
-    monthly = prices.resample("ME").last().ffill().dropna(axis=1, how="all")
+    monthly = completed_monthly_prices(prices)
     scores = calculate_scores(monthly)
     selected = scores.head(min(top_n, len(scores))).index.tolist()
     if not selected:
         raise HTTPException(status_code=503, detail="No assets have sufficient valid history")
-    returns = monthly[selected].pct_change(fill_method=None).dropna(how="all").tail(12)
-    vol = float(returns.mean(axis=1).std(ddof=1) * np.sqrt(12)) if len(returns) > 1 else float("nan")
+    returns = monthly[selected].pct_change(fill_method=None).iloc[-12:]
+    portfolio_returns = returns.mean(axis=1, skipna=False).dropna()
+    vol = float(portfolio_returns.std(ddof=1) * np.sqrt(12)) if len(portfolio_returns) > 1 else float("nan")
     annualized_vol = vol if np.isfinite(vol) else None
     weight = 1 / len(selected)
     allocations = [
@@ -164,32 +257,39 @@ def get_decision(
             "lower_observed_volatility" if annualized_vol < .10 else
             "moderate_observed_volatility" if annualized_vol < .20 else
             "higher_observed_volatility")
+    with _cache_lock:
+        metadata = dict(_cache_metadata)
+    warnings = [
+        "Research ranking only; it is not a validated return forecast or personalized financial advice.",
+        "Confidence is unavailable until probabilities are calibrated out-of-sample.",
+        "The current universe uses global proxies and crypto, not direct Iranian market instruments.",
+        "Equal weights do not guarantee minimum risk; fees, slippage, taxes, liquidity and FX conversion are not modeled.",
+        "The horizon is recorded for the client; ranking still uses trailing monthly observations and is not horizon-specific.",
+    ]
+    if metadata.get("stale"):
+        warnings.append("WARNING: provider refresh failed; cached data may be stale.")
     return DecisionResponse(
-        horizon=horizon, market_scope="global_proxy",
-        source="Yahoo Finance via yfinance",
-        data_as_of=pd.Timestamp(prices.index.max()).date().isoformat(),
-        generated_at=datetime.now(timezone.utc).isoformat(),
-        allocation=allocations, capital=capital, confidence=None,
-        confidence_status="not_calibrated", risk_level=risk,
+        horizon=horizon, market_scope="global_proxy", source="Yahoo Finance via yfinance",
+        data_as_of=pd.Timestamp(prices.dropna(how="all").index.max()).date().isoformat(),
+        generated_at=datetime.now(timezone.utc).isoformat(), allocation=allocations,
+        capital=capital, confidence=None, confidence_status="not_calibrated", risk_level=risk,
         annualized_volatility=round(annualized_vol, 6) if annualized_vol is not None else None,
-        total_assets_analyzed=len(scores),
-        warnings=[
-            "Research ranking only; it is not a validated return forecast or personalized financial advice.",
-            "Confidence is unavailable until probabilities are calibrated out-of-sample.",
-            "The current universe uses global proxies and crypto, not direct Iranian market instruments.",
-            "Equal weights do not guarantee minimum risk; fees, slippage, taxes, liquidity and FX conversion are not modeled.",
-            "The horizon is recorded for the client; ranking still uses trailing monthly observations and is not horizon-specific.",
-        ],
+        total_assets_analyzed=len(scores), warnings=warnings,
     )
 
 
 @app.get("/scores")
 def get_scores() -> dict:
     prices = get_prices()
-    scores = calculate_scores(prices.resample("ME").last().ffill())
+    scores = calculate_scores(completed_monthly_prices(prices))
+    with _cache_lock:
+        metadata = dict(_cache_metadata)
     return {
-        "data_as_of": pd.Timestamp(prices.index.max()).date().isoformat(),
+        "market_scope": "global_proxy", "source": "Yahoo Finance via yfinance",
+        "data_as_of": metadata.get("data_as_of"),
         "scores": {TICKERS.get(t, t): round(float(v), 4) for t, v in scores.items()},
+        "stale": bool(metadata.get("stale")),
+        "confidence_status": "not_calibrated",
     }
 
 
