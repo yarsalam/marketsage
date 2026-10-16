@@ -48,3 +48,30 @@ def test_return_metrics_are_defined_for_benchmarks():
     metrics = summarize_returns(pd.Series([.01, -.02, .03, .01, -.01]), 12)
     assert metrics["total_return"] is not None
     assert metrics["max_drawdown"] <= 0
+
+
+def test_slippage_costs_reduce_net_returns_and_are_reported():
+    prices = make_prices()
+    no_slippage = run_monthly_momentum_backtest(
+        prices, BacktestConfig(top_n=2, momentum_months=3, volatility_months=6,
+                               transaction_cost_bps=10, slippage_bps=0)
+    )
+    with_slippage = run_monthly_momentum_backtest(
+        prices, BacktestConfig(top_n=2, momentum_months=3, volatility_months=6,
+                               transaction_cost_bps=10, slippage_bps=25)
+    )
+
+    assert with_slippage["metrics"]["total_return"] <= no_slippage["metrics"]["total_return"]
+    assert with_slippage["config"]["slippage_bps"] == 25
+    monthly = with_slippage["monthly"]
+    assert (monthly["slippage_cost"] >= 0).all()
+    assert np.allclose(
+        monthly["total_cost"],
+        monthly["transaction_cost"] + monthly["slippage_cost"],
+    )
+    assert (monthly["net_return"] <= monthly["gross_return"] + 1e-12).all()
+
+
+def test_invalid_slippage_assumption_is_rejected():
+    with pytest.raises(ValueError, match="slippage_bps"):
+        BacktestConfig(slippage_bps=1001).validate()

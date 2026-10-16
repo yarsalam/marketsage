@@ -16,6 +16,8 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
+from source_registry import source_catalog
+from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -108,7 +110,15 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
     csv_path = target / f"prices-{day}.csv"
     meta_path = target / f"prices-{day}.json"
     if csv_path.exists() and meta_path.exists():
-        return json.loads(meta_path.read_text(encoding="utf-8"))
+        existing_metadata = json.loads(meta_path.read_text(encoding="utf-8"))
+        # Re-ingest the immutable canonical snapshot if the process restarted.
+        # The original retrieval timestamp and checksum make this idempotent.
+        canonical = pd.read_csv(csv_path, index_col="date", parse_dates=True)
+        _persist_temporal_prices(
+            canonical, datetime.fromisoformat(existing_metadata["retrieved_at"]),
+            existing_metadata["sha256"], target,
+        )
+        return existing_metadata
     csv_bytes = prices.to_csv(index_label="date", date_format="%Y-%m-%dT%H:%M:%S").encode("utf-8")
     metadata = {
         "source": "Yahoo Finance via yfinance",
@@ -125,7 +135,55 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
     meta_tmp.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     os.replace(csv_tmp, csv_path)
     os.replace(meta_tmp, meta_path)
+    _persist_temporal_prices(prices, retrieved_at, metadata["sha256"], target)
     return metadata
+
+
+def _persist_temporal_prices(
+    prices: pd.DataFrame, retrieved_at: datetime, snapshot_sha256: str, directory: Path,
+) -> int:
+    """Append each observed daily adjusted close to the point-in-time store.
+
+    Yahoo's historical response does not provide a trustworthy original publication
+    timestamp for each row. We therefore leave published_at unset: captured-as-of
+    replay is supported, but source-publication replay must not treat these prices
+    as historically known at their observation date.
+    """
+    configured_path = os.getenv("TEMPORAL_STORE_PATH")
+    store_path = Path(configured_path) if configured_path else directory / "temporal.sqlite3"
+    store = PointInTimeStore(store_path)
+    source_id = "global.yahoo_finance.yfinance"
+    count = 0
+    for timestamp, row in prices.iterrows():
+        observed = pd.Timestamp(timestamp)
+        if observed.tzinfo is None:
+            observed = observed.tz_localize("UTC")
+        else:
+            observed = observed.tz_convert("UTC")
+        observed_at = observed.to_pydatetime()
+        for symbol, value in row.items():
+            if pd.isna(value) or not np.isfinite(float(value)) or float(value) <= 0:
+                continue
+            store.append(TemporalRecord(
+                record_key=f"{symbol}:{observed.date().isoformat()}",
+                source_id=source_id,
+                market="global_proxy",
+                data_kind="adjusted_close",
+                observed_at=observed_at,
+                retrieved_at=retrieved_at,
+                published_at=None,
+                source_revision=snapshot_sha256,
+                payload={
+                    "symbol": str(symbol),
+                    "close": float(value),
+                    "currency": "USD",
+                    "price_unit": "adjusted_close_usd_per_unit",
+                    "adjustment_policy": "yfinance auto_adjust=True; Close field",
+                    "snapshot_sha256": snapshot_sha256,
+                },
+            ))
+            count += 1
+    return count
 
 
 def download_prices() -> pd.DataFrame:
@@ -241,6 +299,12 @@ def markets() -> dict:
     }
 
 
+@app.get("/sources")
+def sources() -> dict:
+    """Versioned source registry with explicit readiness and validation gates."""
+    return source_catalog()
+
+
 @app.get("/iran-market/providers")
 def iran_market_providers() -> dict:
     """Report provider readiness without presenting unverified data as live."""
@@ -251,6 +315,65 @@ def iran_market_providers() -> dict:
 def data_status() -> dict:
     with _cache_lock:
         return dict(_cache_metadata)
+
+
+@app.get("/data-quality")
+def data_quality() -> dict:
+    """Combine the declared source registry with actual persisted temporal coverage."""
+    catalog = source_catalog()
+    configured_path = os.getenv("TEMPORAL_STORE_PATH")
+    store_path = Path(configured_path) if configured_path else DATA_SNAPSHOT_DIR / "temporal.sqlite3"
+    if store_path.exists():
+        temporal_summary = PointInTimeStore(store_path).summary()
+    else:
+        temporal_summary = {"record_versions": 0, "series": []}
+
+    now = datetime.now(timezone.utc)
+    series_by_source: dict[str, list[dict]] = {}
+    for series in temporal_summary["series"]:
+        latest = series.get("latest_observed_at")
+        age_days = None
+        freshness = "unknown"
+        if latest:
+            observed = datetime.fromisoformat(latest.replace("Z", "+00:00"))
+            age_days = max(0, (now - observed.astimezone(timezone.utc)).total_seconds() / 86400)
+            symbol = series.get("series_key", "")
+            max_age_days = 3 if symbol.endswith("-USD") else 7
+            freshness = "fresh" if age_days <= max_age_days else "stale"
+        series_by_source.setdefault(series["source_id"], []).append({
+            **series,
+            "observed_age_days": round(age_days, 2) if age_days is not None else None,
+            "freshness": freshness,
+            "freshness_rule": "3 days for crypto symbols ending -USD; 7 days for other global price proxies",
+        })
+
+    sources = []
+    for source in catalog["sources"]:
+        observed_series = series_by_source.get(source["source_id"], [])
+        sources.append({
+            **source,
+            "runtime_status": "data_present" if observed_series else "no_data_captured",
+            "runtime_series_count": len(observed_series),
+            "runtime_series": observed_series,
+        })
+    return {
+        "generated_at": now.isoformat(),
+        "registry_version": catalog["registry_version"],
+        "storage": {
+            "kind": "sqlite",
+            "path_configured": bool(configured_path),
+            "store_exists": store_path.exists(),
+            "record_versions": temporal_summary["record_versions"],
+            "series_count": len(temporal_summary["series"]),
+        },
+        "sources": sources,
+        "limitations": [
+            "Freshness is based on latest observed date, not provider publication time.",
+            "Yahoo historical prices do not provide a verified original publication timestamp; published_at remains null.",
+            "A registry entry with no captured records is not evidence that the provider is unavailable; it means this store has no records for it.",
+            "Provider licensing, correctness, corporate actions and point-in-time availability require separate validation.",
+        ],
+    }
 
 
 @app.get("/decision", response_model=DecisionResponse)
@@ -304,6 +427,7 @@ def get_decision(
 def get_backtest(
     top_n: int = Query(3, ge=1, le=10),
     transaction_cost_bps: float = Query(10.0, ge=0, le=1000),
+    slippage_bps: float = Query(0.0, ge=0, le=1000),
 ) -> dict:
     prices = get_prices()
     monthly = completed_monthly_prices(prices)
@@ -322,6 +446,7 @@ def get_backtest(
         momentum_months=3,
         volatility_months=12,
         transaction_cost_bps=transaction_cost_bps,
+        slippage_bps=slippage_bps,
     )
     try:
         result = run_monthly_momentum_backtest(common, config)
@@ -353,9 +478,9 @@ def get_backtest(
     else:
         metrics["beta_vs_spy"] = None
 
-    # Chronological untouched holdout: the strategy has fixed parameters and no
-    # parameter search. All signals remain strictly trailing, including during
-    # the holdout, but the displayed holdout metrics are separated from full history.
+    # Chronological holdout: the strategy has fixed parameters and no parameter search.
+    # Signals remain strictly trailing during the holdout. This single split is not
+    # a substitute for repeated walk-forward validation.
     split_index = max(1, int(len(common) * 0.70))
     holdout_start = common.index[split_index]
     holdout_returns = strategy_returns.loc[strategy_returns.index >= holdout_start]
@@ -394,6 +519,8 @@ def get_backtest(
             "drawdown": float(row["drawdown"]),
             "turnover": float(row["turnover"]),
             "transaction_cost": float(row["transaction_cost"]),
+            "slippage_cost": float(row["slippage_cost"]),
+            "total_cost": float(row["total_cost"]),
             "selected_assets": row["selected_assets"],
         }
         for name, returns in benchmark_returns.items():
@@ -418,9 +545,9 @@ def get_backtest(
             "Research-only historical simulation; not a forecast or personalized advice.",
             "Assets are restricted to those with complete monthly observations over the common test window.",
             "Equal-weight and 60/40 benchmarks are monthly rebalanced and exclude transaction costs; SPY buy-and-hold is not rebalanced.",
-            "Transaction costs are sensitivity assumptions, not calibrated broker fees or market impact.",
+            "Transaction costs and slippage are sensitivity assumptions, not calibrated broker fees or market impact.",
             "Taxes, liquidity, slippage, FX conversion, survivorship/delistings, and execution are not modeled.",
-            "No parameter tuning or untouched holdout test has been performed.",
+            "The holdout is one chronological split; repeated walk-forward validation and parameter-search correction have not been performed.",
         ] + (["Provider refresh failed; cached prices may be stale."] if metadata.get("stale") else []),
     }
 
