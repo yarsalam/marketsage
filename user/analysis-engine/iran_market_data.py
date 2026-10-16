@@ -173,6 +173,11 @@ def validate_points(
             )
         if not isfinite(point.close) or point.close <= 0:
             raise DataQualityError("Close must be a finite positive number")
+        if point.market == "iran_equities" and not point.adjusted:
+            raise DataQualityError(
+                "Iranian equity scoring requires adjusted prices until a separate "
+                "corporate-action-aware return pipeline is implemented"
+            )
         if point.volume is not None and (
             not isfinite(point.volume) or point.volume < 0
         ):
