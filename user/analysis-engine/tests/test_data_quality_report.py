@@ -96,3 +96,26 @@ def test_cli_returns_configuration_error_without_url(monkeypatch, capsys):
 
     assert report.main([]) == 3
     assert "MARKET_SAGE_DATA_QUALITY_URL" in capsys.readouterr().err
+
+def test_cli_fetch_failure_returns_three_and_preserves_existing_report(monkeypatch, tmp_path, capsys):
+    from urllib.error import URLError
+
+    monkeypatch.setattr(report, "fetch_payload", lambda url, timeout: (_ for _ in ()).throw(URLError("offline")))
+    output = tmp_path / "quality.json"
+    output.write_text('{"status":"previous"}', encoding="utf-8")
+
+    code = report.main(["--url", "http://example.test/data-quality", "--output", str(output)])
+
+    assert code == 3
+    assert json.loads(output.read_text(encoding="utf-8")) == {"status": "previous"}
+    assert "URLError" in capsys.readouterr().err
+
+
+def test_cli_rejects_invalid_payload_without_writing_report(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(report, "fetch_payload", lambda url, timeout: {"unexpected": []})
+    output = tmp_path / "quality.json"
+
+    assert report.main(["--url", "http://example.test/data-quality", "--output", str(output)]) == 3
+    assert not output.exists()
+    assert "ValueError" in capsys.readouterr().err
+
