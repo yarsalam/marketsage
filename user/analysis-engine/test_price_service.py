@@ -8,6 +8,7 @@ from fastapi import HTTPException
 
 import price_service
 from fastapi.testclient import TestClient
+from temporal_data import PointInTimeStore
 
 client = TestClient(price_service.app)
 
@@ -66,6 +67,41 @@ def test_daily_snapshot_has_checksum_and_is_immutable(tmp_path):
     saved = json.loads((tmp_path / "prices-2024-01-05.json").read_text())
     assert saved["rows"] == 4
     assert saved["sha256"] == metadata["sha256"]
+
+
+def test_daily_snapshot_appends_prices_to_temporal_store_idempotently(tmp_path):
+    dates = pd.date_range("2024-01-01", periods=3, freq="D")
+    prices = pd.DataFrame({"SPY": [100.0, 101.0, 102.0], "GLD": [50.0, np.nan, 52.0]}, index=dates)
+    retrieved_at = datetime(2024, 1, 5, 10, tzinfo=timezone.utc)
+
+    price_service.write_daily_snapshot(prices, retrieved_at, tmp_path)
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    first = store.as_of(as_of=datetime(2024, 1, 6, tzinfo=timezone.utc), market="global_proxy")
+    assert len(first) == 5
+    spy_day_one = next(row for row in first if row["record_key"] == "SPY:2024-01-01")
+    assert spy_day_one["source_id"] == "global.yahoo_finance.yfinance"
+    assert spy_day_one["payload"]["close"] == 100.0
+    assert spy_day_one["published_at"] is None
+    assert spy_day_one["retrieved_at"] == retrieved_at.isoformat()
+
+    # Restart/retry uses the canonical snapshot and original retrieval time.
+    price_service.write_daily_snapshot(prices * 2, retrieved_at, tmp_path)
+    second = store.as_of(as_of=datetime(2024, 1, 6, tzinfo=timezone.utc), market="global_proxy")
+    assert len(second) == 5
+    assert next(row for row in second if row["record_key"] == "SPY:2024-01-01")["payload"]["close"] == 100.0
+
+
+def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates():
+    response = client.get("/sources")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["registry_version"]
+    entries = {entry["source_id"]: entry for entry in payload["sources"]}
+    assert entries["global.yahoo_finance.yfinance"]["used_by_research_engine"] is True
+    assert entries["global.yahoo_finance.yfinance"]["approved_for_production"] is False
+    assert entries["iran.tsetmc"]["approved_for_production"] is False
+    assert entries["iran.gold_fx"]["status"] == "provider_not_selected"
+    assert entries["crypto.exchange_specific"]["approved_for_production"] is False
 
 
 def test_backtest_endpoint_uses_real_calculation_and_reports_benchmarks(monkeypatch):
