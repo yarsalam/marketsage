@@ -14,6 +14,7 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import yfinance as yf
+from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -276,6 +277,99 @@ def get_decision(
         annualized_volatility=round(annualized_vol, 6) if annualized_vol is not None else None,
         total_assets_analyzed=len(scores), warnings=warnings,
     )
+
+
+@app.get("/backtest")
+def get_backtest(
+    top_n: int = Query(3, ge=1, le=10),
+    transaction_cost_bps: float = Query(10.0, ge=0, le=1000),
+) -> dict:
+    prices = get_prices()
+    monthly = completed_monthly_prices(prices)
+    present = [column for column in monthly if monthly[column].notna().any()]
+    if not present:
+        raise HTTPException(status_code=503, detail="No monthly market prices are available")
+    first_dates = [monthly[column].first_valid_index() for column in present]
+    common_start = max(date for date in first_dates if date is not None)
+    common = monthly.loc[monthly.index >= common_start, present]
+    complete = [column for column in common if common[column].notna().all()]
+    common = common[complete]
+    if len(common) < 36 or common.shape[1] < 2:
+        raise HTTPException(status_code=503, detail="At least 36 complete common monthly observations and two assets are required")
+    config = BacktestConfig(
+        top_n=min(top_n, common.shape[1]),
+        momentum_months=3,
+        volatility_months=12,
+        transaction_cost_bps=transaction_cost_bps,
+    )
+    try:
+        result = run_monthly_momentum_backtest(common, config)
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail=f"Backtest data-quality gate failed: {exc}") from exc
+
+    strategy_returns = result["monthly"]["net_return"]
+    asset_returns = common.pct_change(fill_method=None).loc[strategy_returns.index]
+    benchmark_returns = {"equal_weight_monthly_rebalanced": asset_returns.mean(axis=1)}
+    if "SPY" in asset_returns:
+        benchmark_returns["SPY_buy_and_hold"] = asset_returns["SPY"]
+    if "SPY" in asset_returns and "GLD" in asset_returns:
+        benchmark_returns["60_40_SPY_GLD_monthly_rebalanced"] = (
+            0.6 * asset_returns["SPY"] + 0.4 * asset_returns["GLD"]
+        )
+    benchmarks = {
+        name: summarize_returns(returns, 12)
+        for name, returns in benchmark_returns.items()
+    }
+    metrics = dict(result["metrics"])
+    metrics["historical_var_95_monthly"] = float(max(0.0, -strategy_returns.quantile(0.05)))
+    if "SPY" in asset_returns:
+        benchmark = asset_returns["SPY"]
+        variance = float(benchmark.var(ddof=1))
+        metrics["beta_vs_spy"] = (
+            float(strategy_returns.cov(benchmark) / variance)
+            if variance > 0 else None
+        )
+    else:
+        metrics["beta_vs_spy"] = None
+    recent = result["monthly"].tail(36)
+    monthly_rows = []
+    for date, row in recent.iterrows():
+        item = {
+            "date": date.date().isoformat(),
+            "gross_return": float(row["gross_return"]),
+            "net_return": float(row["net_return"]),
+            "equity": float(row["equity"]),
+            "drawdown": float(row["drawdown"]),
+            "turnover": float(row["turnover"]),
+            "transaction_cost": float(row["transaction_cost"]),
+            "selected_assets": row["selected_assets"],
+        }
+        for name, returns in benchmark_returns.items():
+            item[name + "_return"] = float(returns.loc[date])
+        monthly_rows.append(item)
+    with _cache_lock:
+        metadata = dict(_cache_metadata)
+    return {
+        "market_scope": "global_proxy",
+        "source": "Yahoo Finance via yfinance",
+        "data_as_of": metadata.get("data_as_of"),
+        "start": result["start"],
+        "end": result["end"],
+        "periods": result["periods"],
+        "config": result["config"],
+        "metrics": metrics,
+        "benchmarks": benchmarks,
+        "monthly": monthly_rows,
+        "confidence_status": "not_calibrated",
+        "warnings": [
+            "Research-only historical simulation; not a forecast or personalized advice.",
+            "Assets are restricted to those with complete monthly observations over the common test window.",
+            "Equal-weight and 60/40 benchmarks are monthly rebalanced and exclude transaction costs; SPY buy-and-hold is not rebalanced.",
+            "Transaction costs are sensitivity assumptions, not calibrated broker fees or market impact.",
+            "Taxes, liquidity, slippage, FX conversion, survivorship/delistings, and execution are not modeled.",
+            "No parameter tuning or untouched holdout test has been performed.",
+        ] + (["Provider refresh failed; cached prices may be stale."] if metadata.get("stale") else []),
+    }
 
 
 @app.get("/scores")
