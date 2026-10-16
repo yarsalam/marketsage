@@ -165,3 +165,19 @@ def test_data_quality_reports_captured_series_and_unconfigured_sources(tmp_path,
     assert entries["iran.tsetmc"]["runtime_status"] == "no_data_captured"
     assert entries["iran.gold_fx"]["runtime_series_count"] == 0
     assert any("published_at remains null" in note for note in payload["limitations"])
+
+
+def test_extract_close_masks_non_positive_and_non_finite_prices():
+    raw = provider_frame()
+    raw.loc[raw.index[1], ("Close", "BTC-USD")] = 0
+    raw.loc[raw.index[2], ("Close", "ETH-USD")] = -1
+    raw.loc[raw.index[3], ("Close", "SOL-USD")] = np.inf
+    raw.loc[raw.index[4], ("Close", "BTC-USD")] = -np.inf
+
+    result = price_service._extract_close(raw)
+
+    assert pd.isna(result.loc[raw.index[1], "BTC-USD"])
+    assert pd.isna(result.loc[raw.index[2], "ETH-USD"])
+    assert pd.isna(result.loc[raw.index[3], "SOL-USD"])
+    assert pd.isna(result.loc[raw.index[4], "BTC-USD"])
+    assert (result.stack(future_stack=True).dropna() > 0).all()

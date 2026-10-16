@@ -129,3 +129,15 @@ def test_cli_requires_exactly_one_argument(capsys):
     assert main([]) == 3
     assert "Usage:" in capsys.readouterr().err
 
+
+
+def test_unit_reconciliation_failure_blocks_source_acceptance():
+    evidence = _complete_evidence("iran.tsetmc")
+    evidence["unit_reconciliation"] = "failed"
+
+    report = evaluate_acceptance("iran.tsetmc", evidence)
+
+    assert "unit_reconciliation" in report["failed_items"]
+    assert report["evidence_complete"] is False
+    assert report["production_scoring_allowed"] is False
+    assert report["production_scoring_gate"]["eligible_for_production_scoring"] is False
