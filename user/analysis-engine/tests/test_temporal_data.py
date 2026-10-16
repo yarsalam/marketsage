@@ -114,3 +114,35 @@ def test_historical_source_vintages_can_be_replayed_after_later_download(tmp_pat
     feb = store.as_of(as_of=dt("2024-02-20T00:00:00Z"), availability_basis="source")
     assert jan[0]["payload"]["value"] == 3.1
     assert feb[0]["payload"]["value"] == 3.2
+
+
+
+def test_summary_reports_series_coverage_without_exposing_payloads(tmp_path):
+    store = PointInTimeStore(tmp_path / "pit.sqlite")
+    store.append(TemporalRecord(
+        record_key="SPY:2024-01-01",
+        source_id="global.yahoo_finance.yfinance",
+        market="global_proxy",
+        data_kind="adjusted_close",
+        observed_at=dt("2024-01-01T00:00:00Z"),
+        retrieved_at=dt("2024-01-02T00:00:00Z"),
+        payload={"symbol": "SPY", "close": 100.0},
+    ))
+    store.append(TemporalRecord(
+        record_key="SPY:2024-01-01",
+        source_id="global.yahoo_finance.yfinance",
+        market="global_proxy",
+        data_kind="adjusted_close",
+        observed_at=dt("2024-01-01T00:00:00Z"),
+        retrieved_at=dt("2024-01-03T00:00:00Z"),
+        payload={"symbol": "SPY", "close": 101.0},
+    ))
+    summary = store.summary()
+    assert summary["record_versions"] == 2
+    assert len(summary["series"]) == 1
+    series = summary["series"][0]
+    assert series["series_key"] == "SPY"
+    assert series["distinct_records"] == 1
+    assert series["stored_versions"] == 2
+    assert series["latest_retrieved_at"] == "2024-01-03T00:00:00+00:00"
+    assert "payload" not in series
