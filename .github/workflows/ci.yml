@@ -65,3 +65,15 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ""
         run: pnpm build
+
+  production-images:
+    needs: [analysis, user-backend, user-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production Compose configuration
+        run: |
+          cp .env.production.example .env.production
+          docker compose --env-file .env.production -f docker-compose.production.yml config -q
+      - name: Build all production images
+        run: docker compose --env-file .env.production -f docker-compose.production.yml build
