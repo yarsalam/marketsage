@@ -1,6 +1,6 @@
 # MarketSage point-in-time data foundation and source selection
 
-Status: implementation step 1. The FRED/ALFRED adapter now ingests historical macro vintages into the point-in-time store. It is not yet scheduled as a production collector, connected to the decision scoring path, or deployed to a persistent database service.
+Status: implementation steps 1–3 are in progress. The FRED/ALFRED adapter ingests historical macro vintages into the point-in-time store; the existing global-proxy price snapshot now appends daily adjusted-close records to SQLite, and `/sources` exposes a versioned candidate/approval registry. These are local research foundations, not a scheduled production collector or production database service.
 
 ## Objective
 
@@ -66,7 +66,7 @@ Report net returns, benchmark-relative returns, volatility, Sharpe/Sortino with 
 
 ## Current limitation
 
-The new SQLite module is not yet wired to the yfinance snapshot path or any macro/news/event collector. Iranian providers remain disabled for scoring. Passing unit tests for this primitive does not certify source quality or strategy performance.
+The yfinance snapshot path now appends captured price records to SQLite using the snapshot retrieval time and checksum. Yahoo does not provide a trustworthy original publication timestamp per historical row, so `published_at` remains null: the records support captured-as-of replay only, not a claim that the price was available at its market observation time. The `/sources` registry is versioned and records research wiring separately from production approval; all providers remain unapproved for production. Iranian providers remain disabled for scoring. Passing unit tests does not certify source quality or strategy performance.
 
 
 ## Version-one scope decision
@@ -91,8 +91,8 @@ Do not imply every item is directly tradable for every user. The global universe
 
 ### Implementation order after this PR
 1. Stabilize and test the temporal store plus the FRED/ALFRED vintage adapter.
-2. Add a versioned provider registry and data-quality status endpoint for every instrument family.
-3. Connect the existing price collector to the temporal store and persist raw snapshot metadata, source and retrieval time.
+2. ~~Add a versioned provider registry and data-quality status endpoint for every instrument family.~~ A versioned candidate/approval registry and `/sources` endpoint are now present; operational freshness/quality status remains pending.
+3. ~~Connect the existing price collector to the temporal store and persist raw snapshot metadata, source and retrieval time.~~ Daily adjusted-close rows now append to SQLite with source ID, retrieval time, snapshot checksum and explicit adjustment/unit metadata. Durable raw provider response retention and production database migration remain pending.
 4. Add one validated source adapter per family, beginning with the sources that have legal access, sufficient historical depth, and reliable timestamps.
 5. Build a daily data-quality report and explicit quarantine behavior before a record can affect scoring.
 6. Rebuild walk-forward baseline/ablation runs on the selected universes; do not enable model-driven live allocation before acceptance.
