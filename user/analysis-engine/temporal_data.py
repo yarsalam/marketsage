@@ -120,11 +120,25 @@ class PointInTimeStore:
         as_of: datetime,
         market: str | None = None,
         data_kind: str | None = None,
+        availability_basis: str = "captured",
     ) -> list[dict[str, Any]]:
-        """Return latest version known by as_of, excluding not-yet-published facts."""
+        """Return latest version available at a cutoff.
+
+        captured reproduces what this system had ingested by the cutoff.
+        source replays historical publisher vintages downloaded later and
+        therefore requires a trustworthy published_at timestamp.
+        """
+        if availability_basis not in {"captured", "source"}:
+            raise ValueError("availability_basis must be 'captured' or 'source'")
         cutoff = _utc_iso(as_of)
-        filters = ["retrieved_at <= ?", "(published_at IS NULL OR published_at <= ?)"]
-        params: list[Any] = [cutoff, cutoff]
+        if availability_basis == "captured":
+            filters = ["retrieved_at <= ?", "(published_at IS NULL OR published_at <= ?)"]
+            params: list[Any] = [cutoff, cutoff]
+            revision_order = "retrieved_at DESC, id DESC"
+        else:
+            filters = ["published_at IS NOT NULL", "published_at <= ?"]
+            params = [cutoff]
+            revision_order = "published_at DESC, retrieved_at DESC, id DESC"
         if market is not None:
             filters.append("market = ?")
             params.append(market)
@@ -138,7 +152,7 @@ class PointInTimeStore:
                     SELECT temporal_records.*,
                         ROW_NUMBER() OVER (
                             PARTITION BY record_key, source_id
-                            ORDER BY retrieved_at DESC, id DESC
+                            ORDER BY {revision_order}
                         ) AS revision_rank
                     FROM temporal_records
                     WHERE {where}
