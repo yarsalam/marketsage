@@ -141,3 +141,12 @@ def test_unit_reconciliation_failure_blocks_source_acceptance():
     assert report["evidence_complete"] is False
     assert report["production_scoring_allowed"] is False
     assert report["production_scoring_gate"]["eligible_for_production_scoring"] is False
+
+
+def test_complete_evidence_never_approves_any_registered_source():
+    for source in SOURCES:
+        report = evaluate_acceptance(source.source_id, _complete_evidence(source.source_id))
+
+        assert report["evidence_complete"] is True, source.source_id
+        assert report["production_scoring_allowed"] is False, source.source_id
+        assert report["production_scoring_gate"]["eligible_for_production_scoring"] is False, source.source_id
