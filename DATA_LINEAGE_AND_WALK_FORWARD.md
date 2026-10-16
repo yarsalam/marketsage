@@ -1,6 +1,6 @@
 # MarketSage point-in-time data foundation and source selection
 
-Status: implementation step 1; not yet wired into live collectors, production scoring, or a database service.
+Status: implementation step 1. The FRED/ALFRED adapter now ingests historical macro vintages into the point-in-time store. It is not yet scheduled as a production collector, connected to the decision scoring path, or deployed to a persistent database service.
 
 ## Objective
 
@@ -12,7 +12,7 @@ Every feature used by a decision must be reproducible using only information tha
 - `source_revision` and `payload_sha256`: provider revision identifier where available and a content fingerprint.
 - Revisions are appended, never overwritten. An as-of query chooses the newest version that had been retrieved and published by the requested decision time.
 
-This is a storage primitive, not a claim that all provider payloads already enter it. Live adapters, source licensing review, raw payload retention, migration/backup, and API integration are separate acceptance gates.
+The FRED/ALFRED adapter in `fred_adapter.py` is the first concrete adapter. It requests FRED observation vintages, records the observation date, source vintage date and retrieval time, and appends revisions. Because the API's vintage dates are day-level rather than exact intraday release timestamps, it conservatively marks the value available at 23:59:59 UTC on that date. This is intentionally cautious, but it is not a substitute for an exact publisher release timestamp. The adapter is not yet scheduled as a collector or connected to scoring. Other live adapters, source licensing review, raw payload retention, migration/backup and API integration remain separate gates.
 
 ## Initial source registry (candidate sources, not all approved for scoring)
 
@@ -67,3 +67,32 @@ Report net returns, benchmark-relative returns, volatility, Sharpe/Sortino with 
 ## Current limitation
 
 The new SQLite module is not yet wired to the yfinance snapshot path or any macro/news/event collector. Iranian providers remain disabled for scoring. Passing unit tests for this primitive does not certify source quality or strategy performance.
+
+
+## Version-one scope decision
+
+The first research release covers **Iran and global markets as separate investable universes**, across equities, gold, FX, fixed income/bonds and crypto. A common data lineage and scenario layer can relate them, but raw series, venue, quote currency, instrument type, fees, and tradability must remain distinct.
+
+### Universe A — Iran
+- Equities and exchange-traded funds (equity, mixed, fixed-income, and gold funds).
+- Gold/coin prices, with separate gram/coin definitions and units.
+- Official and free-market FX as separate series.
+- Local fixed-income/fund returns and available rate proxies.
+- Crypto pairs on each selected Iranian exchange, separate from global USD pairs.
+
+### Universe B — Global
+- Equity indices and liquid market proxies/ETFs.
+- Gold and oil benchmarks; distinguish futures, spot proxies, and ETF total-return behavior.
+- Government-bond/rate series and yield curves.
+- FX pairs and broad USD indicators.
+- Crypto spot prices and liquidity from named venues or a clearly defined aggregate.
+
+Do not imply every item is directly tradable for every user. The global universe can provide context for an Iran decision without being treated as an Iranian brokerage universe.
+
+### Implementation order after this PR
+1. Stabilize and test the temporal store plus the FRED/ALFRED vintage adapter.
+2. Add a versioned provider registry and data-quality status endpoint for every instrument family.
+3. Connect the existing price collector to the temporal store and persist raw snapshot metadata, source and retrieval time.
+4. Add one validated source adapter per family, beginning with the sources that have legal access, sufficient historical depth, and reliable timestamps.
+5. Build a daily data-quality report and explicit quarantine behavior before a record can affect scoring.
+6. Rebuild walk-forward baseline/ablation runs on the selected universes; do not enable model-driven live allocation before acceptance.
