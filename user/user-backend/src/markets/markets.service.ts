@@ -30,7 +30,7 @@ export class MarketsService {
   }
 
   getBacktest(topN = '3', transactionCostBps = '10') {
-    return this.getAnalysis('/backtest');
+    return this.getAnalysis(`/backtest?top_n=${encodeURIComponent(topN)}&transaction_cost_bps=${encodeURIComponent(transactionCostBps)}`);
   }
 
   getDataStatus() {
