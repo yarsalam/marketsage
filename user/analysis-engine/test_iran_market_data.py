@@ -52,6 +52,7 @@ def test_valid_point_is_preserved_without_currency_conversion():
     {"retrieved_at": datetime(2026, 10, 16, 8)},
     {"observed_at": date(2026, 10, 17)},
     {"volume": -1},
+    {"adjusted": False},
 ])
 def test_invalid_points_fail_closed(overrides):
     with pytest.raises(DataQualityError):
