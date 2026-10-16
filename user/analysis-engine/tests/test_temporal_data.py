@@ -44,7 +44,7 @@ def test_as_of_uses_only_versions_already_retrieved(tmp_path):
 
 def test_unpublished_future_release_is_not_visible(tmp_path):
     store = PointInTimeStore(tmp_path / "pit.sqlite")
-    store.append(record(retrieved="2024-01-02T08:00:00Z", value=3.1,
+    store.append(record(retrieved="2024-01-02T09:01:00Z", value=3.1,
                         published="2024-01-02T09:00:00Z"))
     assert store.as_of(as_of=dt("2024-01-02T08:30:00Z")) == []
 
