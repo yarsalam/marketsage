@@ -83,7 +83,7 @@ PROVIDERS: tuple[ProviderDefinition, ...] = (
         market="crypto_global",
         label="رمزارز جهانی",
         status="existing_global_provider",
-        enabled_for_scoring=False,
+        enabled_for_scoring=True,
         source="Yahoo Finance via yfinance",
         notes=(
             "Existing prototype feed only; separate from local Iranian exchange prices. "
