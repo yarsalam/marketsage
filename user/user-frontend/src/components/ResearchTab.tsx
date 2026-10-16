@@ -9,6 +9,11 @@ type Backtest = {
   start: string; end: string; periods: number; data_as_of: string;
   metrics: Record<string, number | null>;
   benchmarks: Record<string, Record<string, number | null>>;
+  holdout?: {
+    method: string; start: string; end: string; periods: number;
+    metrics: Record<string, number | null>;
+    benchmarks: Record<string, Record<string, number | null>>;
+  };
   monthly: Array<Record<string, string | number>>;
   warnings: string[];
   confidence_status: string;
@@ -98,7 +103,8 @@ export function ResearchTab({ activeTab, onNavigate }: { activeTab: TabId; onNav
   }
 
   const result = data as Backtest;
-  const m = result.metrics ?? {};
+  const m = result.holdout?.metrics ?? result.metrics ?? {};
+  const shownBenchmarks = result.holdout?.benchmarks ?? result.benchmarks ?? {};
   const metricCards: Array<[string, number | null | undefined, boolean]> = [
     ["بازده کل خالص", m.total_return, true],
     ["CAGR", m.cagr, true],
@@ -110,11 +116,12 @@ export function ResearchTab({ activeTab, onNavigate }: { activeTab: TabId; onNav
     ["میانگین گردش ماهانه", m.average_monthly_turnover, false],
   ];
   return <Panel title={activeTab === "risk" ? "مرکز ریسک — بک‌تست تاریخی" : "آزمایشگاه بک‌تست"}>
-    <Notice>دوره: {result.start} تا {result.end} · {result.periods} ماه بازده · داده تا {result.data_as_of ?? "نامشخص"}<br />این شبیه‌سازی پژوهشی است؛ کارمزدها تخمینی‌اند و نتایج خارج از نمونه مستقل هنوز تأیید نشده‌اند.</Notice>
+    <Notice>کل تاریخچه: {result.start} تا {result.end} · {result.periods} ماه بازده · داده تا {result.data_as_of ?? "نامشخص"}<br />{result.holdout ? `دوره آزمون زمانی جداگانه (۳۰٪ انتهایی): ${result.holdout.start} تا ${result.holdout.end} · ${result.holdout.periods} ماه` : "دوره آزمون جداگانه در دسترس نیست."}<br />اعداد کارت‌ها و جدول معیارها مربوط به دوره آزمون جداگانه‌اند. این شبیه‌سازی پژوهشی است؛ هزینه‌ها تخمینی‌اند و این آزمون جایگزین اعتبارسنجی مستقل در بازار واقعی نیست.</Notice>
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{metricCards.map(([label, value, percent]) => <article key={label} className="rounded-xl border border-border bg-surface p-4"><p className="text-xs text-text-secondary">{label}</p><p className="mt-2 text-xl font-bold">{percent ? formatPercent(value) : formatMetric(value)}</p></article>)}</div>
     <h3 className="font-bold">مقایسه با معیارها (قبل از هزینه معاملات معیار)</h3>
-    <div className="overflow-x-auto rounded-xl border border-border"><table className="w-full text-right text-sm"><thead className="bg-surface"><tr><th className="p-3">معیار</th><th className="p-3">بازده کل</th><th className="p-3">CAGR</th><th className="p-3">افت حداکثر</th><th className="p-3">نوسان</th></tr></thead><tbody>{Object.entries(result.benchmarks ?? {}).map(([name, metrics]) => <tr key={name} className="border-t border-border"><td className="p-3">{name.replaceAll("_", " ")}</td><td className="p-3">{formatPercent(metrics.total_return)}</td><td className="p-3">{formatPercent(metrics.cagr)}</td><td className="p-3">{formatPercent(metrics.max_drawdown)}</td><td className="p-3">{formatPercent(metrics.annualized_volatility)}</td></tr>)}</tbody></table></div>
+    <div className="overflow-x-auto rounded-xl border border-border"><table className="w-full text-right text-sm"><thead className="bg-surface"><tr><th className="p-3">معیار</th><th className="p-3">بازده کل</th><th className="p-3">CAGR</th><th className="p-3">افت حداکثر</th><th className="p-3">نوسان</th></tr></thead><tbody>{Object.entries(shownBenchmarks).map(([name, metrics]) => <tr key={name} className="border-t border-border"><td className="p-3">{name.replaceAll("_", " ")}</td><td className="p-3">{formatPercent(metrics.total_return)}</td><td className="p-3">{formatPercent(metrics.cagr)}</td><td className="p-3">{formatPercent(metrics.max_drawdown)}</td><td className="p-3">{formatPercent(metrics.annualized_volatility)}</td></tr>)}</tbody></table></div>
     {activeTab === "backtest" && <><h3 className="font-bold">۳۶ دوره اخیر</h3><div className="max-h-96 overflow-auto rounded-xl border border-border"><table className="w-full text-right text-xs"><thead className="sticky top-0 bg-surface"><tr><th className="p-2">تاریخ</th><th className="p-2">بازده خالص</th><th className="p-2">افت سرمایه</th><th className="p-2">گردش</th><th className="p-2">دارایی‌های منتخب</th></tr></thead><tbody>{result.monthly?.map((row) => <tr key={String(row.date)} className="border-t border-border"><td className="p-2">{row.date}</td><td className="p-2">{formatPercent(Number(row.net_return))}</td><td className="p-2">{formatPercent(Number(row.drawdown))}</td><td className="p-2">{formatMetric(Number(row.turnover))}</td><td className="p-2">{row.selected_assets}</td></tr>)}</tbody></table></div></>}
+    {result.holdout?.method && <p className="text-xs text-text-secondary">روش آزمون: {result.holdout.method}</p>}
     <ul className="list-disc space-y-1 pr-5 text-xs text-text-secondary">{result.warnings?.map((warning) => <li key={warning}>{warning}</li>)}</ul>
   </Panel>;
 }
