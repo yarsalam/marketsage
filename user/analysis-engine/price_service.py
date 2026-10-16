@@ -380,7 +380,8 @@ def get_scores() -> dict:
         metadata = dict(_cache_metadata)
     return {
         "market_scope": "global_proxy", "source": "Yahoo Finance via yfinance",
-        "data_as_of": metadata.get("data_as_of"),
+        "signal_as_of": pd.Timestamp(completed_monthly_prices(prices).index.max()).date().isoformat(),
+        "provider_data_as_of": metadata.get("data_as_of"),
         "scores": {TICKERS.get(t, t): round(float(v), 4) for t, v in scores.items()},
         "stale": bool(metadata.get("stale")),
         "confidence_status": "not_calibrated",
