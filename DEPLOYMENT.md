@@ -8,7 +8,7 @@ This runbook prepares the **user stack** for controlled deployment. It does not 
 - Install Docker Engine and the Docker Compose plugin.
 - Point the user-facing DNS name to the server and issue TLS certificates.
 - Never store production secrets in Git.
-- Plan off-server backups before introducing persistent user data.
+- Plan off-server backups before introducing persistent user data. The `market_data` Docker volume contains first-seen daily market-data snapshots and manifests; include it in backup/retention policy, but do not treat it as a substitute for user-data backups.
 
 ## 2. Fetch and inspect
 
@@ -50,7 +50,7 @@ curl -fsS http://127.0.0.1:4500/health
 curl -fsS 'http://127.0.0.1:4500/api/decision?horizon=1M'
 ```
 
-The analysis service has no published host port. Backend and frontend bind to loopback only, so a host Nginx/Caddy reverse proxy can reach them without exposing them directly to the public network.
+The analysis service has no published host port. Backend and frontend bind to loopback only, so a host Nginx/Caddy reverse proxy can reach them without exposing them directly to the public network. The analysis service persists the first successful price snapshot per UTC day under the named `market_data` volume, with a JSON manifest containing retrieval time, source, symbols, and SHA-256 checksum.
 
 ## 5. Reverse proxy routing
 
@@ -66,7 +66,7 @@ Validate proxy config and HTTPS before opening public access. Domain names and c
 
 - Backend `GET /health` returns 200.
 - `GET /api/decision?horizon=1M` returns a valid response or a clear 503 if market data is unavailable; it must not fabricate a portfolio.
-- Browser requests use the public same-origin `/api` path.
+- Browser requests use the public same-origin `/api` path. The backend routes market metadata, momentum scores, and backtest output under `/api/markets`.
 - Verify builds, Python tests, CORS, health checks, and TLS.
 - Ensure logs contain no tokens, passwords, or environment dumps.
 - Add monitoring, log rotation, OS updates, and off-server backups before storing user data.
@@ -78,4 +78,5 @@ Never run `docker compose down -v` on a server unless deleting every attached na
 - The admin frontend source is not tracked here; `admin-panel/apps/web` is an embedded Git repository pointer.
 - The admin NestJS server is a starter skeleton. Do not expose it as a functioning admin service.
 - The analysis service is a global-proxy research prototype, not an Iran-market engine. Do not claim calibrated probabilities, minimum risk, or verified outperformance.
+- Daily snapshots are first-seen immutable provider snapshots, not certified exchange data; verify source licensing, symbol coverage, and snapshot retention/backups.
 - Deployment has not been run or validated by these changes. Review generated Compose configuration and test on the target environment before production.
