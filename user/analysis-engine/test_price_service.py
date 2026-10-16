@@ -63,3 +63,31 @@ def test_daily_snapshot_has_checksum_and_is_immutable(tmp_path):
     saved = json.loads((tmp_path / "prices-2024-01-05.json").read_text())
     assert saved["rows"] == 4
     assert saved["sha256"] == metadata["sha256"]
+
+
+def test_backtest_endpoint_uses_real_calculation_and_reports_benchmarks(monkeypatch):
+    dates = pd.date_range("2020-01-31", periods=72, freq="ME")
+    t = np.arange(len(dates), dtype=float)
+    prices = pd.DataFrame({
+        "SPY": 100 * (1.006 ** t) * (1 + .02 * np.sin(t)),
+        "GLD": 100 * (1.003 ** t) * (1 + .01 * np.cos(t)),
+        "BTC-USD": 100 * (1.012 ** t) * (1 + .04 * np.sin(t / 2)),
+    }, index=dates)
+    monkeypatch.setattr(price_service, "get_prices", lambda: prices)
+    response = client.get("/backtest")
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["periods"] > 36
+    assert payload["metrics"]["historical_var_95_monthly"] >= 0
+    assert "equal_weight_monthly_rebalanced" in payload["benchmarks"]
+    assert "SPY_buy_and_hold" in payload["benchmarks"]
+    assert "60_40_SPY_GLD_monthly_rebalanced" in payload["benchmarks"]
+    assert payload["confidence_status"] == "not_calibrated"
+
+
+def test_backtest_endpoint_rejects_too_short_common_history(monkeypatch):
+    dates = pd.date_range("2022-01-31", periods=18, freq="ME")
+    prices = pd.DataFrame({"SPY": np.linspace(100, 120, 18), "GLD": np.linspace(100, 110, 18)}, index=dates)
+    monkeypatch.setattr(price_service, "get_prices", lambda: prices)
+    response = client.get("/backtest")
+    assert response.status_code == 503
