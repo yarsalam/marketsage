@@ -114,6 +114,44 @@ class PointInTimeStore:
                 return int(row["id"])
             return int(cur.lastrowid)
 
+    def summary(self) -> dict[str, Any]:
+        """Summarize persisted coverage and timestamps without exposing price payloads."""
+        with self._connect() as conn:
+            rows = conn.execute("""
+                SELECT source_id, market, data_kind,
+                       COUNT(*) AS stored_versions,
+                       COUNT(DISTINCT record_key) AS distinct_records,
+                       MIN(observed_at) AS first_observed_at,
+                       MAX(observed_at) AS latest_observed_at,
+                       MIN(retrieved_at) AS first_retrieved_at,
+                       MAX(retrieved_at) AS latest_retrieved_at,
+                       MAX(published_at) AS latest_published_at
+                FROM temporal_records
+                GROUP BY source_id, market, data_kind
+                ORDER BY source_id, market, data_kind
+            """).fetchall()
+            total = conn.execute(
+                "SELECT COUNT(*) AS count FROM temporal_records"
+            ).fetchone()["count"]
+        return {
+            "record_versions": int(total),
+            "series": [
+                {
+                    "source_id": row["source_id"],
+                    "market": row["market"],
+                    "data_kind": row["data_kind"],
+                    "stored_versions": int(row["stored_versions"]),
+                    "distinct_records": int(row["distinct_records"]),
+                    "first_observed_at": row["first_observed_at"],
+                    "latest_observed_at": row["latest_observed_at"],
+                    "first_retrieved_at": row["first_retrieved_at"],
+                    "latest_retrieved_at": row["latest_retrieved_at"],
+                    "latest_published_at": row["latest_published_at"],
+                }
+                for row in rows
+            ],
+        }
+
     def as_of(
         self,
         *,
