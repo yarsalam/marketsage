@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000
 
 WORKDIR /app
-RUN addgroup --system app && adduser --system --ingroup app app
+RUN addgroup --system app && adduser --system --ingroup app app && mkdir -p /data/snapshots && chown -R app:app /data
 COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=app:app price_service.py ./price_service.py
