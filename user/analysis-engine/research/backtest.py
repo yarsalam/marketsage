@@ -37,7 +37,7 @@ def validate_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("prices must be strictly positive")
     return out
 
-def _metrics(r: pd.Series, periods: int) -> dict:
+def summarize_returns(r: pd.Series, periods: int = 12) -> dict:
     r = r.dropna().astype(float)
     if r.empty:
         return {"total_return": None, "cagr": None, "annualized_volatility": None, "sharpe": None, "max_drawdown": None}
@@ -107,7 +107,7 @@ def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: Backtest
     result = pd.DataFrame(rows).set_index("date")
     result["equity"] = (1 + result["net_return"]).cumprod()
     result["drawdown"] = result["equity"] / result["equity"].cummax() - 1
-    metrics = _metrics(result["net_return"], cfg.annualization_periods)
+    metrics = summarize_returns(result["net_return"], cfg.annualization_periods)
     metrics["average_monthly_turnover"] = float(result["turnover"].mean())
     metrics["sum_of_period_cost_fractions"] = float(result["transaction_cost"].sum())
     return {"config": {"top_n": cfg.top_n, "momentum_months": cfg.momentum_months,
