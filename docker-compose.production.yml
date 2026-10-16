@@ -9,7 +9,10 @@ services:
     environment:
       PORT: "8000"
       PRICE_CACHE_TTL_SECONDS: ${PRICE_CACHE_TTL_SECONDS:-900}
+      DATA_SNAPSHOT_DIR: /data/snapshots
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - market_data:/data
     expose:
       - "8000"
     networks:
@@ -74,6 +77,9 @@ services:
       start_period: 35s
     security_opt:
       - no-new-privileges:true
+
+volumes:
+  market_data:
 
 networks:
   marketsage-internal:
