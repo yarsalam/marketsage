@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
+from iran_market_data import provider_catalog
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -238,6 +239,12 @@ def markets() -> dict:
         "assets": [{"ticker": t, "name": n} for t, n in TICKERS.items()],
         "limitations": ["No direct Tehran Stock Exchange, Iranian gold/coin, or Iranian FX feed is configured."],
     }
+
+
+@app.get("/iran-market/providers")
+def iran_market_providers() -> dict:
+    """Report provider readiness without presenting unverified data as live."""
+    return provider_catalog()
 
 
 @app.get("/data-status")

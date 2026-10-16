@@ -10,6 +10,7 @@ RUN addgroup --system app && adduser --system --ingroup app app && mkdir -p /dat
 COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=app:app price_service.py ./price_service.py
+COPY --chown=app:app iran_market_data.py ./iran_market_data.py
 COPY --chown=app:app research ./research
 USER app
 EXPOSE 8000
