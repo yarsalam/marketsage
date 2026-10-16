@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,17 +42,28 @@ class PointInTimeStore:
     """SQLite append-only store with as-of queries for leakage-safe research."""
 
     def __init__(self, path: str | Path):
-        self.path = str(path)
+        requested_path = str(path)
+        self._is_memory = requested_path == ":memory:"
+        self.path = (
+            f"file:marketsage-{uuid.uuid4().hex}?mode=memory&cache=shared"
+            if self._is_memory else requested_path
+        )
+        # A shared-cache in-memory DB disappears when its last connection closes.
+        # Keep one anchor alive while each operation uses its own connection.
+        self._anchor = (
+            sqlite3.connect(self.path, uri=True, timeout=30)
+            if self._is_memory else None
+        )
         self._initialize()
 
     def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.path, timeout=30)
+        conn = sqlite3.connect(self.path, timeout=30, uri=self._is_memory)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
         return conn
 
     def _initialize(self) -> None:
-        if self.path != ":memory:":
+        if not self._is_memory:
             Path(self.path).parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             conn.execute("""

@@ -191,3 +191,14 @@ def test_summary_keeps_distinct_macro_series_separate(tmp_path):
     assert series["CPIAUCSL"]["stored_versions"] == 2
     assert series["UNRATE"]["distinct_records"] == 1
     assert summary["record_versions"] == 3
+
+
+
+def test_in_memory_store_persists_between_operations():
+    store = PointInTimeStore(":memory:")
+    item = record(retrieved="2024-01-02T09:01:00Z", value=3.1)
+    store.append(item)
+
+    rows = store.as_of(as_of=dt("2024-01-03T00:00:00Z"))
+    assert len(rows) == 1
+    assert rows[0]["payload"]["value"] == 3.1
