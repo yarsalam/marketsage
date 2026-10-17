@@ -28,10 +28,10 @@ def test_currency_rates_uses_bearer_auth_and_returns_json():
     def handler(request):
         seen["path"] = request.url.path
         seen["auth"] = request.headers.get("Authorization")
-        return httpx.Response(200, json={"rates": []})
+        return httpx.Response(200, json={"success": True, "data": []})
 
     with client_for(handler) as client:
-        assert client.currency_rates() == {"rates": []}
+        assert client.currency_rates() == {"success": True, "data": []}
 
     assert seen == {
         "path": "/api/public/currency-rates",
