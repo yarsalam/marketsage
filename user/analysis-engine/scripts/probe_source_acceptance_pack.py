@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Run one bounded live smoke probe per configured source and emit sanitized JSON.
+"""Run bounded live smoke probes and emit sanitized JSON.
 
-This script checks reachability and response shape only. It does not save raw
-payloads, print credentials, infer publication times, or approve scoring.
+By default, probes all sources in the pack. Use --source SOURCE_ID (repeatable)
+to limit requests to specific sources. This checks reachability and response
+shape only; it does not save raw payloads, print credentials, infer publication
+times, or approve scoring.
 Run from the analysis-engine directory with its virtualenv activated.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
@@ -22,6 +25,28 @@ from fred_alfred_provider import FredAlfredClient
 from gdelt_news_provider import GdeltDocClient, GdeltError
 from tindex_provider import TindexClient
 from tsetmc_provider import TsetmcClient
+
+SOURCE_IDS = (
+    "global.gdelt_doc_api",
+    "iran.tsetmc",
+    "iran.codal",
+    "iran.tindex.public_api",
+    "us.fred.alfred",
+)
+
+
+def parse_source_selection(argv: Sequence[str] | None = None) -> set[str]:
+    """Return selected source IDs; no --source means the full original pack."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--source",
+        action="append",
+        choices=SOURCE_IDS,
+        dest="sources",
+        help="probe only this source; may be repeated to select multiple sources",
+    )
+    args = parser.parse_args(argv)
+    return set(args.sources) if args.sources else set(SOURCE_IDS)
 
 
 def shape(value: Any) -> dict[str, Any]:
@@ -76,54 +101,55 @@ def run_probe(report: dict[str, Any], source_id: str, operation) -> None:
         report["sources"][source_id] = item
 
 
-def main() -> int:
+def main(argv: Sequence[str] | None = None) -> int:
+    selected = parse_source_selection(argv)
     report: dict[str, Any] = {
-        "report_version": "1.1",
+        "report_version": "1.2",
         "started_at_utc": datetime.now(timezone.utc).isoformat(),
         "purpose": "bounded live smoke test; not source validation or production approval",
+        "selected_sources": [source_id for source_id in SOURCE_IDS if source_id in selected],
         "sources": {},
         "summary": {
             "live_probes_attempted": 0,
             "skipped_missing_credentials": [],
+            "skipped_not_selected": [],
             "production_approved": False,
         },
     }
 
-    # One request per public source. The query is intentionally small.
-    run_probe(
-        report, "global.gdelt_doc_api",
-        lambda: _gdelt_probe(),
-    )
-    run_probe(
-        report, "iran.tsetmc",
-        lambda: _tsetmc_probe(),
-    )
-    run_probe(
-        report, "iran.codal",
-        lambda: _codal_probe(),
-    )
+    probes = {
+        "global.gdelt_doc_api": _gdelt_probe,
+        "iran.tsetmc": _tsetmc_probe,
+        "iran.codal": _codal_probe,
+        "iran.tindex.public_api": _tindex_probe,
+        "us.fred.alfred": _fred_probe,
+    }
+    credential_requirements = {
+        "iran.tindex.public_api": ("TINDEX_API_BASE_URL", "TINDEX_API_TOKEN"),
+        "us.fred.alfred": ("FRED_API_KEY",),
+    }
 
-    # Tindex has a local/provider quota. This pack makes exactly one request.
-    if os.getenv("TINDEX_API_BASE_URL", "").strip() and os.getenv("TINDEX_API_TOKEN", "").strip():
-        run_probe(report, "iran.tindex.public_api", _tindex_probe)
-    else:
-        report["sources"]["iran.tindex.public_api"] = {
-            "status": "skipped_missing_credentials",
-            "raw_payload_saved": False,
-            "eligible_for_scoring": False,
-        }
-        report["summary"]["skipped_missing_credentials"].append("iran.tindex.public_api")
+    for source_id in SOURCE_IDS:
+        if source_id not in selected:
+            report["sources"][source_id] = {
+                "status": "skipped_not_selected",
+                "raw_payload_saved": False,
+                "eligible_for_scoring": False,
+            }
+            report["summary"]["skipped_not_selected"].append(source_id)
+            continue
 
-    # FRED is optional because it requires a key. Never include the key in output.
-    if os.getenv("FRED_API_KEY", "").strip():
-        run_probe(report, "us.fred.alfred", _fred_probe)
-    else:
-        report["sources"]["us.fred.alfred"] = {
-            "status": "skipped_missing_credentials",
-            "raw_payload_saved": False,
-            "eligible_for_scoring": False,
-        }
-        report["summary"]["skipped_missing_credentials"].append("us.fred.alfred")
+        required_env = credential_requirements.get(source_id, ())
+        if required_env and not all(os.getenv(name, "").strip() for name in required_env):
+            report["sources"][source_id] = {
+                "status": "skipped_missing_credentials",
+                "raw_payload_saved": False,
+                "eligible_for_scoring": False,
+            }
+            report["summary"]["skipped_missing_credentials"].append(source_id)
+            continue
+
+        run_probe(report, source_id, probes[source_id])
 
     report["summary"]["live_probes_attempted"] = sum(
         1 for item in report["sources"].values()
