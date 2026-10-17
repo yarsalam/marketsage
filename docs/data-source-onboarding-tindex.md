@@ -79,3 +79,12 @@ The provider's endpoint and query controls are described by the [GDELT DOC 2.0 A
 ```bash
 python -m pytest -q tests/test_gdelt_news_provider.py
 ```
+
+
+## Headline sentiment and event-category smoke baseline
+
+`headline_signal_engine.py` provides a transparent Persian/English keyword baseline for headline sentiment and broad category candidates (politics, conflict, sanctions, macro/monetary). It returns the exact matching lexical evidence and abstains with `unknown` where no sentiment terms match. It deliberately does **not** emit a probability, claim a validated model, or permit investment scoring.
+
+The mocked GDELT tests and headline fixtures verify API request construction, response validation, URL deduplication, metadata/timestamp conservatism, known keyword cases, abstention, and auditable evidence. These tests establish code behavior on fixtures only; they do not establish recall/precision on real news or correctness of political-event attribution.
+
+Before this can be called a proven news/sentiment/event engine, build a time-stamped Persian/English benchmark with independently annotated sentiment and event labels, report class-wise precision/recall/F1 and calibration where applicable, check source/language bias and duplicates, and evaluate point-in-time replay. Keep the source gate closed until that evaluation passes.
