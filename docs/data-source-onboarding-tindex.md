@@ -1,65 +1,47 @@
-# Tindex public API connector (free-tier onboarding)
+# Market data source onboarding
 
-## Scope and safety
+This document tracks integration status and acceptance gates for the currently implemented adapters. Registry presence is not production approval; source scoring remains fail-closed until explicit review.
 
-This opt-in, read-only connector targets only the currently enabled Tindex public API surfaces: currency rates, public boards/categories, indicator movers, and indicator history/candles. The provider's current dashboard notice takes precedence over older documentation: Iranian equities/TSE, news/articles, inflation/macroeconomics, housing, calendar, and indicators in disabled categories are unavailable (410 Gone).
+## Tindex public API (free-tier)
 
-The connector:
-- uses a Bearer token from environment variables; no token is committed or printed;
-- requires the API origin from the current Tindex developer dashboard and HTTPS;
-- exposes named endpoint methods rather than arbitrary URLs;
-- locally limits a process to 3 requests/minute and does not automatically retry 401/403/410/429;
-- treats 410 as disabled, not as empty data or permission to scrape another route;
-- is not wired into scoring or a point-in-time store. Production scoring remains fail-closed.
+The Tindex connector is opt-in and read-only. It uses an HTTPS origin and Bearer token from environment variables, limits requests locally to 3/minute, does not automatically retry 401/403/410/429, and treats HTTP 410 as a disabled endpoint. The provider's current dashboard notice disables Iranian equities/TSE, news/articles, inflation/macroeconomics, housing, calendar, and indicators in disabled categories. Do not bypass this by scraping alternate routes.
 
-The local minute limiter is per process; the provider quota remains authoritative, particularly with multiple workers. The currently supplied provider quota says 300 successful requests/day and one active token. Cache responses before recurring pulls.
+A real authenticated request to `/api/public/currency-rates` returned HTTP 200 with `success` (boolean) and `data` (list); observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). `tindex_normalizer.py` validates these types and preserves `rate` as Decimal. It deliberately leaves units, market definition, observation/retrieval times unknown and `eligible_for_scoring=False`. This does not prove Rial/Toman, official/free-market meaning, history depth, licensing or model-training permission.
 
-## Confirmed currency-rates response shape
+Provider quota supplied by the project owner: 3 requests/minute, 300 successful requests/day, one active token. Cache responses and avoid repeated live probes.
 
-A real authenticated request to `/api/public/currency-rates` returned HTTP 200 with an object containing `success` (boolean) and `data` (list). The observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). This is a shape observation, not a semantic data dictionary.
+Focused test command from `user/analysis-engine`:
 
-`user/analysis-engine/tindex_normalizer.py` validates this envelope and those primitive types. It converts `rate` to `Decimal` for precision and keeps the provider's `decimals` as metadata. It intentionally leaves `unit`, `market_definition`, `observed_at`, and `retrieved_at` unknown and sets `eligible_for_scoring=False`. It rejects malformed values and duplicate instrument keys. This does **not** establish whether a quote is Rial or Toman, official or free-market, or what `decimals` means operationally.
+```bash
+python -m pytest -q tests/test_tindex_provider.py tests/test_tindex_normalizer.py
+```
 
-## Local setup
+## FRED/ALFRED observations adapter (new, not scheduled)
 
-1. Create a token in the Tindex developer dashboard. Do not send it in chat or commit it.
-2. Copy the API origin (scheme + hostname, without `/api/public`) from current API documentation.
-3. Set environment variables in your local shell:
+`fred_alfred_provider.py` provides a read-only adapter for FRED series observations and their realtime/vintage metadata. Configure `FRED_API_KEY` in the runtime environment; never commit the key or include it in logs. The adapter uses the official `/fred/series/observations` endpoint, validates date filters and pagination, normalizes numeric values to Decimal, and represents FRED's `.` missing-value marker as null.
 
-   ```bash
-   export TINDEX_API_BASE_URL='https://<API-origin-from-current-docs>'
-   export TINDEX_API_TOKEN='<token-created-in-dashboard>'
-   ```
+Important temporal distinction:
+- `observation_date` is the period the value describes, not its release time.
+- `realtime_start` / `realtime_end` are FRED vintage boundaries, not exact publication timestamps.
+- `vintage_available_at` is a conservative day-end UTC boundary derived from the vintage date; it is not a claim about the actual release time.
+- `publication_timestamp` remains null and `eligible_for_scoring` remains false.
 
-4. From `user/analysis-engine`, install development dependencies and run the focused offline suite:
+Offline tests use HTTP mocks; they do not consume API quota or contact FRED:
 
-   ```bash
-   pip install -r requirements.txt
-   python -m pytest -q tests/test_tindex_provider.py tests/test_tindex_normalizer.py
-   ```
+```bash
+python -m pytest -q tests/test_fred_alfred_provider.py
+```
 
-5. The one-request probe is optional and only for connectivity diagnostics:
+Before scheduling or scoring, verify each series' release calendar, vintage semantics, key/API limits, units, missing-value patterns, and independent reconciliation. Do not treat a macro observation period date as the time it became known to investors.
 
-   ```bash
-   python scripts/probe_tindex.py
-   ```
+## Shared production acceptance gates
 
-   It calls only `/api/public/currency-rates`, prints shape metadata only, and consumes a successful daily request. Do not repeatedly run it; a live request has already confirmed the response envelope.
+For every source, verify:
+1. Terms and permission for automated collection, durable storage, backtesting, AI/model training, redistribution, and commercial display/use.
+2. Instrument/series identity, units, currency and quote convention.
+3. Observation/publication timestamps versus retrieval timestamps, timezone, revisions, missing intervals, history depth, and freshness.
+4. Independent reconciliation and immutable raw response/checksum retention where permitted.
+5. Point-in-time replay proving that future publications and later revisions cannot leak into earlier decisions.
+6. Explicit source-registry review and production approval.
 
-## What a successful request proves—and does not prove
-
-HTTP 200 plus valid JSON proves only that the configured token could read the endpoint at that moment. It does not establish historical depth, completeness, publication timestamps, Rial/Toman units, official/free-market definition, corrections, licensing, redistribution, commercial use, or model-training permission. Do not infer that “currency rates” necessarily means free-market Iranian FX.
-
-## Acceptance gates before ingestion/backtests
-
-1. Written terms/permission for automated collection, durable storage, backtesting, AI/model training, and commercial display/use.
-2. Sanitized fixture/schema tests for each data family intended for use.
-3. Verified instrument identity, market definition, currency and quote convention.
-4. Verified observation/publication timestamps, retrieval timestamps, timezone, revisions, missing intervals, history depth, and freshness checks.
-5. Reconciliation against an independent source and immutable raw response/checksum retention.
-6. Point-in-time replay tests proving no future publication or later revision leaks into earlier decisions.
-7. Separate source-registry review and explicit production approval. Until then, Tindex remains research-only and cannot feed live scores.
-
-## Current quotas and caching
-
-The current supplied dashboard text says 3 requests/minute, 300 successful requests/day, and at most one active token on the free tier. Avoid polling every symbol separately. Do not assume history endpoints are full-history exports; the docs describe history as chart-oriented and candles as resampled daily/weekly/monthly data.
+Until these gates pass, new adapters are research-only and must not affect live investment rankings.
