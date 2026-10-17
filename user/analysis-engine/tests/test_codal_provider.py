@@ -1,5 +1,6 @@
 import httpx
 import pytest
+from datetime import datetime
 
 from codal_provider import CodalClient, CodalError
 
@@ -14,6 +15,10 @@ def test_search_sends_filters_and_keeps_publication_time_unknown():
         result = client.search_disclosures(symbol="فولاد", page=2, page_size=10)
     assert result["payload"] == {"Letters": []}
     assert result["publication_timestamp"] is None
+    assert result["retrieved_at"] is not None
+    retrieved_at = datetime.fromisoformat(result["retrieved_at"])
+    assert retrieved_at.tzinfo is not None
+    assert retrieved_at.utcoffset() is not None
     assert result["eligible_for_scoring"] is False
 
 
