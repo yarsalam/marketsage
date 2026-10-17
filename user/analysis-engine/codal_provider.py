@@ -6,7 +6,7 @@ publication time or makes disclosure data eligible for investment scoring.
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Any
 
 import httpx
@@ -66,15 +66,17 @@ class CodalClient:
             response = self._client.get(BASE_URL, params=params)
             response.raise_for_status()
             payload = response.json()
+            retrieved_at = datetime.now(timezone.utc).isoformat()
         except (httpx.HTTPError, ValueError) as exc:
             raise CodalError(f"CODAL request failed ({type(exc).__name__})") from None
         if not isinstance(payload, dict):
             raise CodalError("CODAL search response must be a JSON object")
-        # Keep provider-native fields intact until fixtures prove exact semantics.
+        # Capture when this response was retrieved, but do not infer publication time.
+        # Provider-native fields remain unchanged until fixtures prove their semantics.
         return {
             "source_id": SOURCE_ID,
             "payload": payload,
             "publication_timestamp": None,
-            "retrieved_at": None,
+            "retrieved_at": retrieved_at,
             "eligible_for_scoring": False,
         }
