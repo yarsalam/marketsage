@@ -62,3 +62,20 @@ python -m pytest -q tests/test_tsetmc_provider.py tests/test_codal_provider.py
 ## Iranian gold and free-market FX: TGJU candidate, not enabled
 
 TGJU is listed as a candidate source for gold, coin and free-market FX discovery. A verified public API contract and automated-collection/license permission have not been established, so **no live TGJU scraper is enabled**. Do not silently scrape or parse unstable page markup. The source must first pass terms/access review, then fixed sanitized fixtures must confirm series identity, free-vs-official market convention, Rial-vs-Toman unit, update/correction semantics and historical coverage. Keep 18k gram gold, each coin type, USD free-market FX, and official FX as separate series. Tindex may expose currency/precious-metal families, but its current payload semantics are not enough to identify or score these series yet.
+
+
+## News discovery: GDELT DOC 2.0
+
+`gdelt_news_provider.py` implements a read-only client for the GDELT DOC 2.0 Article List API (`https://api.gdeltproject.org/api/v2/doc/doc`). It supports keyword queries, a bounded result count (1–250), and optional start/end timestamps within the API's supported search window. It canonicalizes article URLs and deduplicates them.
+
+Important limitations:
+- GDELT `seendate` is stored as `first_seen_at`, not asserted to be the publisher's original publication timestamp.
+- Article titles/metadata are discovery signals, not verified article truth or the full article body.
+- Sentiment and political-event type intentionally remain null in this adapter. This avoids manufacturing a signal before a separately tested classifier and labeled evaluation set exist.
+- Results are not scheduled and are not eligible for investment scoring. Publisher terms, language/country recall, historical coverage, and real network behavior still require acceptance testing.
+
+The provider's endpoint and query controls are described by the [GDELT DOC 2.0 API documentation](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/). The automated tests use HTTP mocks and do not make live requests.
+
+```bash
+python -m pytest -q tests/test_gdelt_news_provider.py
+```
