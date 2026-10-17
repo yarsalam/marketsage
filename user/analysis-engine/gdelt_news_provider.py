@@ -121,6 +121,11 @@ class GdeltDocClient:
             response = self._client.get(BASE_URL, params=params)
             response.raise_for_status()
             payload = response.json()
+        except httpx.HTTPStatusError as exc:
+            # Keep diagnostics useful without exposing response bodies or request URLs.
+            raise GdeltError(
+                f"GDELT request failed (HTTP {exc.response.status_code})"
+            ) from None
         except (httpx.HTTPError, ValueError) as exc:
             raise GdeltError(f"GDELT request failed ({type(exc).__name__})") from None
         return normalize_gdelt_articles(payload)
