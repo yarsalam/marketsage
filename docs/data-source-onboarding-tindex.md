@@ -45,3 +45,20 @@ For every source, verify:
 6. Explicit source-registry review and production approval.
 
 Until these gates pass, new adapters are research-only and must not affect live investment rankings.
+
+
+## Iranian equity disclosures: TSETMC and CODAL (candidate adapters)
+
+`tsetmc_provider.py` adds a read-only client for instrument search and daily history on the TSETMC CDN JSON surface, plus a conservative history normalizer. The endpoints are reverse-engineered and may change or block non-Iranian IPs. Price units, adjustment methodology, suspensions, trading calendar, legal collection rights and history completeness are not approved. Every normalized row has unknown unit/timestamps and `eligible_for_scoring=False`.
+
+`codal_provider.py` adds a read-only client for the CODAL search endpoint. It preserves the provider-native payload rather than guessing the disclosure schema. Exact publication time, amended/corrected filing linkage, search filters, and historical coverage need sanitized fixtures and reconciliation. Retrieval time is not publication time; scoring remains disabled.
+
+Mocked tests:
+
+```bash
+python -m pytest -q tests/test_tsetmc_provider.py tests/test_codal_provider.py
+```
+
+## Iranian gold and free-market FX: TGJU candidate, not enabled
+
+TGJU is listed as a candidate source for gold, coin and free-market FX discovery. A verified public API contract and automated-collection/license permission have not been established, so **no live TGJU scraper is enabled**. Do not silently scrape or parse unstable page markup. The source must first pass terms/access review, then fixed sanitized fixtures must confirm series identity, free-vs-official market convention, Rial-vs-Toman unit, update/correction semantics and historical coverage. Keep 18k gram gold, each coin type, USD free-market FX, and official FX as separate series. Tindex may expose currency/precious-metal families, but its current payload semantics are not enough to identify or score these series yet.
