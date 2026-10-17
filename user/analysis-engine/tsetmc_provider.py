@@ -6,6 +6,7 @@ Do not disable TLS verification, scrape alternate hosts, or infer units/timestam
 from __future__ import annotations
 
 from datetime import datetime
+from urllib.parse import quote
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -54,7 +55,7 @@ class TsetmcClient:
         query = query.strip()
         if not query or len(query) > 100:
             raise ValueError("query must contain 1-100 characters")
-        return self._get_json("/Instrument/GetInstrumentSearch/" + httpx.URL("").copy_with(path="/" + query).raw_path.decode().lstrip("/"))
+        return self._get_json("/Instrument/GetInstrumentSearch/" + quote(query, safe=""))
 
     def daily_history(self, instrument_code: str, limit: int = 0) -> list[dict[str, Any]]:
         code = str(instrument_code).strip()
