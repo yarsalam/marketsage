@@ -73,3 +73,16 @@ def test_http_and_json_errors_are_reported_safely():
     )) as client:
         with pytest.raises(GdeltError, match="GDELT request failed"):
             client.search_articles("Iran politics")
+
+
+
+def test_http_429_reports_status_without_exposing_response_body():
+    secretish_body = "rate limited internal diagnostic text"
+
+    with GdeltDocClient(transport=httpx.MockTransport(
+        lambda _: httpx.Response(429, text=secretish_body)
+    )) as client:
+        with pytest.raises(GdeltError, match=r"GDELT request failed \(HTTP 429\)") as exc:
+            client.search_articles("Iran politics", max_records=1)
+
+    assert secretish_body not in str(exc.value)
