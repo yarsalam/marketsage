@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from codal_provider import CodalClient
 from fred_alfred_provider import FredAlfredClient
-from gdelt_news_provider import GdeltDocClient
+from gdelt_news_provider import GdeltDocClient, GdeltError
 from tindex_provider import TindexClient
 from tsetmc_provider import TsetmcClient
 
@@ -42,6 +42,13 @@ def shape(value: Any) -> dict[str, Any]:
     return {"type": type(value).__name__}
 
 
+def safe_error_detail(source_id: str, exc: Exception) -> str | None:
+    """Expose detail only for GDELT's deliberately sanitized exception contract."""
+    if source_id == "global.gdelt_doc_api" and isinstance(exc, GdeltError):
+        return str(exc)
+    return None
+
+
 def run_probe(report: dict[str, Any], source_id: str, operation) -> None:
     started = datetime.now(timezone.utc).isoformat()
     try:
@@ -53,8 +60,8 @@ def run_probe(report: dict[str, Any], source_id: str, operation) -> None:
             "raw_payload_saved": False,
             "eligible_for_scoring": False,
         }
-    except Exception as exc:  # report type only; exception text may contain URLs/secrets
-        report["sources"][source_id] = {
+    except Exception as exc:  # arbitrary exception text may contain URLs/secrets
+        item = {
             "status": "probe_failed",
             "probe_started_at": started,
             "error_type": type(exc).__name__,
@@ -62,11 +69,16 @@ def run_probe(report: dict[str, Any], source_id: str, operation) -> None:
             "raw_payload_saved": False,
             "eligible_for_scoring": False,
         }
+        detail = safe_error_detail(source_id, exc)
+        if detail is not None:
+            item["safe_error_detail"] = detail
+            item["error_detail_redacted"] = False
+        report["sources"][source_id] = item
 
 
 def main() -> int:
     report: dict[str, Any] = {
-        "report_version": "1.0",
+        "report_version": "1.1",
         "started_at_utc": datetime.now(timezone.utc).isoformat(),
         "purpose": "bounded live smoke test; not source validation or production approval",
         "sources": {},
