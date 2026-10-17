@@ -11,6 +11,8 @@ services:
       PRICE_CACHE_TTL_SECONDS: ${PRICE_CACHE_TTL_SECONDS:-900}
       DATA_SNAPSHOT_DIR: /data/snapshots
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      TINDEX_API_BASE_URL: ${TINDEX_API_BASE_URL:-}
+      TINDEX_API_TOKEN: ${TINDEX_API_TOKEN:-}
     volumes:
       - market_data:/data
     expose:

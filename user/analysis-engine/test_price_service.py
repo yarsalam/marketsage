@@ -100,7 +100,7 @@ def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates()
     assert entries["global.yahoo_finance.yfinance"]["used_by_research_engine"] is True
     assert entries["global.yahoo_finance.yfinance"]["approved_for_production"] is False
     assert entries["iran.tsetmc"]["approved_for_production"] is False
-    assert entries["iran.gold_fx"]["status"] == "provider_not_selected"
+    assert entries["iran.gold_fx"]["status"] == "candidate_requires_validation"
     assert entries["crypto.exchange_specific"]["approved_for_production"] is False
 
 
