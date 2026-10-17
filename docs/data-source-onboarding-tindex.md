@@ -88,3 +88,19 @@ python -m pytest -q tests/test_gdelt_news_provider.py
 The mocked GDELT tests and headline fixtures verify API request construction, response validation, URL deduplication, metadata/timestamp conservatism, known keyword cases, abstention, and auditable evidence. These tests establish code behavior on fixtures only; they do not establish recall/precision on real news or correctness of political-event attribution.
 
 Before this can be called a proven news/sentiment/event engine, build a time-stamped Persian/English benchmark with independently annotated sentiment and event labels, report class-wise precision/recall/F1 and calibration where applicable, check source/language bias and duplicates, and evaluate point-in-time replay. Keep the source gate closed until that evaluation passes.
+
+
+## Batched source acceptance pack
+
+Run the entire offline analysis-engine test suite from the analysis-engine directory in one command (CI runs the same suite):
+
+```bash
+python -m pytest -q
+```
+
+The new `tests/test_acceptance_pack.py` adds deterministic batch invariants in a single pytest test invocation:
+- 2,000 generated Persian/English headline variants: output shape, evidence/score consistency, and the hard scoring gate.
+- 1,000 GDELT URL variants: canonicalization and deduplication, with publication time and sentiment left unknown.
+- One registry-wide gate check for FRED/ALFRED, TSETMC, CODAL, Tindex, GDELT, and the headline baseline.
+
+These are regression/robustness checks, not 3,000 independent examples of real-world accuracy. They make no network calls and require no API credentials. The CI result must be reported separately from controlled live smoke checks. For the live stage, run a bounded probe per provider from the intended runtime/network, save sanitized status/schema/latency metadata (never tokens or full sensitive payloads), and do not turn a network response into production approval automatically.
