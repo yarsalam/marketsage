@@ -104,3 +104,16 @@ The new `tests/test_acceptance_pack.py` adds deterministic batch invariants in a
 - One registry-wide gate check for FRED/ALFRED, TSETMC, CODAL, Tindex, GDELT, and the headline baseline.
 
 These are regression/robustness checks, not 3,000 independent examples of real-world accuracy. They make no network calls and require no API credentials. The CI result must be reported separately from controlled live smoke checks. For the live stage, run a bounded probe per provider from the intended runtime/network, save sanitized status/schema/latency metadata (never tokens or full sensitive payloads), and do not turn a network response into production approval automatically.
+
+
+## One-command live source smoke pack
+
+After the offline suite passes, run this from `user/analysis-engine` in the intended runtime/network:
+
+```bash
+python scripts/probe_source_acceptance_pack.py > source-smoke-report.json
+```
+
+The script makes at most one request to each of GDELT, TSETMC, CODAL, and Tindex, plus one FRED request if `FRED_API_KEY` is configured. Tindex is limited to its single currency-rates request to respect the conservative quota. Missing Tindex/FRED credentials cause a reported skip, not a credential prompt. Error details are redacted; the report contains response shape metadata only, not raw payloads or tokens. A non-zero exit code means at least one attempted live probe failed.
+
+This report tests reachability and observed schema only. It does not prove completeness, licensing, data semantics, source truth, sentiment accuracy, or suitability for investment scoring. Keep the generated report local or review it for environment-specific metadata before sharing. The script never enables scoring.
