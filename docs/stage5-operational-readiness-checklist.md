@@ -1,6 +1,6 @@
 # Stage 5 — Operational Readiness Checklist
 
-**Status:** active; bounded stale-cache fallback and regression tests added, but latest CI/local verification and deployment gates remain open. Not approved for production or deployment.  
+**Status:** active; bounded stale-cache fallback and regression tests added. CI run #246 passed all jobs on code commit `21e4b2e5db74972f510fa88833f99e510984a2c1`; local confirmation and deployment gates remain open. Not approved for production or deployment.  
 **Branch:** `feat/tindex-free-data-connector`  
 **Release posture:** research-only; source scoring and investment ranking remain disabled.
 
@@ -88,4 +88,4 @@ Confirm its dataset hash and output dates before interpreting any metrics. Do no
 
 ## Current decision
 
-**Stage 5 is in progress; release gate not passed.** The changes above still require a fresh CI run and local test confirmation on the resulting commit. Separate readiness semantics, provider/schema/staleness failure tests across all source paths, source rights/semantics review, point-in-time and survivorship assessment, security/dependency review, backup/restore rehearsal, staging smoke tests, rollback rehearsal, and explicit release approval remain open. Investment ranking and source scoring must remain disabled.
+**Stage 5 is in progress; release gate not passed.** CI run [#246](https://github.com/yarsalam/marketsage/actions/runs/39128372381) passed all jobs, including 233 Analysis Engine tests and production-image build, on code commit `21e4b2e5db74972f510fa88833f99e510984a2c1`. The project owner still needs to pull the latest branch and confirm the local test run. Separate readiness semantics, provider/schema/staleness failure tests across all source paths, source rights/semantics review, point-in-time and survivorship assessment, security/dependency review, backup/restore rehearsal, staging smoke tests, rollback rehearsal, and explicit release approval remain open. Investment ranking and source scoring must remain disabled.
