@@ -120,3 +120,22 @@ Do not decide that the app is server-ready from a passing smoke test alone. The 
 - **Pause paid infrastructure / paid data**: data coverage, history, legal rights or strategy feasibility is not yet demonstrated.
 
 This audit is intentionally conservative: the cheapest useful dataset is preferable to the largest dataset, provided it improves the financial decision robustly after costs.
+
+
+## One-command batched acceptance run
+
+From the repository root, after updating the current PR branch without discarding local work:
+
+```bash
+cd ~/projects/marketsage-acceptance
+git status --short --branch
+git pull --ff-only origin feat/tindex-free-data-connector
+cd user/analysis-engine
+bash scripts/run_data_acceptance_pack.sh
+```
+
+The script runs the full offline test suite once, audits the saved Foolad history fixture if present (otherwise fetches one full history), probes TSETMC/CODAL/Tindex with VPN OFF, then pauses once so FRED/GDELT can be probed with VPN ON. It writes sanitized summaries under `/tmp/marketsage-acceptance/`; it does not save raw provider payloads or secrets. FRED is skipped unless `FRED_API_KEY` is already set. Tindex is skipped unless `TINDEX_API_BASE_URL` and `TINDEX_API_TOKEN` are set. A failed live probe is recorded but does not erase other results; the full offline test suite must pass before live requests start.
+
+The TSETMC history audit sorts observations for calculations but reports the original provider ordering. It flags invalid/duplicate dates, instrument mismatches, missing or nonnumeric fields, non-positive prices, candidate OHLC inconsistencies, large close-to-close returns (default absolute 30%), and calendar gaps over four days. Calendar gaps and return jumps are review flags, not automatic rejections: exchange holidays, corporate actions, price limits and field semantics must be checked separately. It never modifies the source registry or enables scoring.
+
+**VPN / rate-limit note:** start the script with VPN OFF. It intentionally pauses before the external probes. GDELT previously returned HTTP 429, so this script makes only one controlled GDELT attempt; if the provider is still rate-limiting, leave it as pending and do not repeatedly retry. Do not paste tokens into chat or commit them. This run is a consolidated evidence-gathering step, not final legal or predictive acceptance.
