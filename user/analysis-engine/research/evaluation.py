@@ -144,7 +144,7 @@ def evaluate_monthly_strategies(
             "walkforward_folds_end_before_final_holdout": True,
             "walkforward_parameters_fixed": True,
             "risk_free_rate_annual_for_sharpe": cfg.risk_free_rate_annual,
-            "cost_convention": "cost fractions charged on sum of absolute target-minus-pretrade weights (one-way traded weight), including initial allocation",
+            "cost_convention": "cost fractions charged on sum of absolute target-minus-pretrade weights (L1 gross traded weight: buys plus sells), including initial allocation",
             "benchmark_definitions": {
                 "cash_zero_return": "simplified zero-return reference; not a real cash yield",
                 "equal_weight_monthly_rebalanced_net": "equal weights across all input assets each month, same transaction-cost and slippage assumptions",
