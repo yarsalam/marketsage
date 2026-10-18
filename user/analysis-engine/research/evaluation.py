@@ -42,6 +42,32 @@ def _net_equal_weight_returns(prices: pd.DataFrame, dates: pd.DatetimeIndex, con
     return pd.Series(values, index=dates, name="equal_weight_monthly_rebalanced")
 
 
+def _net_equal_weight_buy_hold_returns(
+    prices: pd.DataFrame, dates: pd.DatetimeIndex, config: BacktestConfig
+) -> pd.Series:
+    """Initial equal-weight allocation, then let holdings drift without rebalancing."""
+    asset_returns = prices.pct_change(fill_method=None)
+    weights = pd.Series(1.0 / len(prices.columns), index=prices.columns)
+    initial_cost = (config.transaction_cost_bps + config.slippage_bps) / 10000
+    values = []
+    for j, date in enumerate(dates):
+        if j > 0:
+            prior_date = dates[j - 1]
+            drift = asset_returns.loc[prior_date]
+            weights = weights * (1 + drift)
+            total = float(weights.sum())
+            if not math.isfinite(total) or total <= 0:
+                raise ValueError("invalid buy-and-hold benchmark portfolio value")
+            weights = weights / total
+        row_returns = asset_returns.loc[date]
+        if row_returns.isna().any():
+            raise ValueError(f"missing buy-and-hold benchmark return at {date.date()}")
+        gross = float((weights * row_returns).sum())
+        cost = initial_cost if j == 0 else 0.0
+        values.append((1 - cost) * (1 + gross) - 1 if j == 0 else gross)
+    return pd.Series(values, index=dates, name="equal_weight_buy_and_hold_net")
+
+
 def _metric_summary(returns: pd.Series, config: BacktestConfig) -> dict:
     summary = summarize_returns(
         returns, config.annualization_periods, config.risk_free_rate_annual
@@ -76,11 +102,13 @@ def evaluate_monthly_strategies(
     strategy_returns = strategy["monthly"]["net_return"]
     result_dates = pd.DatetimeIndex(strategy_returns.index)
     equal_weight = _net_equal_weight_returns(prices, result_dates, cfg)
+    buy_hold = _net_equal_weight_buy_hold_returns(prices, result_dates, cfg)
     cash = pd.Series(0.0, index=result_dates, name="cash_zero_return")
 
     returns_by_name = {
         "momentum_strategy_net": strategy_returns,
         "equal_weight_monthly_rebalanced_net": equal_weight,
+        "equal_weight_buy_and_hold_net": buy_hold,
         "cash_zero_return": cash,
     }
     holdout_start = result_dates[-holdout_months]
@@ -187,6 +215,7 @@ def evaluate_monthly_strategies(
             "benchmark_definitions": {
                 "cash_zero_return": "simplified zero-return reference; not a real cash yield",
                 "equal_weight_monthly_rebalanced_net": "equal weights across all input assets each month, same transaction-cost and slippage assumptions",
+                "equal_weight_buy_and_hold_net": "initial equal-weight allocation across all input assets, then weights drift without rebalancing; initial costs only",
             },
         },
         "full_period_metrics": full_metrics,
