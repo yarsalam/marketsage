@@ -1,8 +1,7 @@
-"""Conservative client for the currently enabled Tindex public API.
+"""Conservative client for Tindex's documented public indicator API.
 
-This adapter only exposes the documented currency, precious-metal and crypto
-surface. It never scrapes the terminal, bypasses authentication, or treats a
-successful HTTP response as licensing or production approval.
+Only documented API routes are used. The client never scrapes the website or
+bypasses authentication, and HTTP success is not licensing or production approval.
 """
 from __future__ import annotations
 
@@ -19,14 +18,6 @@ import httpx
 SOURCE_ID = "iran.tindex.public_api"
 DEFAULT_TIMEOUT_SECONDS = 15.0
 MAX_REQUESTS_PER_MINUTE = 3
-
-# Categories/endpoints removed by Tindex's current dashboard notice.
-_DISABLED_TERMS = (
-    "equity", "equities", "stock", "stocks", "tse", "bors",
-    "news", "article", "inflation", "macro", "housing", "calendar",
-    "khodro", "مسکن", "بورس", "خبر", "تورم", "اقتصاد", "خودرو",
-)
-
 
 class TindexError(RuntimeError):
     """Base class for sanitized Tindex adapter errors."""
@@ -60,12 +51,6 @@ def _assert_allowed_slug(value: str, label: str) -> str:
     cleaned = value.strip()
     if not cleaned or len(cleaned) > 160:
         raise ValueError(f"{label} must contain 1-160 characters")
-    lowered = cleaned.casefold()
-    if any(term in lowered for term in _DISABLED_TERMS):
-        raise TindexEndpointDisabledError(
-            f"{label} appears to refer to a category disabled by Tindex; "
-            "do not request or substitute a different endpoint."
-        )
     if any(ch in cleaned for ch in ("/", "\\", "?", "#")):
         raise ValueError(f"{label} must be a single path segment")
     return cleaned
@@ -170,9 +155,19 @@ class TindexClient:
                 f"Tindex returned unexpected HTTP status {response.status_code}."
             )
         try:
-            return response.json()
+            payload = response.json()
         except ValueError:
             raise TindexProviderError("Tindex returned a successful response that was not valid JSON.") from None
+        # Tindex may encode resource-level failures in a 2xx JSON envelope.
+        # Never treat success=false as a valid empty dataset.
+        if isinstance(payload, dict) and payload.get("success") is False:
+            raise TindexProviderError(
+                f"Tindex returned success=false (HTTP {response.status_code}); "
+                "check the documented slug/category and response message locally."
+            )
+        if isinstance(payload, dict) and "success" in payload and payload.get("success") is not True:
+            raise TindexProviderError("Tindex response has an invalid success flag.")
+        return payload
 
     def currency_rates(self) -> Any:
         """Fetch the documented public currency-rate endpoint."""
@@ -228,10 +223,19 @@ def tindex_connection_status() -> dict[str, Any]:
         "token_configured": token_present,
         "network_tested": False,
         "production_approved": False,
-        "available_data_families": ["currency", "precious_metals", "cryptocurrency"],
-        "disabled_data_families": [
-            "iran_equities", "news", "inflation", "macroeconomics", "housing", "calendar"
+        # These are documented families, not yet production-accepted data.
+        "documented_data_families": [
+            "currency", "precious_metals", "cryptocurrency",
+            "stock_energy_indices", "housing_indicators", "automotive_indicators",
+            "macro_economy_indicators",
         ],
+        "not_implemented_or_not_confirmed": [
+            "stock_screener_and_per_stock_history",
+            "news_feed",
+            "inflation_series_semantics",
+            "calendar",
+        ],
+        "empty_categories_per_current_docs": ["commodities", "technology", "sentiment"],
         "quota": {
             "requests_per_minute": MAX_REQUESTS_PER_MINUTE,
             "successful_requests_per_day": 300,
