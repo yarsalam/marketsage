@@ -124,7 +124,7 @@ TGJU, unsupported Tindex categories, and any source with unresolved rights or se
 - Stage 4 exploratory report: 78 monthly rows, 11 global proxy/crypto assets, data end 2026-09-30, holdout 2025-10 through 2026-09. Momentum net holdout return was 30.57%, versus 6.41% monthly-rebalanced equal weight and 1.34% equal-weight buy-and-hold. Full-period momentum maximum drawdown was -40.15%, and its Sharpe (0.77) was below monthly-rebalanced equal weight (0.86).
 - The six-month fold from 2023-10 through 2024-03 reported 240.89% momentum return. Asset attribution and data/weight sanity checks are required before Stage 4 acceptance; the annualized number for that short fold is not a forecast.
 - See [Stage 4 empirical review](stage4-empirical-review-2026-10.md) and [Stage 5 readiness checklist](stage5-operational-readiness-checklist.md).
-- Latest Stage 5 code changes add a bounded stale-cache age and sanitized refresh logging. The latest CI and local tests for these newest changes are still pending.
+- Latest Stage 5 code changes add a bounded stale-cache age and sanitized refresh logging. CI run [#246](https://github.com/yarsalam/marketsage/actions/runs/39128372381) reports **233 Analysis Engine tests passed (14 warnings)** and the frontend, backend, and admin workspace jobs passed; the production-image build was still running at the last status check. The project owner still needs to pull the latest branch and confirm the local test run.
 
 ## Immediate next action
 
