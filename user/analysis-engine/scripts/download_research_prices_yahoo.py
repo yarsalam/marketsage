@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=Path.home() / ".cache" / "marketsage" / "research" / "yahoo",
-        help="Output directory (default is outside the Git repository)",
+        help="Output directory (default is outside the Git checkout)",
     )
     parser.add_argument("--overwrite", action="store_true", help="Replace files for requested symbols and manifest")
     return parser.parse_args()
@@ -99,7 +99,6 @@ def main() -> int:
                 auto_adjust=False,
                 actions=True,
                 repair=False,
-                raise_errors=True,
                 timeout=20,
             )
             if frame is None or frame.empty:
@@ -116,7 +115,7 @@ def main() -> int:
                 "currency": "unknown_pending_metadata_review",
             }
             print(f"  rows={len(frame)}; range={frame.index.min().date()}..{frame.index.max().date()}")
-        except Exception as exc:  # provider/library exceptions vary by version
+        except Exception as exc:
             failures += 1
             manifest["symbols"][symbol] = {
                 "status": "failed",
