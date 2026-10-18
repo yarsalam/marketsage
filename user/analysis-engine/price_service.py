@@ -34,11 +34,13 @@ TICKERS = {
     "XLF": "US Financials ETF", "XLE": "US Energy ETF",
 }
 CACHE_TTL = max(60, int(os.getenv("PRICE_CACHE_TTL_SECONDS", "900")))
+# Stale fallback is bounded: a provider outage must not keep an old portfolio usable forever.
+MAX_STALE_CACHE_AGE_SECONDS = max(0, int(os.getenv("MAX_STALE_CACHE_AGE_SECONDS", "86400")))
 DATA_SNAPSHOT_DIR = Path(os.getenv("DATA_SNAPSHOT_DIR", "/data/snapshots"))
 _cache_lock = threading.Lock()
 _cache_frame: pd.DataFrame | None = None
 _cache_time = 0.0
-_cache_metadata: dict = {"loaded": False, "stale": False}
+_cache_metadata: dict = {"loaded": False, "available": False, "stale": False}
 
 
 class ResearchArticleRequest(BaseModel):
@@ -232,13 +234,34 @@ def get_prices() -> pd.DataFrame:
     try:
         frame = download_prices()
     except Exception as exc:
-        logger.exception("Market data refresh failed")
+        # Never log provider exception text or response bodies; they can contain URLs or secrets.
+        logger.error("Market data refresh failed; error_type=%s", type(exc).__name__)
         with _cache_lock:
             if _cache_frame is not None and not _cache_frame.empty:
-                _cache_metadata = {**_cache_metadata, "stale": True, "last_refresh_error": type(exc).__name__}
-                logger.warning("Returning stale cached prices after refresh failure")
-                return _cache_frame.copy()
-        raise HTTPException(status_code=503, detail="Market data unavailable; no decision generated.") from exc
+                stale_age = max(0.0, time.monotonic() - _cache_time)
+                _cache_metadata = {
+                    **_cache_metadata,
+                    "available": stale_age <= MAX_STALE_CACHE_AGE_SECONDS,
+                    "stale": True,
+                    "last_refresh_error": type(exc).__name__,
+                    "last_refresh_failed_at": datetime.now(timezone.utc).isoformat(),
+                    "stale_age_seconds": int(stale_age),
+                }
+                if stale_age <= MAX_STALE_CACHE_AGE_SECONDS:
+                    logger.warning(
+                        "Serving stale cached prices within configured age limit; stale_age_seconds=%d",
+                        int(stale_age),
+                    )
+                    return _cache_frame.copy()
+                _cache_metadata = {
+                    **_cache_metadata,
+                    "available": False,
+                    "unavailable_reason": "stale_cache_exceeded_max_age",
+                }
+        raise HTTPException(
+            status_code=503,
+            detail="Market data unavailable or cached data exceeded the maximum stale age; no decision generated.",
+        ) from exc
 
     retrieved_at = datetime.now(timezone.utc)
     snapshot = None
@@ -249,7 +272,8 @@ def get_prices() -> pd.DataFrame:
     with _cache_lock:
         _cache_frame, _cache_time = frame, time.monotonic()
         _cache_metadata = {
-            "loaded": True, "stale": False, "source": "Yahoo Finance via yfinance",
+            "loaded": True, "available": True, "stale": False, "stale_age_seconds": 0,
+            "source": "Yahoo Finance via yfinance",
             "retrieved_at": retrieved_at.isoformat(),
             "data_as_of": pd.Timestamp(frame.dropna(how="all").index.max()).date().isoformat(),
             "row_count": int(len(frame)),
