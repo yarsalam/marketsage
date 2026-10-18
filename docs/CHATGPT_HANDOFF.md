@@ -38,14 +38,14 @@ cd ~/projects/marketsage-acceptance
 git status --short --branch
 git pull --ff-only origin feat/tindex-free-data-connector
 cd user/analysis-engine
-./scripts/run_research_acceptance.sh
+bash scripts/run_research_acceptance.sh
 ```
 
 The default pack uses synthetic fixtures and requires no VPN. To also test the local NestJS → FastAPI API hop, first ensure FastAPI is listening on `127.0.0.1:8000` and NestJS on `127.0.0.1:4500`, then run:
 
 ```bash
 cd ~/projects/marketsage-acceptance/user/analysis-engine
-RUN_API_SMOKE=1 ./scripts/run_research_acceptance.sh
+RUN_API_SMOKE=1 bash scripts/run_research_acceptance.sh
 ```
 
 The API smoke accepts HTTP 200 or 201 and asserts: one future article excluded; only prices through 2026-10-17 used; return approximately 5%; ranking remains null; ranking status stays disabled; market is not eligible for scoring. User has already confirmed the UI demo is visible and the expected result appears after it was run; the browser button should be clicked again if the local checkout is updated.
@@ -157,4 +157,4 @@ Send back health results, HTTP status/JSON from the POST (no secrets), and wheth
 
 ## Suggested prompt for a new ChatGPT conversation
 
-“Continue MarketSage from `docs/CHATGPT_HANDOFF.md` and `docs/implementation-roadmap.md` in https://github.com/yarsalam/marketsage. First check the current PR #6 head/CI and read those two docs. Do not assume earlier chat state is complete. The five stages are exactly: (1) اصلاح کد و تست‌های فعلی, (2) پذیرش فنی منابع داده, (3) ساخت نمونهٔ انتهابه‌انتها, (4) ارزیابی مدل و بک‌تست, (5) آزمون عملیاتی و تصمیم انتشار. Current owner-reported Analysis Engine tests: 205 passed, 7 warnings. Iran TSETMC/CODAL reachability succeeded with VPN OFF, but both remain ineligible for scoring; FRED key missing; GDELT previously returned 429. The Stage 3 UI fixture demo has rendered and shown the expected output; run `user/analysis-engine/scripts/run_research_acceptance.sh` and optionally `RUN_API_SMOKE=1 ./scripts/run_research_acceptance.sh` with local services running. If the pack passes, begin Stage 4 planning/evaluation while keeping Stage 2 source acceptance separate. Ask me to run commands only where local machine access is required. Never merge/deploy or enable investment ranking without explicit permission. Keep all scoring fail-closed and clearly distinguish evidence from assumptions.” 
+“Continue MarketSage from `docs/CHATGPT_HANDOFF.md` and `docs/implementation-roadmap.md` in https://github.com/yarsalam/marketsage. First check the current PR #6 head/CI and read those two docs. Do not assume earlier chat state is complete. The five stages are exactly: (1) اصلاح کد و تست‌های فعلی, (2) پذیرش فنی منابع داده, (3) ساخت نمونهٔ انتهابه‌انتها, (4) ارزیابی مدل و بک‌تست, (5) آزمون عملیاتی و تصمیم انتشار. Current owner-reported Analysis Engine tests: 205 passed, 7 warnings. Iran TSETMC/CODAL reachability succeeded with VPN OFF, but both remain ineligible for scoring; FRED key missing; GDELT previously returned 429. The Stage 3 UI fixture demo has rendered and shown the expected output; run `user/analysis-engine/scripts/run_research_acceptance.sh` and optionally `RUN_API_SMOKE=1 bash scripts/run_research_acceptance.sh` with local services running. If the pack passes, begin Stage 4 planning/evaluation while keeping Stage 2 source acceptance separate. Ask me to run commands only where local machine access is required. Never merge/deploy or enable investment ranking without explicit permission. Keep all scoring fail-closed and clearly distinguish evidence from assumptions.” 
