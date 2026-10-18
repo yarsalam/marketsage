@@ -1,6 +1,6 @@
 # Stage 5 — Operational Readiness Checklist
 
-**Status:** started as a readiness workstream; not approved for production or deployment.  
+**Status:** active; bounded stale-cache fallback and regression tests added, but latest CI/local verification and deployment gates remain open. Not approved for production or deployment.  
 **Branch:** `feat/tindex-free-data-connector`  
 **Release posture:** research-only; source scoring and investment ranking remain disabled.
 
@@ -11,15 +11,17 @@ Stage 5 is not complete merely because the code builds or a historical simulatio
 - [x] Feature branch / PR remains separate from the deployment branch.
 - [x] Backtest and evaluation outputs explicitly identify research-only purpose.
 - [x] Evaluation report records dataset SHA-256 and declares investment ranking/source scoring disabled.
-- [x] Added a report validator and tests for fail-closed flags, holdout boundaries, required baselines, hash shape, and cost scenarios; local execution still pending.
+- [x] Added a report validator and tests for fail-closed flags, holdout boundaries, required baselines, hash shape, and cost scenarios; project owner reports the validator passed and the full suite passed on the local checkout.
 - [x] Unknown source semantics and unapproved providers remain outside scoring.
 - [ ] Verify current source registry and every API path remain fail-closed in CI and local tests.
-- [ ] Verify live-data failures cannot silently substitute synthetic, stale, or incompatible data.
-- [ ] Verify logs and errors contain no tokens, credentials, or raw provider payloads.
+- [x] Bound stale-cache fallback with `MAX_STALE_CACHE_AGE_SECONDS` (default 24 hours); cache older than the limit fails with HTTP 503 instead of returning a decision.
+- [x] Added regression tests for bounded stale fallback, explicit stale status, fail-closed 503 after the age limit, and provider exception-message redaction.
+- [ ] Verify live-data failures cannot silently substitute synthetic or incompatible data across all source/API paths.
+- [ ] Verify logs and errors contain no tokens, credentials, or raw provider payloads. The price-refresh path now logs exception type only; wider log review remains open.
 
 ## B. Health, readiness, and failure behaviour
 
-- [ ] Define separate liveness and readiness checks; readiness must fail when mandatory dependencies/configuration are missing.
+- [ ] Define and verify separate liveness and readiness semantics; `/health` and `/ready` currently exist but both return unconditional success.
 - [ ] Bound network timeouts and retries per provider; never automatically retry GDELT during a provider cooldown/HTTP 429.
 - [ ] Verify per-provider rate limits and caching; Tindex limits remain enforced.
 - [ ] Test source timeout, HTTP error, malformed schema, missing timestamp, unknown currency/unit, stale response, duplicate observations, and empty history.
@@ -76,6 +78,14 @@ Then run the Stage 4 evaluation command documented in `docs/stage4-evaluation-pr
 
 Confirm its dataset hash and output dates before interpreting any metrics. Do not commit local reports, tokens, or raw licensed data.
 
+## Work completed in this Stage 5 increment
+
+- Bounded stale market-cache fallback with a configurable maximum age (default 86,400 seconds / 24 hours); expired cached data returns HTTP 503 and cannot generate a decision.
+- Sanitized provider-refresh logging to record exception type without logging exception text or provider response details.
+- Added regression coverage for stale-cache use within the limit, explicit stale metadata, rejection after the limit, and log redaction.
+- Added `MAX_STALE_CACHE_AGE_SECONDS` to the production Compose environment and `.env.production.example`.
+- Added `docs/stage4-empirical-review-2026-10.md` with the observed results, the extreme 2023-10–2024-03 fold, and outstanding attribution/data-quality checks.
+
 ## Current decision
 
-**Stage 5 started; release gate not passed.** Outstanding prerequisites include local execution of the report validator and its tests on the newest commit, full-suite confirmation after the newest validator addition, Stage 2 source rights/semantics/coverage review, point-in-time and survivorship assessment, operational failure-mode tests, and explicit staging/release approval. Investment ranking must remain disabled until the applicable gates are approved.
+**Stage 5 is in progress; release gate not passed.** The changes above still require a fresh CI run and local test confirmation on the resulting commit. Separate readiness semantics, provider/schema/staleness failure tests across all source paths, source rights/semantics review, point-in-time and survivorship assessment, security/dependency review, backup/restore rehearsal, staging smoke tests, rollback rehearsal, and explicit release approval remain open. Investment ranking and source scoring must remain disabled.
