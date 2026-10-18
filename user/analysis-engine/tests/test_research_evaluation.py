@@ -63,3 +63,23 @@ def test_six_month_label_inventory_is_not_claimed_as_prediction():
     assert all(row["label_horizon_months"] == 6 for row in labels)
     assert all(row["purpose"] == "label_inventory_only_not_predictive_evaluation" for row in labels)
     assert all(row["available_forward_6m_labels"] == 54 for row in labels)
+
+def test_cost_sensitivity_is_predeclared_and_higher_costs_do_not_improve_return():
+    report = evaluate_monthly_strategies(
+        make_prices(),
+        BacktestConfig(
+            top_n=2, momentum_months=3, volatility_months=6,
+            transaction_cost_bps=10, slippage_bps=0,
+        ),
+        holdout_months=12,
+        min_train_months=24,
+        fold_months=6,
+    )
+    scenarios = {item["scenario"]: item for item in report["cost_sensitivity"]}
+    assert {"zero_cost_reference", "configured_costs", "higher_cost_stress"} <= set(scenarios)
+    assert scenarios["higher_cost_stress"]["full_period_metrics"]["total_return"] <= (
+        scenarios["configured_costs"]["full_period_metrics"]["total_return"] + 1e-12
+    )
+    assert scenarios["higher_cost_stress"]["period_cost_fractions"]["total"] >= (
+        scenarios["configured_costs"]["period_cost_fractions"]["total"]
+    )
