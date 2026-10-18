@@ -2,8 +2,8 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 2 — connector technical acceptance in progress; Stage 3 fixture-backed research API/UI implemented, runtime acceptance pending  
-**Release posture:** research-only; source scoring remains fail-closed
+**Current milestone:** Stage 4 — evaluation and backtesting protocol/data inventory; Stage 2 source acceptance remains open  
+**Release posture:** research-only; investment ranking and source scoring remain disabled
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
 
@@ -169,3 +169,25 @@ This update supersedes older test counts and CI-status notes above where they co
 - **Local E2E acceptance gate:** verify engine `/health`, verify backend `/health`, POST a deterministic fixture to `/api/markets/research-snapshot`, then use the frontend's research demo and verify that future-dated article/price data are excluded and investment ranking remains null/disabled.
 - **Do not start Stage 4 yet** until the full UI -> NestJS -> FastAPI request path is demonstrated and its output is captured. Stage 2 source-semantic/legal/data-quality gates remain independently open; Stage 3 can use fixtures without treating sources as approved.
 - **No merge/deploy:** PR #6 remains open; no production release or scoring activation is authorized by these tests.
+
+
+## Stage 4 execution update — evaluation protocol and local inventory
+
+- Added [`docs/stage4-evaluation-protocol.md`](stage4-evaluation-protocol.md), defining the evaluation scope before results are inspected: approximate six-month target horizon, monthly decision cadence, current monthly momentum strategy as a baseline only, chronological validation, baselines, costs, risk metrics, and exit criteria.
+- Added `user/analysis-engine/scripts/audit_research_data.py`, a read-only local inventory utility. It reports file metadata, candidate schemas/date ranges, missingness, and heuristic price-field checks without printing sample rows or raw cell values. It does not access the network and does not approve sources.
+- The known Yahoo Finance universe (BTC-USD, ETH-USD, SOL-USD, GLD, SPY, QQQ, TLT, UUP, USO, XLF, XLE) is a mixed US-listed fund/equity and crypto sample; it must not be represented as an Iranian-market evaluation.
+- **Not yet evidenced:** the user's current local data inventory, data provenance/licensing, adjusted-price semantics, point-in-time correctness, and any out-of-sample strategy result. Do not report backtest performance until these are audited.
+- Stage 3 remains complete for the fixture-backed local demo only. Stage 2 source acceptance remains separate and open.
+
+### First Stage 4 command
+
+Run from the local checkout after reviewing `git status` and updating the feature branch without discarding local changes:
+
+```bash
+cd ~/projects/marketsage-acceptance
+git status --short --branch
+git pull --ff-only origin feat/tindex-free-data-connector
+python user/analysis-engine/scripts/audit_research_data.py --root user/analysis-engine --output /tmp/marketsage-data-audit.json
+```
+
+Review the summary and the generated JSON locally. Do not commit the generated report or local smoke reports automatically. Keep PR #6 open, do not deploy, and keep ranking disabled.
