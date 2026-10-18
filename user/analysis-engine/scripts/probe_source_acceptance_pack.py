@@ -21,7 +21,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from codal_provider import CodalClient
-from fred_alfred_provider import FredAlfredClient
+from fred_alfred_provider import FredAlfredClient, FredProviderError
 from gdelt_news_provider import GdeltDocClient, GdeltError
 from tindex_provider import TindexClient
 from tsetmc_provider import TsetmcClient
@@ -70,6 +70,8 @@ def shape(value: Any) -> dict[str, Any]:
 def safe_error_detail(source_id: str, exc: Exception) -> str | None:
     """Expose detail only for GDELT's deliberately sanitized exception contract."""
     if source_id == "global.gdelt_doc_api" and isinstance(exc, GdeltError):
+        return str(exc)
+    if source_id == "us.fred.alfred" and isinstance(exc, FredProviderError):
         return str(exc)
     return None
 
