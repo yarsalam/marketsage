@@ -142,7 +142,16 @@ class FredAlfredClient:
                 except (TypeError, ValueError):
                     raise ValueError(f"{name} must use YYYY-MM-DD") from None
                 params[name] = value
-        response = self._client.get("/series/observations", params=params)
+        try:
+            response = self._client.get("/series/observations", params=params)
+        except httpx.TimeoutException as exc:
+            raise FredProviderError(
+                f"FRED network timeout ({type(exc).__name__}); no automatic retry was made"
+            ) from None
+        except httpx.HTTPError as exc:
+            raise FredProviderError(
+                f"FRED network error ({type(exc).__name__}); no automatic retry was made"
+            ) from None
         if response.status_code in (401, 403):
             raise FredProviderError(f"FRED authorization failed ({response.status_code})")
         if response.status_code == 429:
