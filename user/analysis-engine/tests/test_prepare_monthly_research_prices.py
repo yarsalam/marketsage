@@ -108,3 +108,35 @@ def test_panel_uses_only_months_observed_for_all_symbols(tmp_path):
 def test_missing_symbol_file_fails_closed(tmp_path):
     with pytest.raises(ValueError, match="expected file not found"):
         prepare_monthly_panel(tmp_path, ["BTC-USD"])
+
+def test_excludes_incomplete_current_month_using_as_of_date(tmp_path):
+    path = tmp_path / "SPY.csv"
+    write_csv(
+        path,
+        ["2024-01-31", "2024-02-29", "2024-03-15"],
+        **{"Adj Close": [10.0, 11.0, 12.0]},
+    )
+
+    monthly, meta = load_monthly_series(path, "SPY", as_of_date="2024-03-15")
+
+    assert monthly.index.tolist() == [
+        pd.Timestamp("2024-01-31", tz="UTC"),
+        pd.Timestamp("2024-02-29", tz="UTC"),
+    ]
+    assert meta["incomplete_months_excluded"] == 1
+    assert meta["as_of_date_utc"] == "2024-03-15"
+
+
+def test_includes_month_when_as_of_date_is_month_end(tmp_path):
+    path = tmp_path / "SPY.csv"
+    write_csv(
+        path,
+        ["2024-01-31", "2024-02-29"],
+        **{"Adj Close": [10.0, 11.0]},
+    )
+
+    monthly, meta = load_monthly_series(path, "SPY", as_of_date="2024-02-29")
+
+    assert monthly.tolist() == [10.0, 11.0]
+    assert meta["incomplete_months_excluded"] == 0
+
