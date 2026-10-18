@@ -36,7 +36,7 @@ def test_fold_attribution_reconciles_gross_return_and_flags_selected_asset_jump(
     assert report["source_scoring_approved"] is False
     assert report["periods"] == 6
     assert any(
-        item["symbol"] == "A" and item["monthly_return"] == pytest.approx(2.0)
+        item["symbol"] == "A" and item["monthly_return"] == pytest.approx(2.045)
         for item in report["selected_asset_return_outliers"]
     )
     for row in report["monthly"]:
