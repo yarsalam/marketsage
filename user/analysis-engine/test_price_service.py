@@ -280,6 +280,7 @@ def test_research_snapshot_api_rejects_invalid_dates_and_values():
 def test_stale_cache_fallback_is_bounded_and_logs_only_error_type(monkeypatch, caplog):
     prices = provider_frame()
     monkeypatch.setattr(price_service, "_cache_frame", prices)
+    monkeypatch.setattr(price_service, "CACHE_TTL", 5)
     monkeypatch.setattr(price_service, "_cache_time", price_service.time.monotonic() - 10)
     monkeypatch.setattr(
         price_service,
@@ -310,6 +311,7 @@ def test_stale_cache_fallback_is_bounded_and_logs_only_error_type(monkeypatch, c
 def test_expired_stale_cache_fails_closed_with_503(monkeypatch):
     prices = provider_frame()
     monkeypatch.setattr(price_service, "_cache_frame", prices)
+    monkeypatch.setattr(price_service, "CACHE_TTL", 5)
     monkeypatch.setattr(price_service, "_cache_time", price_service.time.monotonic() - 61)
     monkeypatch.setattr(
         price_service,
