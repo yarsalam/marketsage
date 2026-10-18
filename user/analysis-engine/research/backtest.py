@@ -93,8 +93,8 @@ def run_monthly_momentum_backtest(
     that close, turnover is measured against prior holdings after their weights
     have drifted with the just-completed month, and the next month's return is
     then applied. Costs are deducted from capital before that next-period return.
-    Cost fractions are charged against one-way traded weight (sum of absolute
-    target-minus-pretrade weights), not half-turnover.
+    Cost fractions are charged against gross traded weight: the sum of absolute
+    target-minus-pretrade weights (L1 turnover, buys plus sells), not half-turnover.
     """
     cfg = config or BacktestConfig()
     cfg.validate()
