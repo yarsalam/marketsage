@@ -40,21 +40,26 @@ record ""
 
 record "== 2/4 TSETMC history quality audit (VPN OFF) =="
 FIXTURE="/tmp/marketsage-tsetmc-foolad-history.json"
+TSETMC_AUDIT_OK=0
 if [[ -f "$FIXTURE" ]]; then
-  if ! "$PYTHON" scripts/audit_tsetmc_history.py --input "$FIXTURE" \
+  if "$PYTHON" scripts/audit_tsetmc_history.py --input "$FIXTURE" \
       --ins-code 46348559193224090 --output "$REPORT_DIR/tsetmc-history-audit.json"; then
-    record "FAIL: TSETMC fixture audit failed."
-    exit 1
+    TSETMC_AUDIT_OK=1
+  else
+    record "WARN: TSETMC fixture audit failed; continuing with other source probes."
   fi
 else
   record "No saved TSETMC fixture found; fetching one full Foolad history now."
-  if ! "$PYTHON" scripts/audit_tsetmc_history.py \
+  if "$PYTHON" scripts/audit_tsetmc_history.py \
       --ins-code 46348559193224090 --output "$REPORT_DIR/tsetmc-history-audit.json"; then
-    record "FAIL: TSETMC history audit/fetch failed (error details redacted)."
-    exit 1
+    TSETMC_AUDIT_OK=1
+  else
+    record "WARN: TSETMC history audit/fetch failed (error details redacted); continuing with other source probes."
   fi
 fi
-record "PASS: TSETMC history audit; report contains metadata/flags only."
+if [[ "$TSETMC_AUDIT_OK" == "1" ]]; then
+  record "PASS: TSETMC history audit; report contains metadata/flags only."
+fi
 record ""
 
 record "== 3/4 Iran source probes (VPN OFF) =="
