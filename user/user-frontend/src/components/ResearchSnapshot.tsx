@@ -70,7 +70,7 @@ const demoPayload = {
   ],
 };
 
-function percent(value: number | null) {
+function percent(value: number | null | undefined) {
   return value == null || !Number.isFinite(value)
     ? "نامشخص"
     : `${(value * 100).toFixed(2)}٪`;
