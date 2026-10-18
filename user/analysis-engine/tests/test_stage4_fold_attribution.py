@@ -55,3 +55,21 @@ def test_fold_attribution_rejects_empty_window_and_bad_threshold():
     with pytest.raises(ValueError, match="greater than zero"):
         analyze_fold(prices, dates[20].date().isoformat(), dates[25].date().isoformat(),
                      outlier_return_threshold=0)
+
+def test_fold_attribution_accepts_timezone_aware_utc_index():
+    dates = pd.date_range("2020-01-31", periods=40, freq="ME", tz="UTC")
+    t = np.arange(len(dates), dtype=float)
+    prices = pd.DataFrame({
+        "A": 100 * (1.015 ** t),
+        "B": 100 * (1.008 ** t),
+        "C": 100 * (1.002 ** t),
+    }, index=dates)
+    report = analyze_fold(
+        prices,
+        "2021-09-30",
+        "2022-02-28",
+        BacktestConfig(top_n=3, momentum_months=3, volatility_months=12),
+    )
+    assert report["actual_start"] == "2021-09-30"
+    assert report["actual_end"] == "2022-02-28"
+    assert report["periods"] == 6
