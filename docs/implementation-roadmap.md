@@ -2,14 +2,14 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 1 — connector technical acceptance  
+**Current milestone:** Stage 3 — end-to-end prototype (first fixture-backed slice added)  
 **Release posture:** research-only; source scoring remains fail-closed
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
 
 ## 1. Current stage and evidence
 
-### Stage 1 — Connector technical acceptance (in progress)
+### Stage 2 — Connector technical acceptance (in progress)
 
 Local evidence reported by the project owner on 2026-10-18:
 
@@ -25,7 +25,7 @@ Local evidence reported by the project owner on 2026-10-18:
 
 The reported 188-test result is local evidence from the project owner; do not label it as a GitHub Actions/CI result unless a workflow run confirms it.
 
-### Stage 1 exit criteria
+### Stage 2 exit criteria
 
 1. Confirm the full suite is reproducible from the intended branch and record the exact commit and test result.
 2. Review and resolve (or explicitly accept with an issue) the deprecation warnings.
@@ -35,9 +35,9 @@ The reported 188-test result is local evidence from the project owner; do not la
 6. Test that unknown units/timestamps, unavailable sources, stale observations, and unapproved sources cannot enter scoring.
 7. Keep the source registry fail-closed until an explicit review approves a source for a narrowly defined use.
 
-**Stage 1 decision:** Do not block prototype development on every external source being approved. Stage 2 can begin with deterministic fixtures and clearly labelled research-only data, while Stage 1 acceptance gaps remain open.
+**Stage 2 decision:** Do not block prototype development on every external source being approved. Stage 3 can proceed with deterministic fixtures and clearly labelled research-only data, while Stage 1 acceptance gaps remain open.
 
-## 2. Stage 2 — End-to-end research prototype
+## 3. Stage 3 — End-to-end research prototype
 
 **Goal:** demonstrate one auditable path from inputs to an explainable, risk-aware comparison without claiming production predictive ability.
 
@@ -73,14 +73,14 @@ The reported 188-test result is local evidence from the project owner; do not la
    - Expose the prototype through versioned research endpoints and show source freshness, data coverage, model/version, risk metrics, and explanation.
    - Keep unsupported dashboard sections visibly unavailable instead of filling them with fabricated estimates.
 
-### Stage 2 acceptance evidence
+### Stage 3 acceptance evidence
 
 - Deterministic end-to-end tests with frozen fixtures.
 - Tests for duplicate news, corrected disclosures, missing values, unit mismatches, stale data, unavailable providers, and timestamp leakage.
 - At least one fully traceable example from source record to final rank, including rejected records and explanation.
 - No live investment scoring from unapproved sources.
 
-## 3. Stage 3 — Model and strategy validation
+## 4. Stage 4 — Model and strategy validation
 
 1. Build time-stamped, independently labelled Persian/English sentiment and event evaluation data; publish class-wise precision, recall, F1, confusion matrices, and error analysis.
 2. Define the investment universe, benchmark, decision cadence, horizon, costs, slippage, liquidity constraints, and portfolio rules before evaluating strategies.
@@ -93,7 +93,7 @@ The reported 188-test result is local evidence from the project owner; do not la
 
 **Exit gate:** results are reproducible out of sample, limitations are documented, and a reviewer can replay a historical decision using only information available at that time. Passing this gate still does not guarantee future returns.
 
-## 4. Stage 4 — Operational readiness and controlled release
+## 5. Stage 5 — Operational readiness and controlled release
 
 - Add structured metrics/logging without secrets, health/readiness checks, bounded timeouts, provider-specific rate limits, cache policies, and safe degradation.
 - Add data-quality alerts for staleness, schema drift, missing intervals, unexpected unit/scale changes, and abnormal duplicate rates.
@@ -105,32 +105,29 @@ The reported 188-test result is local evidence from the project owner; do not la
 
 **Exit gate:** a documented release review explicitly approves the supported scope, with rollback and monitoring in place. Approval of one data source or one API endpoint does not approve the whole investment product.
 
-## 5. Stage 5 — Source-by-source approval and expansion
 
-Approve sources individually and only for the purposes actually reviewed. Maintain a registry with states such as `candidate`, `reachable_only`, `research_only`, `approved_for_specific_fields`, and `disabled`.
+### Source-by-source approval gate (applies across Stages 2–5)
 
-For each source, the approval record must include:
-- owner/reviewer and review date;
-- terms/licensing decision and permitted use;
-- endpoint/schema version and fixture provenance;
-- unit, currency, timestamp, revision and coverage validation;
-- independent reconciliation evidence;
-- rate limits, outage behaviour and operational owner;
-- exact approved fields/use cases and explicit exclusions.
+Approve sources individually and only for the purposes actually reviewed. Maintain registry states such as `candidate`, `reachable_only`, `research_only`, `approved_for_specific_fields`, and `disabled`.
+
+For each source, record the owner/reviewer and date; terms/licensing and permitted use; endpoint/schema version and fixture provenance; unit, currency, timestamp, revision and coverage validation; independent reconciliation; rate limits and outage behaviour; exact approved fields/use cases and exclusions.
 
 TGJU, unsupported Tindex categories, and any source with unresolved rights or semantics remain disabled. Never bypass a provider's disabled endpoint or access restrictions.
 
 ## Immediate next action
 
-1. Keep the passing full-suite result as local evidence: `188 passed, 7 warnings`.
-2. Do not run another redundant provider test pack now. The next useful check is to confirm the result against the current feature-branch commit and inspect the warning sources when convenient.
-3. Start Stage 2 with canonical schemas and a fixture-backed vertical slice (one market-data series plus a small, manually reviewed news/event fixture set). No additional live provider calls are required to begin.
-4. Leave live scoring disabled until the relevant source and model gates pass.
+1. Run the new fixture-backed pipeline tests and then the full analysis-engine suite from `user/analysis-engine`.
+2. Review the CI run associated with the latest feature-branch commit once it finishes; the local result and CI result must be reported separately.
+3. Inspect and fix any failures before wiring this research-only function into an API or UI.
+4. Keep source scoring disabled; the new pipeline is an auditable prototype, not a validated investment signal.
 
 ## Project status report (copy-ready)
 
-- **Current stage:** Stage 1 — connector technical acceptance, with Stage 2 prototype work ready to begin using fixtures.
-- **Evidence:** local full analysis-engine suite: 188 passed, 7 warnings, 8.83s (reported 2026-10-18); bounded live probes reached TSETMC, CODAL, Tindex, and FRED/ALFRED at least once.
-- **Not verified:** CI status for this exact commit; external-data licensing; full schema/units/timestamps/history/revision semantics; independent reconciliation; GDELT reliability after HTTP 429; real-world sentiment/event accuracy; out-of-sample investment performance.
-- **Exact next step:** implement the canonical data contract and one deterministic end-to-end, fixture-backed research path. No further broad test pack is required before beginning.
-- **Remaining stages:** complete source acceptance; end-to-end research prototype; labelled NLP/event and leakage-aware strategy validation; operational/security readiness; source-by-source release approval.
+- **Stage 1 — code and existing tests:** local full suite reported 188 passed, 7 warnings, 8.83s on 2026-10-18; GitHub Actions previously had a successful run, and a newer run is queued for the latest commit.
+- **Stage 2 — source acceptance:** in progress; TSETMC, CODAL, Tindex, and FRED/ALFRED had bounded live responses, but data semantics/licensing/coverage are not fully approved; GDELT previously returned HTTP 429.
+- **Stage 3 — end-to-end prototype:** started. Added `research_pipeline.py` and `tests/test_research_pipeline.py` on the feature branch. The function combines fixture/provided article metadata, transparent headline labels, and descriptive price metrics; excludes future-dated rows, flags unknown units/source approval, and hard-disables investment ranking.
+- **Stage 4 — model/backtest:** not started for this integrated pipeline; needs labelled NLP/event evaluation, point-in-time validation, chronological holdout/walk-forward, costs/liquidity and drawdown/risk reporting.
+- **Stage 5 — operational/release:** not started; monitoring, failure handling, security, staging deployment, and release review remain.
+- **Not verified:** tests for the newly added pipeline until the user runs them; CI status for latest commit until queued workflow completes; licensing, data correctness, and real-world predictive performance.
+- **Exact next step:** run `python -m pytest -q tests/test_research_pipeline.py`, then run `python -m pytest -q` if focused tests pass.
+- **Release posture:** research-only; no production investment scoring or ranking enabled.
