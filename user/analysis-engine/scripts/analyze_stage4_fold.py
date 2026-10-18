@@ -38,10 +38,19 @@ def analyze_fold(
         raise ValueError("outlier_return_threshold must be finite and greater than zero")
     prices = prices.copy()
     prices.index = pd.DatetimeIndex(prices.index)
+    # Compare timestamps in one consistent convention. Normalize both the
+    # input index and requested dates to UTC-naive to support UTC CSVs and
+    # local/naive monthly fixtures without tz-awareness comparison errors.
+    if prices.index.tz is not None:
+        prices.index = prices.index.tz_convert("UTC").tz_localize(None)
     prices = prices.sort_index()
     cfg = config or BacktestConfig()
     result = run_monthly_momentum_backtest(prices, cfg)
     start, end = pd.Timestamp(start_date), pd.Timestamp(end_date)
+    if start.tzinfo is not None:
+        start = start.tz_convert("UTC").tz_localize(None)
+    if end.tzinfo is not None:
+        end = end.tz_convert("UTC").tz_localize(None)
     if start > end:
         raise ValueError("start_date must be on or before end_date")
     monthly = result["monthly"].loc[(result["monthly"].index >= start) & (result["monthly"].index <= end)]
