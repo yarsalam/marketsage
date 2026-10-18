@@ -64,6 +64,24 @@ The seven six-month momentum fold returns were approximately:
 
 This dispersion is material. The results are not a stable monthly income stream and include multiple losing six-month windows.
 
+## Reproducible attribution follow-up
+
+A local diagnostic was added at `user/analysis-engine/scripts/analyze_stage4_fold.py`. It reuses the same momentum backtest implementation/configuration, lists selected assets and each selected asset's monthly return, reconciles equal-weight gross contributions to the recorded gross strategy return, and flags selected-asset monthly moves whose absolute return meets a configurable threshold. It writes a hash-bearing JSON diagnostic and does not approve ranking.
+
+Run it locally against the same CSV used for the Stage 4 report:
+
+```bash
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+.venv/bin/python scripts/analyze_stage4_fold.py \
+  --input /tmp/marketsage-monthly-stage4/monthly_prices.csv \
+  --output /tmp/marketsage-stage4-fold-attribution.json \
+  --start-date 2023-10-31 \
+  --end-date 2024-03-31 \
+  --outlier-return-threshold 1.0
+```
+
+The local dataset is not committed, so this repository change cannot truthfully claim that asset-level attribution has already been executed. Review the output's SHA-256 against the Stage 4 report before comparing results. The script's cross-period contribution sums are explicitly additive diagnostics, not compounded P&L attribution.
+
 ## Acceptance gaps before any model/strategy approval
 
 1. Attribute each fold and the extreme fold's return to assets and monthly holdings; verify no symbol/price anomaly or portfolio-weight discontinuity.
