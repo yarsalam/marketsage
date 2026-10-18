@@ -134,6 +134,6 @@ Example local command (run from `user/analysis-engine`):
   --risk-free-rate-annual 0
 ```
 
-Do not inspect the holdout and then change settings while still calling it locked. The default CLI slippage of 25 bps is a sensitivity assumption, not an estimate of actual execution cost. Run additional predeclared cost scenarios as separate reports. This runner does not tune parameters, train a predictive model, calculate calibrated probabilities, or prove the strategy is suitable for Iranian markets. Six-month forward labels are counted for data-availability planning only; they are not prediction scores.
+Do not inspect the holdout and then change settings while still calling it locked. The default CLI slippage of 25 bps is a sensitivity assumption, not an estimate of actual execution cost. The report includes zero-cost, configured-cost, and higher-cost stress scenarios; any additional scenarios must be declared before inspecting the locked holdout. This runner does not tune parameters, train a predictive model, calculate calibrated probabilities, or prove the strategy is suitable for Iranian markets. Six-month forward labels are counted for data-availability planning only; they are not prediction scores.
 
 **Acceptance remains pending** until the local command, focused tests, and full analysis-engine suite pass on the intended commit, the report is reviewed, and source/provenance/rights and point-in-time limitations are resolved or explicitly bounded. A successful script exit alone is not Stage 4 approval.
