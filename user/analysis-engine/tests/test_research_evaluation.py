@@ -31,7 +31,6 @@ def test_evaluation_reports_full_holdout_and_pre_holdout_folds():
     assert report["evaluation_design"]["walkforward_folds_end_before_final_holdout"] is True
     assert report["evaluation_design"]["holdout_start"] == "2024-01-31"
     assert report["evaluation_design"]["holdout_end"] == "2024-12-31"
-    assert len(report["locked_holdout_metrics"]["momentum_strategy_net"]["periods"].__str__()) > 0
     assert report["locked_holdout_metrics"]["momentum_strategy_net"]["periods"] == 12
     assert len(report["walkforward_folds"]) == 4
     assert all(fold["end"] < report["evaluation_design"]["holdout_start"] for fold in report["walkforward_folds"])
