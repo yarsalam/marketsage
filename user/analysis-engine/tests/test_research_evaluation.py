@@ -37,6 +37,7 @@ def test_evaluation_reports_full_holdout_and_pre_holdout_folds():
     assert set(report["full_period_metrics"]) == {
         "momentum_strategy_net",
         "equal_weight_monthly_rebalanced_net",
+        "equal_weight_buy_and_hold_net",
         "cash_zero_return",
     }
 
