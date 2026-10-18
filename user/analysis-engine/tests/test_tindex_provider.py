@@ -128,3 +128,28 @@ def test_success_false_json_envelope_is_not_treated_as_data():
     )) as client:
         with pytest.raises(TindexProviderError, match="success=false"):
             client.indicator_history("unknown-slug")
+
+
+
+def test_history_requests_explicit_three_month_range_and_english_units():
+    seen = {}
+
+    def handler(request):
+        seen["path"] = request.url.path
+        seen["params"] = dict(request.url.params)
+        return httpx.Response(200, json={
+            "success": True,
+            "data": {"range": "3m", "dates": [], "points": []},
+        })
+
+    with client_for(handler) as client:
+        client.indicator_history("USD-EXCHANGE-RATE")
+
+    assert seen["path"] == "/api/public/indicators/USD-EXCHANGE-RATE/history"
+    assert seen["params"] == {"range": "3m", "lang": "en"}
+
+
+def test_history_range_validation_happens_before_network():
+    with client_for(lambda request: pytest.fail("request must not run")) as client:
+        with pytest.raises(ValueError, match="history range"):
+            client.indicator_history("USD-EXCHANGE-RATE", range="1y")
