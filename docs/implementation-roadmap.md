@@ -2,7 +2,7 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 4 — evaluation implementation pending local/CI confirmation; Stage 5 operational readiness checklist started; Stage 2 source acceptance remains open  
+**Current milestone:** Stage 4 — empirical review documented, acceptance still open; Stage 5 operational hardening in progress; Stage 2 source acceptance remains open  
 **Release posture:** research-only; investment ranking and source scoring remain disabled
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
@@ -99,6 +99,7 @@ The reported 188-test result is local evidence from the project owner; do not la
 ## 5. Stage 5 — Operational readiness and controlled release
 
 - Add structured metrics/logging without secrets, health/readiness checks, bounded timeouts, provider-specific rate limits, cache policies, and safe degradation.
+- Implemented in the current work branch: provider-refresh logs now emit exception type only, and stale cached market prices may be served only up to configurable `MAX_STALE_CACHE_AGE_SECONDS` (default 86,400 seconds); older cache fails closed with HTTP 503. Regression tests cover the age boundary and log redaction; fresh CI/local confirmation remains required.
 - Add data-quality alerts for staleness, schema drift, missing intervals, unexpected unit/scale changes, and abnormal duplicate rates.
 - Ensure provider failures cannot silently fall back to fabricated or incompatible data.
 - Secure secrets through environment/secret management; review access control, dependency security, backups, retention, and permitted data storage.
@@ -116,6 +117,14 @@ Approve sources individually and only for the purposes actually reviewed. Mainta
 For each source, record the owner/reviewer and date; terms/licensing and permitted use; endpoint/schema version and fixture provenance; unit, currency, timestamp, revision and coverage validation; independent reconciliation; rate limits and outage behaviour; exact approved fields/use cases and exclusions.
 
 TGJU, unsupported Tindex categories, and any source with unresolved rights or semantics remain disabled. Never bypass a provider's disabled endpoint or access restrictions.
+
+## Current evidence update (2026-10-18)
+
+- Project owner reports the Analysis Engine suite passed **229 tests with 14 warnings** and the Stage 4 report validator passed. This is local evidence; it must not be labelled as CI evidence.
+- Stage 4 exploratory report: 78 monthly rows, 11 global proxy/crypto assets, data end 2026-09-30, holdout 2025-10 through 2026-09. Momentum net holdout return was 30.57%, versus 6.41% monthly-rebalanced equal weight and 1.34% equal-weight buy-and-hold. Full-period momentum maximum drawdown was -40.15%, and its Sharpe (0.77) was below monthly-rebalanced equal weight (0.86).
+- The six-month fold from 2023-10 through 2024-03 reported 240.89% momentum return. Asset attribution and data/weight sanity checks are required before Stage 4 acceptance; the annualized number for that short fold is not a forecast.
+- See [Stage 4 empirical review](stage4-empirical-review-2026-10.md) and [Stage 5 readiness checklist](stage5-operational-readiness-checklist.md).
+- Latest Stage 5 code changes add a bounded stale-cache age and sanitized refresh logging. The latest CI and local tests for these newest changes are still pending.
 
 ## Immediate next action
 
