@@ -323,11 +323,10 @@ def test_expired_stale_cache_fails_closed_with_503(monkeypatch):
         lambda: (_ for _ in ()).throw(TimeoutError("provider timed out")),
     )
 
-    with pytest.raises(HTTPException) as error:
-        price_service.get_prices()
+    response = client.get("/decision")
 
-    assert error.value.status_code == 503
-    assert "maximum stale age" in error.value.detail
+    assert response.status_code == 503
+    assert "maximum stale age" in response.json()["detail"]
     payload = client.get("/data-status").json()
     assert payload["stale"] is True
     assert payload["available"] is False
