@@ -214,3 +214,64 @@ def test_backtest_endpoint_rejects_negative_slippage_before_fetch(monkeypatch):
     )
     response = client.get("/backtest?slippage_bps=-1")
     assert response.status_code == 422
+
+
+def test_research_snapshot_api_returns_descriptive_metrics_and_keeps_ranking_disabled():
+    response = client.post(
+        "/research/snapshot",
+        json={
+            "as_of_date": "2026-10-17",
+            "articles": [{
+                "source_id": "fixture.news",
+                "url": "https://example.test/article",
+                "title": "Central bank announces growth agreement",
+                "first_seen_date": "2026-10-16",
+            }],
+            "market_series": [{
+                "symbol": "DEMO",
+                "source_id": "fixture.market",
+                "unit": "USD per unit",
+                "currency": "USD",
+                "unit_confirmed": True,
+                "currency_confirmed": True,
+                "observations": [
+                    {"date": "2026-10-15", "close": 100},
+                    {"date": "2026-10-16", "close": 110},
+                    {"date": "2026-10-17", "close": 105},
+                    {"date": "2026-10-18", "close": 1000},
+                ],
+            }],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["pipeline_version"] == "research_snapshot_v1"
+    assert payload["news"]["articles_analyzed"] == 1
+    assert payload["markets"][0]["metrics"]["last_observation_date"] == "2026-10-17"
+    assert payload["markets"][0]["metrics"]["total_return"] == pytest.approx(0.05)
+    assert payload["markets"][0]["eligible_for_scoring"] is False
+    assert "source_not_approved" in payload["markets"][0]["exclusion_reasons"]
+    assert payload["investment_ranking"] is None
+    assert payload["investment_ranking_status"] == "disabled_until_source_and_model_acceptance"
+
+
+def test_research_snapshot_api_rejects_invalid_dates_and_values():
+    bad_date = client.post(
+        "/research/snapshot",
+        json={"as_of_date": "17-10-2026", "articles": [], "market_series": []},
+    )
+    assert bad_date.status_code == 422
+
+    bad_close = client.post(
+        "/research/snapshot",
+        json={
+            "as_of_date": "2026-10-17",
+            "articles": [],
+            "market_series": [{
+                "symbol": "DEMO",
+                "observations": [{"date": "2026-10-17", "close": -1}],
+            }],
+        },
+    )
+    assert bad_close.status_code == 422
