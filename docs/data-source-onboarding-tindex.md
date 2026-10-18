@@ -106,14 +106,67 @@ The new `tests/test_acceptance_pack.py` adds deterministic batch invariants in a
 These are regression/robustness checks, not 3,000 independent examples of real-world accuracy. They make no network calls and require no API credentials. The CI result must be reported separately from controlled live smoke checks. For the live stage, run a bounded probe per provider from the intended runtime/network, save sanitized status/schema/latency metadata (never tokens or full sensitive payloads), and do not turn a network response into production approval automatically.
 
 
-## One-command live source smoke pack
+## VPN-aware live source smoke pack
 
-After the offline suite passes, run this from `user/analysis-engine` in the intended runtime/network:
+The probe script accepts repeatable `--source SOURCE_ID` arguments. **Do not run the default all-source pack when providers require different VPN states.** Run the Iranian and external probes separately.
+
+All commands below run from `user/analysis-engine`. Use the project's virtualenv interpreter so the command works even when the shell does not provide a `python` alias:
 
 ```bash
-python scripts/probe_source_acceptance_pack.py > source-smoke-report.json
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+PYTHON="$PWD/.venv/bin/python"
 ```
 
-The script makes at most one request to each of GDELT, TSETMC, CODAL, and Tindex, plus one FRED request if `FRED_API_KEY` is configured. Tindex is limited to its single currency-rates request to respect the conservative quota. Missing Tindex/FRED credentials cause a reported skip, not a credential prompt. Error details are redacted; the report contains response shape metadata only, not raw payloads or tokens. A non-zero exit code means at least one attempted live probe failed.
+### Iranian providers — VPN OFF
 
-This report tests reachability and observed schema only. It does not prove completeness, licensing, data semantics, source truth, sentiment accuracy, or suitability for investment scoring. Keep the generated report local or review it for environment-specific metadata before sharing. The script never enables scoring.
+TSETMC and CODAL make one bounded request each:
+
+```bash
+"$PYTHON" scripts/probe_source_acceptance_pack.py \
+  --source iran.tsetmc \
+  --source iran.codal > source-smoke-iran.json
+```
+
+Tindex is optional and must only be included if its environment credentials are configured. Check presence without printing the values:
+
+```bash
+if [ -n "${TINDEX_API_BASE_URL:-}" ] && [ -n "${TINDEX_API_TOKEN:-}" ]; then
+  "$PYTHON" scripts/probe_source_acceptance_pack.py \
+    --source iran.tindex.public_api > source-smoke-tindex.json
+else
+  echo "Tindex skipped: credentials are not configured in this shell."
+fi
+```
+
+The Tindex probe calls only the currency-rates endpoint; respect the provider's 3 requests/minute and 300 successful requests/day limits.
+
+### External providers — VPN ON
+
+FRED/ALFRED is optional and must only be probed when `FRED_API_KEY` is configured:
+
+```bash
+if [ -n "${FRED_API_KEY:-}" ]; then
+  "$PYTHON" scripts/probe_source_acceptance_pack.py \
+    --source us.fred.alfred > source-smoke-fred.json
+else
+  echo "FRED skipped: FRED_API_KEY is not configured in this shell."
+fi
+```
+
+**Do not probe GDELT again immediately:** its previous live request returned HTTP 429. Wait for a deliberate cooldown, then make at most one bounded attempt with VPN on:
+
+```bash
+"$PYTHON" scripts/probe_source_acceptance_pack.py \
+  --source global.gdelt_doc_api > source-smoke-gdelt.json
+```
+
+Do not run the GDELT command until the cooldown/request budget is intentionally chosen. Repeated requests will not improve acceptance evidence and may trigger further rate limiting.
+
+### Interpreting the reports
+
+- `reachable_response_received` means only that a response arrived and its shape was summarized.
+- `probe_failed` can indicate connectivity, rate limiting, provider changes, authentication, or a real client defect; classify the cause before changing code.
+- `skipped_missing_credentials` is not a failed test.
+- Non-zero exit status means at least one selected, attempted probe failed; it does not by itself identify whether the cause was network or code.
+- Reports omit raw payloads and credentials, but review them for environment-specific metadata before sharing. Keep generated reports local unless reviewed.
+- Live probes never enable scoring. Production eligibility still requires source rights, unit/time semantics, coverage, reconciliation and point-in-time acceptance.
