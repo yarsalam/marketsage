@@ -23,9 +23,9 @@
 - FRED/ALFRED probe was skipped because `FRED_API_KEY` is not configured; when tested, VPN ON.
 - GDELT previously returned HTTP 429; VPN ON if retried, but do not repeat until cooldown/request budget is deliberately chosen.
 - Stage 3 code exists: fixture-backed `POST /research/snapshot` in FastAPI, proxied via NestJS `POST /api/markets/research-snapshot`, with Persian `ResearchSnapshot` UI demo. It uses synthetic fixture data and deliberately keeps `investment_ranking=null` and source scoring disabled.
-- Stage 3: **UI demo visibly rendered and API result was shown**, per user confirmation. The NestJS `POST /api/markets/research-snapshot` previously returned HTTP `201 Created` with the expected fixture result: one future article excluded, last observation date `2026-10-17`, descriptive return `5.00%`, ranking null and status `disabled_until_source_and_model_acceptance`. Treat HTTP 201 as successful for this POST unless the API contract is intentionally changed; do not incorrectly require only HTTP 200.
-- A repeatable test pack was added on this branch at `user/analysis-engine/scripts/run_research_acceptance.sh`. Default mode runs `tests/test_research_pipeline.py` and `tests/test_research_backtest.py`; optional `RUN_API_SMOKE=1` checks the local NestJS → FastAPI API path. The user has not yet reported running this pack.
-- **Next action:** run the test pack locally. If it passes, Stage 3 can be marked complete for the fixture-backed local flow and Stage 4 can begin. This does not close Stage 2 or approve any live source. No VPN is needed for the fixture-only tests; do not probe external providers in this test.
+- Stage 3: **fixture-backed local UI/API demonstration passed the current acceptance checks**. User confirmed the Persian `ResearchSnapshot` UI rendered and showed the API output. On 2026-10-18, the new acceptance pack ran twice: `tests/test_research_pipeline.py` + `tests/test_research_backtest.py`: **24 passed** (4.00s and 3.92s). With `RUN_API_SMOKE=1`, local API contract smoke also passed: **HTTP 201**, one future article excluded, snapshot last observation date `2026-10-17`, descriptive return `5.00%`, `investment_ranking=null`, ranking status `disabled_until_source_and_model_acceptance`, and market not eligible for scoring. HTTP 201 is valid for this NestJS POST; do not require only HTTP 200 unless the contract is intentionally changed.
+- Stage 3 may be treated as **complete for the fixture-backed local path only**. This does not close Stage 2, approve live sources, prove model predictiveness, or establish production readiness.
+- **Next action: begin Stage 4 — evaluation and backtesting.** First write the evaluation scope and data audit; then define time-ordered train/validation/holdout windows, baselines, transaction costs/slippage and risk metrics before running or interpreting model comparisons. Keep Stage 2 source acceptance separate. Fixture-only tests require no VPN; do not probe external providers as part of this pack.
 - Stage 4 requires a written evaluation scope and careful time-series evaluation. Stage 2 source acceptance remains a separate gate and must not be falsely marked complete.
 - Do not merge PR #6, deploy, enable source scoring, or claim production readiness without the user's explicit authorization and evidence.
 
@@ -138,6 +138,19 @@ Expected API acceptance:
 - Visit http://127.0.0.1:3000, navigate to the research tab/demo, click its run button, and confirm the same behavior through the UI.
 
 Send back health results, HTTP status/JSON from the POST (no secrets), and whether the UI demo rendered. If successful, record Stage 3 runtime acceptance and then plan Stage 4. If it fails, debug only the failing hop.
+
+## Stage 4 — evaluation and backtesting (current stage)
+
+Stage 3 fixture-backed local acceptance passed on 2026-10-18. Begin Stage 4 with a design/specification and data audit before treating any model metrics as evidence. Keep the following gates explicit:
+
+1. Define evaluation scope before modelling: markets/instruments, horizon (~6 months), decision frequency, baseline(s), transaction costs/slippage, and risk metrics.
+2. Audit data for point-in-time availability, revisions, missingness, units, timezone and survivorship/selection bias.
+3. Create time-ordered train/validation/holdout periods and walk-forward evaluation; never random-split time series.
+4. Compare against simple baselines and buy-and-hold; include fees/slippage, turnover, drawdown, volatility/Sharpe where appropriate.
+5. Calibrate probabilities only with out-of-sample evidence; report uncertainty and failure cases.
+6. Keep ranking disabled until source and model acceptance gates pass. No target return (e.g. 50%) should be presented as promised/validated.
+
+Stage 2 source acceptance remains open and separate. Stage 4 analysis may begin using only datasets whose provenance and limitations are explicit; synthetic fixtures validate plumbing, not predictive performance.
 
 ## Stage 4 plan after Stage 3 passes
 
