@@ -207,3 +207,10 @@ This section supersedes earlier handoff notes that Stage 4 had not started. Work
 **Important: implementation is not the same as acceptance.** These new changes have not yet been run on the owner's local checkout in this conversation. Wait for the exact PR-head GitHub Actions result and local focused/full Python test results. Review any failures and fix them before interpreting the generated report. Do not mark Stage 4 complete until the runner/report is reproduced and reviewed, data provenance/permissions and point-in-time/survivorship gaps are resolved or explicitly bounded, and the locked holdout is not used for tuning.
 
 **Stage 5 remains open.** No staging deployment was performed, no production readiness claim is made, PR #6 remains unmerged, and investment ranking/source scoring must remain disabled.
+
+
+## Local evidence update — 2026-10-18
+
+The owner reports the Stage 4 runner completed locally against the monthly panel with SHA-256 `1e71d898b18b4a6db74aba4826c86a4982efad934ee30aa82ff354883f01d878`, 78 rows, 11 assets, data range 2020-04-30 through 2026-09-30, 12-month holdout 2025-10-31 through 2026-09-30, and 7 walk-forward folds. The focused tests passed 16/16 and the full Analysis Engine suite passed 225/225 on the checkout before the report-validator addition. These are user-provided local results, not independently executed by this maintainer.
+
+Stage 5 work added `scripts/validate_stage4_report.py` and `tests/test_stage4_report_validator.py`. They validate research-only/disabled-ranking flags, SHA-256 shape, baseline presence, holdout separation, and cost scenario presence. **The validator tests and full suite must be rerun after this newest change.** The metric values from the generated report have not yet been reviewed, so Stage 4 is not accepted. CI for the newest changes is pending; PR #6 remains unmerged and no deployment has been performed.
