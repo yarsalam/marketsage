@@ -28,8 +28,20 @@ def _filename(symbol: str) -> str:
     return f"{symbol.replace('/', '_')}.csv"
 
 
-def load_monthly_series(csv_path: Path, symbol: str) -> tuple[pd.Series, dict]:
-    """Load one daily CSV, validate it, and select the last observed price per month."""
+def _utc_day(value: object) -> pd.Timestamp:
+    """Normalize a date-like value to midnight UTC."""
+    stamp = pd.Timestamp(value)
+    if stamp.tzinfo is None:
+        stamp = stamp.tz_localize("UTC")
+    else:
+        stamp = stamp.tz_convert("UTC")
+    return stamp.normalize()
+
+
+def load_monthly_series(
+    csv_path: Path, symbol: str, as_of_date: object | None = None
+) -> tuple[pd.Series, dict]:
+    """Load and validate daily CSV data, excluding a not-yet-complete UTC month."""
     try:
         frame = pd.read_csv(csv_path)
     except Exception as exc:
@@ -68,6 +80,15 @@ def load_monthly_series(csv_path: Path, symbol: str) -> tuple[pd.Series, dict]:
     monthly = daily.resample("ME").last().dropna()
     if monthly.empty:
         raise ValueError(f"{symbol}: no monthly observations after resampling")
+
+    # Resampling labels a partial current month with its future calendar month-end.
+    # Exclude that bucket unless its month-end has passed as of the supplied date.
+    as_of = _utc_day(as_of_date if as_of_date is not None else pd.Timestamp.now(tz="UTC"))
+    incomplete = monthly.index.normalize() > as_of
+    incomplete_months_excluded = int(incomplete.sum())
+    monthly = monthly.loc[~incomplete]
+    if monthly.empty:
+        raise ValueError(f"{symbol}: no completed monthly observations as of {as_of.date()}")
     meta = {
         "symbol": symbol,
         "file": csv_path.name,
@@ -75,6 +96,8 @@ def load_monthly_series(csv_path: Path, symbol: str) -> tuple[pd.Series, dict]:
         "asset_type_assumption": "crypto" if is_crypto else "non_crypto_adjusted_price",
         "daily_rows": int(len(daily)),
         "monthly_observations": int(len(monthly)),
+        "incomplete_months_excluded": incomplete_months_excluded,
+        "as_of_date_utc": as_of.date().isoformat(),
         "first_month": monthly.index.min().date().isoformat(),
         "last_month": monthly.index.max().date().isoformat(),
         "missing_months_inside_observed_range": int(
@@ -112,7 +135,7 @@ def prepare_monthly_panel(
         "schema_version": 1,
         "purpose": "research_only_unapproved",
         "input_dir": str(input_dir.resolve()),
-        "alignment_policy": "calendar_month_end_last_observed_price; inner intersection; no forward fill",
+        "alignment_policy": "completed calendar months only; last observed price per month; inner intersection; no forward fill",
         "price_policy": "Close for symbols ending -USD; Adj Close required for all other symbols",
         "symbols": per_symbol,
         "requested_symbols": symbols,
@@ -125,7 +148,8 @@ def prepare_monthly_panel(
         "limitations": [
             "Yahoo Finance data remain unapproved for production or investment ranking.",
             "Non-crypto Adj Close selection is a research convention and requires instrument-specific review.",
-            "Calendar-month last-observed prices are not guaranteed executable month-end prices.",
+            "Completed calendar-month last-observed prices are not guaranteed executable month-end prices.",
+            "The current incomplete UTC calendar month is excluded using the run date unless an explicit as-of date is supplied.",
             "This sample is not representative of Iranian markets.",
             "No currency, licensing, point-in-time revision, delisting, or survivorship validation is performed.",
         ],
