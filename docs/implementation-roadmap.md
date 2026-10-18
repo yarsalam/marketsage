@@ -2,7 +2,7 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 3 — end-to-end prototype (first fixture-backed slice added)  
+**Current milestone:** Stage 3 — fixture-backed research API and UI wired; validation pending  
 **Release posture:** research-only; source scoring remains fail-closed
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
@@ -70,8 +70,11 @@ The reported 188-test result is local evidence from the project owner; do not la
    - Include a clear “insufficient data / not rankable” result.
 
 6. **API/UI integration**
-   - Expose the prototype through versioned research endpoints and show source freshness, data coverage, model/version, risk metrics, and explanation.
-   - Keep unsupported dashboard sections visibly unavailable instead of filling them with fabricated estimates.
+   - Implemented `POST /research/snapshot` in the FastAPI analysis engine and `POST /api/markets/research-snapshot` through the NestJS backend.
+   - Added a Persian UI demo in the existing News tab. It submits deterministic fixture data, displays headline labels and descriptive metrics, and shows future-record exclusion plus disabled scoring.
+   - The API forces `source_approved=false` for caller-supplied market series; it never accepts client input as production approval.
+   - Updated the analysis-engine Dockerfile to copy local modules required by the service and research pipeline.
+   - Remaining: run focused/full Python tests, NestJS tests/build, frontend build, and production image build in CI; inspect API behaviour in the deployed staging environment only after explicit deployment approval.
 
 ### Stage 3 acceptance evidence
 
@@ -116,18 +119,19 @@ TGJU, unsupported Tindex categories, and any source with unresolved rights or se
 
 ## Immediate next action
 
-1. Run the new fixture-backed pipeline tests and then the full analysis-engine suite from `user/analysis-engine`.
-2. Review the CI run associated with the latest feature-branch commit once it finishes; the local result and CI result must be reported separately.
-3. Inspect and fix any failures before wiring this research-only function into an API or UI.
-4. Keep source scoring disabled; the new pipeline is an auditable prototype, not a validated investment signal.
+1. Pull `feat/tindex-free-data-connector` and run `python -m pytest -q` from `user/analysis-engine`; the owner previously reported 203 passed, 7 warnings after adding the API endpoint tests, but that latest result must be confirmed locally.
+2. Run the backend checks from `user/user-backend`: `pnpm install --frozen-lockfile`, `pnpm build`, and `pnpm exec jest --runInBand`.
+3. Run the frontend checks from `user/user-frontend`: `pnpm install --frozen-lockfile` and `pnpm build`.
+4. Confirm the production image build includes `research_pipeline.py`, `headline_signal_engine.py`, `source_registry.py`, and `temporal_data.py`; check CI separately from local evidence.
+5. Keep the PR open and do not merge or deploy without explicit permission. Keep source scoring disabled; this endpoint uses caller-supplied demo data and is not a production feed.
 
 ## Project status report (copy-ready)
 
 - **Stage 1 — code and existing tests:** local full suite reported 188 passed, 7 warnings, 8.83s on 2026-10-18; GitHub Actions previously had a successful run, and a newer run is queued for the latest commit.
 - **Stage 2 — source acceptance:** in progress; TSETMC, CODAL, Tindex, and FRED/ALFRED had bounded live responses, but data semantics/licensing/coverage are not fully approved; GDELT previously returned HTTP 429.
-- **Stage 3 — end-to-end prototype:** started. Added `research_pipeline.py` and `tests/test_research_pipeline.py` on the feature branch. The function combines fixture/provided article metadata, transparent headline labels, and descriptive price metrics; excludes future-dated rows, flags unknown units/source approval, and hard-disables investment ranking.
+- **Stage 3 — end-to-end prototype:** API/UI wiring added on the feature branch. The fixture-backed `research_pipeline.py` is exposed via FastAPI `POST /research/snapshot`, proxied by NestJS `POST /api/markets/research-snapshot`, and called from a Persian demo panel in the existing News tab. Added API tests and updated Docker module copies. Latest API/UI commits still require CI and local validation.
 - **Stage 4 — model/backtest:** not started for this integrated pipeline; needs labelled NLP/event evaluation, point-in-time validation, chronological holdout/walk-forward, costs/liquidity and drawdown/risk reporting.
 - **Stage 5 — operational/release:** not started; monitoring, failure handling, security, staging deployment, and release review remain.
-- **Not verified:** tests for the newly added pipeline until the user runs them; CI status for latest commit until queued workflow completes; licensing, data correctness, and real-world predictive performance.
-- **Exact next step:** run `python -m pytest -q tests/test_research_pipeline.py`, then run `python -m pytest -q` if focused tests pass.
+- **Not verified:** latest API endpoint tests, NestJS build/tests, Next.js build, production image build, and CI status for the newest commits; licensing, data correctness, and real-world predictive performance.
+- **Exact next step:** run the Python suite, backend build/tests, and frontend build using the commands above.
 - **Release posture:** research-only; no production investment scoring or ranking enabled.
