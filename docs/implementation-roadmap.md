@@ -2,7 +2,7 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 3 — fixture-backed research API and UI wired; local tests and CI green, runtime acceptance in progress  
+**Current milestone:** Stage 2 — connector technical acceptance in progress; Stage 3 fixture-backed research API/UI implemented, runtime acceptance pending  
 **Release posture:** research-only; source scoring remains fail-closed
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
@@ -152,3 +152,12 @@ This update supersedes older test counts and CI-status notes above where they co
 1. Iranian sources — VPN **off**: TSETMC and CODAL. Tindex is optional and should only be probed when its configured credentials are available; respect its quota.
 2. External sources — VPN **on**: FRED/ALFRED only when `FRED_API_KEY` is configured. GDELT remains on cooldown after the previously observed HTTP 429; do not include it in the next probe until the retry window is deliberately chosen.
 3. A reachability failure is not automatically a code failure. Record provider, VPN state, timestamp, HTTP/error class, and sanitized response-shape metadata; never store tokens or raw payloads in the report.
+
+## Latest execution update — 2026-10-18 (PR #6 head `1943df208705a7266f59999ac7615097acfb3017`)
+
+- **GitHub Actions:** run [39106444216](https://github.com/yarsalam/marketsage/actions/runs/39106444216) completed successfully on the current PR head. All five jobs passed: analysis, user frontend, user backend, admin workspace, and production images.
+- **Owner-reported Iranian source smoke report:** `iran.tsetmc` and `iran.codal` each returned `reachable_response_received`; 2 probes attempted, 2 reachable, 0 failed. TSETMC returned an object with an `instrumentSearch` list. CODAL returned a payload object, but `publication_timestamp` was null. The report shows `eligible_for_scoring=false` for both.
+- **Scope limitations:** this confirms response reachability and coarse response shape only. It does not validate unit conventions, historical coverage, publication/correction semantics, collection rights, or independent data accuracy. The command output did not itself record the actual VPN state; the required procedure remains VPN off for Iranian providers.
+- **FRED/ALFRED:** live probe was skipped because `FRED_API_KEY` is not configured. If run later, VPN must be on. GDELT remains on cooldown after the previously observed HTTP 429; do not repeat it in this batch. Tindex was not selected in this Iranian-only report and needs a separate bounded probe only when its credentials are available (VPN off; honor the 3 requests/minute and 300 successful requests/day limits).
+- **Current gate decision:** Stage 2 remains open. The next user-run batch should be local/offline acceptance tests plus a sanitized Tindex probe only if credentials are available. After that, complete the source evidence review (rights, units, timestamps, history, reconciliation) and validate the local API/UI path. Do not merge PR #6, deploy, or enable investment scoring as part of this update.
+
