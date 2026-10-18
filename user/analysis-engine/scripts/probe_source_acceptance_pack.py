@@ -187,8 +187,10 @@ def _codal_probe():
 
 
 def _tindex_probe():
+    # One request validates current auth, route, and the documented 3-month
+    # history contract without consuming quota on several endpoints.
     with TindexClient(timeout=15.0) as client:
-        return client.currency_rates()
+        return client.indicator_history("USD-EXCHANGE-RATE", range="3m")
 
 
 def _fred_probe():
