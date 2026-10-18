@@ -108,3 +108,32 @@ python user/analysis-engine/scripts/audit_research_data.py --root user/analysis-
 ```
 
 Review the generated report locally. Share the summary output only; do not paste secrets or raw licensed datasets. The script is an inventory aid, not a source-approval decision.
+
+
+## 9. Implemented evaluation runner (pending local/CI confirmation)
+
+The repository now includes:
+
+- `research/evaluation.py`: full-period comparison of the fixed momentum strategy, a zero-return cash reference, and an all-asset equal-weight monthly-rebalanced reference. The equal-weight comparator uses the same configured transaction-cost and slippage basis.
+- `scripts/run_stage4_evaluation.py`: command-line runner that writes a JSON report with the input CSV SHA-256, sample dates, strategy configuration, full-period metrics, a final locked holdout, pre-holdout chronological folds, and a six-month forward-label inventory.
+- `tests/test_research_evaluation.py`: deterministic fixture tests for holdout boundaries, fold boundaries, baseline presence, and label-inventory scope.
+- The backtest summary now reports transaction-cost, slippage, and total-cost fractions separately. The backward-compatible `sum_of_period_cost_fractions` key now means the sum of all charged cost fractions.
+- Sharpe uses a configurable annual risk-free assumption (`risk_free_rate_annual`, default 0.0) and records that assumption in the output.
+
+Example local command (run from `user/analysis-engine`):
+
+```bash
+.venv/bin/python scripts/run_stage4_evaluation.py \
+  --input /tmp/marketsage-monthly-stage4/monthly_prices.csv \
+  --output /tmp/marketsage-stage4-evaluation.json \
+  --holdout-months 12 \
+  --min-train-months 24 \
+  --fold-months 6 \
+  --transaction-cost-bps 10 \
+  --slippage-bps 25 \
+  --risk-free-rate-annual 0
+```
+
+Do not inspect the holdout and then change settings while still calling it locked. The default CLI slippage of 25 bps is a sensitivity assumption, not an estimate of actual execution cost. Run additional predeclared cost scenarios as separate reports. This runner does not tune parameters, train a predictive model, calculate calibrated probabilities, or prove the strategy is suitable for Iranian markets. Six-month forward labels are counted for data-availability planning only; they are not prediction scores.
+
+**Acceptance remains pending** until the local command, focused tests, and full analysis-engine suite pass on the intended commit, the report is reviewed, and source/provenance/rights and point-in-time limitations are resolved or explicitly bounded. A successful script exit alone is not Stage 4 approval.
