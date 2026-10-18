@@ -114,7 +114,7 @@ Review the generated report locally. Share the summary output only; do not paste
 
 The repository now includes:
 
-- `research/evaluation.py`: full-period comparison of the fixed momentum strategy, a zero-return cash reference, and an all-asset equal-weight monthly-rebalanced reference. The equal-weight comparator uses the same configured transaction-cost and slippage basis.
+- `research/evaluation.py`: full-period comparison of the fixed momentum strategy, a zero-return cash reference, an all-asset equal-weight buy-and-hold reference (initial costs only), and an all-asset equal-weight monthly-rebalanced reference (same configured cost basis).
 - `scripts/run_stage4_evaluation.py`: command-line runner that writes a JSON report with the input CSV SHA-256, sample dates, strategy configuration, full-period metrics, a final locked holdout, pre-holdout chronological folds, and a six-month forward-label inventory.
 - `tests/test_research_evaluation.py`: deterministic fixture tests for holdout boundaries, fold boundaries, baseline presence, and label-inventory scope.
 - The backtest summary now reports transaction-cost, slippage, and total-cost fractions separately. The backward-compatible `sum_of_period_cost_fractions` key now means the sum of all charged cost fractions.
