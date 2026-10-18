@@ -11,6 +11,7 @@ Stage 5 is not complete merely because the code builds or a historical simulatio
 - [x] Feature branch / PR remains separate from the deployment branch.
 - [x] Backtest and evaluation outputs explicitly identify research-only purpose.
 - [x] Evaluation report records dataset SHA-256 and declares investment ranking/source scoring disabled.
+- [x] Added a report validator and tests for fail-closed flags, holdout boundaries, required baselines, hash shape, and cost scenarios; local execution still pending.
 - [x] Unknown source semantics and unapproved providers remain outside scoring.
 - [ ] Verify current source registry and every API path remain fail-closed in CI and local tests.
 - [ ] Verify live-data failures cannot silently substitute synthetic, stale, or incompatible data.
@@ -66,8 +67,15 @@ cd user/analysis-engine
 .venv/bin/python -m pytest -q
 ```
 
-Then run the Stage 4 evaluation command documented in `docs/stage4-evaluation-protocol.md`. Confirm its dataset hash and output dates before interpreting any metrics. Do not commit local reports, tokens, or raw licensed data.
+Then run the Stage 4 evaluation command documented in `docs/stage4-evaluation-protocol.md`, followed by:
+
+```bash
+.venv/bin/python scripts/validate_stage4_report.py /tmp/marketsage-stage4-evaluation.json
+.venv/bin/python -m pytest -q tests/test_stage4_report_validator.py
+```
+
+Confirm its dataset hash and output dates before interpreting any metrics. Do not commit local reports, tokens, or raw licensed data.
 
 ## Current decision
 
-**Stage 5 started; release gate not passed.** Outstanding prerequisites include local execution of the new evaluation runner and tests, full-suite confirmation on the current commit, Stage 2 source rights/semantics/coverage review, point-in-time and survivorship assessment, operational failure-mode tests, and explicit staging/release approval. Investment ranking must remain disabled until the applicable gates are approved.
+**Stage 5 started; release gate not passed.** Outstanding prerequisites include local execution of the report validator and its tests on the newest commit, full-suite confirmation after the newest validator addition, Stage 2 source rights/semantics/coverage review, point-in-time and survivorship assessment, operational failure-mode tests, and explicit staging/release approval. Investment ranking must remain disabled until the applicable gates are approved.
