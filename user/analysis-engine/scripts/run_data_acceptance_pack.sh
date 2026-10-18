@@ -58,7 +58,19 @@ record "PASS: TSETMC history audit; report contains metadata/flags only."
 record ""
 
 record "== 3/4 Iran source probes (VPN OFF) =="
-record "Sources: TSETMC instrument search, CODAL disclosure search, Tindex currency rates if credentials exist."
+record "Sources: TSETMC instrument search, CODAL disclosure search, Tindex currency rates."
+if [[ -z "${TINDEX_API_BASE_URL:-}" || -z "${TINDEX_API_TOKEN:-}" ]]; then
+  read -r -p "Tindex API origin (Enter to skip): " TINDEX_ORIGIN
+  if [[ -n "$TINDEX_ORIGIN" ]]; then
+    export TINDEX_API_BASE_URL="$TINDEX_ORIGIN"
+    if [[ -z "${TINDEX_API_TOKEN:-}" ]]; then
+      read -r -s -p "Tindex API token (input hidden): " TINDEX_TOKEN
+      echo
+      export TINDEX_API_TOKEN="$TINDEX_TOKEN"
+      unset TINDEX_TOKEN
+    fi
+  fi
+fi
 if "$PYTHON" scripts/probe_source_acceptance_pack.py \
     --source iran.tsetmc --source iran.codal --source iran.tindex.public_api \
     > "$REPORT_DIR/iran-source-probes.json"; then
@@ -70,8 +82,14 @@ record "Iran probe report: $REPORT_DIR/iran-source-probes.json"
 record ""
 
 record "== 4/4 External source probes (VPN ON) =="
-record "Please turn VPN ON now. FRED needs FRED_API_KEY; without it, the probe is skipped."
+record "Please turn VPN ON now."
 read -r -p "When VPN is ON, press Enter to continue (Ctrl-C to stop): " _
+if [[ -z "${FRED_API_KEY:-}" ]]; then
+  read -r -s -p "FRED API key (Enter to skip; input hidden): " FRED_TOKEN
+  echo
+  if [[ -n "$FRED_TOKEN" ]]; then export FRED_API_KEY="$FRED_TOKEN"; fi
+  unset FRED_TOKEN
+fi
 if "$PYTHON" scripts/probe_source_acceptance_pack.py \
     --source global.gdelt_doc_api --source us.fred.alfred \
     > "$REPORT_DIR/external-source-probes.json"; then
