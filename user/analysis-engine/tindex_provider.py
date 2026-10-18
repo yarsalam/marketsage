@@ -188,14 +188,29 @@ class TindexClient:
     def movers(self) -> Any:
         return self._get_json("/api/public/indicators/movers")
 
-    def indicator_history(self, slug: str) -> Any:
+    def indicator_history(self, slug: str, *, range: str = "3m") -> Any:
+        """Fetch daily history; Tindex clamps longer ranges to its latest 100 days."""
         slug = _assert_allowed_slug(slug, "indicator slug")
-        return self._get_json(f"/api/public/indicators/{quote(slug, safe='')}/history")
+        if range not in {"1d", "1w", "1m", "3m"}:
+            raise ValueError("history range must be one of: 1d, 1w, 1m, 3m")
+        return self._get_json(
+            f"/api/public/indicators/{quote(slug, safe='')}/history",
+            params={"range": range, "lang": "en"},
+        )
 
-    def indicator_candles(self, slug: str) -> Any:
-        """Fetch provider-defined resampled candles without guessing query parameters."""
+    def indicator_candles(
+        self, slug: str, *, range: str = "3m", interval: str = "daily"
+    ) -> Any:
+        """Fetch documented daily/weekly candles within the provider's 100-day cap."""
         slug = _assert_allowed_slug(slug, "indicator slug")
-        return self._get_json(f"/api/public/indicators/{quote(slug, safe='')}/candles")
+        if range not in {"1m", "3m"}:
+            raise ValueError("candles range must be one of: 1m, 3m")
+        if interval not in {"daily", "weekly"}:
+            raise ValueError("candles interval must be daily or weekly")
+        return self._get_json(
+            f"/api/public/indicators/{quote(slug, safe='')}/candles",
+            params={"range": range, "interval": interval, "lang": "en"},
+        )
 
     def indicators_by_category(self, category_slug: str) -> Any:
         category_slug = _assert_allowed_slug(category_slug, "category slug")
