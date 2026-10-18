@@ -1,7 +1,7 @@
 """Predeclared, chronological evaluation helpers for the Stage 4 baseline."""
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import math
 
 import pandas as pd
@@ -110,6 +110,45 @@ def evaluate_monthly_strategies(
         name: _metric_summary(series.loc[holdout_dates], cfg)
         for name, series in returns_by_name.items()
     }
+    # Predeclared cost stress cases; do not select a case after inspecting the holdout.
+    scenarios = [
+        ("zero_cost_reference", 0.0, 0.0),
+        ("configured_costs", cfg.transaction_cost_bps, cfg.slippage_bps),
+        (
+            "higher_cost_stress",
+            max(cfg.transaction_cost_bps, 25.0),
+            max(cfg.slippage_bps, 50.0),
+        ),
+    ]
+    cost_sensitivity = []
+    seen_scenarios = set()
+    for label, transaction_bps, slippage_bps in scenarios:
+        key = (float(transaction_bps), float(slippage_bps))
+        if key in seen_scenarios:
+            continue
+        seen_scenarios.add(key)
+        scenario_cfg = replace(
+            cfg,
+            transaction_cost_bps=float(transaction_bps),
+            slippage_bps=float(slippage_bps),
+        )
+        scenario_result = run_monthly_momentum_backtest(prices, scenario_cfg)
+        scenario_returns = scenario_result["monthly"]["net_return"]
+        cost_sensitivity.append({
+            "scenario": label,
+            "transaction_cost_bps": float(transaction_bps),
+            "slippage_bps": float(slippage_bps),
+            "full_period_metrics": _metric_summary(scenario_returns, scenario_cfg),
+            "locked_holdout_metrics": _metric_summary(
+                scenario_returns.loc[holdout_dates], scenario_cfg
+            ),
+            "period_cost_fractions": {
+                "transaction": float(scenario_result["monthly"]["transaction_cost"].sum()),
+                "slippage": float(scenario_result["monthly"]["slippage_cost"].sum()),
+                "total": float(scenario_result["monthly"]["total_cost"].sum()),
+            },
+        })
+
     label_rows = []
     six_month = prices.shift(-6).div(prices).sub(1)
     for symbol in prices.columns:
@@ -153,6 +192,7 @@ def evaluate_monthly_strategies(
         "full_period_metrics": full_metrics,
         "locked_holdout_metrics": holdout_metrics,
         "walkforward_folds": folds,
+        "cost_sensitivity": cost_sensitivity,
         "six_month_forward_label_inventory": label_rows,
         "limitations": [
             "Fixed-parameter historical simulation; no trained predictive model or calibrated probability.",
