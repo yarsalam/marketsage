@@ -2,7 +2,7 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 3 — fixture-backed research API and UI wired; validation pending  
+**Current milestone:** Stage 3 — fixture-backed research API and UI wired; local tests and CI green, runtime acceptance in progress  
 **Release posture:** research-only; source scoring remains fail-closed
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
@@ -135,3 +135,20 @@ TGJU, unsupported Tindex categories, and any source with unresolved rights or se
 - **Not verified:** latest API endpoint tests, NestJS build/tests, Next.js build, production image build, and CI status for the newest commits; licensing, data correctness, and real-world predictive performance.
 - **Exact next step:** run the Python suite, backend build/tests, and frontend build using the commands above.
 - **Release posture:** research-only; no production investment scoring or ranking enabled.
+
+
+## Execution update — 2026-10-18
+
+This update supersedes older test counts and CI-status notes above where they conflict.
+
+- **GitHub Actions:** run [39105077841](https://github.com/yarsalam/marketsage/actions/runs/39105077841) completed successfully on PR #6 head `8d56a1ab3659b234094bebb605dfba272e3ecbb5`. All five jobs passed: analysis, user frontend, user backend, admin workspace, and production images. This is CI evidence for that exact commit, not live-provider acceptance.
+- **Owner-reported local tests:** full Analysis Engine suite: 205 passed, 7 warnings; focused research pipeline: 15 passed; API/research snapshot: 16 passed; source acceptance probe/registry/acceptance focused suites: 5 + 3 + 14 passed. Focused suites overlap the full suite and must not be summed into a new total. Deprecation warnings remain non-blocking but should be cleaned up separately.
+- **Network-aware live validation:** do not run the default all-provider smoke pack while assuming one VPN state fits all providers. Use `--source` to select providers and follow the VPN split documented in `docs/data-source-onboarding-tindex.md`. Do not retry GDELT immediately after HTTP 429; wait for a deliberate cooldown and request budget.
+- **Next Stage 3 acceptance task:** run one bounded local API/UI demo against the actual local services; separately probe Iranian providers with VPN off and external providers with VPN on when credentials are available. Record sanitized reports only. Do not commit credentials or local reports, and do not enable source scoring.
+- **Still unverified:** end-to-end UI/API behavior in the user's local runtime, data rights/licensing, source semantics/units/history completeness, independent reconciliation, and real-world sentiment quality. No production ranking is approved.
+
+### VPN-aware live-probe checklist
+
+1. Iranian sources — VPN **off**: TSETMC and CODAL. Tindex is optional and should only be probed when its configured credentials are available; respect its quota.
+2. External sources — VPN **on**: FRED/ALFRED only when `FRED_API_KEY` is configured. GDELT remains on cooldown after the previously observed HTTP 429; do not include it in the next probe until the retry window is deliberately chosen.
+3. A reachability failure is not automatically a code failure. Record provider, VPN state, timestamp, HTTP/error class, and sanitized response-shape metadata; never store tokens or raw payloads in the report.
