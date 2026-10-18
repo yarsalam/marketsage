@@ -1,9 +1,12 @@
 """Leakage-aware monthly momentum research baseline."""
 from __future__ import annotations
+
 from dataclasses import dataclass
 import math
+
 import numpy as np
 import pandas as pd
+
 
 @dataclass(frozen=True)
 class BacktestConfig:
@@ -13,6 +16,8 @@ class BacktestConfig:
     transaction_cost_bps: float = 10.0
     slippage_bps: float = 0.0
     annualization_periods: int = 12
+    risk_free_rate_annual: float = 0.0
+
     def validate(self):
         if self.top_n < 1 or self.momentum_months < 1 or self.volatility_months < 2:
             raise ValueError("top_n and lookbacks must be positive; volatility lookback >= 2")
@@ -20,6 +25,11 @@ class BacktestConfig:
             raise ValueError("transaction_cost_bps must be between 0 and 1000")
         if not 0 <= self.slippage_bps <= 1000:
             raise ValueError("slippage_bps must be between 0 and 1000")
+        if self.annualization_periods < 1:
+            raise ValueError("annualization_periods must be positive")
+        if not math.isfinite(self.risk_free_rate_annual) or self.risk_free_rate_annual <= -1:
+            raise ValueError("risk_free_rate_annual must be finite and greater than -1")
+
 
 def validate_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
     if not isinstance(prices, pd.DataFrame) or prices.empty:
@@ -40,28 +50,51 @@ def validate_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("prices must be strictly positive")
     return out
 
-def summarize_returns(r: pd.Series, periods: int = 12) -> dict:
+
+def summarize_returns(
+    r: pd.Series,
+    periods: int = 12,
+    risk_free_rate_annual: float = 0.0,
+) -> dict:
+    """Summarize periodic returns; Sharpe uses an explicit annual risk-free assumption."""
+    if periods < 1:
+        raise ValueError("periods must be positive")
+    if not math.isfinite(risk_free_rate_annual) or risk_free_rate_annual <= -1:
+        raise ValueError("risk_free_rate_annual must be finite and greater than -1")
     r = r.dropna().astype(float)
     if r.empty:
-        return {"total_return": None, "cagr": None, "annualized_volatility": None, "sharpe": None, "max_drawdown": None}
+        return {
+            "total_return": None, "cagr": None, "annualized_volatility": None,
+            "sharpe": None, "max_drawdown": None,
+            "risk_free_rate_annual": float(risk_free_rate_annual),
+        }
     equity = (1 + r).cumprod()
     vol = float(r.std(ddof=1) * math.sqrt(periods)) if len(r) > 1 else None
     years = len(r) / periods
+    periodic_rf = (1 + risk_free_rate_annual) ** (1 / periods) - 1
+    excess = r - periodic_rf
+    excess_vol = float(excess.std(ddof=1) * math.sqrt(periods)) if len(excess) > 1 else None
     return {
         "total_return": float(equity.iloc[-1] - 1),
         "cagr": float(equity.iloc[-1] ** (1 / years) - 1) if equity.iloc[-1] > 0 else None,
         "annualized_volatility": vol,
-        "sharpe": float(r.mean() * periods / vol) if vol and vol > 0 else None,
+        "sharpe": float(excess.mean() * periods / excess_vol) if excess_vol and excess_vol > 0 else None,
         "max_drawdown": float((equity / equity.cummax() - 1).min()),
+        "risk_free_rate_annual": float(risk_free_rate_annual),
     }
 
-def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: BacktestConfig | None = None) -> dict:
+
+def run_monthly_momentum_backtest(
+    monthly_prices: pd.DataFrame, config: BacktestConfig | None = None
+) -> dict:
     """Long-only top momentum with drift-aware turnover and rebalance costs.
 
-    Signal uses data through the prior month-end. Target weights are formed at
+    Signals use data through the prior month-end. Target weights are formed at
     that close, turnover is measured against prior holdings after their weights
     have drifted with the just-completed month, and the next month's return is
     then applied. Costs are deducted from capital before that next-period return.
+    Cost fractions are charged against one-way traded weight (sum of absolute
+    target-minus-pretrade weights), not half-turnover.
     """
     cfg = config or BacktestConfig()
     cfg.validate()
@@ -105,22 +138,38 @@ def run_monthly_momentum_backtest(monthly_prices: pd.DataFrame, config: Backtest
             raise ValueError(f"missing next-period return for selected assets at {prices.index[i].date()}")
         gross = float((target.loc[selected] * next_returns.loc[selected]).sum())
         net = float((1 - total_cost) * (1 + gross) - 1)
-        rows.append({"date": prices.index[i], "gross_return": gross, "turnover": turnover,
-                     "transaction_cost": transaction_cost, "slippage_cost": slippage_cost,
-                     "total_cost": total_cost, "net_return": net,
-                     "selected_assets": ",".join(map(str, selected))})
+        rows.append({
+            "date": prices.index[i], "gross_return": gross, "turnover": turnover,
+            "transaction_cost": transaction_cost, "slippage_cost": slippage_cost,
+            "total_cost": total_cost, "net_return": net,
+            "selected_assets": ",".join(map(str, selected)),
+        })
         previous_target = target
+
     result = pd.DataFrame(rows).set_index("date")
     result["equity"] = (1 + result["net_return"]).cumprod()
     result["drawdown"] = result["equity"] / result["equity"].cummax() - 1
-    metrics = summarize_returns(result["net_return"], cfg.annualization_periods)
-    metrics["average_monthly_turnover"] = float(result["turnover"].mean())
-    metrics["sum_of_period_cost_fractions"] = float(result["transaction_cost"].sum())
-    return {"config": {"top_n": cfg.top_n, "momentum_months": cfg.momentum_months,
-                       "volatility_months": cfg.volatility_months,
-                       "transaction_cost_bps": cfg.transaction_cost_bps,
-                       "slippage_bps": cfg.slippage_bps,
-                       "annualization_periods": cfg.annualization_periods},
-            "metrics": metrics, "periods": len(result),
-            "start": result.index.min().date().isoformat(),
-            "end": result.index.max().date().isoformat(), "monthly": result}
+    metrics = summarize_returns(
+        result["net_return"], cfg.annualization_periods, cfg.risk_free_rate_annual
+    )
+    metrics.update({
+        "average_monthly_turnover": float(result["turnover"].mean()),
+        "sum_transaction_cost_fractions": float(result["transaction_cost"].sum()),
+        "sum_slippage_cost_fractions": float(result["slippage_cost"].sum()),
+        "sum_total_cost_fractions": float(result["total_cost"].sum()),
+        # Backward-compatible name; now correctly reflects all charged costs.
+        "sum_of_period_cost_fractions": float(result["total_cost"].sum()),
+    })
+    return {
+        "config": {
+            "top_n": cfg.top_n, "momentum_months": cfg.momentum_months,
+            "volatility_months": cfg.volatility_months,
+            "transaction_cost_bps": cfg.transaction_cost_bps,
+            "slippage_bps": cfg.slippage_bps,
+            "annualization_periods": cfg.annualization_periods,
+            "risk_free_rate_annual": cfg.risk_free_rate_annual,
+        },
+        "metrics": metrics, "periods": len(result),
+        "start": result.index.min().date().isoformat(),
+        "end": result.index.max().date().isoformat(), "monthly": result,
+    }
