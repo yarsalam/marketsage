@@ -275,3 +275,61 @@ def test_research_snapshot_api_rejects_invalid_dates_and_values():
         },
     )
     assert bad_close.status_code == 422
+
+
+def test_stale_cache_fallback_is_bounded_and_logs_only_error_type(monkeypatch, caplog):
+    prices = provider_frame()
+    monkeypatch.setattr(price_service, "_cache_frame", prices)
+    monkeypatch.setattr(price_service, "_cache_time", price_service.time.monotonic() - 10)
+    monkeypatch.setattr(
+        price_service,
+        "_cache_metadata",
+        {"loaded": True, "available": True, "stale": False, "source": "fixture"},
+    )
+    monkeypatch.setattr(price_service, "MAX_STALE_CACHE_AGE_SECONDS", 60)
+    monkeypatch.setattr(
+        price_service,
+        "download_prices",
+        lambda: (_ for _ in ()).throw(RuntimeError("provider body token=DO_NOT_LOG")),
+    )
+
+    returned = price_service.get_prices()
+    status = client.get("/data-status")
+
+    assert returned.equals(prices)
+    assert status.status_code == 200
+    payload = status.json()
+    assert payload["stale"] is True
+    assert payload["available"] is True
+    assert payload["last_refresh_error"] == "RuntimeError"
+    assert payload["stale_age_seconds"] >= 10
+    assert "DO_NOT_LOG" not in caplog.text
+    assert "provider body" not in caplog.text
+
+
+def test_expired_stale_cache_fails_closed_with_503(monkeypatch):
+    prices = provider_frame()
+    monkeypatch.setattr(price_service, "_cache_frame", prices)
+    monkeypatch.setattr(price_service, "_cache_time", price_service.time.monotonic() - 61)
+    monkeypatch.setattr(
+        price_service,
+        "_cache_metadata",
+        {"loaded": True, "available": True, "stale": False, "source": "fixture"},
+    )
+    monkeypatch.setattr(price_service, "MAX_STALE_CACHE_AGE_SECONDS", 60)
+    monkeypatch.setattr(
+        price_service,
+        "download_prices",
+        lambda: (_ for _ in ()).throw(TimeoutError("provider timed out")),
+    )
+
+    with pytest.raises(HTTPException) as error:
+        price_service.get_prices()
+
+    assert error.value.status_code == 503
+    assert "maximum stale age" in error.value.detail
+    payload = client.get("/data-status").json()
+    assert payload["stale"] is True
+    assert payload["available"] is False
+    assert payload["unavailable_reason"] == "stale_cache_exceeded_max_age"
+    assert payload["last_refresh_error"] == "TimeoutError"
