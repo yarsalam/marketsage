@@ -2,7 +2,7 @@
 
 **Status date:** 2026-10-18  
 **Working branch:** `feat/tindex-free-data-connector`  
-**Current milestone:** Stage 4 — evaluation and backtesting protocol/data inventory; Stage 2 source acceptance remains open  
+**Current milestone:** Stage 4 — evaluation implementation pending local/CI confirmation; Stage 5 operational readiness checklist started; Stage 2 source acceptance remains open  
 **Release posture:** research-only; investment ranking and source scoring remain disabled
 
 This roadmap separates implementation progress from evidence that a data source or model is safe to use. Passing unit tests proves the tested code paths behave as expected on fixtures; it does not prove live-data quality, legal permission, predictive performance, or production readiness.
@@ -191,3 +191,19 @@ python user/analysis-engine/scripts/audit_research_data.py --root user/analysis-
 ```
 
 Review the summary and the generated JSON locally. Do not commit the generated report or local smoke reports automatically. Keep PR #6 open, do not deploy, and keep ranking disabled.
+
+
+## Superseding update — Stage 4 implementation and Stage 5 kickoff (2026-10-18)
+
+This section supersedes earlier handoff notes that Stage 4 had not started. Work was added to the existing feature branch / PR #6:
+
+- Updated `research/backtest.py`: annual risk-free-rate assumption is explicit in Sharpe reporting; transaction costs, slippage, and total costs are reported separately; the legacy aggregate cost key now sums all charged costs.
+- Added `research/evaluation.py`: fixed-parameter comparison against a zero-return cash reference and an equal-weight monthly-rebalanced reference; full-period and final 12-month holdout metrics; six-month chronological folds before the holdout; six-month forward-label inventory only.
+- Added `scripts/run_stage4_evaluation.py`: repeatable JSON report with input dataset SHA-256 and configurable holdout, fold, cost, and risk-free assumptions.
+- Added `tests/test_research_evaluation.py` and extended `tests/test_research_backtest.py` for these contracts.
+- Extended `docs/stage4-evaluation-protocol.md` with command and interpretation constraints.
+- Added `docs/stage5-operational-readiness-checklist.md`; Stage 5 has started as a checklist/readiness workstream, not as production release approval.
+
+**Important: implementation is not the same as acceptance.** These new changes have not yet been run on the owner's local checkout in this conversation. Wait for the exact PR-head GitHub Actions result and local focused/full Python test results. Review any failures and fix them before interpreting the generated report. Do not mark Stage 4 complete until the runner/report is reproduced and reviewed, data provenance/permissions and point-in-time/survivorship gaps are resolved or explicitly bounded, and the locked holdout is not used for tuning.
+
+**Stage 5 remains open.** No staging deployment was performed, no production readiness claim is made, PR #6 remains unmerged, and investment ranking/source scoring must remain disabled.
