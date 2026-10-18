@@ -56,7 +56,7 @@ At minimum, compare like-for-like over the same dates and eligible universe:
 - The existing monthly momentum baseline.
 - A simple momentum-only or no-selection baseline only if specified before the holdout is opened.
 
-Costs must be explicit and configurable: commissions/fees, spread and slippage. Include turnover and state whether cost fractions are charged on one-way or two-way turnover. Avoid assuming execution at a price that was not yet observable. For a mixed asset universe, do not compare nominal local-currency and USD returns without an explicit FX conversion policy and FX data accepted for the same dates.
+Costs must be explicit and configurable: commissions/fees, spread and slippage. Include turnover and state whether costs are charged on one-way or gross traded-weight turnover. The current code charges costs on L1 turnover (buys plus sells), not half-turnover. Avoid assuming execution at a price that was not yet observable. For a mixed asset universe, do not compare nominal local-currency and USD returns without an explicit FX conversion policy and FX data accepted for the same dates.
 
 The current implementation has transaction-cost and slippage knobs but still needs a reviewed, reproducible benchmark comparison and a data-specific cost policy before it can support conclusions.
 
