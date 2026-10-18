@@ -137,3 +137,15 @@ Example local command (run from `user/analysis-engine`):
 Do not inspect the holdout and then change settings while still calling it locked. The default CLI slippage of 25 bps is a sensitivity assumption, not an estimate of actual execution cost. The report includes zero-cost, configured-cost, and higher-cost stress scenarios; any additional scenarios must be declared before inspecting the locked holdout. This runner does not tune parameters, train a predictive model, calculate calibrated probabilities, or prove the strategy is suitable for Iranian markets. Six-month forward labels are counted for data-availability planning only; they are not prediction scores.
 
 **Acceptance remains pending** until the local command, focused tests, and full analysis-engine suite pass on the intended commit, the report is reviewed, and source/provenance/rights and point-in-time limitations are resolved or explicitly bounded. A successful script exit alone is not Stage 4 approval.
+
+
+## 10. Stage 5 report-integrity gate
+
+After producing the report, run the structural validator:
+
+```bash
+.venv/bin/python scripts/validate_stage4_report.py /tmp/marketsage-stage4-evaluation.json
+.venv/bin/python -m pytest -q tests/test_stage4_report_validator.py
+```
+
+The validator fails if the report does not explicitly keep ranking/source scoring disabled, the holdout is marked as used for tuning, walk-forward folds overlap the holdout, required baselines or cost scenarios are absent, or the dataset hash is malformed. This is a structural guardrail, not proof that source data are accurate, licensed, point-in-time correct, or economically tradable. It does not assess whether strategy metrics are good.
