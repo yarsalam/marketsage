@@ -6,8 +6,12 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 import pandas as pd
+
+# Allow direct execution as `python scripts/run_stage4_evaluation.py`.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from research.backtest import BacktestConfig
 from research.evaluation import evaluate_monthly_strategies
