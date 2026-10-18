@@ -18,6 +18,7 @@ from research.backtest import BacktestConfig, run_monthly_momentum_backtest, sum
 from iran_market_data import provider_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
+from research_pipeline import build_research_snapshot
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -38,6 +39,34 @@ _cache_lock = threading.Lock()
 _cache_frame: pd.DataFrame | None = None
 _cache_time = 0.0
 _cache_metadata: dict = {"loaded": False, "stale": False}
+
+
+class ResearchArticleRequest(BaseModel):
+    source_id: str | None = None
+    url: str = Field(min_length=1, max_length=2048)
+    title: str = Field(min_length=1, max_length=2000)
+    first_seen_date: str
+
+
+class ResearchObservationRequest(BaseModel):
+    date: str
+    close: float
+
+
+class ResearchMarketSeriesRequest(BaseModel):
+    symbol: str = Field(min_length=1, max_length=100)
+    source_id: str | None = None
+    unit: str | None = None
+    currency: str | None = None
+    unit_confirmed: bool = False
+    currency_confirmed: bool = False
+    observations: list[ResearchObservationRequest] = Field(default_factory=list, max_length=5000)
+
+
+class ResearchSnapshotRequest(BaseModel):
+    as_of_date: str
+    articles: list[ResearchArticleRequest] = Field(default_factory=list, max_length=500)
+    market_series: list[ResearchMarketSeriesRequest] = Field(default_factory=list, max_length=100)
 
 
 class AllocationItem(BaseModel):
@@ -277,6 +306,25 @@ def calculate_scores(monthly_prices: pd.DataFrame) -> pd.Series:
 
     return (0.50 * scale(momentum) + 0.25 * scale(sharpe_like)
             + 0.25 * (1 - scale(volatility))).replace([np.inf, -np.inf], np.nan).dropna().sort_values(ascending=False)
+
+
+@app.post("/research/snapshot")
+def research_snapshot(payload: ResearchSnapshotRequest) -> dict:
+    """Create a bounded fixture/provided-data snapshot; never enables investment scoring."""
+    try:
+        articles = [item.model_dump(exclude_none=True) for item in payload.articles]
+        # Approval is an internal review decision, not a caller-controlled input.
+        market_series = [
+            {**item.model_dump(exclude_none=True), "source_approved": False}
+            for item in payload.market_series
+        ]
+        return build_research_snapshot(
+            as_of_date=payload.as_of_date,
+            articles=articles,
+            market_series=market_series,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.get("/health")
