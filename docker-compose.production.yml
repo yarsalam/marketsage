@@ -16,6 +16,7 @@ services:
       TINDEX_API_TOKEN: ${TINDEX_API_TOKEN:-}
       IRAN_DATA_DB_PATH: /data/iran-market.sqlite3
       IRAN_REFRESH_TOKEN: ${IRAN_REFRESH_TOKEN:-}
+      TINDEX_PUBLIC_DISPLAY_ENABLED: ${TINDEX_PUBLIC_DISPLAY_ENABLED:-false}
     volumes:
       - market_data:/data
     expose:
