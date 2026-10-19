@@ -99,6 +99,7 @@ The user-facing app now has an Iranian market-data landing tab. The Tindex pipel
 - Configure `TINDEX_API_BASE_URL` and `TINDEX_API_TOKEN` in the protected server-side `.env.production`; do not commit either value.
 - Set `IRAN_REFRESH_TOKEN` to a long random secret in `.env.production`. The same secret authorizes manual refresh requests; the dashboard asks for it per request and does not persist it in browser storage.
 - Keep `TINDEX_PUBLIC_DISPLAY_ENABLED=false` unless the vendor agreement explicitly allows public display/redistribution. Turning it on exposes persisted provider rates through the public site/API.
+- Keep `IRAN_DATA_AUTO_REFRESH_ENABLED=false` unless the vendor agreement permits automated collection. When enabled, the collector requests the Tindex currency-rate endpoint at startup only after the configured interval elapses, then at intervals of at least one hour. The default is disabled.
 - Rebuild and restart after setting these variables:
   ```bash
   docker compose --env-file .env.production -f docker-compose.production.yml config
@@ -106,7 +107,7 @@ The user-facing app now has an Iranian market-data landing tab. The Tindex pipel
   docker compose --env-file .env.production -f docker-compose.production.yml up -d
   ```
 - Check `GET /api/markets/iran/data-status`, `GET /api/markets/iran/currency-rates`, and `GET /api/markets/iran/opportunities`.
-- From the Iranian market-data dashboard, enter the refresh secret and request a refresh. This makes one Tindex currency-rates request; there is no scheduler or automatic retry. Respect the provider's account quota.
+- From the Iranian market-data dashboard, enter the refresh secret and request a refresh. This makes one Tindex currency-rates request; the API enforces a 60-second local cooldown and does not automatically retry failures. Respect the provider's account quota.
 - Raw payloads, SHA-256 checksum, retrieval timestamp, normalized rows, and sanitized refresh status persist in `/data/iran-market.sqlite3` on the existing `market_data` volume.
 
 When `TINDEX_PUBLIC_DISPLAY_ENABLED=true`, displayed provider rates are explicitly raw values: unit, market definition, and source publication timestamp are not inferred. Public display is disabled by default. The opportunity endpoint intentionally returns no ranks until an appropriate set of comparable, approved historical series passes the source acceptance gates. Do not describe the Tindex integration as commercial-license approved solely because the token works.
