@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from tindex_normalizer import TindexPayloadError, normalize_currency_rates
+from tindex_normalizer import (\n    TindexPayloadError, normalize_currency_rates, normalize_indicator_candles,\n)
 
 
 def valid_payload():
@@ -78,3 +78,66 @@ def test_rejects_duplicate_instrument_keys():
     ]}
     with pytest.raises(TindexPayloadError, match="duplicated"):
         normalize_currency_rates(payload)
+
+
+
+def valid_candle_payload():
+    return {
+        "success": True,
+        "data": {
+            "slug": "GOLD-18K",
+            "range": "3m",
+            "interval": "daily",
+            "count": 4,
+            "t": [20560, 1, 1, 1],
+            "o": [10, 11, 12, 13],
+            "h": [12, 13, 14, 14],
+            "l": [9, 10, 11, 12],
+            "c": [11, 12, 13, 13.5],
+            "partial": [False, False, False, True],
+            "unit": "تومان/گرم",
+            "source": "تیندکس",
+        },
+    }
+
+
+def test_normalizes_delta_encoded_candles_and_keeps_unit_and_partial_flag():
+    rows = normalize_indicator_candles(valid_candle_payload())
+
+    assert len(rows) == 4
+    assert [row["observation_date"] for row in rows] == [
+        "2026-04-17", "2026-04-18", "2026-04-19", "2026-04-20"
+    ]
+    assert rows[0]["instrument_key"] == "GOLD-18K"
+    assert rows[0]["open"] == Decimal("10")
+    assert rows[-1]["close"] == Decimal("13.5")
+    assert rows[-1]["partial"] is True
+    assert rows[0]["unit"] == "تومان/گرم"
+    assert rows[0]["eligible_for_scoring"] is False
+
+
+@pytest.mark.parametrize("mutate, message", [
+    (lambda d: d.update(h=[12, 13]), "length must match"),
+    (lambda d: d.update(count=99), "count must match"),
+    (lambda d: d.update(t=[20560, 1, 0, 1]), "deltas must be positive"),
+    (lambda d: d.update(partial=[False, False, "false", True]), "must be boolean"),
+    (lambda d: d.update(c=[11, 12, float("nan"), 13.5]), "finite number"),
+    (lambda d: d.update(h=[12, 13, 11, 14]), "OHLC high/low invariants"),
+])
+def test_rejects_invalid_candle_vectors(mutate, message):
+    import copy
+
+    payload = copy.deepcopy(valid_candle_payload())
+    mutate(payload["data"])
+    with pytest.raises(TindexPayloadError, match=message):
+        normalize_indicator_candles(payload)
+
+
+def test_rejects_unknown_or_incomplete_candle_envelopes():
+    with pytest.raises(TindexPayloadError, match="success"):
+        normalize_indicator_candles({"success": False, "data": {}})
+    with pytest.raises(TindexPayloadError, match="data.t"):
+        normalize_indicator_candles({
+            "success": True,
+            "data": {"slug": "btc", "o": [1], "h": [1], "l": [1], "c": [1], "partial": [False]},
+        })
