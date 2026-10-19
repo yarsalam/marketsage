@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import logging
 import os
@@ -19,7 +20,7 @@ from iran_market_data import provider_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from research_pipeline import build_research_snapshot
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from iran_live_data import (
     get_iran_data_status,
     get_iran_opportunities,
@@ -408,8 +409,13 @@ def iran_opportunities() -> dict:
 
 
 @app.post("/iran/refresh")
-def refresh_iran_data() -> dict:
-    """Manually fetch one Tindex endpoint; no scheduler or automatic retries."""
+def refresh_iran_data(x_iran_refresh_token: str | None = Header(default=None)) -> dict:
+    """Manually fetch one Tindex endpoint; requires a server-side refresh token."""
+    expected_token = os.getenv("IRAN_REFRESH_TOKEN", "").strip()
+    if not expected_token:
+        raise HTTPException(status_code=503, detail="Iran data refresh is disabled until IRAN_REFRESH_TOKEN is configured.")
+    if not x_iran_refresh_token or not hmac.compare_digest(x_iran_refresh_token, expected_token):
+        raise HTTPException(status_code=403, detail="Iran data refresh authorization failed.")
     try:
         return refresh_tindex_currency_rates()
     except Exception as exc:
