@@ -9,6 +9,7 @@ type SourceStatus = {
   provider: string;
   configured: boolean;
   refresh_enabled: boolean;
+  public_display_enabled: boolean;
   network_tested: boolean;
   production_approved: boolean;
   eligible_for_scoring: boolean;
@@ -148,12 +149,13 @@ export function IranMarketDashboard() {
       <Panel title="وضعیت استفاده تجاری">
         <p className="font-semibold">امتیازدهی غیرفعال</p>
         <p className="mt-2 text-sm text-text-secondary">تأیید مجوز، تعریف واحدها و زمان مشاهده هنوز کامل نیست.</p>
+        <p className="mt-1 text-xs text-text-secondary">نمایش عمومی داده: {status?.public_display_enabled ? "فعال" : "غیرفعال تا تأیید مجوز"}</p>
       </Panel>
     </div>
 
     <Panel title="نرخ‌های دریافتی از منبع">
       {!rates?.rates?.length ? (
-        <p className="text-sm text-text-secondary">هنوز دریافت موفقی ثبت نشده است. پس از تنظیم متغیرهای اتصال، دکمه دریافت را بزن.</p>
+        <p className="text-sm text-text-secondary">{rates?.notice ?? "هنوز دریافت موفقی ثبت نشده است. پس از تنظیم متغیرهای اتصال، دکمه دریافت را بزن."}</p>
       ) : <>
         <p className="mb-3 text-xs text-text-secondary">
           آخرین دریافت: {rates.latest_refresh?.retrieved_at ?? "نامشخص"} · اعداد خام منبع هستند و واحدشان تأیید نشده است.
