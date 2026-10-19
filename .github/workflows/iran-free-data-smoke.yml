@@ -1,6 +1,12 @@
 name: Iran free-data live smoke
 
 on:
+  push:
+    branches:
+      - research/iran-free-data-smoke
+    paths:
+      - ".github/workflows/iran-free-data-smoke.yml"
+      - "user/analysis-engine/scripts/collect_iran_free_data_smoke.py"
   workflow_dispatch:
     inputs:
       symbol:
@@ -18,7 +24,7 @@ permissions:
 
 jobs:
   tsetmc-smoke:
-    if: inputs.confirm_live_request == true
+    if: github.event_name == 'push' || inputs.confirm_live_request == true
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -34,7 +40,7 @@ jobs:
         working-directory: user/analysis-engine
         run: |
           python scripts/collect_iran_free_data_smoke.py \
-            --symbol "${{ inputs.symbol }}" \
+            --symbol "${{ inputs.symbol || 'فولاد' }}" \
             --out-dir "${{ runner.temp }}/iran-free-data-smoke"
       - name: Upload sanitized report and returned history
         if: always()
