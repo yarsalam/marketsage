@@ -86,9 +86,11 @@ def main() -> int:
         query = normalized(args.symbol)
         # Prefer an exact normalized display-name match; never silently choose candidate #1.
         exact = []
+        name_fields = ("lVal18AFC", "lVal30", "instrumentName", "name", "symbol")
         for item in candidates:
-            display = find_field(item, ("lVal18AFC", "lVal30", "instrumentName", "name", "symbol"))
-            if normalized(display) == query:
+            # TSETMC often exposes both a full company name and a short ticker.
+            aliases = [normalized(item.get(field)) for field in name_fields if item.get(field) not in (None, "")]
+            if query in aliases:
                 exact.append(item)
         if not exact:
             report["status"] = "blocked_no_exact_instrument_match"
@@ -107,7 +109,9 @@ def main() -> int:
 
         report["instrument"] = {
             "requested_name": args.symbol,
-            "matched_name": find_field(selected, ("lVal18AFC", "lVal30", "instrumentName", "name", "symbol")),
+            "matched_name": args.symbol,
+            "provider_full_name": selected.get("lVal18AFC"),
+            "provider_ticker": selected.get("lVal30"),
             "instrument_code": str(instrument_code),
             "record_keys": sorted(selected.keys()),
         }
