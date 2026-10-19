@@ -65,12 +65,15 @@ SOURCES: tuple[SourceDefinition, ...] = (
         status="adapter_implemented_not_scheduled",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("daily_ohlcv_candidate", "adjusted_price_candidate", "fund_quote_candidate"),
+        data_kinds=("daily_ohlcv_candidate", "daily_ohlcv_adjusted_candidate",
+                    "adjusted_price_candidate", "fund_quote_candidate"),
         timestamp_quality="not_verified",
         required_checks=("actual_host_connectivity", "terms_and_access_permission",
                          "symbol_identity", "adjusted_history", "suspensions",
                          "historical_depth", "unit_and_currency"),
-        notes="Read-only adapter and mocked tests added; endpoint is reverse-engineered, history/adjustments/terms remain unverified, and scoring stays disabled.",
+        notes=("Raw and provider-adjusted history are stored as separate candidate series. "
+               "The legacy chart mapping is empirical, coverage can be incomplete, price units "
+               "and terms remain unverified, and scoring stays disabled."),
     ),
     SourceDefinition(
         source_id="iran.codal",

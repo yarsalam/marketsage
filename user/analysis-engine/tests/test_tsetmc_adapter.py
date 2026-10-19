@@ -42,6 +42,14 @@ def sample_payload():
     }
 
 
+def sample_adjusted_chart():
+    # Positional fields are checked against the raw daily-history fixture:
+    # date, high, low, open, last-traded price, volume, closing price.
+    return {
+        "20261015": ["20261015", "12500", "9800", "11000", "9877", "100000", "9876"]
+    }
+
+
 def test_parser_normalizes_history_and_keeps_source_publication_unknown():
     records = tsetmc_adapter.parse_daily_history(
         sample_payload(), ins_code=INS_CODE, retrieved_at=RETRIEVED_AT
@@ -57,7 +65,8 @@ def test_parser_normalizes_history_and_keeps_source_publication_unknown():
     assert first.retrieved_at == RETRIEVED_AT
     assert first.payload["close_candidate"] == 12345.0
     assert first.payload["price_unit"] == "rial_candidate_unverified"
-    assert first.payload["normalization_status"] == "candidate_quarantined"
+    assert first.payload["normalization_status"] == "candidate_quarantined_raw_history"
+    assert first.payload["eligible_for_scoring"] is False
     assert len(first.payload["source_response_sha256"]) == 64
 
 
@@ -103,6 +112,89 @@ def test_parser_rejects_duplicate_dates_and_naive_retrieval_time():
         tsetmc_adapter.parse_daily_history(
             sample_payload(), ins_code=INS_CODE, retrieved_at=datetime(2026, 10, 16)
         )
+
+
+def test_adjusted_chart_maps_price_fields_and_accepts_saved_json_shape():
+    chart = tsetmc_adapter.parse_adjusted_chart(sample_adjusted_chart())
+    assert chart["20261015"] == {
+        "high_adj": 12500.0,
+        "low_adj": 9800.0,
+        "open_adj": 11000.0,
+        "last_adj": 9877.0,
+        "chart_volume": 100000.0,
+        "close_adj": 9876.0,
+    }
+
+
+def test_adjusted_chart_parses_provider_delimited_text():
+    chart = tsetmc_adapter.parse_adjusted_chart(
+        "20261015,12500,9800,11000,9877,100000,9876;\n"
+    )
+    assert chart["20261015"]["close_adj"] == 9876.0
+
+
+def test_adjusted_history_uses_provider_adjusted_close_and_keeps_raw_price():
+    records = tsetmc_adapter.parse_adjusted_history(
+        sample_payload(), sample_adjusted_chart(),
+        ins_code=INS_CODE, retrieved_at=RETRIEVED_AT,
+        daily_response_sha256="a" * 64,
+        chart_response_sha256="b" * 64,
+    )
+
+    assert len(records) == 2
+    first = records[0]
+    assert first.data_kind == "daily_ohlcv_adjusted_candidate"
+    assert first.record_key == f"{INS_CODE}:2026-10-15:adjusted"
+    assert first.payload["close_candidate"] == 9876.0
+    assert first.payload["raw_close_candidate"] == 12345.0
+    assert first.payload["adjustment_status"] == "provider_supplied_unvalidated"
+    assert first.payload["source_response_sha256"] != "a" * 64
+    assert first.payload["eligible_for_scoring"] is False
+    assert first.published_at is None
+
+
+def test_adjusted_history_does_not_fall_back_to_raw_for_missing_chart_date():
+    records = tsetmc_adapter.parse_adjusted_history(
+        sample_payload(), sample_adjusted_chart(),
+        ins_code=INS_CODE, retrieved_at=RETRIEVED_AT,
+    )
+    second = next(record for record in records if record.payload["observation_date"] == "2026-10-14")
+    assert second.payload["close_candidate"] is None
+    assert second.payload["raw_close_candidate"] == 12100.0
+    assert second.payload["adjustment_status"] == "missing_adjusted_chart_row"
+    assert second.payload["adjusted_chart_row_present"] is False
+
+
+def test_adjusted_ingestion_stores_adjusted_series_and_reports_coverage(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        tsetmc_adapter,
+        "fetch_daily_history",
+        lambda ins_code, timeout=20.0: (sample_payload(), "a" * 64),
+    )
+    monkeypatch.setattr(
+        tsetmc_adapter,
+        "fetch_adjusted_chart",
+        lambda ins_code, timeout=20.0: (
+            tsetmc_adapter.parse_adjusted_chart(sample_adjusted_chart()), "b" * 64
+        ),
+    )
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    result = tsetmc_adapter.ingest_adjusted_history(
+        store, INS_CODE, retrieved_at=RETRIEVED_AT
+    )
+
+    assert result["ingested_records"] == 2
+    assert result["rows_with_adjusted_close"] == 1
+    assert result["rows_missing_adjusted_close"] == 1
+    assert result["eligible_for_production_scoring"] is False
+    captured = store.as_of(
+        as_of=datetime(2026, 10, 17, tzinfo=timezone.utc),
+        market="iran_candidate",
+        data_kind="daily_ohlcv_adjusted_candidate",
+        availability_basis="captured",
+    )
+    assert len(captured) == 2
+    assert captured[0]["payload"]["close_candidate"] is None or captured[1]["payload"]["close_candidate"] is None
 
 
 def test_ingested_records_remain_unavailable_to_source_vintage_replay(tmp_path):
