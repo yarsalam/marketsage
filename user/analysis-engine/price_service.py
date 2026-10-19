@@ -33,6 +33,45 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("marketsage.analysis")
 app = FastAPI(title="MarketSage Analysis API", version="0.3.0")
 
+_iran_auto_refresh_stop = threading.Event()
+_iran_auto_refresh_thread: threading.Thread | None = None
+
+
+def _iran_auto_refresh_loop() -> None:
+    # Keep the schedule conservative: no more than one request per hour.
+    interval = max(3600, int(os.getenv("IRAN_DATA_REFRESH_INTERVAL_SECONDS", "3600")))
+    while not _iran_auto_refresh_stop.wait(interval):
+        try:
+            refresh_tindex_currency_rates()
+            logger.info("Scheduled Iranian source refresh completed")
+        except Exception as exc:
+            logger.warning("Scheduled Iranian source refresh failed: %s", type(exc).__name__)
+
+
+@app.on_event("startup")
+def start_iran_auto_refresh() -> None:
+    global _iran_auto_refresh_thread
+    if os.getenv("IRAN_DATA_AUTO_REFRESH_ENABLED", "false").strip().lower() != "true":
+        return
+    if not get_iran_data_status()["configured"]:
+        logger.warning("Iran auto-refresh requested but Tindex credentials are not configured")
+        return
+    _iran_auto_refresh_stop.clear()
+    _iran_auto_refresh_thread = threading.Thread(
+        target=_iran_auto_refresh_loop,
+        name="marketsage-iran-refresh",
+        daemon=True,
+    )
+    _iran_auto_refresh_thread.start()
+    logger.info("Iran auto-refresh enabled with an interval of at least one hour")
+
+
+@app.on_event("shutdown")
+def stop_iran_auto_refresh() -> None:
+    _iran_auto_refresh_stop.set()
+    if _iran_auto_refresh_thread and _iran_auto_refresh_thread.is_alive():
+        _iran_auto_refresh_thread.join(timeout=2)
+
 TICKERS = {
     "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana",
     "GLD": "Gold ETF (US proxy)", "SPY": "S&P 500 ETF (US proxy)",
