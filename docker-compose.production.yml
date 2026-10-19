@@ -14,6 +14,8 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       TINDEX_API_BASE_URL: ${TINDEX_API_BASE_URL:-}
       TINDEX_API_TOKEN: ${TINDEX_API_TOKEN:-}
+      IRAN_DATA_DB_PATH: /data/iran-market.sqlite3
+      IRAN_REFRESH_TOKEN: ${IRAN_REFRESH_TOKEN:-}
     volumes:
       - market_data:/data
     expose:
