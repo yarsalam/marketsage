@@ -76,6 +76,25 @@ SOURCES: tuple[SourceDefinition, ...] = (
                "and terms remain unverified, and scoring stays disabled."),
     ),
     SourceDefinition(
+        source_id="vendor.streamdata_export",
+        market_scope="iran_and_global",
+        asset_family="seller_supplied_gold_fund_crypto_gold_fx_csv",
+        provider="Seller-provided StreamData CSV export (provider identity pending confirmation)",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("ohlcv_vendor_csv_candidate",),
+        timestamp_quality="observation date available; source clock, timezone and publication time unknown",
+        required_checks=("seller_identity_and_contract", "redistribution_and_derived_data_rights",
+                         "instrument_identity_and_venue", "unit_currency_and_quote_convention",
+                         "timezone_and_candle_boundary", "raw_vs_adjusted_status",
+                         "historical_reconciliation_and_missing_sessions",
+                         "corrections_and_versioning_policy", "ohlc_quality_anomalies"),
+        notes=("Local-only CSV exports identified as Ayar gold fund, BTCUSDT, 18K gold and free-market USD. "
+               "Values are preserved without assuming price units, currencies or adjustment state. "
+               "Do not commit vendor data files to this public repository; candidate scoring remains disabled."),
+    ),
+    SourceDefinition(
         source_id="iran.codal",
         market_scope="iran",
         asset_family="company_filings_and_corporate_events",
