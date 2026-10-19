@@ -17,10 +17,19 @@ def test_status_does_not_expose_credentials(monkeypatch, tmp_path):
 
 def test_latest_rates_are_empty_before_successful_refresh(monkeypatch, tmp_path):
     monkeypatch.setenv("IRAN_DATA_DB_PATH", str(tmp_path / "iran.sqlite3"))
+    monkeypatch.setenv("TINDEX_PUBLIC_DISPLAY_ENABLED", "true")
     result = live.get_latest_currency_rates()
     assert result["status"] == "no_successful_refresh"
     assert result["rates"] == []
     assert result["eligible_for_scoring"] is False
+
+
+def test_public_display_is_disabled_by_default(monkeypatch, tmp_path):
+    monkeypatch.setenv("IRAN_DATA_DB_PATH", str(tmp_path / "iran.sqlite3"))
+    monkeypatch.delenv("TINDEX_PUBLIC_DISPLAY_ENABLED", raising=False)
+    result = live.get_latest_currency_rates()
+    assert result["status"] == "public_display_disabled"
+    assert result["rates"] == []
 
 
 def test_opportunities_fail_closed_without_approved_data(monkeypatch, tmp_path):
@@ -34,6 +43,7 @@ def test_opportunities_fail_closed_without_approved_data(monkeypatch, tmp_path):
 
 def test_refresh_persists_raw_payload_and_normalized_values(monkeypatch, tmp_path):
     monkeypatch.setenv("IRAN_DATA_DB_PATH", str(tmp_path / "iran.sqlite3"))
+    monkeypatch.setenv("TINDEX_PUBLIC_DISPLAY_ENABLED", "true")
 
     class FakeClient:
         def __enter__(self):
