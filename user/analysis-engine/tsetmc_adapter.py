@@ -165,21 +165,37 @@ def parse_adjusted_chart(payload: Any) -> dict[str, dict[str, float]]:
 
     parsed: dict[str, dict[str, float]] = {}
     for index, (key, values) in enumerate(rows):
-        if not isinstance(values, (list, tuple)) or len(values) < 7:
-            raise TSETMCDataError(f"chart row {index}: expected at least seven positional fields")
         date_text = str(key).strip()
-        value_date = str(values[0]).strip()
         if len(date_text) != 8 or not date_text.isdigit():
-            date_text = value_date
+            date_text = str(values[0]).strip() if isinstance(values, (list, tuple)) and values else ""
         try:
             datetime.strptime(date_text, "%Y%m%d")
         except ValueError as exc:
             raise TSETMCDataError(f"chart row {index}: invalid date") from exc
-        if value_date and value_date != date_text:
-            raise TSETMCDataError(f"chart row {index}: date key and first field disagree")
         if date_text in parsed:
             raise TSETMCDataError(f"chart row {index}: duplicate date {date_text}")
 
+        # Live fetches are normalized before they are joined; saved probe files
+        # contain raw positional arrays. Accept both representations explicitly.
+        if isinstance(values, dict):
+            required = {"high_adj", "low_adj", "open_adj", "last_adj", "chart_volume", "close_adj"}
+            if not required.issubset(values):
+                raise TSETMCDataError(f"chart row {index}: normalized chart fields are incomplete")
+            parsed[date_text] = {
+                "high_adj": _positive_finite_number(values["high_adj"], "chart high_adj", index),
+                "low_adj": _positive_finite_number(values["low_adj"], "chart low_adj", index),
+                "open_adj": _positive_finite_number(values["open_adj"], "chart open_adj", index),
+                "last_adj": _positive_finite_number(values["last_adj"], "chart last_adj", index),
+                "chart_volume": _nonnegative_finite_number(values["chart_volume"], "chart volume", index),
+                "close_adj": _positive_finite_number(values["close_adj"], "chart close_adj", index),
+            }
+            continue
+
+        if not isinstance(values, (list, tuple)) or len(values) < 7:
+            raise TSETMCDataError(f"chart row {index}: expected at least seven positional fields")
+        value_date = str(values[0]).strip()
+        if value_date and value_date != date_text:
+            raise TSETMCDataError(f"chart row {index}: date key and first field disagree")
         parsed[date_text] = {
             "high_adj": _positive_finite_number(values[1], "chart high_adj", index),
             "low_adj": _positive_finite_number(values[2], "chart low_adj", index),
