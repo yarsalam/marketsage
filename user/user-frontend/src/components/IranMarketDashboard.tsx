@@ -8,6 +8,7 @@ type SourceStatus = {
   source_id: string;
   provider: string;
   configured: boolean;
+  refresh_enabled: boolean;
   network_tested: boolean;
   production_approved: boolean;
   eligible_for_scoring: boolean;
@@ -70,6 +71,7 @@ export function IranMarketDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshResult, setRefreshResult] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState("");
 
   const load = useCallback(async () => {
     setError(null);
@@ -96,7 +98,7 @@ export function IranMarketDashboard() {
     try {
       const result = await getJson<{ status: string; item_count: number; message: string }>(
         "/api/markets/iran/refresh",
-        { method: "POST" },
+        { method: "POST", headers: { "X-Iran-Refresh-Token": refreshToken } },
       );
       setRefreshResult(`دریافت موفق: ${result.item_count} رکورد ذخیره شد.`);
       await load();
@@ -113,13 +115,20 @@ export function IranMarketDashboard() {
         <h1 className="text-2xl font-bold">مرکز داده بازار ایران</h1>
         <p className="mt-2 max-w-3xl text-sm text-text-secondary">
           اتصال منبع، ذخیره‌سازی داده خام و نرمال‌شده و نمایش وضعیت پوشش بازار.
-          به‌روزرسانی فقط با درخواست دستی انجام می‌شود تا سهمیه API مصرف بی‌دلیل نداشته باشد.
+          به‌روزرسانی فقط دستی و با توکن سروری انجام می‌شود تا سهمیه API مصرف بی‌دلیل نداشته باشد. توکن در مرورگر ذخیره نمی‌شود.
         </p>
       </div>
-      <button onClick={refresh} disabled={refreshing || !status?.configured}
-        className="rounded-xl bg-primary px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
-        {refreshing ? "در حال دریافت..." : "دریافت آخرین داده از Tindex"}
-      </button>
+      <div className="flex w-full flex-col gap-2 sm:w-auto">
+        <label className="text-xs text-text-secondary" htmlFor="iran-refresh-token">توکن مجاز به‌روزرسانی (فقط برای همین درخواست)</label>
+        <input id="iran-refresh-token" type="password" autoComplete="off" value={refreshToken}
+          onChange={(event) => setRefreshToken(event.target.value)}
+          placeholder="توکن تنظیم‌شده روی سرور"
+          className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+        <button onClick={refresh} disabled={refreshing || !status?.configured || !status?.refresh_enabled || !refreshToken}
+          className="rounded-xl bg-primary px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+          {refreshing ? "در حال دریافت..." : "دریافت آخرین داده از Tindex"}
+        </button>
+      </div>
     </header>
 
     {error && <div role="alert" className="rounded-xl border border-red-500/40 p-4 text-sm">{error}</div>}
