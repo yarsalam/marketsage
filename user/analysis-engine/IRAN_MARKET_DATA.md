@@ -59,6 +59,21 @@ Only run collection where permitted by the applicable source terms. A successful
 ingestion result means that payloads were captured; it does **not** grant
 production-scoring approval.
 
+## Seller-provided StreamData CSV exports
+
+- `vendor.streamdata_export` is registered as a separate candidate source.
+- `scripts/audit_streamdata_vendor_exports.py` reads the seller's CSVs from a local
+  directory, writes candidate-normalized copies and a JSON QA report, and emits
+  SHA-256 hashes. It does not copy proprietary source CSVs into Git or infer units,
+  currency, timezone, or price-adjustment status.
+- The export capture currently has an AYAR OHLC inconsistency (close exceeds high on
+  2026-10-14) and varying source-time values for AYAR. The other series also require
+  confirmation of source/venue identity, price units, timezone and raw/adjusted
+  semantics. See `docs/vendor-streamdata-csv-acceptance.md`.
+- These feeds are not wired to portfolio allocation, research scoring, or automatic
+  scheduled ingestion; `eligible_for_scoring` remains false until seller terms and
+  data conventions are confirmed and independent reconciliation is complete.
+
 ## Release gates per provider
 
 1. Confirm terms/permission and availability from the actual production host.
