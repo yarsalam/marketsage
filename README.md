@@ -6,6 +6,7 @@ MarketSage is an early-stage investment research application with a Next.js fron
 
 - The analysis service ranks a small set of **global-market proxies and crypto assets** using trailing monthly prices.
 - It does **not** yet ingest Tehran Stock Exchange prices, Iranian FX rates, Iranian gold/coin prices, news, political events, or macroeconomic publication-time data.
+- The Iranian-market dashboard now has an opt-in Tindex currency-rate refresh and persistent raw/normalized storage. It does not yet claim production approval or score Iranian opportunities; it reports blockers until data semantics and commercial rights are accepted.
 - The probability model is not production-validated. The API reports confidence as unavailable until probabilities are calibrated out-of-sample.
 - Rankings are research output, not personalized recommendations, guaranteed returns, or a minimum-risk portfolio.
 
