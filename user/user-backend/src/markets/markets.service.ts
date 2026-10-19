@@ -33,6 +33,32 @@ export class MarketsService {
     return this.getAnalysis(`/backtest?top_n=${encodeURIComponent(topN)}&transaction_cost_bps=${encodeURIComponent(transactionCostBps)}`);
   }
 
+  getIranDataStatus() {
+    return this.getAnalysis('/iran/data-status');
+  }
+
+  getIranCurrencyRates() {
+    return this.getAnalysis('/iran/currency-rates');
+  }
+
+  getIranOpportunities() {
+    return this.getAnalysis('/iran/opportunities');
+  }
+
+  async refreshIranData() {
+    try {
+      const { data } = await axios.post(this.baseUrl + '/iran/refresh', {}, {
+        timeout: 45_000,
+        headers: { Accept: 'application/json' },
+      });
+      return data;
+    } catch {
+      throw new ServiceUnavailableException(
+        'Iranian market-data refresh failed. Check source configuration and provider access.',
+      );
+    }
+  }
+
   getDataStatus() {
     return this.getAnalysis('/data-status');
   }
