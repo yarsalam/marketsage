@@ -45,14 +45,17 @@ export class MarketsService {
     return this.getAnalysis('/iran/opportunities');
   }
 
-  async refreshIranData() {
+  async refreshIranData(refreshToken: string) {
     try {
       const { data } = await axios.post(this.baseUrl + '/iran/refresh', {}, {
         timeout: 45_000,
-        headers: { Accept: 'application/json' },
+        headers: { Accept: 'application/json', 'X-Iran-Refresh-Token': refreshToken },
       });
       return data;
-    } catch {
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        throw new ServiceUnavailableException('Iranian data refresh authorization failed.');
+      }
       throw new ServiceUnavailableException(
         'Iranian market-data refresh failed. Check source configuration and provider access.',
       );
