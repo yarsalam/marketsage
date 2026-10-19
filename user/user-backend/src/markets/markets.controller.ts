@@ -31,6 +31,26 @@ export class MarketsController {
     return this.marketsService.getBacktest(String(topNValue), String(costValue));
   }
 
+  @Get('iran/data-status')
+  getIranDataStatus() {
+    return this.marketsService.getIranDataStatus();
+  }
+
+  @Get('iran/currency-rates')
+  getIranCurrencyRates() {
+    return this.marketsService.getIranCurrencyRates();
+  }
+
+  @Get('iran/opportunities')
+  getIranOpportunities() {
+    return this.marketsService.getIranOpportunities();
+  }
+
+  @Post('iran/refresh')
+  refreshIranData() {
+    return this.marketsService.refreshIranData();
+  }
+
   @Get('data-status')
   getDataStatus() {
     return this.marketsService.getDataStatus();
