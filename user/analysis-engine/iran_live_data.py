@@ -156,14 +156,19 @@ def get_iran_data_status() -> dict[str, Any]:
             count = db.execute(
                 "SELECT COUNT(*) AS n FROM iran_currency_observations",
             ).fetchone()["n"]
+            successful = db.execute(
+                "SELECT 1 FROM iran_source_refreshes WHERE source_id = ? AND status = 'success' LIMIT 1",
+                (SOURCE_ID,),
+            ).fetchone()
     except Exception:
-        latest, total, count = None, 0, 0
+        latest, total, count, successful = None, 0, 0, None
     return {
         "source_id": SOURCE_ID,
         "provider": "Tindex",
         "configured": status["configured"],
         "refresh_enabled": bool(os.getenv("IRAN_REFRESH_TOKEN", "").strip()),
-        "network_tested": bool(latest and latest["status"] == "success"),
+        "public_display_enabled": os.getenv("TINDEX_PUBLIC_DISPLAY_ENABLED", "false").strip().lower() == "true",
+        "network_tested": bool(successful),
         "production_approved": False,
         "eligible_for_scoring": False,
         "stored_observation_count": int(count),
@@ -174,24 +179,43 @@ def get_iran_data_status() -> dict[str, Any]:
             "A refresh is manual and makes one provider request.",
             "Rate units, market definition, observation timestamp, history depth, and redistribution rights are not inferred.",
             "No rates from this source enter opportunity scoring until source acceptance is completed.",
+            "Public display is disabled by default and requires explicit Tindex contract approval.",
         ],
     }
 
 
 def get_latest_currency_rates() -> dict[str, Any]:
-    """Return latest persisted normalized records without inventing semantics."""
+    """Return latest permitted display data without inventing semantics."""
+    display_enabled = os.getenv("TINDEX_PUBLIC_DISPLAY_ENABLED", "false").strip().lower() == "true"
     with _connect() as db:
-        refresh = db.execute(
+        latest_attempt = db.execute(
             """SELECT id, retrieved_at, status, payload_sha256, item_count, error_code
                FROM iran_source_refreshes WHERE source_id = ?
                ORDER BY id DESC LIMIT 1""",
             (SOURCE_ID,),
         ).fetchone()
-        if not refresh or refresh["status"] != "success":
+        refresh = db.execute(
+            """SELECT id, retrieved_at, status, payload_sha256, item_count, error_code
+               FROM iran_source_refreshes WHERE source_id = ? AND status = 'success'
+               ORDER BY id DESC LIMIT 1""",
+            (SOURCE_ID,),
+        ).fetchone()
+        if not display_enabled:
+            return {
+                "source_id": SOURCE_ID,
+                "status": "public_display_disabled",
+                "latest_refresh": dict(refresh) if refresh else None,
+                "latest_attempt": dict(latest_attempt) if latest_attempt else None,
+                "rates": [],
+                "eligible_for_scoring": False,
+                "notice": "Public display is disabled until the provider contract explicitly permits it.",
+            }
+        if not refresh:
             return {
                 "source_id": SOURCE_ID,
                 "status": "no_successful_refresh",
-                "latest_refresh": dict(refresh) if refresh else None,
+                "latest_refresh": None,
+                "latest_attempt": dict(latest_attempt) if latest_attempt else None,
                 "rates": [],
                 "eligible_for_scoring": False,
             }
@@ -207,6 +231,7 @@ def get_latest_currency_rates() -> dict[str, Any]:
         "source_id": SOURCE_ID,
         "status": "data_available",
         "latest_refresh": dict(refresh),
+        "latest_attempt": dict(latest_attempt) if latest_attempt else None,
         "rates": [
             {**dict(row), "eligible_for_scoring": bool(row["eligible_for_scoring"])}
             for row in rows
