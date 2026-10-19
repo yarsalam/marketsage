@@ -20,6 +20,12 @@ from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from research_pipeline import build_research_snapshot
 from fastapi import FastAPI, HTTPException, Query
+from iran_live_data import (
+    get_iran_data_status,
+    get_iran_opportunities,
+    get_latest_currency_rates,
+    refresh_tindex_currency_rates,
+)
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
@@ -381,6 +387,37 @@ def sources() -> dict:
 def iran_market_providers() -> dict:
     """Report provider readiness without presenting unverified data as live."""
     return provider_catalog()
+
+
+@app.get("/iran/data-status")
+def iran_data_status() -> dict:
+    """Report Tindex connection and persisted Iranian-market data coverage."""
+    return get_iran_data_status()
+
+
+@app.get("/iran/currency-rates")
+def iran_currency_rates() -> dict:
+    """Return the latest persisted Tindex rates; never triggers provider requests."""
+    return get_latest_currency_rates()
+
+
+@app.get("/iran/opportunities")
+def iran_opportunities() -> dict:
+    """Return only production-eligible Iranian opportunities; fail closed otherwise."""
+    return get_iran_opportunities()
+
+
+@app.post("/iran/refresh")
+def refresh_iran_data() -> dict:
+    """Manually fetch one Tindex endpoint; no scheduler or automatic retries."""
+    try:
+        return refresh_tindex_currency_rates()
+    except Exception as exc:
+        logger.warning("Iran source refresh failed: %s", type(exc).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Tindex refresh failed ({type(exc).__name__}). Check server-side configuration and provider access.",
+        ) from None
 
 
 @app.get("/data-status")
