@@ -26,3 +26,8 @@ def test_registry_exposes_gate_decision_for_audit_clients():
     iran = entries["iran.tsetmc"]
     assert iran["scoring_gate"]["eligible_for_production_scoring"] is False
     assert "production_approval_missing" in iran["scoring_gate"]["blocked_reasons"]
+    vendor = entries["vendor.streamdata_export"]
+    assert vendor["scoring_gate"]["eligible_for_production_scoring"] is False
+    assert vendor["approved_for_production"] is False
+    assert "unit_currency_and_quote_convention" in vendor["required_checks"]
+
