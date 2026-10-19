@@ -10,6 +10,8 @@ import hashlib
 import json
 import os
 import sqlite3
+import threading
+import time
 from contextlib import contextmanager
 from typing import Iterator
 from datetime import datetime, timezone
@@ -17,10 +19,23 @@ from pathlib import Path
 from typing import Any
 
 from tindex_normalizer import normalize_currency_rates
-from tindex_provider import SOURCE_ID, TindexClient, tindex_connection_status
+from tindex_provider import SOURCE_ID, TindexClient, TindexRateLimitError, tindex_connection_status
 
 
 DEFAULT_DB_PATH = "/data/iran-market.sqlite3"
+_MIN_REFRESH_INTERVAL_SECONDS = 60
+_refresh_slot_lock = threading.Lock()
+_last_refresh_monotonic = 0.0
+
+
+def _reserve_refresh_slot() -> None:
+    """Apply a process-wide cooldown across newly constructed API clients."""
+    global _last_refresh_monotonic
+    with _refresh_slot_lock:
+        now = time.monotonic()
+        if _last_refresh_monotonic and now - _last_refresh_monotonic < _MIN_REFRESH_INTERVAL_SECONDS:
+            raise TindexRateLimitError("Local source refresh cooldown active; wait at least 60 seconds.")
+        _last_refresh_monotonic = now
 
 
 def _db_path() -> Path:
@@ -83,6 +98,7 @@ def _utc_now() -> str:
 
 def refresh_tindex_currency_rates() -> dict[str, Any]:
     """Fetch one explicitly requested endpoint and persist raw plus normalized data."""
+    _reserve_refresh_slot()
     retrieved_at = _utc_now()
     try:
         with TindexClient() as client:
@@ -167,6 +183,7 @@ def get_iran_data_status() -> dict[str, Any]:
         "provider": "Tindex",
         "configured": status["configured"],
         "refresh_enabled": bool(os.getenv("IRAN_REFRESH_TOKEN", "").strip()),
+        "auto_refresh_enabled": os.getenv("IRAN_DATA_AUTO_REFRESH_ENABLED", "false").strip().lower() == "true",
         "public_display_enabled": os.getenv("TINDEX_PUBLIC_DISPLAY_ENABLED", "false").strip().lower() == "true",
         "network_tested": bool(successful),
         "production_approved": False,
