@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { MarketsService } from './markets.service';
 
 @Controller('api/markets')
@@ -47,8 +47,8 @@ export class MarketsController {
   }
 
   @Post('iran/refresh')
-  refreshIranData() {
-    return this.marketsService.refreshIranData();
+  refreshIranData(@Headers('x-iran-refresh-token') refreshToken?: string) {
+    return this.marketsService.refreshIranData(refreshToken ?? '');
   }
 
   @Get('data-status')
