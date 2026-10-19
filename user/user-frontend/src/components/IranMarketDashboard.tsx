@@ -9,6 +9,7 @@ type SourceStatus = {
   provider: string;
   configured: boolean;
   refresh_enabled: boolean;
+  auto_refresh_enabled: boolean;
   public_display_enabled: boolean;
   network_tested: boolean;
   production_approved: boolean;
