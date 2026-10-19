@@ -104,7 +104,7 @@ SOURCES: tuple[SourceDefinition, ...] = (
         source_id="iran.tindex.public_api",
         market_scope="iran_and_global",
         asset_family="currency_precious_metals_crypto",
-        provider="Tindex public developer API (free tier; current enabled endpoints only)",
+        provider="Tindex developer API (vendor-provided account; current enabled endpoints only)",
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
@@ -113,9 +113,10 @@ SOURCES: tuple[SourceDefinition, ...] = (
         required_checks=("terms_and_commercial_rights", "automated_collection_permission",
                          "payload_schema_and_units", "historical_depth", "publication_and_retrieval_times",
                          "revisions_and_missing_intervals", "independent_reconciliation"),
-        notes=("Dashboard notice disables TSE/equities, news, inflation/macro, housing, and calendar "
-               "endpoints (410 Gone). Only currency, precious metals, and crypto are candidate families; "
-               "this entry is not production approval."),
+        notes=("Access is through a vendor-provided account; plan, quotas, and commercial display/redistribution rights "
+               "must follow the vendor agreement. Dashboard notice disables TSE/equities, news, "
+               "inflation/macro, housing, and calendar endpoints (410 Gone). Only currency, precious "
+               "metals, and crypto are candidate families; this entry is not production approval."),
     ),
     SourceDefinition(
         source_id="iran.gold_fx",
