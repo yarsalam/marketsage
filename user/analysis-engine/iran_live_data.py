@@ -10,6 +10,8 @@ import hashlib
 import json
 import os
 import sqlite3
+from contextlib import contextmanager
+from typing import Iterator
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -25,12 +27,14 @@ def _db_path() -> Path:
     return Path(os.getenv("IRAN_DATA_DB_PATH", DEFAULT_DB_PATH))
 
 
-def _connect() -> sqlite3.Connection:
+@contextmanager
+def _connect() -> Iterator[sqlite3.Connection]:
     path = _db_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(path, timeout=10)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("PRAGMA foreign_keys=ON")
     connection.executescript(
         """
         CREATE TABLE IF NOT EXISTS iran_source_refreshes (
@@ -63,7 +67,14 @@ def _connect() -> sqlite3.Connection:
         """
     )
     connection.commit()
-    return connection
+    try:
+        yield connection
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
 
 def _utc_now() -> str:
@@ -151,6 +162,7 @@ def get_iran_data_status() -> dict[str, Any]:
         "source_id": SOURCE_ID,
         "provider": "Tindex",
         "configured": status["configured"],
+        "refresh_enabled": bool(os.getenv("IRAN_REFRESH_TOKEN", "").strip()),
         "network_tested": bool(latest and latest["status"] == "success"),
         "production_approved": False,
         "eligible_for_scoring": False,
