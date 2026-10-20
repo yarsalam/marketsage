@@ -7,6 +7,7 @@ describe('MarketsController', () => {
     getScores: jest.fn(),
     getBacktest: jest.fn(),
     getDataStatus: jest.fn(),
+    getResearchSnapshot: jest.fn(),
   };
   let controller: MarketsController;
 
@@ -28,5 +29,15 @@ describe('MarketsController', () => {
   it('forwards validated backtest parameters', () => {
     controller.getBacktest('4', '15');
     expect(marketsService.getBacktest).toHaveBeenCalledWith('4', '15');
+  });
+
+  it('forwards research snapshot payload without enabling scoring', () => {
+    const payload = {
+      as_of_date: '2026-10-17',
+      articles: [],
+      market_series: [],
+    };
+    controller.getResearchSnapshot(payload);
+    expect(marketsService.getResearchSnapshot).toHaveBeenCalledWith(payload);
   });
 });

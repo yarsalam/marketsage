@@ -11,9 +11,13 @@ COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=app:app price_service.py ./price_service.py
 COPY --chown=app:app iran_market_data.py ./iran_market_data.py
+COPY --chown=app:app source_registry.py ./source_registry.py
+COPY --chown=app:app temporal_data.py ./temporal_data.py
+COPY --chown=app:app headline_signal_engine.py ./headline_signal_engine.py
+COPY --chown=app:app research_pipeline.py ./research_pipeline.py
 COPY --chown=app:app research ./research
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=3)"
 CMD ["uvicorn", "price_service:app", "--host", "0.0.0.0", "--port", "8000"]

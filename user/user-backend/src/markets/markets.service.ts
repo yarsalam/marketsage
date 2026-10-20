@@ -1,4 +1,4 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException, UnprocessableEntityException } from '@nestjs/common';
 import axios from 'axios';
 
 @Injectable()
@@ -35,5 +35,22 @@ export class MarketsService {
 
   getDataStatus() {
     return this.getAnalysis('/data-status');
+  }
+
+  async getResearchSnapshot(payload: Record<string, unknown>) {
+    try {
+      const { data } = await axios.post(`${this.baseUrl}/research/snapshot`, payload, {
+        timeout: 45_000,
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      });
+      return data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 422) {
+        throw new UnprocessableEntityException('Research snapshot input failed validation.');
+      }
+      throw new ServiceUnavailableException(
+        'Research snapshot is temporarily unavailable.',
+      );
+    }
   }
 }

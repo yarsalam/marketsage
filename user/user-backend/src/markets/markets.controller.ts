@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { MarketsService } from './markets.service';
 
 @Controller('api/markets')
@@ -34,5 +34,10 @@ export class MarketsController {
   @Get('data-status')
   getDataStatus() {
     return this.marketsService.getDataStatus();
+  }
+
+  @Post('research-snapshot')
+  getResearchSnapshot(@Body() payload: Record<string, unknown>) {
+    return this.marketsService.getResearchSnapshot(payload);
   }
 }

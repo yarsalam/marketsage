@@ -79,7 +79,21 @@ Validate proxy config and HTTPS before opening public access. Domain names and c
 
 Never run `docker compose down -v` on a server unless deleting every attached named volume is intentional.
 
-## 7. Explicit launch blockers
+## 7. Stale-data fallback policy
+
+The analysis service allows a previously successful in-memory price cache to be served after a provider refresh failure only while its age is at most `MAX_STALE_CACHE_AGE_SECONDS` (default: 86,400 seconds / 24 hours). Set this value in the protected `.env.production` file; use `0` to disable stale fallback. When the cache exceeds the limit, price-dependent endpoints return HTTP 503 and must not produce a decision.
+
+Check `GET /data-status` during an incident. A stale cache is reported with `stale=true`, its age, and a sanitized error type. Provider exception text and raw response bodies should not be copied into logs or incident reports. This in-memory fallback policy does not make the cached provider data validated or suitable for investment ranking.
+
+Before a staging release, run the automated stale-cache regression tests from `user/analysis-engine`:
+
+```bash
+.venv/bin/python -m pytest -q test_price_service.py
+```
+
+Do not simulate provider failure against a production account or alter production cache age just to force a test.
+
+## 8. Explicit launch blockers
 
 - The admin UI source is tracked, but the admin NestJS server is only a starter skeleton and is not included in production Compose. Do not expose it as a functioning admin service.
 - Admin authentication, authorization, audit logging, persistence and actual admin operations remain unimplemented/unverified.

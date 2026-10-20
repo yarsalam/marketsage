@@ -75,3 +75,36 @@ def test_slippage_costs_reduce_net_returns_and_are_reported():
 def test_invalid_slippage_assumption_is_rejected():
     with pytest.raises(ValueError, match="slippage_bps"):
         BacktestConfig(slippage_bps=1001).validate()
+
+
+
+def test_cost_summary_includes_transaction_cost_and_slippage():
+    result = run_monthly_momentum_backtest(
+        make_prices(),
+        BacktestConfig(
+            top_n=2, momentum_months=3, volatility_months=6,
+            transaction_cost_bps=10, slippage_bps=25,
+        ),
+    )
+    metrics = result["metrics"]
+    monthly = result["monthly"]
+    assert metrics["sum_transaction_cost_fractions"] == pytest.approx(monthly["transaction_cost"].sum())
+    assert metrics["sum_slippage_cost_fractions"] == pytest.approx(monthly["slippage_cost"].sum())
+    assert metrics["sum_total_cost_fractions"] == pytest.approx(monthly["total_cost"].sum())
+    assert metrics["sum_of_period_cost_fractions"] == pytest.approx(monthly["total_cost"].sum())
+
+
+def test_sharpe_records_and_uses_explicit_risk_free_rate():
+    from research.backtest import summarize_returns
+
+    returns = pd.Series([0.02, -0.01, 0.03, 0.01, 0.00, 0.02])
+    zero_rf = summarize_returns(returns, periods=12, risk_free_rate_annual=0.0)
+    positive_rf = summarize_returns(returns, periods=12, risk_free_rate_annual=0.04)
+    assert zero_rf["risk_free_rate_annual"] == 0.0
+    assert positive_rf["risk_free_rate_annual"] == 0.04
+    assert positive_rf["sharpe"] < zero_rf["sharpe"]
+
+
+def test_invalid_annual_risk_free_rate_is_rejected():
+    with pytest.raises(ValueError, match="risk_free_rate_annual"):
+        BacktestConfig(risk_free_rate_annual=-1.0).validate()
