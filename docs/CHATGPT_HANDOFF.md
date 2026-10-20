@@ -296,3 +296,16 @@ Resume prompt: “Continue MarketSage from the newest docs/CHATGPT_HANDOFF.md an
 - Exact current PR #6 head: 37c6e85dea37b02543df7150d359d8f72c5be511. GitHub Actions run [#39393823453](https://github.com/yarsalam/marketsage/actions/runs/39393823453) completed successfully; all five jobs passed, including the production-image build.
 - PR #6 and PR #13 remain open; no merge or deployment was performed. Source acceptance, staging access-control/security review, backups/rollback and staging smoke tests remain open.
 - Staging decision is unchanged: a research-only staging test can use deterministic fixtures while investment ranking and source scoring remain disabled. Do not treat /ready=ready, a successful build, or a fixture test as market-data/model approval.
+
+
+## Staging exposure blocker — 2026-10-20
+
+Review of the current PR #6 branch found that the NestJS MarketsController registers GET markets/scores/backtest/data-status and POST research-snapshot without an authentication guard. CORS configuration in main.ts is not authentication. The research-snapshot route accepts caller-supplied payload and should not be exposed as an unrestricted public endpoint during staging.
+
+The frontend ResearchSnapshot sends requests to same-origin /api/markets/research-snapshot when NEXT_PUBLIC_API_URL is empty. next.config.ts has standalone output but no /api rewrite, and docker-compose.production.yml does not include a reverse-proxy service. The server therefore needs a separately managed reverse proxy that routes /api/ to the user backend and all other paths to the frontend.
+
+Staging conditions before any browser-accessible test:
+- Keep frontend/backend host ports bound to loopback as the Compose file currently does; do not open 3000/4500 directly to the internet.
+- Protect the reverse-proxy route with an IP allowlist or strong authentication for staging; configure TLS and firewall rules.
+- Before public exposure, add application-level authentication/authorization and request-rate/size controls for the API, with tests.
+- Do not treat CORS as a security boundary. No server deployment has been performed in this update.

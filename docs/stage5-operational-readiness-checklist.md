@@ -41,7 +41,7 @@ Stage 5 is not complete merely because the code builds or a historical simulatio
 
 - [ ] Confirm all secrets are environment/secret-manager supplied and absent from Git history, logs, images, and artifacts.
 - [ ] Review dependency vulnerabilities and supported runtime versions.
-- [ ] Verify authentication/authorization boundaries for research endpoints and admin functions.
+- [ ] Access-control blocker confirmed on the current branch: MarketsController exposes markets, scores, backtest, data-status and research-snapshot without an authentication guard; CORS is not authentication. Keep staging behind a private reverse proxy with an IP allowlist or strong authentication, and add application auth/authorization plus request-rate/size controls before public exposure.
 - [ ] Review network exposure, TLS, reverse proxy, firewall, container resource limits, and least-privilege permissions.
 - [ ] Verify backups and restore procedure for persistent state; document retention/deletion policy.
 - [ ] Build immutable images from the reviewed commit; record image digests and SBOM where supported.
@@ -101,3 +101,8 @@ Confirm its dataset hash and output dates before interpreting any metrics. Do no
 - Tests added: tests/test_health_readiness.py.
 - CI run [#39393823453](https://github.com/yarsalam/marketsage/actions/runs/39393823453) passed all five jobs on PR #6 head 37c6e85dea37b02543df7150d359d8f72c5be511.
 - Still open: source failure/stale data scenarios throughout the API, auth/access-control review, dependency/secret security, TLS/reverse proxy, resource limits, backup/restore, staging smoke test and rollback rehearsal. No server deployment was performed.
+
+
+## Staging access-control finding — 2026-10-20
+
+The current branch's MarketsController endpoints have no authentication guard; CORS in main.ts does not protect API access. The ResearchSnapshot UI defaults to same-origin /api, but Next.js has no rewrite and the Compose file does not contain a reverse proxy. The server deployment must configure a reverse proxy to route /api/ to the user backend and / to the frontend. Keep host ports bound to loopback and protect staging with an IP allowlist or strong authentication plus TLS. Before public exposure, implement app-level authorization and request-rate/size protections with tests. No server deployment was performed.

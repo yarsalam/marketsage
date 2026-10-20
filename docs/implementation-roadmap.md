@@ -346,3 +346,14 @@ Review both open PRs and local branch status. If the user is ready to authorize 
 - Added tests for /health liveness, /ready research-only semantics/disabled ranking, and an invalid/empty registry returning 503.
 - CI run [#39393823453](https://github.com/yarsalam/marketsage/actions/runs/39393823453) passed all five jobs on exact PR #6 head 37c6e85dea37b02543df7150d359d8f72c5be511, including production-images. This is a code/build test, not server staging evidence.
 - Remaining Stage 5 gates still include source outage/staleness failure tests across all paths, auth/access-control review, secret and dependency security checks, network exposure/TLS, backups/restore, staging smoke tests and rehearsed rollback. No deployment was performed.
+
+
+## Staging exposure review — 2026-10-20
+
+Static review of the current feature branch found a concrete access-control gap:
+
+- The NestJS MarketsController exposes GET markets/scores/backtest/data-status and POST research-snapshot without a controller/route authentication guard. main.ts configures CORS, but CORS is not authentication.
+- The research snapshot endpoint processes a caller-supplied payload. Keep it private during staging; review payload-size and request-rate limits before public exposure.
+- The frontend calls same-origin /api/markets/research-snapshot when NEXT_PUBLIC_API_URL is empty. next.config.ts has no /api rewrite, and the production Compose file does not define a reverse-proxy service. A server-managed reverse proxy is therefore required to route /api/ to the user backend and other paths to the frontend.
+- Keep the Compose host ports bound to loopback. For staging, put an IP allowlist or strong authentication at the reverse proxy and use TLS; do not expose 3000/4500 directly. CORS is not an access-control substitute.
+- Before public exposure, implement app-level auth/authorization and request-rate/size controls with regression tests. This was a static code review; no server was contacted and no deployment was performed.
