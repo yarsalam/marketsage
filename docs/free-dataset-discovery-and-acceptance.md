@@ -26,7 +26,8 @@ Current source catalog: [`free_dataset_source_catalog.json`](free_dataset_source
 | CODAL | Public disclosure search | Financial filings and corporate-event candidates | Retrieval time is not publication time; amendment links and historical coverage need validation |
 | World Bank Indicators API | Public API; the current official documentation says API keys are not required | Annual Iranian/global macro series, long historical spans | Annual period is not release timestamp; some series may be missing/revised and are not daily market prices |
 | Binance Spot public market data | Public klines endpoint, no API key for public market-data routes | Venue-specific crypto OHLCV | A BTCUSDT candle is not a USD quote or a universal crypto-market price; terms/geographic access remain to be reviewed |
-| Tindex | Free-tier account, environment token/origin required | Current currency snapshot and some indicator candles | Account scope and usage rights remain unverified; documented candle history is capped at about 100 days |
+| Tindex | Free-tier account, environment token/origin required | Current currency snapshot and some indicator candles | Current public docs state 1 request/minute and 100 successful requests/day, indicator history up to 100 days, and Toman values since 2026-07-20; account payload, unit semantics and usage rights still require reconciliation |
+| Nerkhsanj rates archive | Publisher-announced no-key JSON candidate (not yet live-verified) | Potential daily Iranian free-market FX, gold and coin history | Publisher announcement claims selected series back to 2010 and Toman values; actual schema, lineage, rights, attribution and history coverage are not yet verified |
 | FRED/ALFRED | Free API key | US macro, rates and historical vintages | Observation period is not exact release time; series-specific vintage behavior matters |
 | Yahoo Finance / yfinance | Existing no-subscription research path | Global proxies and selected crypto history | Unofficial client/terms and reuse rights need review; not a certified exchange feed |
 | GDELT DOC | Public API candidate | News discovery metadata | Earlier request returned HTTP 429; intentionally not part of the default live run |
@@ -71,7 +72,7 @@ This run probes only TSETMC and CODAL. To explicitly add Tindex candles, only wh
 bash scripts/run_free_dataset_acceptance_pack.sh --live-iran --include-tindex
 ```
 
-The Tindex candle probe is limited to three slugs/requests in a run. Its quota is shared across endpoints; do not add an additional Tindex currency-rate call to the same batch. Never paste tokens into chat, command arguments, output reports, or Git.
+The current public Tindex Free-plan docs state 1 request/minute and 100 successful requests/day, shared by account. The local in-memory guard is process-wide but not persistent or account-wide across other processes/hosts. The guarded runner now supports one optional slug, for example `--live-iran --include-tindex --tindex-slug "USD-EXCHANGE-RATE"`; do not poll a second slug until at least 60 seconds have elapsed. Never paste tokens into chat, command arguments, output reports, or Git. Tindex docs also describe currency-rate values as Toman per quoted unit; the project keeps units unconfirmed until the current account payload and an independent reference reconcile.
 
 ### Foreign/international provider run — VPN ON
 
@@ -123,24 +124,17 @@ TSETMC ingestion/audit scripts remain the history and adjusted-price workflow.
 
 ### Probe actual Tindex candles
 
-The shell batch uses the following defaults only if the token/origin are configured:
-`GOLD-18K`, `USD-EXCHANGE-RATE`, and `btc`. Each response is handled independently.
-A disabled slug, a 410 response or a missing series must remain a failure—not an
-empty price or a reason to use yesterday's value.
-
-To test only one known slug:
+**VPN must be OFF before this live request.** Tindex is an Iran-provider flow in the guarded runner and requires the exact interactive `VPN-OFF` confirmation. The current public Free tier permits **one request/minute and 100 successful requests/day**. Probe only one slug per invocation:
 
 ```bash
-python scripts/discover_free_datasets.py --mode probe \
-  --source iran.tindex.candles \
-  --tindex-slug "GOLD-18K" \
-  --output /tmp/marketsage-free-dataset-acceptance/tindex-gold18.json
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+bash scripts/run_free_dataset_acceptance_pack.sh \
+  --live-iran --include-tindex --tindex-slug "GOLD-18K"
 ```
 
-Never pass tokens as CLI arguments; the provider reads them from environment
-variables. Historical candle collection already has a dedicated, opt-in persistence
-path in `scripts/ingest_tindex_candles.py`; the discovery export is only a small
-candidate sample.
+After at least 60 seconds, repeat only for another required slug, for example `USD-EXCHANGE-RATE` or `btc`. Do not run concurrent Tindex clients/jobs; the local guard is process-memory only and cannot see other machines sharing the account quota.
+
+A disabled slug, 403/410 response, 429, or missing series remains a failure—not an empty price or a reason to switch to another route. The public developer docs say currency rates are quoted in Toman and that Markets & Indicators values are in Toman since 2026-07-20; keep the normalized unit unknown until the actual enabled-account payload and a lawful independent reference reconcile. The documented history window is only about 100 days, so this source alone cannot validate a six-month strategy. Never pass tokens as CLI arguments.
 
 ## CSV acceptance audit
 
@@ -243,3 +237,14 @@ stage cannot skip the next:
 - [FRED API](https://fred.stlouisfed.org/docs/api/fred/) — API key, observation and vintage endpoints.
 - [Tindex developer docs](https://tindex.app/en/developers/) — current free-tier/API limits and history/candle constraints.
 - [GDELT DOC 2.0](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) — article discovery, not a validated sentiment label source.
+
+
+## Additional Iranian rate-history candidate: Nerkhsanj (discovery only)
+
+The publisher's October 2026 announcement describes a no-key API at `https://nerkh.jahankhahan.shop` with `/data/live.json`, `/data/rates.json` and `/data/intraday.json`, claiming daily archive coverage since 2010 for selected FX/gold/coin/crypto series. It also describes Toman values and Jalali dates and asks for Nerkhsanj attribution/link. Source lineage, endpoint availability/schema, the series inventory, daily coverage, revision behavior, and the legal/commercial rights are **not independently verified**. It is registered as a candidate only; no live request was made in this update.
+
+Before a bounded live request to this external host, **turn VPN ON first**. Start with a single request to the announced rates archive; do not request `/calc` once per date or instrument. Capture only sanitized schema metadata. Build a typed parser only after an observed response is reviewed and committed as a sanitized fixture. Do not store raw rows, infer source licensing, or allow the candidate into scoring.
+
+Announcement references (publisher-authored, not independent proof of accuracy):
+- [WebNuz announcement](https://www.webnuz.com/article/2026-10-06/A%20free%2C%20keyless%20JSON%20API%20for%20Iran%27s%20free-market%20exchange%20rates%20%28with%20a%20daily%20archive%20since%202010%29)
+- [DEV.to announcement](https://dev.to/hamidjh80arch/a-free-keyless-json-api-for-irans-free-market-exchange-rates-with-a-daily-archive-since-2010-k6f)
