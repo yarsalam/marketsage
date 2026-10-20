@@ -18,6 +18,7 @@ REPORT_DIR="${MARKETSAGE_FREE_DATASET_DIR:-/tmp/marketsage-free-dataset-acceptan
 OFFLINE_ONLY=0
 INCLUDE_GDELT=0
 TSETMC_QUERY_ARGS=()
+AUDIT_CSV_ARGS=()
 
 while (($#)); do
   case "$1" in
@@ -34,9 +35,14 @@ while (($#)); do
       TSETMC_QUERY_ARGS+=(--tsetmc-query "$2")
       shift 2
       ;;
+    --audit-csv)
+      if (($# < 2)); then echo "Missing value for --audit-csv" >&2; exit 2; fi
+      AUDIT_CSV_ARGS+=(--audit-csv "$2")
+      shift 2
+      ;;
     *)
       echo "Unknown option: $1" >&2
-      echo "Usage: bash scripts/run_free_dataset_acceptance_pack.sh [--offline-only] [--include-gdelt] [--tsetmc-query NAME ...]" >&2
+      echo "Usage: bash scripts/run_free_dataset_acceptance_pack.sh [--offline-only] [--include-gdelt] [--tsetmc-query NAME ...] [--audit-csv FILE ...]" >&2
       exit 2
       ;;
   esac
@@ -47,6 +53,30 @@ SUMMARY="$REPORT_DIR/summary.txt"
 : > "$SUMMARY"
 record() { printf '%s\n' "$*" | tee -a "$SUMMARY"; }
 
+audit_csv_batch() {
+  local -a csv_files=()
+  local candidate
+  local i
+  if [[ -d "$REPORT_DIR/candidate-exports" ]]; then
+    while IFS= read -r candidate; do
+      csv_files+=("$candidate")
+    done < <(find "$REPORT_DIR/candidate-exports" -maxdepth 1 -type f -name '*.csv' -print | sort)
+  fi
+  for ((i=0; i<${#AUDIT_CSV_ARGS[@]}; i+=2)); do
+    csv_files+=("${AUDIT_CSV_ARGS[i+1]}")
+  done
+  if (("${#csv_files[@]}" == 0)); then
+    record "CSV audit skipped: no exported or explicitly supplied CSV files were found."
+    return 0
+  fi
+  if "$PYTHON" scripts/audit_candidate_dataset.py "${csv_files[@]}" \
+      --out-report "$REPORT_DIR/csv-quality-report.json" > "$REPORT_DIR/csv-quality-report.stdout.json"; then
+    record "CSV audit completed: $REPORT_DIR/csv-quality-report.json"
+  else
+    record "WARN: one or more CSVs could not be audited; see $REPORT_DIR/csv-quality-report.json"
+  fi
+}
+
 record "MarketSage free-access dataset discovery/acceptance"
 record "Started (UTC): $(date -u +%FT%TZ)"
 record "Repository: $REPO_DIR"
@@ -54,7 +84,7 @@ record "Reports: $REPORT_DIR"
 record "The run never enables scoring or ranking."
 record ""
 
-record "== 1/5 Validate source catalog and run complete offline test suite =="
+record "== 1/6 Validate source catalog and run complete offline test suite =="
 if ! "$PYTHON" -m json.tool "$REPO_DIR/docs/free_dataset_source_catalog.json" >/dev/null; then
   record "FAIL: free dataset source catalog is invalid JSON."
   exit 1
@@ -63,27 +93,36 @@ if ! "$PYTHON" -m pytest -q tests; then
   record "FAIL: offline test suite failed; live probes were not started."
   exit 1
 fi
-record "PASS: catalog JSON and full offline analysis-engine tests"
+if ! bash -n scripts/run_free_dataset_acceptance_pack.sh; then
+  record "FAIL: bundled acceptance shell script failed bash syntax validation."
+  exit 1
+fi
+record "PASS: catalog JSON, shell syntax and full offline analysis-engine tests"
 record ""
 
-record "== 2/5 Generate source inventory without network requests =="
+record "== 2/6 Generate inventory and pending evidence templates (no network) =="
 if ! "$PYTHON" scripts/discover_free_datasets.py --mode inventory \
     --output "$REPORT_DIR/source-inventory.json" > "$REPORT_DIR/source-inventory.stdout.json"; then
   record "FAIL: inventory generation failed."
   exit 1
 fi
-record "PASS: inventory written to $REPORT_DIR/source-inventory.json"
+if ! "$PYTHON" scripts/create_source_evidence_templates.py --all \
+    --output-dir "$REPORT_DIR/evidence-templates" > "$REPORT_DIR/evidence-templates.stdout.json"; then
+  record "FAIL: source evidence template generation failed."
+  exit 1
+fi
+record "PASS: source inventory and pending evidence templates"
 record ""
 
 if [[ "$OFFLINE_ONLY" == "1" ]]; then
   record "== Live probes skipped by --offline-only =="
   record "Run completed; no network requests were made by the discovery pack."
-  record "Templates and CSV audits are optional local commands documented in docs/free-dataset-discovery-and-acceptance.md."
+  audit_csv_batch
   record "Summary: $SUMMARY"
   exit 0
 fi
 
-record "== 3/5 Probe unauthenticated public-access candidates (bounded) =="
+record "== 3/6 Probe unauthenticated public-access candidates (bounded) =="
 LIVE_ARGS=(--mode probe --source iran.tsetmc --source iran.codal \
   --source global.world_bank_indicators --source global.binance_spot_public \
   --export-dir "$REPORT_DIR/candidate-exports" --output "$REPORT_DIR/public-live-probes.json")
@@ -96,7 +135,7 @@ fi
 record "Public report: $REPORT_DIR/public-live-probes.json"
 record ""
 
-record "== 4/5 Probe optional free-tier/keyed APIs only when credentials already exist =="
+record "== 4/6 Probe optional free-tier/keyed APIs only when credentials already exist =="
 OPTIONAL_ARGS=(--mode probe --output "$REPORT_DIR/optional-live-probes.json" \
   --export-dir "$REPORT_DIR/candidate-exports")
 OPTIONAL_SELECTED=0
@@ -127,7 +166,11 @@ fi
 record "Optional report: $REPORT_DIR/optional-live-probes.json"
 record ""
 
-record "== 5/5 GDELT is excluded from the default run =="
+record "== 5/6 Audit any exported candidate CSVs and explicitly supplied local CSVs =="
+audit_csv_batch
+record ""
+
+record "== 6/6 GDELT is excluded from the default run =="
 if [[ "$INCLUDE_GDELT" == "1" ]]; then
   record "GDELT explicit opt-in: making one tiny request; previous probes saw HTTP 429."
   if "$PYTHON" scripts/discover_free_datasets.py --mode probe \
@@ -144,10 +187,11 @@ fi
 record ""
 record "Generated artifacts (outside the repository):"
 record "$REPORT_DIR/source-inventory.json"
+record "$REPORT_DIR/evidence-templates/"
 record "$REPORT_DIR/public-live-probes.json"
 record "$REPORT_DIR/optional-live-probes.json"
 record "$REPORT_DIR/candidate-exports/"
+record "$REPORT_DIR/csv-quality-report.json"
 record "$SUMMARY"
 record ""
-record "Next: run scripts/audit_candidate_dataset.py on candidate CSVs and complete a source evidence template."
 record "Access success != complete history != legal reuse != production scoring approval."

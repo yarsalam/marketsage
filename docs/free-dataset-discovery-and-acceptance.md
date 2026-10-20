@@ -62,7 +62,8 @@ set. The script never asks for a secret, echoes a secret, writes a secret to rep
 or prints raw provider price rows. Tindex is limited to at most three candle requests
 in one invocation because the account quota is shared. GDELT is excluded by default;
 add `--include-gdelt` only when you explicitly want one probe and accept the chance
-of HTTP 429. After a 429, do not retry rapidly.
+of HTTP 429. After a 429, do not retry rapidly. The batch also generates pending
+source-evidence templates and automatically audits the small CSV candidate exports.
 
 To run tests/inventory without any network traffic:
 
@@ -147,6 +148,18 @@ World Bank records must not be merged directly into daily prices without a
 publication-time/point-in-time policy. For local StreamData files, point the same
 auditor at the original CSVs to get a fresh metadata-only report. The auditor does
 not validate vendor permission or resolve price-unit ambiguity.
+
+You can pass local files to the one-command runner with repeated `--audit-csv`
+options; this only performs a technical audit and does not reclassify vendor-provided
+data as free. To audit the four already-supplied local exports without live requests:
+
+```bash
+bash scripts/run_free_dataset_acceptance_pack.sh --offline-only \
+  --audit-csv "$HOME/Downloads/Telegram Desktop/4_Symbols_Data_StreamData/Ayar_Gold_Fund_1D_StreamData.csv" \
+  --audit-csv "$HOME/Downloads/Telegram Desktop/4_Symbols_Data_StreamData/BTCUSDT_1D_StreamData.csv" \
+  --audit-csv "$HOME/Downloads/Telegram Desktop/4_Symbols_Data_StreamData/Gold18_1D_StreamData.csv" \
+  --audit-csv "$HOME/Downloads/Telegram Desktop/4_Symbols_Data_StreamData/US_Dollar_1D_StreamData.csv"
+```
 
 ## Source acceptance evidence
 

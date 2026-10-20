@@ -14,6 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validate free dataset acceptance scripts/catalog
+        working-directory: user/analysis-engine
+        run: |
+          bash -n scripts/run_free_dataset_acceptance_pack.sh
+          python -m json.tool ../../docs/free_dataset_source_catalog.json >/dev/null
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
