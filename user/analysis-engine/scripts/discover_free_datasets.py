@@ -208,9 +208,9 @@ def _run_one(
                 data = payload.get("data")
                 record["record_count"] = len(data) if isinstance(data, list) else None
         elif source_id == "iran.tindex.candles":
-            slugs = tindex_slugs or ["GOLD-18K", "USD-EXCHANGE-RATE", "btc"]
-            if len(slugs) > 3:
-                raise ValueError("at most three Tindex slugs can be queried in a single run")
+            slugs = tindex_slugs or ["GOLD-18K"]
+            if len(slugs) > 1:
+                raise ValueError("only one Tindex slug can be queried in a single run under the current free-tier quota")
             results = []
             # Reuse a single client so the local three-requests/minute limiter is effective.
             with TindexClient(timeout=15.0) as client:
@@ -300,7 +300,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--tsetmc-query", action="append",
                         help="Exact TSETMC instrument-name search query; may be repeated, maximum 20.")
     parser.add_argument("--tindex-slug", action="append",
-                        help="Tindex candle slug; at most three per run.")
+                        help="Single Tindex candle slug per run; current free tier allows one request/minute.")
     return parser.parse_args(argv)
 
 
@@ -316,8 +316,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.tsetmc_query and len(args.tsetmc_query) > 20:
         print(json.dumps({"error": "at most 20 TSETMC search queries per run"}, indent=2))
         return 2
-    if args.tindex_slug and len(args.tindex_slug) > 3:
-        print(json.dumps({"error": "at most three Tindex slugs per run"}, indent=2))
+    if args.tindex_slug and len(args.tindex_slug) > 1:
+        print(json.dumps({"error": "only one Tindex slug per run under the current free-tier quota"}, indent=2))
         return 2
 
     if args.mode == "inventory":
@@ -340,7 +340,7 @@ def main(argv: list[str] | None = None) -> int:
         if "iran.tindex.public_api" in selected and "iran.tindex.candles" in selected:
             print(json.dumps({
                 "error": "Do not combine Tindex currency-rates and candle probes in one run; the free-tier account quota is shared.",
-                "hint": "Run one Tindex probe pack at a time. Candle mode makes at most three requests.",
+                "hint": "Run a single Tindex slug per invocation and leave at least 60 seconds before the next request.",
                 "production_approved": False,
             }, ensure_ascii=False, indent=2))
             return 2
@@ -392,7 +392,7 @@ def main(argv: list[str] | None = None) -> int:
             "notes": [
                 "Probe success is not history completeness, licensing approval or predictive evidence.",
                 "No raw price rows, article text, or credentials are included in the JSON report.",
-                "Tindex limits are shared by the account; its candle probe makes at most three requests.",
+                "Tindex limits are shared by the account; each invocation makes at most one candle request.",
                 "GDELT is excluded from defaults because a prior request returned HTTP 429; select it explicitly.",
             ],
         }
