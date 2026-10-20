@@ -53,6 +53,8 @@ def test_builder_preserves_raw_prices_and_does_not_fill_missing_adjusted_dates()
     assert missing["adjustment_status"] == "missing_adjusted_chart_row"
     assert report["rows_with_adjusted_close"] == 1
     assert report["rows_without_adjusted_close"] == 1
+    assert report["adjusted_ohlc_violation_observation_count"] == 0
+    assert report["adjusted_ohlc_violation_flag_count_sample_capped"] == 0
     assert report["eligible_for_scoring"] is False
 
 
