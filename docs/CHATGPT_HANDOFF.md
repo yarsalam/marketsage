@@ -309,3 +309,36 @@ Staging conditions before any browser-accessible test:
 - Protect the reverse-proxy route with an IP allowlist or strong authentication for staging; configure TLS and firewall rules.
 - Before public exposure, add application-level authentication/authorization and request-rate/size controls for the API, with tests.
 - Do not treat CORS as a security boundary. No server deployment has been performed in this update.
+
+
+## Latest acceptance and staging checkpoint — 2026-10-20
+
+### PRs and verified CI
+
+- **PR #6** remains open: `feat/tindex-free-data-connector` → `deploy/production-readiness`. The staging overlay/runbook and readiness checks are on this branch. [CI run #39404768839](https://github.com/yarsalam/marketsage/actions/runs/39404768839) passed all five jobs on commit `e2b6f7798a7b360b851402a8108e10a2dbfac80e`, including production image build, staging Compose configuration validation and Caddyfile syntax validation.
+- **PR #13** remains open separately: `feature/free-dataset-discovery-acceptance` → `feature/iran-live-data-dashboard`. Its adjusted-history test increment passed [CI run #39403875602](https://github.com/yarsalam/marketsage/actions/runs/39403875602) on code/test commit `cb557837788e0f805088ac7ad72a9aedc676143c`. The next doc-only commit added `docs/data-source-acceptance-matrix.md`; do not call that newer docs commit CI-green until its run is checked.
+- The PRs target different base branches. Do not silently merge them together or deploy one feature branch as if it contained both workstreams.
+
+### TSETMC adjustment/history — test coverage and remaining evidence
+
+- PR #13 currently contains **32 collected regression cases across three modules**: `test_tsetmc_adapter.py`, `test_tsetmc_adjusted_dataset.py`, and `test_tsetmc_adjustment_validation.py`. New cases verify duplicate/incomplete adjusted-chart rows fail closed, invalid close does not fall back to raw, and a failed adjusted-chart fetch stores no partial adjusted series. These are fixture tests, not 32 independent real-market reconciliations.
+- A previous owner-reported live candidate build for `فولاد` returned 4,664 raw daily rows; 4,249 had adjusted close and 415 had no matching adjusted-chart row. Missing adjusted rows remain null; no fallback to raw close is permitted. This is one instrument only and is not source approval.
+- The proposed minimum *method validation* is the existing فولاد baseline plus two further exact-identity instruments selected from TSETMC adjustment-event evidence to cover at least two corporate-action patterns. Review multiple sessions before/after each action and compare raw daily, adjustment events, unadjusted chart and adjusted chart. Try an independent, legally usable reference; same-provider endpoint comparison is not independent evidence. Then automate quality checks for every symbol actually admitted to the research universe.
+- Do not repeatedly download identical full histories just to create a test count. Re-run focused/full regression tests on every changed candidate commit (CI does this); perform live history acceptance only for each selected instrument, provider schema change, or data-quality drift event.
+
+### Staging implementation now available (not deployed)
+
+- Added `docker-compose.staging.yml`, `deploy/staging/Caddyfile`, `.env.staging.example`, and `docs/staging-deployment-runbook.md`.
+- When layered on top of `docker-compose.production.yml`, Caddy terminates HTTPS, gates the entire browser/API site behind Basic Auth, routes `/api/*` to NestJS, and routes other paths to the frontend. Backend/frontend ports stay loopback-bound by the base Compose file. The staging Caddyfile and Compose overlay both pass CI validation.
+- The staging env example deliberately contains an invalid hash placeholder. A real hostname, DNS, strong password hash and private `.env.staging` must be prepared on the server. The admin workspace is CI-built but is not part of this staging Compose stack.
+- **No server deployment has been performed.** The missing deployment-specific inputs are the staging server/SSH context (not credentials in chat), DNS hostname and confirmation of firewall/reverse-proxy ownership. Do not place passwords, tokens, or the completed env file into Git or chat.
+
+### Next actions
+
+1. Check the latest CI status for PR #13's current head (including the source acceptance matrix doc), then review both PRs and their current base/head relationships.
+2. Preserve local modifications/untracked reports. Do not run destructive reset/clean commands.
+3. For adjusted-history live acceptance, VPN **OFF** before requesting TSETMC. First use the VPN-separated runner to resolve exact IDs for the next two symbols; then use `scripts/validate_tsetmc_adjustments.py` one instrument at a time and keep raw artifacts local. For Binance/World Bank/FRED/GDELT or other foreign sources, first tell the owner to turn VPN **ON**. GDELT still requires deliberate cooldown after HTTP 429.
+4. Staging should be built from one reviewed combined candidate that contains the intended changes from both workstreams; first inspect merge-base/conflicts. Do not deploy PR #13 alone to represent PR #6, or vice versa. Only perform the server test once a private domain/proxy/SSH setup is available and the user authorizes it.
+5. After staging, review authenticated UI/API smoke results, “not-rankable” behavior, no future-data leakage, readiness and error/staleness recovery. Only then consider each PR for merge, subject to explicit authorization.
+
+Resume prompt: “Continue MarketSage with docs/CHATGPT_HANDOFF.md, docs/implementation-roadmap.md and docs/data-source-acceptance-matrix.md. PR #6 CI run #39404768839 passed all five jobs on e2b6f7798a7b360b851402a8108e10a2dbfac80e; it now has a private HTTPS+Basic Auth Caddy staging overlay, but nothing has been deployed. PR #13's code/test head cb557837788e0f805088ac7ad72a9aedc676143c passed CI run #39403875602 and introduced 32 adjusted-history fixture test cases across three modules; later matrix documentation must have its CI checked. A prior live candidate for فولاد had 4,664 raw rows / 4,249 adjusted / 415 unmatched. Do not treat this as broad acceptance. Next, review current heads/CI, test two more exact TSETMC instruments with VPN OFF using adjustment event evidence, reconcile event windows, and create one combined staging candidate only after inspecting branch compatibility. For all foreign live providers, explicitly tell me to turn VPN ON. Do not deploy, merge, or enable ranking without authorization and evidence.”

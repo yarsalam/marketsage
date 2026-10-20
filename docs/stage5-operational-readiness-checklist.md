@@ -106,3 +106,12 @@ Confirm its dataset hash and output dates before interpreting any metrics. Do no
 ## Staging access-control finding — 2026-10-20
 
 The current branch's MarketsController endpoints have no authentication guard; CORS in main.ts does not protect API access. The ResearchSnapshot UI defaults to same-origin /api, but Next.js has no rewrite and the Compose file does not contain a reverse proxy. The server deployment must configure a reverse proxy to route /api/ to the user backend and / to the frontend. Keep host ports bound to loopback and protect staging with an IP allowlist or strong authentication plus TLS. Before public exposure, implement app-level authorization and request-rate/size protections with tests. No server deployment was performed.
+
+
+## Staging overlay and adjustment-history tests — 2026-10-20
+
+- Added a staging-only Compose overlay and Caddy reverse proxy with HTTPS and a global Basic Auth gate. It proxies `/api/*` to the user backend and remaining paths to the frontend. The env example intentionally uses placeholder domain/hash values and cannot be deployed without private operator configuration.
+- GitHub Actions run [#39404768839](https://github.com/yarsalam/marketsage/actions/runs/39404768839) passed all five jobs, including validation of the staging Compose overlay and Caddyfile. This is CI evidence, not a server smoke test.
+- No deployment occurred. Server, DNS and authorization-specific prerequisites remain open.
+- PR #13 adjustment/history test coverage is now 32 collected fixture test cases across three modules; CI run [#39403875602](https://github.com/yarsalam/marketsage/actions/runs/39403875602) passed on code/test commit `cb557837788e0f805088ac7ad72a9aedc676143c`. The next docs-only matrix commit's CI must be checked separately.
+- Live-data acceptance is still open: one previously reported فولاد sample has 4,664 raw rows / 4,249 adjusted / 415 unmatched. Expand with two additional exact-identity instruments selected from actual adjustment-event responses, review event windows and independent reconciliation. Missing adjusted rows must not fall back to raw prices.

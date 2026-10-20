@@ -357,3 +357,29 @@ Static review of the current feature branch found a concrete access-control gap:
 - The frontend calls same-origin /api/markets/research-snapshot when NEXT_PUBLIC_API_URL is empty. next.config.ts has no /api rewrite, and the production Compose file does not define a reverse-proxy service. A server-managed reverse proxy is therefore required to route /api/ to the user backend and other paths to the frontend.
 - Keep the Compose host ports bound to loopback. For staging, put an IP allowlist or strong authentication at the reverse proxy and use TLS; do not expose 3000/4500 directly. CORS is not an access-control substitute.
 - Before public exposure, implement app-level auth/authorization and request-rate/size controls with regression tests. This was a static code review; no server was contacted and no deployment was performed.
+
+
+## Latest acceptance/staging increment — 2026-10-20
+
+- PR #6 candidate head `e2b6f7798a7b360b851402a8108e10a2dbfac80e` passed CI run [#39404768839](https://github.com/yarsalam/marketsage/actions/runs/39404768839), all five jobs. Added an optional staging overlay with Caddy HTTPS + global Basic Auth, `/api/*` → NestJS routing, frontend fallback routing, and a staging runbook. CI validates Compose and Caddy syntax.
+- PR #13's adjusted-history test increment passed CI run [#39403875602](https://github.com/yarsalam/marketsage/actions/runs/39403875602) on `cb557837788e0f805088ac7ad72a9aedc676143c`. It adds regression guards around duplicate/incomplete chart rows, invalid adjusted close and no partial persistence after the adjusted endpoint fails. The newer `docs/data-source-acceptance-matrix.md` document commit must have its own CI state checked before being called green.
+- The PRs target different bases and must not be treated as one combined release. Neither PR has been merged, and no server deployment has occurred.
+
+### Adjustment-test cadence and acceptance sample
+
+The three adjustment-related modules on PR #13 now contain 32 collected regression test cases. These run in the full offline suite on each candidate commit; there is no value in repeating identical fixture tests multiple times on unchanged code.
+
+A previous owner-reported live adjustment build for one instrument (فولاد) had 4,664 raw daily observations, 4,249 adjusted closes and 415 dates without a corresponding adjusted chart row. This only proves one instrument has a candidate dataset. It does not prove the full universe or corporate-action correctness.
+
+Minimum next live acceptance: keep فولاد as the baseline, identify two more exact instruments from TSETMC search and adjustment-event output, inspect events covering at least two distinct action patterns, reconcile multiple sessions around each event, and compare against a second legally usable reference when possible. Missing adjusted dates stay missing; they are never filled from raw values. VPN OFF for TSETMC, and all live artifacts remain local and uncommitted.
+
+### Private staging overlay
+
+Added `docker-compose.staging.yml`, `deploy/staging/Caddyfile`, `.env.staging.example`, and `docs/staging-deployment-runbook.md`. Use the overlay with the existing production Compose file only after preparing a real staging domain/DNS, a strong Caddy password hash and a private env file. Caddy applies HTTPS and Basic Auth to the whole site/API, sends `/api/*` to the NestJS backend, and sends other routes to the Next.js frontend. Frontend/backend host ports remain loopback-bound. CI validates the overlay and Caddyfile but no server deployment is implied.
+
+### Immediate next action
+
+1. Confirm CI on the newest PR #13 docs head and inspect the compatibility/base relation of PR #6 and PR #13.
+2. Run a controlled TSETMC adjustment-event validation for two more exact instruments (VPN OFF) using `scripts/validate_tsetmc_adjustments.py`; review metadata and event windows, not just row counts.
+3. Retry Binance only as a bounded foreign-source diagnosis after the owner is explicitly told VPN ON. Do not use a public live probe as source approval.
+4. Prepare a combined staging candidate only after reviewing branch compatibility. Do not deploy until the user authorizes staging and the domain/DNS/host setup is known; do not merge or enable ranking by default.
