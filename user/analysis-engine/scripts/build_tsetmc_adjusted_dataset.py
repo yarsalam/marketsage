@@ -124,6 +124,32 @@ def build_dataset(
 
     covered = sum(row["close_adj"] is not None for row in rows)
     dates = [row["date"] for row in rows]
+    adjusted_ohlc_violations: list[dict[str, Any]] = []
+    adjusted_ohlc_flag_count = 0
+    for row in rows:
+        low = row["low_adj"]
+        high = row["high_adj"]
+        open_price = row["open_adj"]
+        last_price = row["last_adj"]
+        close = row["close_adj"]
+        flags: list[str] = []
+        if low is not None and high is not None:
+            if low > high:
+                flags.append("low_above_high")
+            else:
+                if open_price is not None and not low <= open_price <= high:
+                    flags.append("open_outside_low_high")
+                if last_price is not None and not low <= last_price <= high:
+                    flags.append("last_outside_low_high")
+                if close is not None and not low <= close <= high:
+                    flags.append("close_outside_low_high")
+        if flags:
+            adjusted_ohlc_flag_count += len(flags)
+            if len(adjusted_ohlc_violations) < 50:
+                adjusted_ohlc_violations.append({
+                    "date": row["date"],
+                    "flags": flags,
+                })
     report = {
         "source_id": "iran.tsetmc",
         "instrument_code": instrument_code,
@@ -136,6 +162,10 @@ def build_dataset(
         "adjusted_close_coverage_fraction": covered / len(rows),
         "date_range": {"first": min(dates), "last": max(dates)},
         "adjusted_to_raw_close_ratio": _ratio_summary(ratios),
+        "adjusted_ohlc_violation_observation_count": len(adjusted_ohlc_violations),
+        "adjusted_ohlc_violation_flag_count_sample_capped": adjusted_ohlc_flag_count,
+        "adjusted_ohlc_violation_samples": adjusted_ohlc_violations,
+        "adjusted_ohlc_violation_sample_cap": 50,
         "missing_adjusted_dates_are_filled": False,
         "raw_prices_preserved": True,
         "eligible_for_scoring": False,
