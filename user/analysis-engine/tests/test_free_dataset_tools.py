@@ -24,7 +24,7 @@ def test_angle_bracket_daily_csv_headers_are_recognized(tmp_path: Path):
         })
     report = audit_file(sample)
     assert report["row_count"] == 2
-    assert report["columns_detected"]["date"] == "<DTYYYYMMDD>"
+    assert report["columns_detected"]["date_or_period"] == "<DTYYYYMMDD>"
     assert report["duplicate_date_count"] == 1
     assert report["ohlc_violation_count"] == 1
     assert report["raw_values_emitted"] is False
