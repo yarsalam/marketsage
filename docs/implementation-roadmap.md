@@ -281,3 +281,58 @@ Before asking the user to execute a live request to any foreign/international pr
 5. Keep Stage 2 source acceptance open; scoring/ranking disabled. Stage 4 may use only appropriately labelled research data, with point-in-time limitations explicit. Do not merge either PR or deploy without explicit authorization.
 
 **Next-session starting point:** no more full-suite rerun is required just to read these reports. Start with branch/PR/CI state, the sanitized Binance error and local AYAR anomaly. When any foreign-source probe is proposed, announce VPN-on first.
+
+
+## Latest execution checkpoint — 2026-10-20 (source gates and staging decision)
+
+### CI and branches
+
+- PR #6, feat/tindex-free-data-connector → deploy/production-readiness, remains open/unmerged. Latest inspected head 496cb9bc9785442b43ba1d31ee1f44ed30f0913d; [CI run #39389606760](https://github.com/yarsalam/marketsage/actions/runs/39389606760) passed all five jobs.
+- PR #13, feature/free-dataset-discovery-acceptance → feature/iran-live-data-dashboard, remains open/unmerged. Latest inspected head 8d330c460bf2cd89ff2bb4a59e7a07523e6dfb1f; [CI run #39392008358](https://github.com/yarsalam/marketsage/actions/runs/39392008358) passed all five jobs.
+- These branches target different bases and must be reviewed separately. CI success verifies the checked code/build contracts; it does not approve a live data source or authorize deployment.
+
+### VPN-isolated source acceptance tooling
+
+PR #13 changes the free-dataset acceptance runner so the default run is offline and creates inventory/evidence templates without provider calls. Live probes require exactly one source group per invocation:
+
+- Iranian providers: --live-iran, with VPN OFF; optional Tindex candle probe only via --include-tindex. The runner requires a terminal confirmation VPN-OFF.
+- Foreign providers: --live-foreign, with VPN ON; optional FRED via --include-fred and GDELT via --include-gdelt. The runner requires a terminal confirmation VPN-ON.
+- Mixed groups and invalid option combinations exit before any live provider request. The script cannot detect the real VPN state, so the user is explicitly warned and must confirm it.
+- New shell-contract tests cover the mixed-group refusal and option guards. The latest CI run on the exact PR #13 head passed all five jobs.
+
+Before suggesting any live foreign-source command, explicitly tell the user to turn VPN on. GDELT is still under cooldown/low-retry discipline after the previous HTTP 429.
+
+### Updated cross-market data maturity matrix
+
+| Market/data family | Current status | Remaining acceptance work |
+|---|---|---|
+| Iranian stocks/funds | TSETMC and CODAL bounded probes returned responses; candidate adapters exist | Full symbol master, symbol identity, historical depth, adjusted-price methodology, dividends/capital actions, delisted/suspended instruments, licensing and independent reconciliation |
+| Gold/coins | Tindex and vendor StreamData are candidates; TGJU automated path is not approved | Verify unit (Rial/Toman), quote convention, instrument/coin identity, timestamp, history overlap and rights. Investigate and quarantine the single AYAR OHLC violation |
+| Free-market FX | Prior Tindex snapshot is candidate; latest Tindex batch skipped for missing configuration | Precisely define free vs official quote, preserve units/times and validate historical coverage against an independent lawful reference |
+| Crypto | Yahoo Finance research proxies; vendor BTCUSDT file; latest Binance public probe failed at HTTP-status level | Diagnose Binance once with a bounded request after VPN-on reminder; validate pair/venue, OHLCV, full six-month coverage, fees/slippage and terms |
+| Fixed income | No accepted provider or series | Find an accessible lawful series with consistent yield convention, maturity/duration metadata, dates and history; otherwise mark unavailable |
+| Iran macro/inflation | World Bank schema-valid candidate: 26 annual Iran CPI observations, 2000–2025; official Iranian feeds not automated/accepted | Preserve annual period rather than invent daily timestamps; acquire publication/revision dates and validate Central Bank/Statistical Center series |
+| CODAL corporate events | Search adapter candidate | Link amendments/corrections, distinguish publication time from retrieval time, map filings to structured event schema and point-in-time availability |
+| News/geopolitics | GDELT discovery adapter exists; previous 429 | Validate coverage/reliability, preserve first-seen separately from publication time, build event labels and avoid look-ahead |
+| Sentiment/social | Not production-validated or connected to ranking | Choose permitted sources, manually label a representative Persian/English benchmark, report out-of-sample class-wise metrics and drift; abstain when uncertain |
+
+Seller StreamData is explicitly non-free/vendor-provided. None of its four exports is approved for public commits or production training; its latest audit found one AYAR OHLC anomaly. A data-quality pass is not proof of usage rights, and roughly six months of rows do not by themselves prove a six-month investment strategy.
+
+### Staging versus complete source acceptance
+
+Decision: Continue application completion and prepare staging in parallel with source acceptance. Do not block fixture-backed service/UI smoke tests while every market awaits historical/legal acceptance. A staging prototype may use synthetic and explicitly labelled research-only data; any unapproved market must return an explicit unavailable/not-rankable state. The live investment ranking/source scoring must remain disabled.
+
+The currently inspected production Compose defines only analysis-engine, user-backend, and user-frontend. CI builds the admin workspace, but that admin service is not included in the production Compose file. Before staging, decide whether admin is outside the first staging scope or requires its own reviewed deployment service. The Compose file also relies on externally managed DNS/TLS/reverse proxy, firewall and production environment values.
+
+### Staging exit checklist
+
+1. Do not merge either PR or deploy until the user explicitly authorizes it.
+2. Select a single reviewed release-candidate commit after checking current branch heads and CI status; do not deploy the PR #13 branch accidentally, as it targets another feature branch.
+3. Prepare the server's .env.production privately with restrictive permissions, validate Compose configuration, build immutable images and record the exact commit/image digests.
+4. Verify DNS/TLS/reverse proxy, firewall/exposure, secret handling, backups and a tested rollback.
+5. Smoke-test health and API/UI paths for fixture-backed success, not-rankable response, stale data, provider failure and recovery. Keep sanitized evidence only.
+6. Keep all unaccepted source IDs out of scoring; staging success is not source, model or production acceptance.
+
+### Immediate next action
+
+Review both open PRs and local branch status. If the user is ready to authorize staging, ask for the target server/environment details then prepare a deployment-specific plan; until that authorization, continue on feature branches only. For foreign live data probes, remind the user to enable VPN before giving the command; for TSETMC/CODAL/Tindex, specify VPN off. Do not repeat the entire 265-test pack just to revisit the already-read reports.
