@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Metadata-only CSV quality audit for daily market-data candidate files.
+"""Metadata-only CSV quality audit for candidate price or annual macro datasets.
 
-Supports StreamData-style angle-bracket headers such as <DTYYYYMMDD>, <OPEN>,
-<HIGH>, <LOW>, <CLOSE>, and <VOL>. It never repairs data or prints price values.
+Supports StreamData-style headers (<DTYYYYMMDD>, <OPEN>, ...) and annual
+observation_year/value files. It never repairs data or prints raw numeric values.
 """
 from __future__ import annotations
 
@@ -12,19 +12,25 @@ import hashlib
 import json
 import math
 import re
-import sys
 from collections import Counter
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-DATE_ALIASES = ("dtyyyymmdd", "date", "trading_date", "tradingdate",
-                "observation_date", "observationdate", "day", "datetime", "timestamp")
+DATE_ALIASES = (
+    "dtyyyymmdd", "date", "trading_date", "tradingdate", "observation_date",
+    "observationdate", "observation_year", "observationyear", "year",
+    "annual_year", "period", "day", "datetime", "timestamp",
+)
+YEAR_ALIASES = {"observation_year", "observationyear", "year", "annual_year"}
 OPEN_ALIASES = ("open", "o", "openprice", "pricefirst", "open_raw")
 HIGH_ALIASES = ("high", "h", "highprice", "pricemax", "high_raw")
 LOW_ALIASES = ("low", "l", "lowprice", "pricemin", "low_raw")
-CLOSE_ALIASES = ("close", "c", "closingprice", "pclosing", "close_raw",
-                 "adjusted_close", "adj_close", "last")
+CLOSE_ALIASES = (
+    "close", "c", "closingprice", "pclosing", "close_raw",
+    "adjusted_close", "adj_close", "last",
+)
+VALUE_ALIASES = ("value", "observation_value", "indicator_value", "rate", "raw_rate")
 VOLUME_ALIASES = ("vol", "volume", "qtottran5j", "base_volume", "quote_volume")
 
 
@@ -45,7 +51,7 @@ def _parse_date(value: Any) -> date | None:
     if value is None:
         return None
     text = str(value).strip()
-    if not text:
+    if not text or re.fullmatch(r"\d{4}", text):
         return None
     for fmt in ("%Y%m%d", "%Y-%m-%d", "%Y/%m/%d"):
         try:
@@ -71,19 +77,20 @@ def _parse_number(value: Any) -> float | None:
 
 
 def audit_file(path: Path) -> dict[str, Any]:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-
     report: dict[str, Any] = {
-        "path": str(path.resolve()),
-        "sha256": digest.hexdigest(),
+        "path": str(path.expanduser().resolve()),
+        "sha256": None,
         "status": "audit_failed",
         "production_approved": False,
         "raw_values_emitted": False,
     }
     try:
+        digest = hashlib.sha256()
+        with path.open("rb") as source:
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                digest.update(chunk)
+        report["sha256"] = digest.hexdigest()
+
         with path.open("r", encoding="utf-8-sig", newline="") as handle:
             reader = csv.DictReader(handle)
             fieldnames = reader.fieldnames or []
@@ -92,6 +99,7 @@ def audit_file(path: Path) -> dict[str, Any]:
             high_col = _column(fieldnames, HIGH_ALIASES)
             low_col = _column(fieldnames, LOW_ALIASES)
             close_col = _column(fieldnames, CLOSE_ALIASES)
+            value_col = _column(fieldnames, VALUE_ALIASES)
             volume_col = _column(fieldnames, VOLUME_ALIASES)
             row_count = 0
             invalid_date_count = 0
@@ -102,35 +110,57 @@ def audit_file(path: Path) -> dict[str, Any]:
             nonnumeric_numeric = Counter()
             ohlc_violation_count = 0
             dates: list[date] = []
-            seen: set[date] = set()
-            previous: date | None = None
+            years: list[int] = []
+            seen_periods: set[str] = set()
+            previous_order: int | None = None
             numeric_cols = {
-                "open": open_col, "high": high_col, "low": low_col, "close": close_col,
-                "volume": volume_col,
+                "open": open_col, "high": high_col, "low": low_col,
+                "close": close_col, "value": value_col, "volume": volume_col,
             }
 
             for row in reader:
                 row_count += 1
-                parsed_day = _parse_date(row.get(date_col)) if date_col else None
-                if not date_col or not str(row.get(date_col, "")).strip():
+                raw_period = str(row.get(date_col, "") or "").strip() if date_col else ""
+                parsed_day: date | None = None
+                year_only: int | None = None
+                if not date_col or not raw_period:
                     missing_date_count += 1
-                elif parsed_day is None:
-                    invalid_date_count += 1
+                elif normalize_header(date_col) in YEAR_ALIASES and re.fullmatch(r"\d{4}", raw_period):
+                    candidate_year = int(raw_period)
+                    if not 1 <= candidate_year <= 2200:
+                        invalid_date_count += 1
+                    else:
+                        year_only = candidate_year
                 else:
+                    parsed_day = _parse_date(raw_period)
+                    if parsed_day is None:
+                        invalid_date_count += 1
+
+                period_key: str | None = None
+                order_value: int | None = None
+                if year_only is not None:
+                    years.append(year_only)
+                    period_key = f"year:{year_only:04d}"
+                    order_value = year_only * 372
+                elif parsed_day is not None:
                     dates.append(parsed_day)
-                    if parsed_day in seen:
+                    period_key = f"date:{parsed_day.isoformat()}"
+                    order_value = parsed_day.year * 372 + parsed_day.month * 31 + parsed_day.day
+
+                if period_key is not None and order_value is not None:
+                    if period_key in seen_periods:
                         duplicate_date_count += 1
-                    seen.add(parsed_day)
-                    if previous is not None and parsed_day < previous:
+                    seen_periods.add(period_key)
+                    if previous_order is not None and order_value < previous_order:
                         order_inversion_count += 1
-                    previous = parsed_day
+                    previous_order = order_value
 
                 nums: dict[str, float | None] = {}
                 for label, column in numeric_cols.items():
                     if column is None:
                         continue
                     raw = row.get(column)
-                    if raw in (None, ""):
+                    if raw is None or not str(raw).strip():
                         missing_numeric[label] += 1
                         nums[label] = None
                     else:
@@ -147,26 +177,39 @@ def audit_file(path: Path) -> dict[str, Any]:
                             ohlc_violation_count += 1
 
         columns = {
-            "date": date_col, "open": open_col, "high": high_col,
-            "low": low_col, "close": close_col, "volume": volume_col,
+            "date_or_period": date_col, "open": open_col, "high": high_col,
+            "low": low_col, "close": close_col, "value": value_col, "volume": volume_col,
         }
-        critical_missing_columns = [key for key in ("date", "close") if columns[key] is None]
+        critical_missing_columns = []
+        if date_col is None:
+            critical_missing_columns.append("date_or_period")
+        if close_col is None and value_col is None:
+            critical_missing_columns.append("close_or_value")
         report.update({
             "status": "schema_incomplete" if critical_missing_columns else "audited_candidate",
             "row_count": row_count,
             "columns_detected": columns,
             "source_columns": fieldnames,
             "missing_critical_columns": critical_missing_columns,
-            "valid_date_count": len(dates),
+            "date_precision": "year" if years and not dates else "date" if dates and not years else (
+                "mixed" if dates and years else None
+            ),
+            "valid_observation_period_count": len(dates) + len(years),
             "invalid_date_count": invalid_date_count,
             "missing_date_count": missing_date_count,
             "duplicate_date_count": duplicate_date_count,
             "source_order_inversion_count": order_inversion_count,
             "first_date": min(dates).isoformat() if dates else None,
             "last_date": max(dates).isoformat() if dates else None,
+            "first_observation_year": min(years) if years else None,
+            "last_observation_year": max(years) if years else None,
             "missing_numeric_counts": dict(missing_numeric),
             "nonnumeric_numeric_counts": dict(nonnumeric_numeric),
-            "ohlc_violation_count": ohlc_violation_count if all(numeric_cols[k] for k in ("open", "high", "low", "close")) else None,
+            "ohlc_violation_count": (
+                ohlc_violation_count
+                if all(numeric_cols[k] for k in ("open", "high", "low", "close"))
+                else None
+            ),
             "issues_detected": bool(
                 critical_missing_columns or invalid_date_count or missing_date_count
                 or duplicate_date_count or order_inversion_count
@@ -188,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     reports = [audit_file(Path(name).expanduser()) for name in args.csv_files]
     summary = {
-        "report_version": "1.0.0",
+        "report_version": "1.1.0",
         "purpose": "candidate CSV data-quality audit, not source approval",
         "production_approved": False,
         "raw_values_emitted": False,

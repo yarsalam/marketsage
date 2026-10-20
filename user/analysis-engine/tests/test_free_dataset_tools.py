@@ -63,3 +63,25 @@ def test_tsetmc_search_summary_only_contains_metadata_and_counts():
     assert result["exact_match_identity_samples"][0]["instrument_id"] == "12345"
     assert result["exact_match_identity_samples"][0]["provider_ticker"] == "فولاد"
     assert "999999" not in serialized
+
+def test_annual_macro_csv_is_audited_without_faking_january_first(tmp_path: Path):
+    sample = tmp_path / "world_bank.csv"
+    sample.write_text(
+        "observation_year,value,indicator_id\n2022,21.1,FP.CPI.TOTL.ZG\n2023,,FP.CPI.TOTL.ZG\n2024,25.0,FP.CPI.TOTL.ZG\n",
+        encoding="utf-8",
+    )
+    report = audit_file(sample)
+    assert report["status"] == "audited_candidate"
+    assert report["date_precision"] == "year"
+    assert report["first_date"] is None
+    assert report["first_observation_year"] == 2022
+    assert report["last_observation_year"] == 2024
+    assert report["ohlc_violation_count"] is None
+    assert report["missing_numeric_counts"]["value"] == 1
+
+
+def test_missing_csv_is_reported_instead_of_crashing(tmp_path: Path):
+    report = audit_file(tmp_path / "does-not-exist.csv")
+    assert report["status"] == "audit_failed"
+    assert report["error_type"] == "FileNotFoundError"
+    assert report["raw_values_emitted"] is False
