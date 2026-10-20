@@ -61,3 +61,13 @@ def test_runner_rejects_tindex_slug_without_iran_group():
     result = run_runner("--tindex-slug", "GOLD-18K")
     assert result.returncode == 2
     assert "--tindex-slug requires --include-tindex" in result.stderr
+
+
+def test_runner_rejects_more_than_one_tindex_slug_before_any_tests_or_network():
+    result = run_runner(
+        "--live-iran", "--include-tindex",
+        "--tindex-slug", "GOLD-18K",
+        "--tindex-slug", "USD-EXCHANGE-RATE",
+    )
+    assert result.returncode == 2
+    assert "Only one Tindex slug is allowed" in result.stderr
