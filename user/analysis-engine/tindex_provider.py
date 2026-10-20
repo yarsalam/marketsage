@@ -18,7 +18,8 @@ import httpx
 
 SOURCE_ID = "iran.tindex.public_api"
 DEFAULT_TIMEOUT_SECONDS = 15.0
-MAX_REQUESTS_PER_MINUTE = 3
+MAX_REQUESTS_PER_MINUTE = 1
+MAX_SUCCESSFUL_REQUESTS_PER_DAY = 100
 
 # Categories/endpoints removed by Tindex's current dashboard notice.
 _DISABLED_TERMS = (
@@ -234,7 +235,10 @@ def tindex_connection_status() -> dict[str, Any]:
         ],
         "quota": {
             "requests_per_minute": MAX_REQUESTS_PER_MINUTE,
-            "successful_requests_per_day": 300,
-            "note": "Provider-enforced daily quota; avoid repeated uncached polling.",
+            "successful_requests_per_day": MAX_SUCCESSFUL_REQUESTS_PER_DAY,
+            "note": (
+                "Based on current public developer docs. Daily accounting is provider-enforced; "
+                "the local guard is per-client/process and is not a persistent account-wide counter."
+            ),
         },
     }
