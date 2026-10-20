@@ -74,6 +74,20 @@ production-scoring approval.
   scheduled ingestion; `eligible_for_scoring` remains false until seller terms and
   data conventions are confirmed and independent reconciliation is complete.
 
+## Tindex history
+
+- `tindex_normalizer.py` now decodes the documented candle endpoint's delta-encoded
+  epoch-day vector and validates parallel OHLC/partial arrays.
+- `iran_live_data.py` supports explicit storage and retrieval of one symbol's latest
+  candle snapshot in `iran_candle_observations`, alongside a hashed raw payload.
+  It records observation dates separately from retrieval time and keeps scoring false.
+- `scripts/ingest_tindex_candles.py` fetches one slug per invocation and can export
+  the stored candidate series to a local CSV. No token or raw API body is printed.
+- Tindex's documented candle history is capped at 100 days and cannot independently
+  validate a six-month strategy. Account-level disabled endpoints, units, venue,
+  terms, revisions and source time semantics still require acceptance. See
+  `docs/tindex-historical-candle-ingestion.md`.
+
 ## Release gates per provider
 
 1. Confirm terms/permission and availability from the actual production host.

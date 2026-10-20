@@ -77,3 +77,65 @@ def test_refresh_persists_raw_payload_and_normalized_values(monkeypatch, tmp_pat
         raw = db.execute("SELECT payload_json FROM iran_raw_payloads").fetchone()[0]
         assert json.loads(raw)["success"] is True
         assert db.execute("SELECT COUNT(*) FROM iran_currency_observations").fetchone()[0] == 2
+
+
+
+def test_refresh_persists_tindex_candidate_candles_and_keeps_scoring_disabled(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setenv("IRAN_DATA_DB_PATH", str(tmp_path / "iran.sqlite3"))
+    monkeypatch.setattr(live, "_reserve_refresh_slot", lambda: None)
+
+    payload = {
+        "success": True,
+        "data": {
+            "slug": "GOLD-18K",
+            "range": "3m",
+            "interval": "daily",
+            "count": 3,
+            "t": [20560, 1, 1],
+            "o": [10, 11, 12],
+            "h": [12, 13, 14],
+            "l": [9, 10, 11],
+            "c": [11, 12, 13],
+            "partial": [False, False, True],
+            "unit": "تومان/گرم",
+            "source": "تیندکس",
+        },
+    }
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def indicator_candles(self, slug, *, range, interval):
+            assert slug == "GOLD-18K"
+            assert range == "3m"
+            assert interval == "daily"
+            return payload
+
+    monkeypatch.setattr(live, "TindexClient", FakeClient)
+    result = live.refresh_tindex_indicator_candles("GOLD-18K")
+
+    assert result["status"] == "success"
+    assert result["observation_count"] == 3
+    assert result["first_observation_date"] == "2026-04-17"
+    assert result["last_observation_date"] == "2026-04-19"
+    assert result["partial_candle_count"] == 1
+    assert result["eligible_for_scoring"] is False
+
+    stored = live.get_candidate_indicator_candles("GOLD-18K")
+    assert stored["status"] == "candidate_history_available"
+    assert len(stored["candles"]) == 3
+    assert stored["candles"][0]["close_raw"] == "11"
+    assert stored["candles"][0]["unit"] == "تومان/گرم"
+    assert stored["candles"][-1]["partial"] is True
+    assert stored["candles"][-1]["eligible_for_scoring"] is False
+
+    status = live.get_iran_data_status()
+    assert status["stored_candle_observation_count"] == 3
+    assert status["candle_refresh_attempt_count"] == 1
+    assert status["eligible_for_scoring"] is False

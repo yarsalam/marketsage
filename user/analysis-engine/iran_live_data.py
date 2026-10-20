@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from tindex_normalizer import normalize_currency_rates
+from tindex_normalizer import normalize_currency_rates, normalize_indicator_candles
 from tindex_provider import SOURCE_ID, TindexClient, TindexRateLimitError, tindex_connection_status
 
 
@@ -79,6 +79,33 @@ def _connect() -> Iterator[sqlite3.Connection]:
             eligible_for_scoring INTEGER NOT NULL DEFAULT 0,
             PRIMARY KEY (refresh_id, instrument_key)
         );
+        CREATE TABLE IF NOT EXISTS iran_candle_refresh_metadata (
+            refresh_id INTEGER PRIMARY KEY REFERENCES iran_source_refreshes(id),
+            instrument_key TEXT NOT NULL,
+            requested_range TEXT NOT NULL,
+            requested_interval TEXT NOT NULL,
+            response_slug TEXT
+        );
+        CREATE TABLE IF NOT EXISTS iran_candle_observations (
+            refresh_id INTEGER NOT NULL REFERENCES iran_source_refreshes(id),
+            source_id TEXT NOT NULL,
+            instrument_key TEXT NOT NULL,
+            observation_date TEXT NOT NULL,
+            open_raw TEXT NOT NULL,
+            high_raw TEXT NOT NULL,
+            low_raw TEXT NOT NULL,
+            close_raw TEXT NOT NULL,
+            unit TEXT,
+            partial INTEGER NOT NULL DEFAULT 0,
+            provider_source TEXT,
+            requested_range TEXT NOT NULL,
+            requested_interval TEXT NOT NULL,
+            retrieved_at TEXT NOT NULL,
+            eligible_for_scoring INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (refresh_id, instrument_key, observation_date)
+        );
+        CREATE INDEX IF NOT EXISTS idx_iran_candle_observations_lookup
+            ON iran_candle_observations (instrument_key, observation_date, refresh_id);
         """
     )
     connection.commit()
@@ -154,6 +181,190 @@ def refresh_tindex_currency_rates() -> dict[str, Any]:
     }
 
 
+
+def refresh_tindex_indicator_candles(
+    slug: str,
+    *,
+    requested_range: str = "3m",
+    interval: str = "daily",
+) -> dict[str, Any]:
+    """Fetch one Tindex candle range and persist it as non-scoreable candidate data.
+
+    This function deliberately handles one slug per invocation to respect the
+    existing local cooldown. Tindex documents candle history as capped at 100 days.
+    Publication timestamps are not invented; the decoded date is stored separately.
+    """
+    clean_slug = slug.strip() if isinstance(slug, str) else ""
+    if not clean_slug or len(clean_slug) > 100 or any(
+        not (char.isalnum() or char in "._-") for char in clean_slug
+    ):
+        raise ValueError("slug must be a single safe Tindex indicator slug")
+    if requested_range not in ("1m", "3m"):
+        raise ValueError("requested_range must be one of: 1m, 3m")
+    if interval not in ("daily", "weekly"):
+        raise ValueError("interval must be one of: daily, weekly")
+
+    _reserve_refresh_slot()
+    retrieved_at = _utc_now()
+    try:
+        with TindexClient() as client:
+            payload = client.indicator_candles(
+                clean_slug, range=requested_range, interval=interval
+            )
+        normalized = normalize_indicator_candles(payload)
+        normalized_slug = normalized[0]["instrument_key"]
+        if normalized_slug.casefold() != clean_slug.casefold():
+            raise ValueError("provider response slug does not match requested slug")
+        returned_range = normalized[0]["requested_range"]
+        returned_interval = normalized[0]["interval"]
+        if returned_range != requested_range:
+            raise ValueError(
+                f"provider returned range {returned_range!r}; requested {requested_range!r}"
+            )
+        if returned_interval != interval:
+            raise ValueError(
+                f"provider returned interval {returned_interval!r}; requested {interval!r}"
+            )
+    except Exception as exc:
+        with _connect() as db:
+            cursor = db.execute(
+                """INSERT INTO iran_source_refreshes
+                   (source_id, retrieved_at, status, error_code)
+                   VALUES (?, ?, 'error', ?)""",
+                (SOURCE_ID, retrieved_at, type(exc).__name__[:80]),
+            )
+            refresh_id = int(cursor.lastrowid)
+            db.execute(
+                """INSERT INTO iran_candle_refresh_metadata
+                   (refresh_id, instrument_key, requested_range, requested_interval, response_slug)
+                   VALUES (?, ?, ?, ?, NULL)""",
+                (refresh_id, clean_slug, requested_range, interval),
+            )
+        raise
+
+    payload_json = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    checksum = hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
+    with _connect() as db:
+        cursor = db.execute(
+            """INSERT INTO iran_source_refreshes
+               (source_id, retrieved_at, status, payload_sha256, item_count)
+               VALUES (?, ?, 'success', ?, ?)""",
+            (SOURCE_ID, retrieved_at, checksum, len(normalized)),
+        )
+        refresh_id = int(cursor.lastrowid)
+        db.execute(
+            "INSERT INTO iran_raw_payloads (refresh_id, payload_json) VALUES (?, ?)",
+            (refresh_id, payload_json),
+        )
+        db.execute(
+            """INSERT INTO iran_candle_refresh_metadata
+               (refresh_id, instrument_key, requested_range, requested_interval, response_slug)
+               VALUES (?, ?, ?, ?, ?)""",
+            (refresh_id, clean_slug, requested_range, interval, normalized_slug),
+        )
+        for row in normalized:
+            db.execute(
+                """INSERT INTO iran_candle_observations
+                   (refresh_id, source_id, instrument_key, observation_date,
+                    open_raw, high_raw, low_raw, close_raw, unit, partial,
+                    provider_source, requested_range, requested_interval,
+                    retrieved_at, eligible_for_scoring)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)""",
+                (
+                    refresh_id, SOURCE_ID, row["instrument_key"], row["observation_date"],
+                    str(row["open"]), str(row["high"]), str(row["low"]), str(row["close"]),
+                    row["unit"], int(row["partial"]), row["provider_source"],
+                    requested_range, interval, retrieved_at,
+                ),
+            )
+    return {
+        "status": "success",
+        "source_id": SOURCE_ID,
+        "instrument_key": clean_slug,
+        "requested_range": requested_range,
+        "interval": interval,
+        "retrieved_at": retrieved_at,
+        "observation_count": len(normalized),
+        "first_observation_date": normalized[0]["observation_date"],
+        "last_observation_date": normalized[-1]["observation_date"],
+        "partial_candle_count": sum(row["partial"] for row in normalized),
+        "provider_units": sorted({row["unit"] for row in normalized if row["unit"]}),
+        "payload_sha256": checksum,
+        "publication_time_known": False,
+        "eligible_for_scoring": False,
+        "message": "Candles stored as candidate history only; provider unit, venue, rights, timing and independent reconciliation still require approval.",
+    }
+
+
+def get_candidate_indicator_candles(slug: str) -> dict[str, Any]:
+    """Read the latest successful Tindex history snapshot for internal candidate use.
+
+    This helper is not a public-display endpoint and returns no scoring approval.
+    """
+    clean_slug = slug.strip() if isinstance(slug, str) else ""
+    if not clean_slug or len(clean_slug) > 100 or any(
+        not (char.isalnum() or char in "._-") for char in clean_slug
+    ):
+        raise ValueError("slug must be a single safe Tindex indicator slug")
+    with _connect() as db:
+        latest_attempt = db.execute(
+            """SELECT r.id, r.retrieved_at, r.status, r.payload_sha256,
+                      r.item_count, r.error_code, m.requested_range, m.requested_interval
+               FROM iran_candle_refresh_metadata m
+               JOIN iran_source_refreshes r ON r.id = m.refresh_id
+               WHERE r.source_id = ? AND m.instrument_key = ?
+               ORDER BY r.id DESC LIMIT 1""",
+            (SOURCE_ID, clean_slug),
+        ).fetchone()
+        latest_success = db.execute(
+            """SELECT r.id, r.retrieved_at, r.status, r.payload_sha256,
+                      r.item_count, r.error_code, m.requested_range, m.requested_interval
+               FROM iran_candle_refresh_metadata m
+               JOIN iran_source_refreshes r ON r.id = m.refresh_id
+               WHERE r.source_id = ? AND m.instrument_key = ? AND r.status = 'success'
+               ORDER BY r.id DESC LIMIT 1""",
+            (SOURCE_ID, clean_slug),
+        ).fetchone()
+        if not latest_success:
+            return {
+                "source_id": SOURCE_ID,
+                "instrument_key": clean_slug,
+                "status": "no_successful_history_refresh",
+                "latest_attempt": dict(latest_attempt) if latest_attempt else None,
+                "candles": [],
+                "eligible_for_scoring": False,
+            }
+        rows = db.execute(
+            """SELECT observation_date, open_raw, high_raw, low_raw, close_raw,
+                      unit, partial, provider_source, requested_range,
+                      requested_interval, retrieved_at
+               FROM iran_candle_observations
+               WHERE refresh_id = ? ORDER BY observation_date""",
+            (latest_success["id"],),
+        ).fetchall()
+    return {
+        "source_id": SOURCE_ID,
+        "instrument_key": clean_slug,
+        "status": "candidate_history_available",
+        "latest_successful_refresh": dict(latest_success),
+        "latest_attempt": dict(latest_attempt) if latest_attempt else None,
+        "candles": [
+            {
+                **dict(row),
+                "partial": bool(row["partial"]),
+                "eligible_for_scoring": False,
+                "observation_precision": "day",
+                "source_publication_time": None,
+            }
+            for row in rows
+        ],
+        "eligible_for_scoring": False,
+        "notice": "Internal candidate data only. Historical ranges are provider-capped and must not be treated as total-return series without instrument-specific reconciliation.",
+    }
+
+
 def get_iran_data_status() -> dict[str, Any]:
     """Return safe configuration and persisted coverage metadata."""
     status = tindex_connection_status()
@@ -172,12 +383,19 @@ def get_iran_data_status() -> dict[str, Any]:
             count = db.execute(
                 "SELECT COUNT(*) AS n FROM iran_currency_observations",
             ).fetchone()["n"]
+            candle_count = db.execute(
+                "SELECT COUNT(*) AS n FROM iran_candle_observations",
+            ).fetchone()["n"]
+            candle_refreshes = db.execute(
+                "SELECT COUNT(*) AS n FROM iran_candle_refresh_metadata",
+            ).fetchone()["n"]
             successful = db.execute(
                 "SELECT 1 FROM iran_source_refreshes WHERE source_id = ? AND status = 'success' LIMIT 1",
                 (SOURCE_ID,),
             ).fetchone()
     except Exception:
         latest, total, count, successful = None, 0, 0, None
+        candle_count, candle_refreshes = 0, 0
     return {
         "source_id": SOURCE_ID,
         "provider": "Tindex",
@@ -189,6 +407,8 @@ def get_iran_data_status() -> dict[str, Any]:
         "production_approved": False,
         "eligible_for_scoring": False,
         "stored_observation_count": int(count),
+        "stored_candle_observation_count": int(candle_count),
+        "candle_refresh_attempt_count": int(candle_refreshes),
         "refresh_attempt_count": int(total),
         "latest_refresh": dict(latest) if latest else None,
         "storage": "SQLite; raw provider payload and normalized rows retained separately",
@@ -269,8 +489,8 @@ def get_iran_opportunities() -> dict[str, Any]:
         "eligible_sources": [],
         "blocked_reasons": [
             "No Iranian source is currently approved for production scoring.",
-            "The available Tindex currency-rate endpoint is a quote snapshot, not comparable historical total-return series.",
-            "Currency units, market definitions, publication/observation times, and commercial redistribution rights are not fully verified.",
+            "The Tindex candle endpoint is capped at recent history (up to 100 days) and is not a long-horizon total-return history.",
+            "Currency/price units must be taken from each provider response and independently reconciled; market definitions, publication times, and commercial redistribution rights are not fully verified.",
         ],
         "source_status": status,
         "message": "No ranking is published until the required source and data-quality gates pass.",

@@ -130,15 +130,16 @@ SOURCES: tuple[SourceDefinition, ...] = (
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("currency_rate", "precious_metal_quote", "crypto_indicator"),
-        timestamp_quality="not_verified",
+        data_kinds=("currency_rate", "indicator_candle_candidate",
+                    "precious_metal_quote", "crypto_indicator"),
+        timestamp_quality="provider observation dates available for candles; publication timestamp and account access remain unverified",
         required_checks=("terms_and_commercial_rights", "automated_collection_permission",
                          "payload_schema_and_units", "historical_depth", "publication_and_retrieval_times",
                          "revisions_and_missing_intervals", "independent_reconciliation"),
         notes=("Access is through a vendor-provided account; plan, quotas, and commercial display/redistribution rights "
-               "must follow the vendor agreement. Dashboard notice disables TSE/equities, news, "
-               "inflation/macro, housing, and calendar endpoints (410 Gone). Only currency, precious "
-               "metals, and crypto are candidate families; this entry is not production approval."),
+               "must follow the vendor agreement. The documented candle-history endpoint is limited to a recent window "
+               "of up to 100 days and requires delta-date decoding; account-level 410 responses must remain disabled. "
+               "Only successfully fetched, schema-validated series are stored as candidates, never for scoring."),
     ),
     SourceDefinition(
         source_id="iran.gold_fx",
