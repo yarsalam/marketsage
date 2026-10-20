@@ -75,21 +75,22 @@ def test_path_segments_cannot_inject_extra_routes():
             client.board("../currency-rates")
 
 
-def test_local_rate_limit_is_three_requests_per_minute():
+def test_local_rate_limit_is_one_request_per_minute():
     calls = []
+    now = [0.0]
 
     def handler(request):
         calls.append(request.url.path)
         return httpx.Response(200, json={"ok": True})
 
-    with client_for(handler) as client:
+    with client_for(handler, clock=lambda: now[0]) as client:
         client.currency_rates()
-        client.boards()
-        client.categories()
         with pytest.raises(TindexRateLimitError, match="Local Tindex limit"):
-            client.movers()
+            client.boards()
+        now[0] = 60.0
+        client.boards()
 
-    assert len(calls) == 3
+    assert len(calls) == 2
 
 
 def test_missing_configuration_fails_closed(monkeypatch):
@@ -106,5 +107,7 @@ def test_status_does_not_expose_token(monkeypatch):
     assert status["configured"] is True
     assert status["network_tested"] is False
     assert status["production_approved"] is False
+    assert status["quota"]["requests_per_minute"] == 1
+    assert status["quota"]["successful_requests_per_day"] == 100
     assert "do-not-expose-me" not in repr(status)
     assert "iran_equities" in status["disabled_data_families"]
