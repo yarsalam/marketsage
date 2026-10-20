@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import sys
+
+import pytest
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
@@ -66,3 +68,26 @@ def test_builder_rejects_duplicate_daily_dates():
         assert "duplicate" in str(exc)
     else:
         raise AssertionError("duplicate history date should be rejected")
+
+
+@pytest.mark.parametrize("instrument_code", ["", "FOLAD", "12 34"])
+def test_builder_rejects_invalid_instrument_identity(instrument_code):
+    with pytest.raises(ValueError, match="instrument_code must be numeric"):
+        build_dataset(
+            [{"dEven": 20261015, "pClosing": 100}],
+            {"20261015": ["20261015", "120", "80", "100", "100", "10", "100"]},
+            instrument_code=instrument_code,
+        )
+
+
+def test_builder_rejects_empty_raw_history():
+    with pytest.raises(ValueError, match="non-empty JSON array"):
+        build_dataset([], {"20261015": ["20261015", "120", "80", "100", "100", "10", "100"]},
+                      instrument_code="46348559193224090")
+
+
+def test_builder_rejects_invalid_adjusted_close_instead_of_falling_back_to_raw():
+    daily = [{"dEven": 20261015, "pClosing": 100}]
+    chart = {"20261015": ["20261015", "120", "80", "100", "100", "10", "0"]}
+    with pytest.raises(ValueError, match="chart close_adj"):
+        build_dataset(daily, chart, instrument_code="46348559193224090")
