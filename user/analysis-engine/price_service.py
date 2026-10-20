@@ -353,12 +353,52 @@ def research_snapshot(payload: ResearchSnapshotRequest) -> dict:
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "service": "analysis-engine"}
+    """Liveness only: the process can answer HTTP requests."""
+    return {"status": "ok", "service": "analysis-engine", "check": "liveness"}
 
 
 @app.get("/ready")
 def ready() -> dict:
-    return {"status": "ready", "service": "analysis-engine"}
+    """Readiness for the research-only API; no external providers are contacted."""
+    try:
+        registry = source_catalog()
+        sources = registry.get("sources")
+        summary = registry.get("summary")
+        if not isinstance(sources, list) or not sources or not isinstance(summary, dict):
+            raise ValueError("source_registry_empty_or_invalid")
+        registered_count = int(summary.get("total_sources", -1))
+        approved_count = sum(
+            1 for item in sources
+            if isinstance(item, dict) and item.get("approved_for_production") is True
+        )
+        reported_approved_count = int(summary.get("production_approved", -1))
+        if registered_count != len(sources) or reported_approved_count != approved_count:
+            raise ValueError("source_registry_summary_mismatch")
+        if not callable(build_research_snapshot):
+            raise ValueError("research_snapshot_pipeline_unavailable")
+    except Exception as exc:
+        # Emit only the exception class: never return internal provider details.
+        logger.warning("Readiness check failed (%s)", type(exc).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "reason": "critical_local_dependency_unavailable",
+            },
+        ) from exc
+
+    return {
+        "status": "ready",
+        "service": "analysis-engine",
+        "readiness_scope": "research_only",
+        "checks": {
+            "source_registry": "ready",
+            "research_snapshot_pipeline": "ready",
+        },
+        "registered_source_count": registered_count,
+        "production_approved_source_count": approved_count,
+        "investment_ranking_enabled": False,
+    }
 
 
 @app.get("/markets")
