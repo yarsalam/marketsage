@@ -75,6 +75,10 @@ if [[ "${#TINDEX_SLUG_ARGS[@]}" -gt 0 ]] && (( ! RUN_IRAN )); then
   echo "--tindex-slug requires --live-iran." >&2
   exit 2
 fi
+if [[ "${#TINDEX_SLUG_ARGS[@]}" -gt 1 ]]; then
+  echo "Only one Tindex slug is allowed per invocation under the current 1-request/minute free-tier quota." >&2
+  exit 2
+fi
 
 mkdir -p "$REPORT_DIR"
 SUMMARY="$REPORT_DIR/summary.txt"
@@ -163,7 +167,7 @@ if (( RUN_IRAN )); then
     IRAN_ARGS+=(--source iran.tindex.candles)
     IRAN_ARGS+=("${TINDEX_SLUG_ARGS[@]}")
     if [[ -n "${TINDEX_API_BASE_URL:-}" && -n "${TINDEX_API_TOKEN:-}" ]]; then
-      record "Tindex configured; candle probe is limited to at most three requests."
+      record "Tindex configured; one candle slug maximum per invocation under the current 1-request/minute quota."
     else
       record "Tindex selected but credentials are absent; provider will be marked skipped, without a prompt."
     fi
