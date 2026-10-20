@@ -4,11 +4,11 @@ This document tracks integration status and acceptance gates for the currently i
 
 ## Tindex public API (free-tier)
 
-The Tindex connector is opt-in and read-only. It uses an HTTPS origin and Bearer token from environment variables, limits requests locally to 3/minute, does not automatically retry 401/403/410/429, and treats HTTP 410 as a disabled endpoint. The provider's current dashboard notice disables Iranian equities/TSE, news/articles, inflation/macroeconomics, housing, calendar, and indicators in disabled categories. Do not bypass this by scraping alternate routes.
+The Tindex connector is opt-in and read-only. It uses the documented HTTPS origin `https://tindex.app` and a Bearer token from environment variables, limits requests locally to 3/minute, does not automatically retry 401/403/410/429, and treats HTTP 410 as a disabled endpoint. The current official developer page documents indicator categories including currency, precious metals, crypto, stock/energy indices, housing, automotive and macro-economy. The adapter must not locally block these documented category slugs merely because their names contain words such as `stock`, `housing` or `macro`. This does not mean every category has usable history or is production-approved. The documented history/candles endpoints cap history at 100 days; this is not enough alone for a six-month backtest. See [official Tindex developer docs](https://tindex.app/en/developers/).
 
 A real authenticated request to `/api/public/currency-rates` returned HTTP 200 with `success` (boolean) and `data` (list); observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). `tindex_normalizer.py` validates these types and preserves `rate` as Decimal. It deliberately leaves units, market definition, observation/retrieval times unknown and `eligible_for_scoring=False`. This does not prove Rial/Toman, official/free-market meaning, history depth, licensing or model-training permission.
 
-Provider quota supplied by the project owner: 3 requests/minute, 300 successful requests/day, one active token. Cache responses and avoid repeated live probes.
+The official developer page currently states 3 requests/minute, 300 requests/day, and one active token per account on the free plan. Requests are counted per account, not per token; rejected 429 requests do not count toward the daily quota. Cache responses and avoid repeated live probes. Commercial/high-volume use requires bespoke terms according to the provider. Rial-denominated amounts in this API are reported in toman since 2026-07-20; normalize and store units explicitly.
 
 Focused test command from `user/analysis-engine`:
 
@@ -61,7 +61,7 @@ python -m pytest -q tests/test_tsetmc_provider.py tests/test_codal_provider.py
 
 ## Iranian gold and free-market FX: TGJU candidate, not enabled
 
-TGJU is listed as a candidate source for gold, coin and free-market FX discovery. A verified public API contract and automated-collection/license permission have not been established, so **no live TGJU scraper is enabled**. Do not silently scrape or parse unstable page markup. The source must first pass terms/access review, then fixed sanitized fixtures must confirm series identity, free-vs-official market convention, Rial-vs-Toman unit, update/correction semantics and historical coverage. Keep 18k gram gold, each coin type, USD free-market FX, and official FX as separate series. Tindex may expose currency/precious-metal families, but its current payload semantics are not enough to identify or score these series yet.
+TGJU is listed as a candidate source for gold, coin and free-market FX discovery. A verified public API contract and automated-collection/license permission have not been established, so **no live TGJU scraper is enabled**. Do not silently scrape or parse unstable page markup. The source must first pass terms/access review, then fixed sanitized fixtures must confirm series identity, free-vs-official market convention, Rial-vs-Toman unit, update/correction semantics and historical coverage. Keep 18k gram gold, each coin type, USD free-market FX, and official FX as separate series. Tindex exposes documented currency/precious-metal families and other indicator categories, but payload semantics, units, source lineage, market definition, history completeness and licensing are not enough to score these series yet.
 
 
 ## News discovery: GDELT DOC 2.0
