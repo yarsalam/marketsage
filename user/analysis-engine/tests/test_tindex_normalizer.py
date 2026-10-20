@@ -4,7 +4,9 @@ from decimal import Decimal
 
 import pytest
 
-from tindex_normalizer import (\n    TindexPayloadError, normalize_currency_rates, normalize_indicator_candles,\n)
+from tindex_normalizer import (
+    TindexPayloadError, normalize_currency_rates, normalize_indicator_candles,
+)
 
 
 def valid_payload():
