@@ -1,0 +1,158 @@
+{
+  "catalog_version": "1.0.0",
+  "last_reviewed": "2026-10-20",
+  "policy": {
+    "prefer_no_subscription": true,
+    "free_access_is_not_a_reuse_license": true,
+    "all_new_sources_eligible_for_scoring": false,
+    "vendor_provided_streamdata_is_not_classified_as_free": true,
+    "missing_values_are_never_forward_filled": true,
+    "raw_vendor_files_must_not_be_committed": true
+  },
+  "sources": [
+    {
+      "source_id": "iran.tsetmc",
+      "label": "TSETMC instrument search and daily history",
+      "free_access_class": "public_candidate",
+      "authentication": "none observed for current candidate endpoints",
+      "probe_mode": "one bounded exact instrument search by default",
+      "data_families": ["Iranian equities", "listed funds"],
+      "history_limit": "Endpoint returns candidate daily history; actual coverage must be measured per instrument",
+      "limitations": ["Reverse-engineered endpoints can change or block non-Iranian IPs", "Rial/Toman convention and adjusted history must be verified", "Automated collection and commercial rights are not approved"],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.codal",
+      "label": "CODAL company disclosures",
+      "free_access_class": "public_candidate",
+      "authentication": "none observed for current search endpoint",
+      "probe_mode": "one small page of disclosure search",
+      "data_families": ["issuer filings", "corporate events"],
+      "history_limit": "Search response only; publication and amendment history require validation",
+      "limitations": ["Retrieval timestamp is not publication time", "Filing corrections and amendments need linkage", "Use terms and automated access need review"],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.world_bank_indicators",
+      "label": "World Bank Indicators API",
+      "free_access_class": "public_api_no_key",
+      "authentication": "none required by current official API documentation",
+      "probe_mode": "Iran annual CPI inflation indicator, bounded to selected years",
+      "data_families": ["annual macroeconomic indicators"],
+      "history_limit": "Indicator-specific; API supports long annual histories but data may be missing or revised",
+      "limitations": ["Annual observation year is not publication time", "Not a substitute for daily prices", "Indicator definitions and licensing/redistribution conditions still need review"],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.binance_spot_public",
+      "label": "Binance Spot public klines",
+      "free_access_class": "public_market_data_no_key",
+      "authentication": "none for public market-data endpoint",
+      "probe_mode": "up to five daily BTCUSDT candles",
+      "data_families": ["venue-specific crypto OHLCV"],
+      "history_limit": "Public kline endpoint supports pagination; completeness must be audited over the requested window",
+      "limitations": ["BTCUSDT is venue/pair-specific and is not the same as USD spot", "Network/geographic access may vary", "Usage terms, storage, derived outputs and commercial display rights require review"],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.tindex.public_api",
+      "label": "Tindex free-tier public API",
+      "free_access_class": "free_tier_account_scoped",
+      "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
+      "probe_mode": "one current currency-rate request",
+      "data_families": ["currency snapshots", "documented indicators"],
+      "history_limit": "Documented indicator history/candles window up to about 100 days",
+      "limitations": ["Account-level endpoint access is not established by public docs", "Commercial/high-volume use requires provider terms", "Never infer units or free-vs-official market semantics"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.tindex.candles",
+      "label": "Tindex indicator candle history",
+      "free_access_class": "free_tier_account_scoped",
+      "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
+      "probe_mode": "up to three explicit slugs per run (local client limit is three requests per minute)",
+      "data_families": ["indicator OHLC series"],
+      "history_limit": "At most about 100 days on the documented endpoint",
+      "limitations": ["Slugs must be verified against the user's account", "Do not combine with snapshots until symbols, venue, units and overlap reconcile", "All outputs are candidates only"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "us.fred.alfred",
+      "label": "FRED/ALFRED observations and vintages",
+      "free_access_class": "free_api_key",
+      "authentication": "FRED_API_KEY in environment only",
+      "probe_mode": "three FEDFUNDS observations",
+      "data_families": ["US macro", "rates", "historical vintages"],
+      "history_limit": "Series-specific and API paginated",
+      "limitations": ["Observation period is not release time", "Vintage dates are day-level not exact intraday release timestamps", "Series definition and terms need review"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.gdelt_doc_api",
+      "label": "GDELT DOC article discovery",
+      "free_access_class": "public_api_candidate",
+      "authentication": "none observed",
+      "probe_mode": "explicit opt-in, one tiny request only",
+      "data_families": ["news discovery metadata"],
+      "history_limit": "Provider search-window and query dependent",
+      "limitations": ["Previous probe returned HTTP 429; deliberately excluded from default run", "First-seen/index time is not verified publisher publication time", "Article discovery is not truth verification or sentiment validation"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.yahoo_finance.yfinance",
+      "label": "Yahoo Finance via yfinance",
+      "free_access_class": "public_site_access_unofficial_client",
+      "authentication": "usually none for current research path",
+      "probe_mode": "existing research pipeline, not contacted by new discovery pack",
+      "data_families": ["global ETF proxies", "listed assets", "crypto proxies"],
+      "history_limit": "Symbol and endpoint dependent",
+      "limitations": ["Not an official guaranteed API contract", "Terms, redistribution and automated usage must be reviewed", "Global ETFs are research proxies, not guaranteed Iran-tradable assets"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.official_macro",
+      "label": "Central Bank of Iran and Statistical Center of Iran",
+      "free_access_class": "public_portal_candidate",
+      "authentication": "No stable accepted machine-readable API registered yet",
+      "probe_mode": "manual catalog/format discovery before automating collection",
+      "data_families": ["inflation", "monetary aggregates", "rates", "national accounts"],
+      "history_limit": "Not established",
+      "limitations": ["Release date, revision policy, units and machine-readable coverage need inspection", "PDF publication date must not be inferred from retrieval time"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.gold_fx",
+      "label": "TGJU gold, coin and free-market FX pages",
+      "free_access_class": "not_yet_approved_candidate",
+      "authentication": "Unknown/endpoint contract not verified",
+      "probe_mode": "no automated scraper; legal/access review first",
+      "data_families": ["18K gold", "individual coin types", "free-market FX"],
+      "history_limit": "Not established",
+      "limitations": ["Public webpage access is not permission for automated scraping", "Keep official and free-market FX series separate", "Rial/Toman, timestamps and correction behavior need reconciliation"],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "vendor.streamdata_export",
+      "label": "Seller-provided StreamData CSV exports",
+      "free_access_class": "vendor_supplied_not_free",
+      "authentication": "Vendor contract/account dependent",
+      "probe_mode": "local files only; never auto-download or classify as free",
+      "data_families": ["AYAR fund", "BTCUSDT", "18K gold", "free-market USD"],
+      "history_limit": "Supplied capture is approximately six months",
+      "limitations": ["Rights and fees are not assumed", "Do not commit raw files", "Resolve the AYAR OHLC anomaly and unit/time semantics"],
+      "default_live_probe": false,
+      "production_approved": false
+    }
+  ]
+}

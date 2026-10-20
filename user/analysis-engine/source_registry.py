@@ -95,6 +95,41 @@ SOURCES: tuple[SourceDefinition, ...] = (
                "Do not commit vendor data files to this public repository; candidate scoring remains disabled."),
     ),
     SourceDefinition(
+        source_id="global.world_bank_indicators",
+        market_scope="global_and_iran",
+        asset_family="annual_macro_indicators",
+        provider="World Bank Indicators API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("annual_macro_observation_candidate",),
+        timestamp_quality="observation year known; exact publication timestamp unavailable",
+        required_checks=("indicator_identity_and_definition", "historical_coverage",
+                         "data_revisions_and_vintages", "country_and_unit_semantics",
+                         "api_terms_and_reuse_rights", "point_in_time_release_availability"),
+        notes=("Public no-key API adapter for bounded annual series. These are macro "
+               "observations, not daily prices; release-time and revision semantics remain "
+               "unverified and every row remains ineligible for scoring."),
+    ),
+    SourceDefinition(
+        source_id="global.binance_spot_public",
+        market_scope="global_crypto_venue_specific",
+        asset_family="crypto_spot_ohlcv",
+        provider="Binance Spot public market-data API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("venue_specific_spot_ohlcv_candidate",),
+        timestamp_quality="candle open/close UTC times; publication timestamp unavailable",
+        required_checks=("instrument_pair_and_venue_identity", "history_completeness_and_pagination",
+                         "timezone_and_candle_boundary", "ohlcv_and_volume_reconciliation",
+                         "terms_and_geographic_access", "rate_limit_and_failure_backoff",
+                         "partial_candle_policy"),
+        notes=("Unauthenticated public kline adapter. Pair and venue stay explicit; quote "
+               "currency is not inferred from the symbol text. Terms, geography, historical "
+               "completeness, and market-data semantics require acceptance."),
+    ),
+    SourceDefinition(
         source_id="iran.codal",
         market_scope="iran",
         asset_family="company_filings_and_corporate_events",
