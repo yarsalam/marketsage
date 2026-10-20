@@ -227,3 +227,62 @@ All four had zero invalid dates, missing dates, duplicate dates, and source-orde
 6. Keep source acceptance open, ranking/scoring disabled, and both PRs unmerged unless the user explicitly authorizes a merge/release. Do not commit local candidate exports, evidence reports, vendor files, API keys, or raw payloads.
 
 **Resume prompt:** “Continue MarketSage using the latest update in `docs/CHATGPT_HANDOFF.md` and `docs/implementation-roadmap.md`. Check PR #6 and PR #13 as separate branches. Local free-dataset acceptance run: 265 tests passed; TSETMC/CODAL reachable, World Bank schema validated for 26 annual Iran CPI observations (2000–2025), Binance HTTPStatusError; Tindex/FRED skipped for missing configuration; GDELT not contacted. The four seller CSVs have only one reported OHLC issue, in AYAR, and remain unapproved/vendor-restricted candidates. Before any live call to FRED, Binance, World Bank, GDELT, or other foreign provider, explicitly remind me to turn VPN on. For TSETMC/CODAL/Tindex use VPN off. Do not repeat the full test pack, merge, deploy, or enable ranking without evidence and permission.” 
+
+
+## Latest implementation continuation — 2026-10-20
+
+### VPN-separated acceptance runner
+
+A follow-up change was made on PR #13's separate branch, feature/free-dataset-discovery-acceptance:
+
+- Latest PR #13 head: 8d330c460bf2cd89ff2bb4a59e7a07523e6dfb1f.
+- GitHub Actions run [#39392008358](https://github.com/yarsalam/marketsage/actions/runs/39392008358) completed successfully: analysis, user frontend, user backend, admin workspace, and production-images jobs all passed.
+- The acceptance runner now defaults to offline-only behavior. Live Iranian and foreign-source probes require separate invocations. It refuses to combine groups and prompts for exact VPN-OFF or VPN-ON confirmation before making network requests. New tests cover mixed-mode refusal and invalid option combinations.
+- The default command does not call any provider. These changes do not change source approvals or enable scoring.
+- PR #13 remains open and unmerged into feature/iran-live-data-dashboard.
+
+### Latest CI for the Tindex workstream
+
+- PR #6 remains open: feat/tindex-free-data-connector → deploy/production-readiness.
+- Latest inspected head: 496cb9bc9785442b43ba1d31ee1f44ed30f0913d.
+- GitHub Actions run [#39389606760](https://github.com/yarsalam/marketsage/actions/runs/39389606760) passed all five jobs (analysis, user frontend, user backend, admin workspace, production images).
+- These are CI/build results, not data-source acceptance, licence approval, model validation, or deployment evidence. Neither PR was merged, and no server deployment was performed.
+
+### Decision: source discovery and staging can proceed in parallel
+
+Do not wait for all nine market/data families to be fully accepted before completing the deployable prototype. A staging-only run can use synthetic fixtures or explicitly labelled research-only data while production ranking and source scoring stay disabled. It must visibly return “insufficient data / not rankable” for unaccepted markets.
+
+| Area | Current evidence and next gate |
+|---|---|
+| Iranian equities | TSETMC/CODAL responded to bounded discovery probes. Complete instrument universe, symbol identity, daily coverage, adjusted prices, corporate actions and permission checks remain open. |
+| Gold/coin | Tindex and seller exports are candidates. Resolve units, quote conventions, source overlap and usage rights. Keep the AYAR row with the detected OHLC invariant violation quarantined until checked against the vendor. |
+| Free-market USD | Tindex has a prior candidate snapshot but its latest discovery probe was skipped for missing environment configuration. Define free vs official rate and validate history independently. |
+| Crypto | Existing Yahoo Finance history is a research proxy; seller BTCUSDT is venue-specific and not yet rights-approved. Latest Binance probe returned sanitized HTTPStatusError; cause is not established. |
+| Fixed income | No accepted series yet. Keep this asset class unavailable/not-rankable until a source, yield definition and history are accepted. |
+| Iran macro | World Bank produced 26 annual Iran CPI observations for 2000–2025. This is a candidate only; publication/revision timing remains unresolved. Central Bank/Statistical Center have no accepted automated pipeline yet. |
+| CODAL events | Search adapter exists; publication-vs-retrieval timestamps, corrections/amendments and event normalization remain open. |
+| News/geopolitics | GDELT adapter exists, but a prior request returned HTTP 429. Its current live status was not tested in the latest run. |
+| Sentiment/social | No production-validated sentiment model or connected scoring path. Build/label a benchmark and report held-out metrics before use. |
+
+The four StreamData files are vendor-provided, not free/open. Their metadata audit found one OHLC issue in AYAR and no detected date/order/OHLC issues in the other three files. None is production-approved; do not commit raw files or infer units/timezone/rights.
+
+### Staging readiness decision
+
+The production Compose file currently contains the Analysis Engine, user backend and user frontend. The admin workspace is built by CI but is not a service in that production Compose file; confirm whether it belongs in this staging scope or needs a separately reviewed deployment definition. The Compose stack expects server-managed DNS/TLS/reverse proxy and environment configuration rather than providing those itself.
+
+Before staging:
+1. Review both open PRs and their base/head relationships; do not merge or deploy without explicit user authorization.
+2. Choose one reviewed, exact release-candidate commit and ensure all CI jobs passed on that commit. Do not deploy the PR #13 feature-branch head to the server accidentally; it currently targets another feature branch.
+3. Configure a private server-side .env.production (permissions such as chmod 600), DNS/TLS/reverse proxy, firewall, and backup/rollback plan. Never place real secrets in Git or chat.
+4. Run the service health checks and smoke tests for normal, not-rankable, stale-data, provider outage and recovery paths. Capture sanitized results.
+5. Keep live scoring and rankings disabled even if the staging deployment passes.
+
+### Next-session instructions
+
+1. Read this section and the current roadmap, then check current heads/CI for PR #6 and PR #13 separately.
+2. Preserve the user's local changes/untracked files. Start with git status --short --branch; never run a destructive reset/clean.
+3. From the PR #13 local branch, the default bash scripts/run_free_dataset_acceptance_pack.sh now runs offline tests/inventory/audit only. Do not run foreign live probes without first telling the user to turn VPN ON. For Iranian providers, tell the user VPN must be OFF. The runner then demands the matching confirmation.
+4. Do not automatically rerun the full test pack merely to read existing reports. Diagnose the specific failing item, and do not retry GDELT after HTTP 429 without an intentional cooldown.
+5. After the user authorizes staging, prepare and run a staging-only checklist; do not treat staging deployment or CI as proof of market-data acceptance or predictive value.
+
+Resume prompt: “Continue MarketSage from the newest docs/CHATGPT_HANDOFF.md and docs/implementation-roadmap.md. PR #6 is open on feat/tindex-free-data-connector; its latest checked CI run #39389606760 passed all five jobs. PR #13 is a separate open PR on feature/free-dataset-discovery-acceptance; latest head 8d330c460bf2cd89ff2bb4a59e7a07523e6dfb1f passed all five CI jobs in run #39392008358. PR #13's acceptance runner now defaults offline and forces separate live runs: VPN OFF for TSETMC/CODAL/Tindex and VPN ON for World Bank/Binance/FRED/GDELT. Source acceptance remains open. Staging may be prepared with fixtures/research-only data and ranking disabled, but do not merge or deploy without my explicit authorization. Check the branch/CI states first and preserve local untracked files.”
