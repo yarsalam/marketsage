@@ -4,11 +4,11 @@ This document tracks integration status and acceptance gates for the currently i
 
 ## Tindex public API (free-tier)
 
-The Tindex connector is opt-in and read-only. It uses an HTTPS origin and Bearer token from environment variables, limits requests locally to 3/minute, does not automatically retry 401/403/410/429, and treats HTTP 410 as a disabled endpoint. The provider's current dashboard notice disables Iranian equities/TSE, news/articles, inflation/macroeconomics, housing, calendar, and indicators in disabled categories. Do not bypass this by scraping alternate routes.
+The Tindex connector is opt-in and read-only. It uses an HTTPS origin and Bearer token from environment variables, enforces the current documented free-tier ceiling of 1 request/minute and 100 successful requests/day with a process-memory guard, does not automatically retry 401/403/410/429, and treats HTTP 410 as a disabled endpoint. The local daily guard is not persistent and cannot account for other processes/hosts using the same token; provider-side quota remains authoritative. The provider's current dashboard notice disables Iranian equities/TSE, news/articles, inflation/macroeconomics, housing, calendar, and indicators in disabled categories. Do not bypass this by scraping alternate routes.
 
-A real authenticated request to `/api/public/currency-rates` returned HTTP 200 with `success` (boolean) and `data` (list); observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). `tindex_normalizer.py` validates these types and preserves `rate` as Decimal. It deliberately leaves units, market definition, observation/retrieval times unknown and `eligible_for_scoring=False`. This does not prove Rial/Toman, official/free-market meaning, history depth, licensing or model-training permission.
+A real authenticated request to `/api/public/currency-rates` previously returned HTTP 200 with `success` (boolean) and `data` (list); observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). `tindex_normalizer.py` validates these types and preserves `rate` as Decimal. The current public Tindex docs now state that currency-rate `rate` values are expressed in Toman per quoted unit, and that since 2026-07-20 values in Markets & Indicators are returned in Toman. However, until the user's currently enabled account payload and a second lawful reference are reconciled, the normalized `unit` must remain unknown and `eligible_for_scoring=False`. Official/free-market meaning, history completeness, licensing, and model-training permission remain unapproved.
 
-Provider quota supplied by the project owner: 3 requests/minute, 300 successful requests/day, one active token. Cache responses and avoid repeated live probes.
+**Current public-docs quota update (2026-10-20):** Free tier documents 1 request/minute and 100 successful requests/day, with one active token. This supersedes the earlier 3/minute and 300/day values recorded in older project notes. Cache responses and avoid repeated live probes. The local process-memory guard cannot enforce account-wide quotas across machines or processes.
 
 Focused test command from `user/analysis-engine`:
 
@@ -138,7 +138,7 @@ else
 fi
 ```
 
-The Tindex probe calls only the currency-rates endpoint; respect the provider's 3 requests/minute and 300 successful requests/day limits.
+The Tindex probe calls only the currency-rates endpoint; respect the current provider docs' 1 request/minute and 100 successful requests/day limits.
 
 ### External providers — VPN ON
 
