@@ -1,6 +1,6 @@
 # MarketSage Implementation Roadmap
 
-**Status date:** 2026-10-18  
+**Status date:** 2026-10-20  
 **Working branch:** `feat/tindex-free-data-connector`  
 **Current milestone:** Stage 4 — empirical review documented, acceptance still open; Stage 5 operational hardening in progress; Stage 2 source acceptance remains open  
 **Release posture:** research-only; investment ranking and source scoring remain disabled
@@ -223,3 +223,61 @@ This section supersedes earlier handoff notes that Stage 4 had not started. Work
 The owner reports the Stage 4 runner completed locally against the monthly panel with SHA-256 `1e71d898b18b4a6db74aba4826c86a4982efad934ee30aa82ff354883f01d878`, 78 rows, 11 assets, data range 2020-04-30 through 2026-09-30, 12-month holdout 2025-10-31 through 2026-09-30, and 7 walk-forward folds. The focused tests passed 16/16 and the full Analysis Engine suite passed 225/225 on the checkout before the report-validator addition. These are user-provided local results, not independently executed by this maintainer.
 
 Stage 5 work added `scripts/validate_stage4_report.py` and `tests/test_stage4_report_validator.py`. They validate research-only/disabled-ranking flags, SHA-256 shape, baseline presence, holdout separation, and cost scenario presence. **The validator tests and full suite must be rerun after this newest change.** The metric values from the generated report have not yet been reviewed, so Stage 4 is not accepted. CI for the newest changes is pending; PR #6 remains unmerged and no deployment has been performed.
+
+
+## Latest source-discovery checkpoint — 2026-10-20
+
+This checkpoint records the free-dataset acceptance work on a separate workstream; it does not supersede or merge the Tindex connector branch.
+
+### Branch / CI distinction
+
+- PR #6: `feat/tindex-free-data-connector` → `deploy/production-readiness`; still open.
+- PR #13: `feature/free-dataset-discovery-acceptance` → `feature/iran-live-data-dashboard`; last inspected open and mergeable, head `ef5183c8d800efa1e729939c3966839ec541dd58`.
+- Local acceptance-pack result for the PR #13 workstream: **265 tests passed in 17.19 seconds; 9 warnings**. Offline tests, catalog and shell syntax passed. This is local evidence; the current GitHub Actions result for the exact head has not been confirmed here.
+- Keep the two PRs distinct. Do not merge, deploy, or enable ranking as part of the data-discovery checkpoint.
+
+### Free-source discovery results
+
+Report path on the user's machine: `/tmp/marketsage-free-dataset-acceptance/public-live-probes.json`.
+
+| Source | Latest result | Interpretation |
+|---|---|---|
+| TSETMC | `reachable_response_received` | Reachability only; VPN off |
+| CODAL | `reachable_response_received` | Reachability only; VPN off |
+| World Bank Indicators | `reachable_schema_validated_candidate`, 26 annual Iran CPI observations for 2000–2025 | Candidate only; VPN on before any future foreign-source request |
+| Binance Spot public data | `probe_failed`, sanitized error class `HTTPStatusError` | Cause not established; do not infer provider outage or code defect without a bounded diagnosis |
+
+Three of four public probes returned a response. The report explicitly states `production_approved=false`; this is not source acceptance. Tindex was skipped because `TINDEX_API_BASE_URL`/`TINDEX_API_TOKEN` were absent in the shell; FRED/ALFRED was skipped because `FRED_API_KEY` was absent; GDELT was not contacted. Do not ask for secrets in chat or repeat the entire acceptance pack merely to diagnose Binance.
+
+### Seller CSV audit — outside the free-source batch
+
+Metadata-only report: `/tmp/marketsage-free-dataset-acceptance/vendor-streamdata-quality-report.json`. The four seller-provided files were all parseable candidates; no raw values were emitted and none was production-approved.
+
+| Dataset | Rows | Date range | Audit note |
+|---|---:|---|---|
+| AYAR gold fund daily | 123 | 2026-04-19 – 2026-10-18 | 1 OHLC invariant violation |
+| BTCUSDT daily | 184 | 2026-04-19 – 2026-10-19 | No detected structural issue |
+| Gold18 daily | 184 | 2026-04-19 – 2026-10-19 | No detected structural issue |
+| US Dollar daily | 176 | 2026-04-19 – 2026-10-19 | No detected structural issue |
+
+All four reports showed zero invalid/missing/duplicate dates and zero source-order inversions. Investigate the AYAR OHLC violation using the user's local copy and vendor documentation; quarantine the affected observation until corrected by evidence. These are seller-provided exports, not free/open datasets. Confirm contract, usage and redistribution/training rights, units, timezone/session rules and adjustment semantics before research use. Never put these CSV files or raw price rows into GitHub. Their approximately six-month history does not by itself support robust six-month-horizon strategy validation.
+
+### VPN rule (owner requirement — must be stated before any live command)
+
+Before asking the user to execute a live request to any foreign/international provider, explicitly tell them to turn VPN on first. This specifically includes **FRED/ALFRED, Binance, World Bank, GDELT and other foreign sites**. Do not mix foreign and Iranian probes in one batch with ambiguous VPN state.
+
+- TSETMC, CODAL, Tindex: VPN **off**.
+- FRED/ALFRED: VPN **on**, and only if `FRED_API_KEY` is already configured securely.
+- Binance, World Bank and GDELT: VPN **on** before a live request.
+- GDELT had previously returned HTTP 429; do not retry before an intentional cooldown and bounded request budget.
+- Tindex: if credentials are configured, probe separately with VPN off; enforce 3 requests/minute and 300 successful requests/day. Never print or share tokens.
+
+### Updated immediate next actions
+
+1. Inspect PR #13's current head and GitHub Actions status, and preserve local modifications/untracked files (`git status --short --branch`); no destructive reset/clean.
+2. Diagnose the single Binance HTTP-level failure with at most one bounded retry after telling the user to enable VPN; separate network/provider diagnosis from source-quality acceptance.
+3. Inspect and quarantine the AYAR OHLC anomaly locally; do not silently repair it or use the four vendor CSVs as “free data.”
+4. Continue provenance/permission, units, timestamp, history-depth and independent-reconciliation checks for each source. Keep the World Bank data as an annual macro candidate; do not treat response-schema success as approval.
+5. Keep Stage 2 source acceptance open; scoring/ranking disabled. Stage 4 may use only appropriately labelled research data, with point-in-time limitations explicit. Do not merge either PR or deploy without explicit authorization.
+
+**Next-session starting point:** no more full-suite rerun is required just to read these reports. Start with branch/PR/CI state, the sanitized Binance error and local AYAR anomaly. When any foreign-source probe is proposed, announce VPN-on first.
