@@ -16,9 +16,16 @@
       "free_access_class": "public_candidate",
       "authentication": "none observed for current candidate endpoints",
       "probe_mode": "one bounded exact instrument search by default",
-      "data_families": ["Iranian equities", "listed funds"],
+      "data_families": [
+        "Iranian equities",
+        "listed funds"
+      ],
       "history_limit": "Endpoint returns candidate daily history; actual coverage must be measured per instrument",
-      "limitations": ["Reverse-engineered endpoints can change or block non-Iranian IPs", "Rial/Toman convention and adjusted history must be verified", "Automated collection and commercial rights are not approved"],
+      "limitations": [
+        "Reverse-engineered endpoints can change or block non-Iranian IPs",
+        "Rial/Toman convention and adjusted history must be verified",
+        "Automated collection and commercial rights are not approved"
+      ],
       "default_live_probe": true,
       "production_approved": false
     },
@@ -28,9 +35,16 @@
       "free_access_class": "public_candidate",
       "authentication": "none observed for current search endpoint",
       "probe_mode": "one small page of disclosure search",
-      "data_families": ["issuer filings", "corporate events"],
+      "data_families": [
+        "issuer filings",
+        "corporate events"
+      ],
       "history_limit": "Search response only; publication and amendment history require validation",
-      "limitations": ["Retrieval timestamp is not publication time", "Filing corrections and amendments need linkage", "Use terms and automated access need review"],
+      "limitations": [
+        "Retrieval timestamp is not publication time",
+        "Filing corrections and amendments need linkage",
+        "Use terms and automated access need review"
+      ],
       "default_live_probe": true,
       "production_approved": false
     },
@@ -40,9 +54,15 @@
       "free_access_class": "public_api_no_key",
       "authentication": "none required by current official API documentation",
       "probe_mode": "Iran annual CPI inflation indicator, bounded to selected years",
-      "data_families": ["annual macroeconomic indicators"],
+      "data_families": [
+        "annual macroeconomic indicators"
+      ],
       "history_limit": "Indicator-specific; API supports long annual histories but data may be missing or revised",
-      "limitations": ["Annual observation year is not publication time", "Not a substitute for daily prices", "Indicator definitions and licensing/redistribution conditions still need review"],
+      "limitations": [
+        "Annual observation year is not publication time",
+        "Not a substitute for daily prices",
+        "Indicator definitions and licensing/redistribution conditions still need review"
+      ],
       "default_live_probe": true,
       "production_approved": false
     },
@@ -52,9 +72,15 @@
       "free_access_class": "public_market_data_no_key",
       "authentication": "none for public market-data endpoint",
       "probe_mode": "up to five daily BTCUSDT candles",
-      "data_families": ["venue-specific crypto OHLCV"],
+      "data_families": [
+        "venue-specific crypto OHLCV"
+      ],
       "history_limit": "Public kline endpoint supports pagination; completeness must be audited over the requested window",
-      "limitations": ["BTCUSDT is venue/pair-specific and is not the same as USD spot", "Network/geographic access may vary", "Usage terms, storage, derived outputs and commercial display rights require review"],
+      "limitations": [
+        "BTCUSDT is venue/pair-specific and is not the same as USD spot",
+        "Network/geographic access may vary",
+        "Usage terms, storage, derived outputs and commercial display rights require review"
+      ],
       "default_live_probe": true,
       "production_approved": false
     },
@@ -63,10 +89,19 @@
       "label": "Tindex free-tier public API",
       "free_access_class": "free_tier_account_scoped",
       "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
-      "probe_mode": "one current currency-rate request",
-      "data_families": ["currency snapshots", "documented indicators"],
-      "history_limit": "Documented indicator history/candles window up to about 100 days",
-      "limitations": ["Account-level endpoint access is not established by public docs", "Commercial/high-volume use requires provider terms", "Never infer units or free-vs-official market semantics"],
+      "probe_mode": "one currency-rate request per invocation; current Free plan documented at 1 request/minute and 100 successful requests/day",
+      "data_families": [
+        "currency snapshots",
+        "documented indicators"
+      ],
+      "history_limit": "Indicator history/candles are capped at the latest 100 days; not sufficient alone for six-month strategy tests",
+      "limitations": [
+        "Account-level endpoint access is not established by public docs and can differ by token",
+        "Current docs describe currency rate in Toman per quoted unit and say Markets & Indicators values are in Toman since 2026-07-20; reconcile against a sanitized account payload and independent reference before setting a confirmed unit",
+        "Free tier documents 1 request/minute and 100 successful requests/day; local guard is not account-wide across hosts/processes",
+        "Commercial/high-volume use, durable storage, derived display and redistribution rights require review",
+        "Never infer official/free-market market semantics from the name alone"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -75,10 +110,18 @@
       "label": "Tindex indicator candle history",
       "free_access_class": "free_tier_account_scoped",
       "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
-      "probe_mode": "up to three explicit slugs per run (local client limit is three requests per minute)",
-      "data_families": ["indicator OHLC series"],
-      "history_limit": "At most about 100 days on the documented endpoint",
-      "limitations": ["Slugs must be verified against the user's account", "Do not combine with snapshots until symbols, venue, units and overlap reconcile", "All outputs are candidates only"],
+      "probe_mode": "one explicit slug per run (current Free plan documents 1 request/minute)",
+      "data_families": [
+        "indicator OHLC series"
+      ],
+      "history_limit": "At most the latest 100 days on the documented endpoint",
+      "limitations": [
+        "Slugs and category access must be verified against the specific account; do not bypass 410/403",
+        "One active token/account, 1 request/minute and 100 successful requests/day on the current Free plan",
+        "Only a recent 100-day window is documented, so not enough alone for six-month evaluation",
+        "Toman semantics are documented since 2026-07-20 for Markets & Indicators, but series units need reconciliation before confirmation",
+        "All outputs are research candidates only; rights and independent reconciliation remain open"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -88,9 +131,17 @@
       "free_access_class": "free_api_key",
       "authentication": "FRED_API_KEY in environment only",
       "probe_mode": "three FEDFUNDS observations",
-      "data_families": ["US macro", "rates", "historical vintages"],
+      "data_families": [
+        "US macro",
+        "rates",
+        "historical vintages"
+      ],
       "history_limit": "Series-specific and API paginated",
-      "limitations": ["Observation period is not release time", "Vintage dates are day-level not exact intraday release timestamps", "Series definition and terms need review"],
+      "limitations": [
+        "Observation period is not release time",
+        "Vintage dates are day-level not exact intraday release timestamps",
+        "Series definition and terms need review"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -100,9 +151,15 @@
       "free_access_class": "public_api_candidate",
       "authentication": "none observed",
       "probe_mode": "explicit opt-in, one tiny request only",
-      "data_families": ["news discovery metadata"],
+      "data_families": [
+        "news discovery metadata"
+      ],
       "history_limit": "Provider search-window and query dependent",
-      "limitations": ["Previous probe returned HTTP 429; deliberately excluded from default run", "First-seen/index time is not verified publisher publication time", "Article discovery is not truth verification or sentiment validation"],
+      "limitations": [
+        "Previous probe returned HTTP 429; deliberately excluded from default run",
+        "First-seen/index time is not verified publisher publication time",
+        "Article discovery is not truth verification or sentiment validation"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -112,9 +169,17 @@
       "free_access_class": "public_site_access_unofficial_client",
       "authentication": "usually none for current research path",
       "probe_mode": "existing research pipeline, not contacted by new discovery pack",
-      "data_families": ["global ETF proxies", "listed assets", "crypto proxies"],
+      "data_families": [
+        "global ETF proxies",
+        "listed assets",
+        "crypto proxies"
+      ],
       "history_limit": "Symbol and endpoint dependent",
-      "limitations": ["Not an official guaranteed API contract", "Terms, redistribution and automated usage must be reviewed", "Global ETFs are research proxies, not guaranteed Iran-tradable assets"],
+      "limitations": [
+        "Not an official guaranteed API contract",
+        "Terms, redistribution and automated usage must be reviewed",
+        "Global ETFs are research proxies, not guaranteed Iran-tradable assets"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -124,9 +189,17 @@
       "free_access_class": "public_portal_candidate",
       "authentication": "No stable accepted machine-readable API registered yet",
       "probe_mode": "manual catalog/format discovery before automating collection",
-      "data_families": ["inflation", "monetary aggregates", "rates", "national accounts"],
+      "data_families": [
+        "inflation",
+        "monetary aggregates",
+        "rates",
+        "national accounts"
+      ],
       "history_limit": "Not established",
-      "limitations": ["Release date, revision policy, units and machine-readable coverage need inspection", "PDF publication date must not be inferred from retrieval time"],
+      "limitations": [
+        "Release date, revision policy, units and machine-readable coverage need inspection",
+        "PDF publication date must not be inferred from retrieval time"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -136,9 +209,17 @@
       "free_access_class": "not_yet_approved_candidate",
       "authentication": "Unknown/endpoint contract not verified",
       "probe_mode": "no automated scraper; legal/access review first",
-      "data_families": ["18K gold", "individual coin types", "free-market FX"],
+      "data_families": [
+        "18K gold",
+        "individual coin types",
+        "free-market FX"
+      ],
       "history_limit": "Not established",
-      "limitations": ["Public webpage access is not permission for automated scraping", "Keep official and free-market FX series separate", "Rial/Toman, timestamps and correction behavior need reconciliation"],
+      "limitations": [
+        "Public webpage access is not permission for automated scraping",
+        "Keep official and free-market FX series separate",
+        "Rial/Toman, timestamps and correction behavior need reconciliation"
+      ],
       "default_live_probe": false,
       "production_approved": false
     },
@@ -148,9 +229,41 @@
       "free_access_class": "vendor_supplied_not_free",
       "authentication": "Vendor contract/account dependent",
       "probe_mode": "local files only; never auto-download or classify as free",
-      "data_families": ["AYAR fund", "BTCUSDT", "18K gold", "free-market USD"],
+      "data_families": [
+        "AYAR fund",
+        "BTCUSDT",
+        "18K gold",
+        "free-market USD"
+      ],
       "history_limit": "Supplied capture is approximately six months",
-      "limitations": ["Rights and fees are not assumed", "Do not commit raw files", "Resolve the AYAR OHLC anomaly and unit/time semantics"],
+      "limitations": [
+        "Rights and fees are not assumed",
+        "Do not commit raw files",
+        "Resolve the AYAR OHLC anomaly and unit/time semantics"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.nerkhsanj.rates_archive",
+      "label": "Nerkhsanj public JSON rates/archive (publisher-announced candidate)",
+      "free_access_class": "public_api_candidate",
+      "authentication": "Publisher announcement says no API key; live access and schema not yet verified",
+      "probe_mode": "one bounded request to a published JSON archive after VPN-on reminder; no per-record /calc loops",
+      "data_families": [
+        "free-market FX",
+        "gold",
+        "coins",
+        "selected crypto/local-price candidates"
+      ],
+      "history_limit": "Publisher announcement claims daily archive since 2010 for selected series; coverage is unverified per key",
+      "limitations": [
+        "Third-party/community-operated candidate; source ownership, upstream data lineage, reliability and terms require verification",
+        "Publisher announcement asks for Nerkhsanj attribution/link; confirm conditions and permitted commercial/data use before reuse",
+        "Publisher describes Toman values and Jalali dates; parser must be based on a sanitized observed response and tested for calendar conversion",
+        "Market series, key names, update frequency, historical gaps and corrections must be inventoried from the actual API, not inferred from the announcement",
+        "No live probe yet; do not merge into scoring until independent reconciliation and usage rights pass"
+      ],
       "default_live_probe": false,
       "production_approved": false
     }
