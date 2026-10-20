@@ -49,3 +49,15 @@ def test_runner_rejects_offline_and_live_modes_together():
     result = run_runner("--offline-only", "--live-foreign")
     assert result.returncode == 2
     assert "--offline-only cannot be combined" in result.stderr
+
+
+def test_runner_requires_tindex_slug_option_to_be_in_guarded_tindex_mode():
+    result = run_runner("--live-iran", "--tindex-slug", "GOLD-18K")
+    assert result.returncode == 2
+    assert "--tindex-slug requires --include-tindex" in result.stderr
+
+
+def test_runner_rejects_tindex_slug_without_iran_group():
+    result = run_runner("--tindex-slug", "GOLD-18K")
+    assert result.returncode == 2
+    assert "--tindex-slug requires --include-tindex" in result.stderr
