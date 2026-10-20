@@ -17,7 +17,15 @@ import httpx
 
 SOURCE_ID = "iran.tindex.public_api"
 DEFAULT_TIMEOUT_SECONDS = 15.0
-MAX_REQUESTS_PER_MINUTE = 3
+MAX_REQUESTS_PER_MINUTE = 1
+MAX_SUCCESSFUL_REQUESTS_PER_DAY = 100
+_REQUEST_WINDOW_SECONDS = 60.0
+_DAY_WINDOW_SECONDS = 86400.0
+
+# Shared across instances in this process; cannot count activity on other hosts.
+_RATE_LOCK = threading.Lock()
+_REQUEST_TIMES: deque[float] = deque()
+_SUCCESSFUL_REQUEST_TIMES: deque[float] = deque()
 
 class TindexError(RuntimeError):
     """Base class for sanitized Tindex adapter errors."""
@@ -99,8 +107,6 @@ class TindexClient:
             transport=transport,
         )
         self._clock = clock
-        self._request_times: deque[float] = deque()
-        self._lock = threading.Lock()
 
     def close(self) -> None:
         self._client.close()
@@ -112,18 +118,28 @@ class TindexClient:
         self.close()
 
     def _reserve_request_slot(self) -> None:
-        # Process-local guard; provider-side quota is the source of truth.
-        # Keep it conservative and do not automatically retry HTTP 429.
-        with self._lock:
+        # Share local minute/day accounting across TindexClient instances.
+        # Provider-side accounting is still authoritative across processes and hosts.
+        # Never retry HTTP 429 automatically.
+        with _RATE_LOCK:
             now = self._clock()
-            while self._request_times and now - self._request_times[0] >= 60:
-                self._request_times.popleft()
-            if len(self._request_times) >= MAX_REQUESTS_PER_MINUTE:
-                wait_for = 60 - (now - self._request_times[0])
+            while _REQUEST_TIMES and now - _REQUEST_TIMES[0] >= _REQUEST_WINDOW_SECONDS:
+                _REQUEST_TIMES.popleft()
+            while (
+                _SUCCESSFUL_REQUEST_TIMES
+                and now - _SUCCESSFUL_REQUEST_TIMES[0] >= _DAY_WINDOW_SECONDS
+            ):
+                _SUCCESSFUL_REQUEST_TIMES.popleft()
+            if len(_SUCCESSFUL_REQUEST_TIMES) >= MAX_SUCCESSFUL_REQUESTS_PER_DAY:
+                raise TindexRateLimitError(
+                    "Local Tindex daily success budget reached; stop requests until its rolling window expires."
+                )
+            if len(_REQUEST_TIMES) >= MAX_REQUESTS_PER_MINUTE:
+                wait_for = _REQUEST_WINDOW_SECONDS - (now - _REQUEST_TIMES[0])
                 raise TindexRateLimitError(
                     f"Local Tindex limit reached; retry after about {max(1, int(wait_for))} seconds."
                 )
-            self._request_times.append(now)
+            _REQUEST_TIMES.append(now)
 
     def _get_json(self, path: str, params: dict[str, Any] | None = None) -> Any:
         self._reserve_request_slot()
@@ -154,6 +170,9 @@ class TindexClient:
             raise TindexProviderError(
                 f"Tindex returned unexpected HTTP status {response.status_code}."
             )
+        # Count all 2xx responses against the local success budget, including malformed bodies.
+        with _RATE_LOCK:
+            _SUCCESSFUL_REQUEST_TIMES.append(self._clock())
         try:
             payload = response.json()
         except ValueError:
@@ -253,7 +272,12 @@ def tindex_connection_status() -> dict[str, Any]:
         "empty_categories_per_current_docs": ["commodities", "technology", "sentiment"],
         "quota": {
             "requests_per_minute": MAX_REQUESTS_PER_MINUTE,
-            "successful_requests_per_day": 300,
-            "note": "Provider-enforced daily quota; avoid repeated uncached polling.",
+            "successful_requests_per_day": MAX_SUCCESSFUL_REQUESTS_PER_DAY,
+            "local_daily_guard_persistent": False,
+            "note": (
+                "Current public docs specify 1 request/minute and 100 successful requests/day. "
+                "The local rolling guard is process-memory only; provider accounting remains "
+                "authoritative across processes and hosts."
+            ),
         },
     }
