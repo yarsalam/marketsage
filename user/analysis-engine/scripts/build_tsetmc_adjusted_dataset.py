@@ -125,6 +125,7 @@ def build_dataset(
     covered = sum(row["close_adj"] is not None for row in rows)
     dates = [row["date"] for row in rows]
     adjusted_ohlc_violations: list[dict[str, Any]] = []
+    adjusted_ohlc_violation_count = 0
     adjusted_ohlc_flag_count = 0
     for row in rows:
         low = row["low_adj"]
@@ -144,6 +145,7 @@ def build_dataset(
                 if close is not None and not low <= close <= high:
                     flags.append("close_outside_low_high")
         if flags:
+            adjusted_ohlc_violation_count += 1
             adjusted_ohlc_flag_count += len(flags)
             if len(adjusted_ohlc_violations) < 50:
                 adjusted_ohlc_violations.append({
@@ -162,7 +164,7 @@ def build_dataset(
         "adjusted_close_coverage_fraction": covered / len(rows),
         "date_range": {"first": min(dates), "last": max(dates)},
         "adjusted_to_raw_close_ratio": _ratio_summary(ratios),
-        "adjusted_ohlc_violation_observation_count": len(adjusted_ohlc_violations),
+        "adjusted_ohlc_violation_observation_count": adjusted_ohlc_violation_count,
         "adjusted_ohlc_violation_flag_count_sample_capped": adjusted_ohlc_flag_count,
         "adjusted_ohlc_violation_samples": adjusted_ohlc_violations,
         "adjusted_ohlc_violation_sample_cap": 50,
