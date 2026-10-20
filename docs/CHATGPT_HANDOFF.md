@@ -286,3 +286,13 @@ Before staging:
 5. After the user authorizes staging, prepare and run a staging-only checklist; do not treat staging deployment or CI as proof of market-data acceptance or predictive value.
 
 Resume prompt: “Continue MarketSage from the newest docs/CHATGPT_HANDOFF.md and docs/implementation-roadmap.md. PR #6 is open on feat/tindex-free-data-connector; its latest checked CI run #39389606760 passed all five jobs. PR #13 is a separate open PR on feature/free-dataset-discovery-acceptance; latest head 8d330c460bf2cd89ff2bb4a59e7a07523e6dfb1f passed all five CI jobs in run #39392008358. PR #13's acceptance runner now defaults offline and forces separate live runs: VPN OFF for TSETMC/CODAL/Tindex and VPN ON for World Bank/Binance/FRED/GDELT. Source acceptance remains open. Staging may be prepared with fixtures/research-only data and ranking disabled, but do not merge or deploy without my explicit authorization. Check the branch/CI states first and preserve local untracked files.”
+
+
+## Latest operational increment — 2026-10-20 (liveness/readiness)
+
+- The Analysis Engine now distinguishes /health (process liveness only) from /ready (readiness for the research-only API). The ready check validates source-registry structure/counts and the research snapshot callable. It returns HTTP 503 on an empty/inconsistent registry and logs only the exception class. It makes no live provider requests and does not imply any financial source is approved.
+- Analysis Engine Dockerfile and production Compose health checks now target /ready, so Compose's service_healthy dependency gates the user backend on local research readiness.
+- Added tests in tests/test_health_readiness.py for liveness, research-only readiness with ranking disabled, and 503 when the source registry is empty.
+- Exact current PR #6 head: 37c6e85dea37b02543df7150d359d8f72c5be511. GitHub Actions run [#39393823453](https://github.com/yarsalam/marketsage/actions/runs/39393823453) completed successfully; all five jobs passed, including the production-image build.
+- PR #6 and PR #13 remain open; no merge or deployment was performed. Source acceptance, staging access-control/security review, backups/rollback and staging smoke tests remain open.
+- Staging decision is unchanged: a research-only staging test can use deterministic fixtures while investment ranking and source scoring remain disabled. Do not treat /ready=ready, a successful build, or a fixture test as market-data/model approval.

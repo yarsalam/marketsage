@@ -1,6 +1,6 @@
 # Stage 5 — Operational Readiness Checklist
 
-**Status:** active; bounded stale-cache fallback and regression tests added. CI run #246 passed all jobs on code commit `21e4b2e5db74972f510fa88833f99e510984a2c1`; local confirmation and deployment gates remain open. Not approved for production or deployment.  
+**Status:** active; bounded stale-cache fallback and research-only readiness checks have CI-passing implementation. Deployment gates remain open; not approved for production or deployment.  
 **Branch:** `feat/tindex-free-data-connector`  
 **Release posture:** research-only; source scoring and investment ranking remain disabled.
 
@@ -16,12 +16,13 @@ Stage 5 is not complete merely because the code builds or a historical simulatio
 - [ ] Verify current source registry and every API path remain fail-closed in CI and local tests.
 - [x] Bound stale-cache fallback with `MAX_STALE_CACHE_AGE_SECONDS` (default 24 hours); cache older than the limit fails with HTTP 503 instead of returning a decision.
 - [x] Added regression tests for bounded stale fallback, explicit stale status, fail-closed 503 after the age limit, and provider exception-message redaction.
+- [x] Point the Analysis Engine Dockerfile and production Compose health checks at `/ready`; the user backend waits for the Analysis Engine container to become healthy. This is local app readiness, not live-source approval.
 - [ ] Verify live-data failures cannot silently substitute synthetic or incompatible data across all source/API paths.
 - [ ] Verify logs and errors contain no tokens, credentials, or raw provider payloads. The price-refresh path now logs exception type only; wider log review remains open.
 
 ## B. Health, readiness, and failure behaviour
 
-- [ ] Define and verify separate liveness and readiness semantics; `/health` and `/ready` currently exist but both return unconditional success.
+- [x] Define distinct semantics: `/health` is process liveness only; `/ready` validates source-registry structure/counts and research-snapshot availability, returns HTTP 503 on empty/inconsistent registry, and makes no external provider requests.
 - [ ] Bound network timeouts and retries per provider; never automatically retry GDELT during a provider cooldown/HTTP 429.
 - [ ] Verify per-provider rate limits and caching; Tindex limits remain enforced.
 - [ ] Test source timeout, HTTP error, malformed schema, missing timestamp, unknown currency/unit, stale response, duplicate observations, and empty history.
@@ -89,3 +90,14 @@ Confirm its dataset hash and output dates before interpreting any metrics. Do no
 ## Current decision
 
 **Stage 5 is in progress; release gate not passed.** CI run [#246](https://github.com/yarsalam/marketsage/actions/runs/39128372381) passed all jobs, including 233 Analysis Engine tests and production-image build, on code commit `21e4b2e5db74972f510fa88833f99e510984a2c1`. The project owner still needs to pull the latest branch and confirm the local test run. Separate readiness semantics, provider/schema/staleness failure tests across all source paths, source rights/semantics review, point-in-time and survivorship assessment, security/dependency review, backup/restore rehearsal, staging smoke tests, rollback rehearsal, and explicit release approval remain open. Investment ranking and source scoring must remain disabled.
+
+
+## Readiness endpoint implementation — 2026-10-20
+
+- Implemented separate liveness and readiness response semantics in the Analysis Engine.
+- Readiness verifies the in-memory source registry is non-empty/consistent and the research-snapshot pipeline is callable; failure produces HTTP 503 with a sanitized response.
+- Readiness does not make provider requests and does not require a production-approved source, because the allowed staging scope is the research-only fixture path.
+- Dockerfile and Compose health checks now target /ready.
+- Tests added: tests/test_health_readiness.py.
+- CI run [#39393823453](https://github.com/yarsalam/marketsage/actions/runs/39393823453) passed all five jobs on PR #6 head 37c6e85dea37b02543df7150d359d8f72c5be511.
+- Still open: source failure/stale data scenarios throughout the API, auth/access-control review, dependency/secret security, TLS/reverse proxy, resource limits, backup/restore, staging smoke test and rollback rehearsal. No server deployment was performed.

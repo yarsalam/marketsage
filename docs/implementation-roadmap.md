@@ -336,3 +336,13 @@ The currently inspected production Compose defines only analysis-engine, user-ba
 ### Immediate next action
 
 Review both open PRs and local branch status. If the user is ready to authorize staging, ask for the target server/environment details then prepare a deployment-specific plan; until that authorization, continue on feature branches only. For foreign live data probes, remind the user to enable VPN before giving the command; for TSETMC/CODAL/Tindex, specify VPN off. Do not repeat the entire 265-test pack just to revisit the already-read reports.
+
+
+## Latest operational increment — 2026-10-20 (readiness endpoint)
+
+- Implemented distinct endpoint contracts: /health reports only process liveness; /ready reports research-only readiness after verifying that the source registry is non-empty, its reported counts match the entries, and the research-snapshot callable is loaded.
+- /ready returns HTTP 503 with a sanitized reason if critical local registry/pipeline prerequisites are invalid. It does not contact TSETMC, CODAL, Tindex, FRED, Binance, World Bank, GDELT or any other provider.
+- The Analysis Engine Dockerfile and docker-compose.production.yml now use /ready for the container health check. This makes the Compose dependency check meaningful for local app readiness while leaving provider/data approvals as separate gates.
+- Added tests for /health liveness, /ready research-only semantics/disabled ranking, and an invalid/empty registry returning 503.
+- CI run [#39393823453](https://github.com/yarsalam/marketsage/actions/runs/39393823453) passed all five jobs on exact PR #6 head 37c6e85dea37b02543df7150d359d8f72c5be511, including production-images. This is a code/build test, not server staging evidence.
+- Remaining Stage 5 gates still include source outage/staleness failure tests across all paths, auth/access-control review, secret and dependency security checks, network exposure/TLS, backups/restore, staging smoke tests and rehearsed rollback. No deployment was performed.
