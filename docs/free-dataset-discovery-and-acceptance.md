@@ -38,40 +38,55 @@ the default discovery batch. Their CSV files must stay local unless the vendor
 contract explicitly permits the intended storage and use. The existing audit
 continues to flag, not repair, the known AYAR OHLC inconsistency.
 
-## Run everything in one command
+## Run the pack safely (offline by default)
 
-After the PR branch is available locally, from the repository root:
+From the repository root, inspect local changes first and preserve any untracked reports/files:
 
 ```bash
 cd ~/projects/marketsage-acceptance
 git status --short --branch
-git fetch origin
-git switch --track origin/feature/free-dataset-discovery-acceptance
-cd user/analysis-engine
+```
+
+The default command runs the complete offline test suite, validates the catalog, writes the source inventory and pending evidence templates, and audits only explicitly supplied local CSVs. **It does not contact any provider.**
+
+```bash
+cd ~/projects/marketsage-acceptance/user/analysis-engine
 bash scripts/run_free_dataset_acceptance_pack.sh
 ```
 
-The pack runs the full offline test suite first. If tests fail, it stops before
-live requests. The default live batch performs a bounded request to TSETMC, CODAL,
-World Bank and Binance, writes sanitized JSON summaries, and exports only the
-small World Bank/Binance candidate series to a local report directory. The default
-outputs are under `/tmp/marketsage-free-dataset-acceptance/`; none are committed.
+You can also state the offline intent explicitly with `--offline-only`. All generated reports stay outside Git under `/tmp/marketsage-free-dataset-acceptance/`. The pack never turns on source approval, investment ranking, or scoring.
 
-Optional Tindex and FRED probes run only if their environment variables are already
-set. The script never asks for a secret, echoes a secret, writes a secret to reports,
-or prints raw provider price rows. Tindex is limited to at most three candle requests
-in one invocation because the account quota is shared. GDELT is excluded by default;
-add `--include-gdelt` only when you explicitly want one probe and accept the chance
-of HTTP 429. After a 429, do not retry rapidly. The batch also generates pending
-source-evidence templates and automatically audits the small CSV candidate exports.
+### Iranian provider run — VPN OFF
 
-To run tests/inventory without any network traffic:
+**Before this live run, turn the VPN off.** The script asks for the exact confirmation `VPN-OFF` before the first network request. If the confirmation is absent/wrong or the terminal is non-interactive, it stops without probing. The script cannot independently verify your VPN state.
 
 ```bash
-bash scripts/run_free_dataset_acceptance_pack.sh --offline-only
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+bash scripts/run_free_dataset_acceptance_pack.sh --live-iran
 ```
 
-The source inventory alone never calls a provider:
+This run probes only TSETMC and CODAL. To explicitly add Tindex candles, only when its token and HTTPS origin are already set securely in environment variables, add `--include-tindex`:
+
+```bash
+bash scripts/run_free_dataset_acceptance_pack.sh --live-iran --include-tindex
+```
+
+The Tindex candle probe is limited to three slugs/requests in a run. Its quota is shared across endpoints; do not add an additional Tindex currency-rate call to the same batch. Never paste tokens into chat, command arguments, output reports, or Git.
+
+### Foreign/international provider run — VPN ON
+
+**Before this live run, turn the VPN on.** This group includes foreign sites and APIs (World Bank, Binance, and optionally FRED/ALFRED or GDELT). The script asks for the exact confirmation `VPN-ON` before the first network request. If the confirmation is absent/wrong or the terminal is non-interactive, it stops without probing. The script cannot independently verify your VPN state.
+
+```bash
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+bash scripts/run_free_dataset_acceptance_pack.sh --live-foreign
+```
+
+FRED/ALFRED is **not** contacted unless you explicitly add `--include-fred`; `FRED_API_KEY` must already be configured securely in the environment. GDELT is also explicit opt-in only; add `--include-gdelt` only after choosing a deliberate cooldown/request budget because a previous probe returned HTTP 429.
+
+Do not combine `--live-iran` and `--live-foreign`; the runner refuses mixed groups so that VPN state is unambiguous. Offline tests run before either group. The runner writes separate `iran-live-probes.json` and `foreign-live-probes.json` reports under the local report directory.
+
+The low-level inventory command itself is network-free:
 
 ```bash
 python scripts/discover_free_datasets.py --mode inventory \
