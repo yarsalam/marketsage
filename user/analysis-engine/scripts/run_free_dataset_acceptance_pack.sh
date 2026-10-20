@@ -23,6 +23,7 @@ INCLUDE_TINDEX=0
 INCLUDE_FRED=0
 INCLUDE_GDELT=0
 TSETMC_QUERY_ARGS=()
+TINDEX_SLUG_ARGS=()
 AUDIT_CSV_ARGS=()
 
 while (($#)); do
@@ -36,12 +37,15 @@ while (($#)); do
     --tsetmc-query)
       if (($# < 2)); then echo "Missing value for --tsetmc-query" >&2; exit 2; fi
       TSETMC_QUERY_ARGS+=(--tsetmc-query "$2"); shift 2 ;;
+    --tindex-slug)
+      if (($# < 2)); then echo "Missing value for --tindex-slug" >&2; exit 2; fi
+      TINDEX_SLUG_ARGS+=(--tindex-slug "$2"); shift 2 ;;
     --audit-csv)
       if (($# < 2)); then echo "Missing value for --audit-csv" >&2; exit 2; fi
       AUDIT_CSV_ARGS+=(--audit-csv "$2"); shift 2 ;;
     *)
       echo "Unknown option: $1" >&2
-      echo "Usage: bash scripts/run_free_dataset_acceptance_pack.sh [--offline-only] [--live-iran [--include-tindex]] [--live-foreign [--include-fred] [--include-gdelt]] [--tsetmc-query NAME ...] [--audit-csv FILE ...]" >&2
+      echo "Usage: bash scripts/run_free_dataset_acceptance_pack.sh [--offline-only] [--live-iran [--include-tindex [--tindex-slug SLUG]]] [--live-foreign [--include-fred] [--include-gdelt]] [--tsetmc-query NAME ...] [--audit-csv FILE ...]" >&2
       exit 2 ;;
   esac
 done
@@ -61,6 +65,14 @@ if (( (INCLUDE_FRED || INCLUDE_GDELT) && ! RUN_FOREIGN )); then
 fi
 if [[ "${#TSETMC_QUERY_ARGS[@]}" -gt 0 ]] && (( ! RUN_IRAN )); then
   echo "--tsetmc-query requires --live-iran." >&2
+  exit 2
+fi
+if [[ "${#TINDEX_SLUG_ARGS[@]}" -gt 0 ]] && (( ! INCLUDE_TINDEX )); then
+  echo "--tindex-slug requires --include-tindex." >&2
+  exit 2
+fi
+if [[ "${#TINDEX_SLUG_ARGS[@]}" -gt 0 ]] && (( ! RUN_IRAN )); then
+  echo "--tindex-slug requires --live-iran." >&2
   exit 2
 fi
 
@@ -149,6 +161,7 @@ if (( RUN_IRAN )); then
   IRAN_ARGS+=("${TSETMC_QUERY_ARGS[@]}")
   if (( INCLUDE_TINDEX )); then
     IRAN_ARGS+=(--source iran.tindex.candles)
+    IRAN_ARGS+=("${TINDEX_SLUG_ARGS[@]}")
     if [[ -n "${TINDEX_API_BASE_URL:-}" && -n "${TINDEX_API_TOKEN:-}" ]]; then
       record "Tindex configured; candle probe is limited to at most three requests."
     else
