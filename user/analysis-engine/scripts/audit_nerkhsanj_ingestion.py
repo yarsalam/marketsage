@@ -211,19 +211,20 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
             value = _positive_decimal(row.get("value"))
             if parsed_date is None:
                 series_invalid_dates += 1
-                continue
-            original_dates.append(parsed_date)
+            else:
+                original_dates.append(parsed_date)
+                try:
+                    converted = jalali_to_gregorian(row.get("observation_date_jalali", ""))
+                except (TypeError, ValueError):
+                    series_calendar_mismatches += 1
+                else:
+                    if converted != parsed_date:
+                        series_calendar_mismatches += 1
             if value is None:
                 series_invalid_values += 1
+            if parsed_date is None or value is None:
                 continue
             date_values[parsed_date].append(value)
-            try:
-                converted = jalali_to_gregorian(row.get("observation_date_jalali", ""))
-            except (TypeError, ValueError):
-                series_calendar_mismatches += 1
-            else:
-                if converted != parsed_date:
-                    series_calendar_mismatches += 1
 
         input_order_inversions = sum(
             1 for left, right in zip(original_dates, original_dates[1:]) if right < left
