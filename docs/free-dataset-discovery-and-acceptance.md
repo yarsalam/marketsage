@@ -287,3 +287,18 @@ Interpretation:
 - Only 18 market rows were reported in this run, so this was not a new five-year ingestion.
 - Do not retry all nine sources as a batch. Investigate EURUSD=X only if this series is needed and the failure persists during a later scheduled refresh; first review the detailed status report for timeout phase and prior successful history coverage.
 - Foreign probes must continue to be performed with VPN enabled and separate from Iran-provider probes. No source approval, scoring permission, or backtest approval follows from this snapshot.
+
+## Owner-run one-shot Nerkhsanj archive probe (2026-10-22)
+
+The project owner ran `scripts/probe_nerkhsanj_archive.py` from the repository commit fetched from `feature/free-dataset-discovery-acceptance`, after explicitly confirming VPN was ON. The single HTTPS request completed and the metadata-only parser reported:
+
+- `status=probe_completed`
+- `schema_status=candidate_schema_parsed`
+- `series_count=28`
+- `raw_values_emitted=false`
+- `raw_payload_saved=false`
+- `production_approved=false`, `eligible_for_scoring=false`
+
+This is the first successful live schema/series-count evidence for this source. The report and console output shared so far do not enumerate the full per-series summary, so no particular key is yet claimed to be gold, a coin, or free-market FX. The probe performs lexical Jalali date checks only, not full Jalali calendar validation, and it does not establish rate units, upstream lineage, completeness, source accuracy, independent reconciliation, attribution requirements, or commercial/model-use permissions.
+
+Next step: inspect the existing local report `/tmp/marketsage-nerkhsanj-probe.json` for per-series keys, counts, and date bounds. Select only clearly identified target candidates, then reconcile dates/units against a separate lawful source before normalizing them into the shared MarketSage research store. Do not rerun the archive fetch just to list these already captured metadata fields, and do not infer market meaning from a key string alone. No registry or scoring approval changes follow from this probe.
