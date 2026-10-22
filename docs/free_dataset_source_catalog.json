@@ -248,7 +248,7 @@
       "source_id": "iran.nerkhsanj.rates_archive",
       "label": "Nerkhsanj public JSON rates/archive (publisher-announced candidate)",
       "free_access_class": "public_api_candidate",
-      "authentication": "Publisher announcement says no API key; live access and schema not yet verified",
+      "authentication": "Publisher announcement says no API key; one owner-run live HTTPS request completed and parsed the candidate schema.",
       "probe_mode": "one bounded request to a published JSON archive after VPN-on reminder; no per-record /calc loops",
       "data_families": [
         "free-market FX",
@@ -262,10 +262,29 @@
         "Publisher announcement asks for Nerkhsanj attribution/link; confirm conditions and permitted commercial/data use before reuse",
         "Publisher describes Toman values and Jalali dates; parser must be based on a sanitized observed response and tested for calendar conversion",
         "Market series, key names, update frequency, historical gaps and corrections must be inventoried from the actual API, not inferred from the announcement",
-        "No live probe yet; do not merge into scoring until independent reconciliation and usage rights pass"
+        "A single metadata-only probe parsed 28 candidate series on 2026-10-22; the probe did not save raw prices. Per-series identity, units, coverage, lineage, rights and independent reconciliation remain unapproved."
       ],
       "default_live_probe": false,
-      "production_approved": false
+      "production_approved": false,
+      "latest_probe_evidence": {
+        "reported_date": "2026-10-22",
+        "probe_type": "single bounded metadata-only HTTPS request",
+        "outcome": "probe_completed",
+        "schema_status": "candidate_schema_parsed",
+        "series_count": 28,
+        "raw_payload_saved": false,
+        "raw_values_emitted": false,
+        "production_approved": false,
+        "eligible_for_scoring": false,
+        "not_yet_established": [
+          "exact series-key meanings",
+          "per-series first/last observation dates and gap coverage",
+          "actual Jalali calendar validity",
+          "Toman versus other unit semantics against an independent source",
+          "upstream data lineage and source accuracy",
+          "attribution and commercial reuse rights"
+        ]
+      }
     }
   ]
 }
