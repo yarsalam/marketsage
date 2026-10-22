@@ -27,7 +27,7 @@ Current source catalog: [`free_dataset_source_catalog.json`](free_dataset_source
 | World Bank Indicators API | Public API; the current official documentation says API keys are not required | Annual Iranian/global macro series, long historical spans | Annual period is not release timestamp; some series may be missing/revised and are not daily market prices |
 | Binance Spot public market data | Public klines endpoint, no API key for public market-data routes | Venue-specific crypto OHLCV | A BTCUSDT candle is not a USD quote or a universal crypto-market price; terms/geographic access remain to be reviewed |
 | Tindex | Free-tier account, environment token/origin required | Current currency snapshot and some indicator candles | Current public docs state 1 request/minute and 100 successful requests/day, indicator history up to 100 days, and Toman values since 2026-07-20; account payload, unit semantics and usage rights still require reconciliation |
-| Nerkhsanj rates archive | Publisher-announced no-key JSON candidate (not yet live-verified) | Potential daily Iranian free-market FX, gold and coin history | Publisher announcement claims selected series back to 2010 and Toman values; actual schema, lineage, rights, attribution and history coverage are not yet verified |
+| Nerkhsanj rates archive | One owner-run metadata probe completed on 2026-10-22 | 28 candidate daily series across FX, gold/coins, local crypto and silver keys; 91,245 reported observations | Unit, key semantics, true Jalali-date validity, archive lineage, completeness, attribution and commercial/model-use rights remain unverified |
 | FRED/ALFRED | Free API key | US macro, rates and historical vintages | Observation period is not exact release time; series-specific vintage behavior matters |
 | Yahoo Finance / yfinance | Existing no-subscription research path | Global proxies and selected crypto history | Unofficial client/terms and reuse rights need review; not a certified exchange feed |
 | GDELT DOC | Public API candidate | News discovery metadata | Earlier request returned HTTP 429; intentionally not part of the default live run |
@@ -288,17 +288,77 @@ Interpretation:
 - Do not retry all nine sources as a batch. Investigate EURUSD=X only if this series is needed and the failure persists during a later scheduled refresh; first review the detailed status report for timeout phase and prior successful history coverage.
 - Foreign probes must continue to be performed with VPN enabled and separate from Iran-provider probes. No source approval, scoring permission, or backtest approval follows from this snapshot.
 
-## Owner-run one-shot Nerkhsanj archive probe (2026-10-22)
+## Owner-run Nerkhsanj archive probe and candidate ingestion (2026-10-22)
 
-The project owner ran `scripts/probe_nerkhsanj_archive.py` from the repository commit fetched from `feature/free-dataset-discovery-acceptance`, after explicitly confirming VPN was ON. The single HTTPS request completed and the metadata-only parser reported:
+The project owner ran \`scripts/probe_nerkhsanj_archive.py\` after explicitly confirming VPN was ON. The single HTTPS request completed and the metadata-only parser reported:
 
-- `status=probe_completed`
-- `schema_status=candidate_schema_parsed`
-- `series_count=28`
-- `raw_values_emitted=false`
-- `raw_payload_saved=false`
-- `production_approved=false`, `eligible_for_scoring=false`
+- \`status=probe_completed\`
+- \`schema_status=candidate_schema_parsed\`
+- \`series_count=28\`
+- \`raw_values_emitted=false\`
+- \`raw_payload_saved=false\`
+- \`production_approved=false\`, \`eligible_for_scoring=false\`
 
-This is the first successful live schema/series-count evidence for this source. The report and console output shared so far do not enumerate the full per-series summary, so no particular key is yet claimed to be gold, a coin, or free-market FX. The probe performs lexical Jalali date checks only, not full Jalali calendar validation, and it does not establish rate units, upstream lineage, completeness, source accuracy, independent reconciliation, attribution requirements, or commercial/model-use permissions.
+The owner's existing report named 28 series and 91,245 source pairs. Its lightweight check reported zero duplicate date strings and zero invalid numeric values. It only checked Jalali date formatting and lexical ordering, not actual calendar validity. These counts therefore describe the report's schema/shape checks, not fully accepted observations.
 
-Next step: inspect the existing local report `/tmp/marketsage-nerkhsanj-probe.json` for per-series keys, counts, and date bounds. Select only clearly identified target candidates, then reconcile dates/units against a separate lawful source before normalizing them into the shared MarketSage research store. Do not rerun the archive fetch just to list these already captured metadata fields, and do not infer market meaning from a key string alone. No registry or scoring approval changes follow from this probe.
+| Provider key | Reported pairs | Reported Jalali span |
+|---|---:|---|
+| \`dollar\` | 3,983 | 1390/09/05–1405/07/29 |
+| \`euro\` | 3,751 | 1391/04/08–1405/07/29 |
+| \`yuan\` | 3,206 | 1393/04/30–1405/07/29 |
+| \`gold\` | 3,535 | 1392/04/31–1405/07/29 |
+| \`coin\` | 4,321 | 1389/01/15–1405/07/29 |
+| \`aed\` | 3,681 | 1391/06/11–1405/07/29 |
+| \`lira\` | 3,181 | 1393/04/30–1405/07/29 |
+| \`pound\` | 3,746 | 1391/06/11–1405/07/29 |
+| \`tether\` | 2,038 | 1399/08/22–1405/07/29 |
+| \`bitcoin\` | 2,031 | 1399/08/22–1405/07/29 |
+| \`gold24\` | 3,394 | 1393/02/12–1405/07/29 |
+| \`bahar\` | 3,516 | 1392/04/31–1405/07/29 |
+| \`half\` | 3,458 | 1392/04/31–1405/07/29 |
+| \`quarter\` | 3,443 | 1392/04/31–1405/07/29 |
+| \`gram\` | 3,379 | 1392/04/31–1405/07/29 |
+| \`cad\` | 3,243 | 1393/04/30–1405/07/29 |
+| \`aud\` | 3,240 | 1393/04/30–1405/07/29 |
+| \`chf\` | 3,231 | 1393/04/30–1405/07/29 |
+| \`sar\` | 3,250 | 1393/04/30–1405/07/29 |
+| \`qar\` | 3,248 | 1393/04/30–1405/07/29 |
+| \`kwd\` | 3,235 | 1393/04/30–1405/07/29 |
+| \`omr\` | 3,238 | 1393/04/30–1405/07/29 |
+| \`iqd\` | 2,848 | 1393/05/01–1405/07/29 |
+| \`afn\` | 3,297 | 1393/04/30–1405/07/29 |
+| \`rub\` | 3,266 | 1393/04/30–1405/07/29 |
+| \`inr\` | 3,252 | 1393/04/30–1405/07/29 |
+| \`mesghal\` | 3,537 | 1392/04/31–1405/07/29 |
+| \`silver\` | 1,697 | 1399/08/10–1405/07/29 |
+
+### Ingestion utility added
+
+\`user/analysis-engine/scripts/ingest_nerkhsanj_archive.py\` is a candidate-only ingestion utility. It makes one bounded HTTPS request when run without a local input, and requires an interactive \`VPN-ON\` confirmation first. Its outputs are written under \`/tmp\` by default—not into Git.
+
+The utility:
+- validates modern Jalali dates by Gregorian conversion and round-trip checking;
+- preserves every accepted source pair, including duplicates, and flags identical vs conflicting duplicate-date records;
+- sends malformed dates/non-positive/non-numeric values to a quarantine CSV;
+- retains the provider key and a *candidate-only* asset mapping; unknown keys stay explicitly unmapped;
+- keeps price unit as \`UNKNOWN_UNVERIFIED\` and value semantics as \`DAILY_PROVIDER_VALUE_NOT_VALIDATED_AS_CLOSE\`;
+- hashes the response but does not retain the raw response payload;
+- refuses to label its output as model feature input and leaves rights/source/scoring/backtest approval false.
+
+Run the focused deterministic tests before live ingestion:
+
+\`\`\`bash
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+python -m pytest -q tests/test_nerkhsanj_archive_ingestion.py
+\`\`\`
+
+Then, with VPN ON, run one capture/normalization pass:
+
+\`\`\`bash
+python scripts/ingest_nerkhsanj_archive.py \\
+  --output-root /tmp/marketsage-nerkhsanj-ingestion
+\`\`\`
+
+The tool requires typing \`VPN-ON\` in the interactive prompt. Main outputs are \`normalized/nerkhsanj_series_daily_values.csv\`, \`normalized/nerkhsanj_series_manifest.csv\`, \`quarantine/rejected_pairs.csv\`, and \`ingestion_report.json\`.
+
+**Do not wire these rows directly into \`market_prices_daily.csv\` yet.** The probe's key names suggest possible FX/gold/coin/crypto series, but they do not prove instrument identity, Rial/Toman conversion, free-vs-official FX convention, quote currency, or whether the daily scalar is a closing price. Cross-asset feature/backtest use remains blocked pending a bounded comparison against another lawful reference and source-use/attribution review. The owner need not repeat the initial metadata probe merely to list keys; the report already exists locally. No source registry or investment-scoring approval is changed by the new utility.
