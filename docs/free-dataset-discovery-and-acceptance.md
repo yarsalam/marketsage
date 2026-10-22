@@ -248,3 +248,31 @@ Before a bounded live request to this external host, **turn VPN ON first**. Star
 Announcement references (publisher-authored, not independent proof of accuracy):
 - [WebNuz announcement](https://www.webnuz.com/article/2026-10-06/A%20free%2C%20keyless%20JSON%20API%20for%20Iran%27s%20free-market%20exchange%20rates%20%28with%20a%20daily%20archive%20since%202010%29)
 - [DEV.to announcement](https://dev.to/hamidjh80arch/a-free-keyless-json-api-for-irans-free-market-exchange-rates-with-a-daily-archive-since-2010-k6f)
+
+## Owner-run multi-asset collection snapshot (2026-10-22; discovery only)
+
+The project owner reported one local run of an exploratory multi-asset collector. Only the aggregate console summary is available in this repository; no raw responses, price rows, headline text, or credentials are copied here.
+
+| Reported measure | Result |
+|---|---:|
+| Source endpoints attempted | 17 |
+| HTTP-accessible sources | 13 |
+| Failed sources | 4 |
+| Normalized market rows | 7,637 |
+| Price series with rows | 8 |
+| RSS source-items | 180 |
+| RSS unique items | 180 |
+
+Reported failures:
+- Binance Spot `BTCUSDT`, `ETHUSDT`, and `SOLUSDT`: HTTP 451. Treat this as an access/legal restriction and leave these requests blocked. Do not try alternate hosts or routes to bypass the response; use a separately reviewed source only if it is available under its own terms.
+- Tasnim RSS: DNS/name-resolution failure. This indicates a network resolution problem for that attempt, not that the publisher has no usable data. Do not retry repeatedly without first checking the host/network resolution.
+
+The console summary reported eight price series, but the collector attempted three TGJU pages and six Yahoo chart proxies. Since that implies up to nine candidate series, the console output is insufficient to identify the missing/empty series or determine whether a parser recognized every page. The local run's `source_status.csv`, `collection_quality_report.json`, and `run_manifest.json` must be reviewed together for per-source parsed-row counts, schema status, and coverage. Do not infer which series was missing from the aggregate counts alone.
+
+Important limitations of this exploratory run:
+- The collector invoked Iranian page sources, foreign market sources, and RSS publishers in one run. Future runs must use the repository's separated network groups / VPN confirmations; Iranian sources, foreign sources, and Persian RSS should be run in distinct invocations.
+- The initial standalone collector labeled TGJU quotes with IRR-like unit identifiers even though the actual quote convention has not been independently confirmed. Treat those unit labels as provisional and do not use the series in cross-asset returns or ranking until the unit is reconciled. Future collector revisions must preserve the unit as unknown/unconfirmed until verified.
+- Public accessibility, row count, a parsable chart, or the weak Persian keyword sentiment output do not prove collection rights, commercial reuse, accurate publication times, correct units, predictive value, or eligibility for scoring.
+- All data remains discovery/research-only. This run changes no registry approval flags; production scoring, investment ranking, and backtest approval stay disabled.
+
+Next action is a source-by-source review of the local summary metadata—not another identical collection run. Resolve the eight-versus-nine series discrepancy, unit semantics, price-series coverage, RSS publication-time completeness, and the two distinct failure classes. Then carry forward only the series with explicit source/asset/unit/time contracts into the common research data layer.
