@@ -126,9 +126,6 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     source_id_mismatches = 0
     unit_semantics_mismatches = 0
     approval_flag_violations = 0
-    valid_value_by_row: dict[int, Decimal] = {}
-    valid_date_by_row: dict[int, date] = {}
-
     for index, row in enumerate(rows):
         key = (row.get("provider_series_key") or "").strip()
         if key:
@@ -138,11 +135,9 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
         if parsed_date is None:
             invalid_iso_dates += 1
         else:
-            valid_date_by_row[index] = parsed_date
         if value is None:
             invalid_positive_values += 1
         else:
-            valid_value_by_row[index] = value
 
         jalali_text = row.get("observation_date_jalali", "")
         if parsed_date is not None:
@@ -206,7 +201,6 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     for key in sorted(groups):
         series_rows = groups[key]
         date_values: dict[date, list[Decimal]] = defaultdict(list)
-        valid_pairs: list[tuple[int, date, Decimal]] = []
         series_invalid_dates = 0
         series_invalid_values = 0
         series_calendar_mismatches = 0
@@ -222,8 +216,6 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
             if value is None:
                 series_invalid_values += 1
                 continue
-            row_index = rows.index(row)
-            valid_pairs.append((row_index, parsed_date, value))
             date_values[parsed_date].append(value)
             try:
                 converted = jalali_to_gregorian(row.get("observation_date_jalali", ""))
@@ -295,7 +287,7 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
         series_results.append({
             "provider_series_key": key,
             "normalized_rows": len(series_rows),
-            "valid_iso_date_rows": len(date_values) + duplicate_excess_rows,
+            "valid_iso_date_rows": len(original_dates),
             "unique_observation_dates": len(date_values),
             "first_observation_date": min(ordered_dates).isoformat() if ordered_dates else None,
             "last_observation_date": max(ordered_dates).isoformat() if ordered_dates else None,
