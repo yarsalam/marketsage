@@ -126,7 +126,7 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     source_id_mismatches = 0
     unit_semantics_mismatches = 0
     approval_flag_violations = 0
-    for index, row in enumerate(rows):
+    for row in rows:
         key = (row.get("provider_series_key") or "").strip()
         if key:
             groups[key].append(row)
@@ -134,10 +134,8 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
         value = _positive_decimal(row.get("value"))
         if parsed_date is None:
             invalid_iso_dates += 1
-        else:
         if value is None:
             invalid_positive_values += 1
-        else:
 
         jalali_text = row.get("observation_date_jalali", "")
         if parsed_date is not None:
