@@ -256,13 +256,13 @@
         "coins",
         "selected crypto/local-price candidates"
       ],
-      "history_limit": "Publisher announcement claims daily archive since 2010 for selected series; coverage is unverified per key",
+      "history_limit": "One owner-run metadata probe reported 28 series, 91,245 pair rows, and key-specific Jalali date bounds from 1389/01/15 to 1405/07/29; those bounds are lexical strings, actual calendar validity, completeness, and per-series trading-day coverage remain unverified.",
       "limitations": [
         "Third-party/community-operated candidate; source ownership, upstream data lineage, reliability and terms require verification",
         "Publisher announcement asks for Nerkhsanj attribution/link; confirm conditions and permitted commercial/data use before reuse",
         "Publisher describes Toman values and Jalali dates; parser must be based on a sanitized observed response and tested for calendar conversion",
         "Market series, key names, update frequency, historical gaps and corrections must be inventoried from the actual API, not inferred from the announcement",
-        "A single metadata-only probe parsed 28 candidate series on 2026-10-22; the probe did not save raw prices. Per-series identity, units, coverage, lineage, rights and independent reconciliation remain unapproved."
+        "A single owner-run metadata-only probe parsed 28 candidate series (91,245 reported pair rows) on 2026-10-22; it did not validate Jalali calendar dates, save raw prices, or establish units, source lineage, rights or independent reconciliation."
       ],
       "default_live_probe": false,
       "production_approved": false,
@@ -278,12 +278,243 @@
         "eligible_for_scoring": false,
         "not_yet_established": [
           "exact series-key meanings",
-          "per-series first/last observation dates and gap coverage",
+          "per-series missing-date/session coverage and corrections",
           "actual Jalali calendar validity",
           "Toman versus other unit semantics against an independent source",
           "upstream data lineage and source accuracy",
           "attribution and commercial reuse rights"
-        ]
+        ],
+        "reported_total_pair_rows": 91245,
+        "reported_duplicate_dates_total": 0,
+        "reported_invalid_numeric_rates_total": 0,
+        "date_bound_semantics": "lexical Jalali YYYY/MM/DD strings; no calendar round-trip validation in probe",
+        "per_series_inventory": [
+          {
+            "series_key": "dollar",
+            "reported_rows": 3983,
+            "first_jalali": "1390/09/05",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "euro",
+            "reported_rows": 3751,
+            "first_jalali": "1391/04/08",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "yuan",
+            "reported_rows": 3206,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "gold",
+            "reported_rows": 3535,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "coin",
+            "reported_rows": 4321,
+            "first_jalali": "1389/01/15",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "aed",
+            "reported_rows": 3681,
+            "first_jalali": "1391/06/11",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "lira",
+            "reported_rows": 3181,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "pound",
+            "reported_rows": 3746,
+            "first_jalali": "1391/06/11",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "tether",
+            "reported_rows": 2038,
+            "first_jalali": "1399/08/22",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "bitcoin",
+            "reported_rows": 2031,
+            "first_jalali": "1399/08/22",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "gold24",
+            "reported_rows": 3394,
+            "first_jalali": "1393/02/12",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "bahar",
+            "reported_rows": 3516,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "half",
+            "reported_rows": 3458,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "quarter",
+            "reported_rows": 3443,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "gram",
+            "reported_rows": 3379,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "cad",
+            "reported_rows": 3243,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "aud",
+            "reported_rows": 3240,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "chf",
+            "reported_rows": 3231,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "sar",
+            "reported_rows": 3250,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "qar",
+            "reported_rows": 3248,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "kwd",
+            "reported_rows": 3235,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "omr",
+            "reported_rows": 3238,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "iqd",
+            "reported_rows": 2848,
+            "first_jalali": "1393/05/01",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "afn",
+            "reported_rows": 3297,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "rub",
+            "reported_rows": 3266,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "inr",
+            "reported_rows": 3252,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "mesghal",
+            "reported_rows": 3537,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "silver",
+            "reported_rows": 1697,
+            "first_jalali": "1399/08/10",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          }
+        ],
+        "actual_jalali_calendar_validity": "not tested by metadata probe"
       }
     }
   ]
