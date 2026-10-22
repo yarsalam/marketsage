@@ -276,3 +276,14 @@ Important limitations of this exploratory run:
 - All data remains discovery/research-only. This run changes no registry approval flags; production scoring, investment ranking, and backtest approval stay disabled.
 
 Next action is a source-by-source review of the local summary metadata—not another identical collection run. Resolve the eight-versus-nine series discrepancy, unit semantics, price-series coverage, RSS publication-time completeness, and the two distinct failure classes. Then carry forward only the series with explicit source/asset/unit/time contracts into the common research data layer.
+
+## Owner-run controlled foreign probe snapshot (2026-10-22; VPN reported enabled)
+
+The project owner shared the aggregate console output from a bounded foreign-source probe. The run attempted nine source requests: three Binance Spot pairs and six Yahoo chart symbols. The console summary reported eight accessible results, one failure, 18 market rows across eight series, and no news requests. The log specifically identified one failure: `yahoo.chart.EURUSD=X`, a TLS handshake timeout.
+
+Interpretation:
+- The BTCUSDT, ETHUSDT and SOLUSDT probe attempts emitted no individual failure lines in the shared log. Treat them as probe-level reachability evidence only; this does not establish multi-year history coverage, uninterrupted daily candles, exact venue/quote semantics, or usage rights.
+- Five of the six Yahoo chart symbol requests emitted no individual failure line. EURUSD=X timed out during TLS; this is a connection failure for that attempt, not evidence that EUR/USD data is unavailable. Reuse the already captured five-year series from the earlier collection rather than redownloading it merely to repeat the same probe.
+- Only 18 market rows were reported in this run, so this was not a new five-year ingestion.
+- Do not retry all nine sources as a batch. Investigate EURUSD=X only if this series is needed and the failure persists during a later scheduled refresh; first review the detailed status report for timeout phase and prior successful history coverage.
+- Foreign probes must continue to be performed with VPN enabled and separate from Iran-provider probes. No source approval, scoring permission, or backtest approval follows from this snapshot.
