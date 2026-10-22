@@ -121,7 +121,6 @@ def test_audit_reports_gaps_repeats_and_large_observed_changes_without_values(tm
     assert result["counts"]["invalid_iso_date_rows"] == 0
     assert result["counts"]["jalali_gregorian_mismatch_rows"] == 0
     assert result["counts"]["unchanged_adjacent_observation_pairs"] == 2
-    assert result["counts"]["calendar_intervals_gt_1_day"] if "calendar_intervals_gt_1_day" in result["counts"] else True
     assert result["series"][0]["calendar_intervals_gt_1_day"] == 1
     assert result["counts"]["observation_change_pairs_abs_pct_ge_20"] == 1
     assert result["counts"]["observation_change_pairs_abs_pct_ge_50"] == 1
