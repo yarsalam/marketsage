@@ -384,5 +384,19 @@ This result supersedes the earlier probe's limitation about Jalali dates **for r
 
 Still unverified: unit and quote convention (including Toman versus Rial), exact meaning of each key, price/close semantics, market calendar and expected weekend/holiday gaps, stale or repeated values, daily return outliers, provider corrections and upstream lineage, independent price reconciliation, attribution, retention and commercial/model-use rights. All 91,245 rows remain candidate-only and must not be joined to the production price contract, used for scoring, or used in an approved backtest.
 
-Next step: run a **local metadata/statistical audit** over this run's normalized CSV and manifest (coverage by series, missing calendar spans, repeated values, and large one-day changes), then select a small set of representative series for comparison against a separately reviewed independent reference. Do not repeat the archive download just to recreate these counts.
+Next step: run the **local, network-free metadata/statistical audit** over this run's normalized CSV and manifest. It prints and writes metadata only; it does not include raw prices.
+
+```bash
+cd ~/projects/marketsage-acceptance/user/analysis-engine
+python scripts/audit_nerkhsanj_ingestion.py \
+  --run-dir /tmp/marketsage-nerkhsanj-ingestion/run_20261022T202100508487Z
+```
+
+The script writes `quality_audit.json` into that run directory. To run its deterministic offline tests:
+
+```bash
+python -m pytest -q tests/test_nerkhsanj_ingestion_audit.py tests/test_nerkhsanj_archive_ingestion.py
+```
+
+Review calendar gaps, repeated values, and large observation-to-observation changes as *flags*, not automatic data rejection: consecutive observations can be separated by weekends or longer gaps, and no verified provider calendar is registered. Then select a small set of representative series for comparison against a separately reviewed independent reference. Do not repeat the archive download just to recreate these counts.
 
