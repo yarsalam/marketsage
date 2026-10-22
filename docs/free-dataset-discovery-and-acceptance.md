@@ -362,3 +362,27 @@ python scripts/ingest_nerkhsanj_archive.py \\
 The tool requires typing \`VPN-ON\` in the interactive prompt. Main outputs are \`normalized/nerkhsanj_series_daily_values.csv\`, \`normalized/nerkhsanj_series_manifest.csv\`, \`quarantine/rejected_pairs.csv\`, and \`ingestion_report.json\`.
 
 **Do not wire these rows directly into \`market_prices_daily.csv\` yet.** The probe's key names suggest possible FX/gold/coin/crypto series, but they do not prove instrument identity, Rial/Toman conversion, free-vs-official FX convention, quote currency, or whether the daily scalar is a closing price. Cross-asset feature/backtest use remains blocked pending a bounded comparison against another lawful reference and source-use/attribution review. The owner need not repeat the initial metadata probe merely to list keys; the report already exists locally. No source registry or investment-scoring approval is changed by the new utility.
+
+## Owner-run Nerkhsanj archive normalization run (2026-10-22)
+
+After the metadata-only probe described above, the owner ran the candidate ingestion utility with VPN explicitly confirmed ON. The owner-provided console summary reported:
+
+| Measure | Result |
+|---|---:|
+| Outcome | `COMPLETED_CANDIDATE_ONLY` |
+| Provider series | 28 |
+| Source pairs received | 91,245 |
+| Rows normalized by the parser | 91,245 |
+| Pairs quarantined by the parser | 0 |
+| Series with duplicate dates | 0 |
+| Series with conflicting duplicate-date values | 0 |
+| Payload SHA-256 | `0498c8a91ea9b080367c1447660f3bf6c555f3d6f20da462634473afd70ee50e` |
+
+The reported local run directory was `/tmp/marketsage-nerkhsanj-ingestion/run_20261022T202100508487Z`. The script reports that the raw response body was not saved; normalized candidate rows, manifest, quarantine CSV, and `ingestion_report.json` are local files under `/tmp`, not repository artifacts.
+
+This result supersedes the earlier probe's limitation about Jalali dates **for rows accepted by the ingestion parser**: the ingestion utility performs Jalali-to-Gregorian conversion with round-trip validation and rejects invalid dates or non-positive/non-numeric values. Zero quarantined pairs means no pairs were rejected by those parser checks in this run; it does **not** establish that provider history is complete or economically correct.
+
+Still unverified: unit and quote convention (including Toman versus Rial), exact meaning of each key, price/close semantics, market calendar and expected weekend/holiday gaps, stale or repeated values, daily return outliers, provider corrections and upstream lineage, independent price reconciliation, attribution, retention and commercial/model-use rights. All 91,245 rows remain candidate-only and must not be joined to the production price contract, used for scoring, or used in an approved backtest.
+
+Next step: run a **local metadata/statistical audit** over this run's normalized CSV and manifest (coverage by series, missing calendar spans, repeated values, and large one-day changes), then select a small set of representative series for comparison against a separately reviewed independent reference. Do not repeat the archive download just to recreate these counts.
+
