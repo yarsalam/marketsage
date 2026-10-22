@@ -1,6 +1,6 @@
 {
   "catalog_version": "1.0.0",
-  "last_reviewed": "2026-10-20",
+  "last_reviewed": "2026-10-22",
   "policy": {
     "prefer_no_subscription": true,
     "free_access_is_not_a_reuse_license": true,
@@ -256,13 +256,13 @@
         "coins",
         "selected crypto/local-price candidates"
       ],
-      "history_limit": "One owner-run metadata probe reported 28 series, 91,245 pair rows, and key-specific Jalali date bounds from 1389/01/15 to 1405/07/29; those bounds are lexical strings, actual calendar validity, completeness, and per-series trading-day coverage remain unverified.",
+      "history_limit": "Owner-run ingestion on 2026-10-22 parsed 91,245 rows across 28 candidate series after Jalali/Gregorian round-trip checks. The full span, expected market calendar, gaps, stale values, and per-series coverage quality remain unaudited.",
       "limitations": [
         "Third-party/community-operated candidate; source ownership, upstream data lineage, reliability and terms require verification",
         "Publisher announcement asks for Nerkhsanj attribution/link; confirm conditions and permitted commercial/data use before reuse",
-        "Publisher describes Toman values and Jalali dates; parser must be based on a sanitized observed response and tested for calendar conversion",
+        "The ingestion parser uses an observed response and round-trip Jalali/Gregorian calendar checks; successful date parsing does not verify units, series semantics, completeness, or economic accuracy.",
         "Market series, key names, update frequency, historical gaps and corrections must be inventoried from the actual API, not inferred from the announcement",
-        "A single owner-run metadata-only probe parsed 28 candidate series (91,245 reported pair rows) on 2026-10-22; it did not validate Jalali calendar dates, save raw prices, or establish units, source lineage, rights or independent reconciliation."
+        "The initial metadata-only probe parsed 28 candidate series (91,245 reported pairs) but did not validate Jalali calendar dates; a later ingestion round-trip-validated accepted rows and wrote normalized candidate files locally, not to Git. Neither step established units, source lineage, rights, or independent reconciliation."
       ],
       "default_live_probe": false,
       "production_approved": false,
@@ -515,6 +515,39 @@
           }
         ],
         "actual_jalali_calendar_validity": "not tested by metadata probe"
+      },
+      "latest_ingestion_evidence": {
+        "reported_date": "2026-10-22",
+        "run_id": "run_20261022T202100508487Z",
+        "ingestion_version": "1.0.0",
+        "outcome": "COMPLETED_CANDIDATE_ONLY",
+        "series_count": 28,
+        "source_rows": 91245,
+        "normalized_rows": 91245,
+        "quarantined_pairs": 0,
+        "duplicate_date_series_count": 0,
+        "conflicting_duplicate_date_series_count": 0,
+        "source_payload_sha256": "0498c8a91ea9b080367c1447660f3bf6c555f3d6f20da462634473afd70ee50e",
+        "raw_payload_saved": false,
+        "jalali_calendar_validation": "round_trip_checked",
+        "value_unit": "UNKNOWN_UNVERIFIED",
+        "value_semantics": "DAILY_PROVIDER_VALUE_NOT_VALIDATED_AS_CLOSE",
+        "source_terms_reviewed": false,
+        "upstream_lineage_verified": false,
+        "unit_semantics_verified": false,
+        "source_approved": false,
+        "eligible_for_scoring": false,
+        "adjusted_returns_approved": false,
+        "backtest_approved": false,
+        "not_yet_established": [
+          "exact meaning and identity of every provider series key",
+          "Toman versus Rial and exact quote convention",
+          "whether daily values represent a close or another daily reference value",
+          "per-series trading calendar, missing dates, stale/repeated values and return outliers",
+          "source lineage, reliability and historical corrections",
+          "independent reconciliation against a separately reviewed reference",
+          "attribution, collection, storage, commercial and model-use rights"
+        ]
       }
     }
   ]
