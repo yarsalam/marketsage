@@ -26,9 +26,18 @@ is raw/unadjusted.
 ```bash
 cd ~/projects/marketsage-acceptance
 python3 user/analysis-engine/scripts/run_tsetmc_acceptance_pipeline.py \
-  --discover-root /absolute/path/to/tsetmc-history-corpus \
+  --discover-root /absolute/path/to/tsetmc_history_pipeline/raw \
   --output-root "$HOME/marketsage-data/tsetmc-acceptance"
 ```
+
+For the known MarketSage corpus layout, point discovery at
+`data/source_snapshots/tsetmc_history_pipeline/raw`, not the entire repository.
+The runner recognizes `history_archive.json` under each instrument folder,
+resolves the folder's ISIN to `insCode` using its sibling
+`instrument_search_*.json` when possible, and looks for a matching
+`corpus_reconciliation/adjusted_candidates_research_only/<ISIN>.adjusted_candidate.csv`.
+Known archive files take priority over fallback history files; alternate paths
+and hashes remain in the inventory. The original input history is never overwritten.
 
 The runner makes no network requests. It creates a fresh UTC-stamped directory
 inside the output root and will not overwrite an earlier run.
