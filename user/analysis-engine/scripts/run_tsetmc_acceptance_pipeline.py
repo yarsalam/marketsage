@@ -372,7 +372,7 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                     "instrument_code": code, "symbol": symbol, "isin": isin,
                     "_discovery_identity_conflict": bool(identity["instrument_code"] and identity["instrument_code"] != code),
                     "daily_history_path": str(path.resolve()),
-                    "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv")),
+                    "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                     "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
                     "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
                     "_base_dir": str(root.resolve()), "_discovered": True,
@@ -386,7 +386,7 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
             rows.append({
                 "instrument_code": code, "symbol": symbol, "isin": isin,
                 "daily_history_path": str(path.resolve()),
-                "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv")),
+                "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                 "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
                 "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
                 "_base_dir": str(root.resolve()), "_discovered": True,
@@ -445,6 +445,25 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
 
 def _sibling(path: Path, names: tuple[str, ...]) -> str:
     return next((str((path.parent / n).resolve()) for n in names if (path.parent / n).is_file()), "")
+
+
+def discover_adjusted_candidate_path(history_path: Path, isin: str) -> str:
+    """Find the corpus' already-built provider-adjusted candidate by exact ISIN filename."""
+    direct = _sibling(history_path, (
+        "chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json",
+        "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv",
+    ))
+    if direct:
+        return direct
+    if not isin or not re.fullmatch(r"[A-Za-z0-9]{12}", isin):
+        return ""
+    # Existing corpus layout: tsetmc_history_pipeline/raw/<ISIN>/history_archive.json
+    if len(history_path.parents) >= 3 and history_path.parents[1].name == "raw":
+        corpus_root = history_path.parents[2]
+        candidate = corpus_root / "corpus_reconciliation" / "adjusted_candidates_research_only" / f"{isin}.adjusted_candidate.csv"
+        if candidate.is_file():
+            return str(candidate.resolve())
+    return ""
 
 
 def extract_history(payload: Any) -> list[dict[str, Any]]:
