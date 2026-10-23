@@ -177,3 +177,7 @@ Recovery order now:
 3. If v0.2.5 still sees <1,000 history instruments or <1,000,000 rows, the runner stops before stage 2 and preserves the single v0.2.5 report/log; do not repeat with guessed paths.
 4. If stage 2 yields zero candidates/features/labels, the runner writes `finalization_blocker.json` and stops before QA. Treat that as one concrete blocker to resolve, not a passing/finished run.
 5. Once non-empty outputs are produced, final QA and local-index update run once. Source rights, event completeness, adjustment semantics and score/backtest gates remain fail-closed.
+
+### Corrected runner revision after the empty-history incident
+
+The one-pass runner has since been tightened further. Its current revision is `81266e04dafb3701ee959a0b06c8f565982c7d47`. It points v0.2.5 at `~/marketsage-data/tsetmc/tsetmc_history_pipeline/normalized/`, checks that `*.history.csv` count matches the raw archive count and is at least 1,000, verifies v0.2.5 actually ingested at least 1,000 instruments and 1,000,000 history rows, and refuses to proceed to final QA when candidate series, features, or forward labels are empty. It logs the v0.2.5 output and records running/blocked/success state in the local index. A failed or blocked run must be diagnosed from its preserved run-specific artifacts; do not automatically launch the script a second time.
