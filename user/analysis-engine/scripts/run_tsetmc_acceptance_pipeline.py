@@ -403,12 +403,14 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
         name = candidate.name.lower()
         raw_exact = {
             "daily_history_raw.json", "closing_price_daily_raw.json",
-            "history_raw.json", "daily_raw.json",
+            "history_raw.json", "daily_raw.json", "history_archive.json",
         }
         if name in raw_exact:
             rank = 0
         elif candidate.suffix.lower() == ".json" and "raw" in name:
             rank = 1
+        elif name == "closing_price_daily_fallback.json":
+            rank = 4
         elif candidate.suffix.lower() == ".json":
             rank = 2
         elif name in {"daily_history.csv", "market_prices_daily.csv", "normalized_history.csv"}:
