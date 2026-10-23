@@ -67,7 +67,8 @@ python3 user/analysis-engine/scripts/run_tsetmc_acceptance_pipeline.py \
 
 The initial triage rules are versioned defaults, not evidence that a series is
 correct: at least 252 valid history rows, adjusted-chart coverage of at least 95%,
-and adjusted/input ratio range 0.05–20. Ratio triage is computed only when input semantics are explicitly `raw_unadjusted`; an unverified input is not labelled raw just because the filenames or field names look familiar. You can override them explicitly for
+and adjusted/input ratio range 0.05–20. The pipeline also checks adjusted-candidate
+OHLC ordering and leaves invalid rows flagged rather than repairing them. Ratio triage is computed only when input semantics are explicitly `raw_unadjusted`; an unverified input is not labelled raw just because the filenames or field names look familiar. You can override them explicitly for
 sensitivity checks with `--min-history-rows`, `--min-adjusted-coverage`,
 `--factor-min`, and `--factor-max`. Do not change thresholds simply to turn
 a failing series into a pass.
@@ -82,9 +83,9 @@ Each run directory contains:
 | `input_history_candidate.csv` | Input observations under neutral “candidate” names plus declared/inferred semantics; original input stays untouched |
 | `raw_history_quality.csv` | Row-level malformed date/value, duplicate-date and input-OHLC flags |
 | `adjusted_candidate_daily.csv` | Separate provider-adjusted candidate values with adjusted-OHLC QA flags and no fallback/fill |
-| `adjusted_candidate_daily.csv` | Raw and provider-adjusted fields side by side; missing adjusted dates remain blank |
+
 | `event_reconciliation.csv` | Event-date overlap with raw history/chart as evidence, not automatic confirmation |
-| `adjustment_factor_audit.csv` | Adjusted/raw ratios, extrema, out-of-range factors and abrupt factor changes |
+| `adjustment_factor_audit.csv` | Adjusted/input ratios (only when input semantics are explicitly raw), extrema, out-of-range factors and abrupt factor changes |
 | `research_eligible_manifest.csv` | Only series passing structural gates and traceable evidence gates |
 | `quarantine.csv` | Open issues with reason codes and required action |
 | `reprocessing_queue.csv` | Non-looping work queue with input hash, attempt count and resolution status |
