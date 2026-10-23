@@ -400,3 +400,29 @@ python -m pytest -q tests/test_nerkhsanj_ingestion_audit.py tests/test_nerkhsanj
 
 Review calendar gaps, repeated values, and large observation-to-observation changes as *flags*, not automatic data rejection: consecutive observations can be separated by weekends or longer gaps, and no verified provider calendar is registered. Then select a small set of representative series for comparison against a separately reviewed independent reference. Do not repeat the archive download just to recreate these counts.
 
+## Owner-run Nerkhsanj local quality audit (2026-10-23; candidate-only)
+
+After the successful archive ingestion, the owner ran the local audit against the normalized CSV and manifest. The audit reported:
+
+| Measure | Result |
+|---|---:|
+| Provider series audited | 28 |
+| Normalized rows examined | 91,245 |
+| Invalid ISO date rows | 0 |
+| Invalid/non-positive numeric value rows | 0 |
+| Jalali/Gregorian mismatches | 0 |
+| Duplicate-date excess rows | 0 |
+| Conflicting duplicate dates | 0 |
+| Adjacent-observation changes with absolute magnitude >= 20% | 182 |
+| Adjacent-observation changes with absolute magnitude >= 50% | 117 |
+| Adjacent-observation changes with absolute magnitude >= 100% | 48 |
+
+The owner's console output reported `run_id=run_20261023T074318140271Z`, with the same payload SHA-256 as the ingestion record: `0498c8a91ea9b080367c1447660f3bf6c555f3d6f20da462634473afd70ee50e`. The run and audit files were stored locally under the user's Home directory, outside Git; raw price values were not copied into the repository.
+
+Interpretation and next steps:
+- The parser and calendar consistency checks found no invalid dates, invalid/non-positive values, Jalali/Gregorian mismatches, or duplicate-date conflicts in the normalized output.
+- The audit flags 48 adjacent-observation transitions of at least 100% absolute change. These are not automatically errors. The comparisons may span multiple calendar days, and source units, key semantics, quote convention, stale-value behavior, source revisions and the expected trading calendar are still unverified.
+- Review the per-series section and its largest-change dates from the local `quality_audit.json`, then reconcile a small number of representative observations with a separately reviewed independent reference. Keep these values out of model features until the anomalies, units, semantics and usage rights are resolved.
+
+This audit is local descriptive QA only. It does not establish economic correctness, coverage completeness, source lineage, data-use rights or predictive value. `source_approved=false`, `eligible_for_scoring=false`, `adjusted_returns_approved=false`, and `backtest_approved=false` remain unchanged.
+
