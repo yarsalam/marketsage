@@ -210,23 +210,53 @@ def read_payload(path: Path) -> Any:
         raise PipelineError(f"cannot parse {path.name} ({type(exc).__name__})") from None
 
 
-def filter_for_instrument(payload: Any, code: str) -> Any:
+def filter_for_instrument(
+    payload: Any, code: str, *, index_cache: dict[str, Any] | None = None,
+    cache_key: str | None = None,
+) -> Any:
+    """Select one instrument efficiently; index a combined file only once."""
     if not code:
         return payload
-
+    indexed: dict[str, list[dict[str, Any]]] | None = None
+    if index_cache is not None and cache_key is not None:
+        if cache_key not in index_cache:
+            rows, code_key = row_list(payload)
+            if rows is not None and code_key:
+                by_code: dict[str, list[dict[str, Any]]] = defaultdict(list)
+                for row in rows:
+                    by_code[str(row.get(code_key, "") or "").strip()].append(row)
+                index_cache[cache_key] = (code_key, dict(by_code))
+            else:
+                index_cache[cache_key] = None
+        index_entry = index_cache[cache_key]
+        if index_entry is not None:
+            _, indexed = index_entry
+    if indexed is not None:
+        selected = indexed.get(code, [])
+        if isinstance(payload, list):
+            return selected
+        if isinstance(payload, dict):
+            cloned = dict(payload)
+            for key in (
+                "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data",
+                "priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "events",
+            ):
+                if isinstance(cloned.get(key), list):
+                    cloned[key] = selected
+                    break
+            return cloned
     def filtered(rows: Any) -> Any:
         values, code_key = row_list(rows)
         if values is not None and code_key:
             return [r for r in values if str(r.get(code_key, "")).strip() == code]
         return rows
-
     if isinstance(payload, list):
         return filtered(payload)
     if isinstance(payload, dict):
         cloned = dict(payload)
         for key in (
             "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data",
-            "priceAdjust", "priceAdjustList", "price_adjustments", "events",
+            "priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "events",
         ):
             if isinstance(cloned.get(key), list):
                 cloned[key] = filtered(cloned[key])
@@ -309,7 +339,54 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
             })
     if not rows:
         raise PipelineError("no recognizable daily-history JSON/CSV files found; provide --manifest with explicit input paths")
-    return rows
+
+    # When both raw archives and derived/normalized copies exist, pick one stable
+    # primary history per instrument and retain alternatives in the run inventory.
+    # Ambiguous peers at the same priority block acceptance instead of silently
+    # choosing whichever file happens to sort first.
+    def priority(item: dict[str, Any]) -> tuple[int, str]:
+        candidate = Path(str(item.get("daily_history_path", "")))
+        name = candidate.name.lower()
+        raw_exact = {
+            "daily_history_raw.json", "closing_price_daily_raw.json",
+            "history_raw.json", "daily_raw.json",
+        }
+        if name in raw_exact:
+            rank = 0
+        elif candidate.suffix.lower() == ".json" and "raw" in name:
+            rank = 1
+        elif candidate.suffix.lower() == ".json":
+            rank = 2
+        elif name in {"daily_history.csv", "market_prices_daily.csv", "normalized_history.csv"}:
+            rank = 3
+        else:
+            rank = 4
+        return rank, str(candidate)
+
+    keyed: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    unkeyed: list[dict[str, Any]] = []
+    for item in rows:
+        code = str(item.get("instrument_code", "") or "").strip()
+        if code:
+            keyed[code].append(item)
+        else:
+            unkeyed.append(item)
+    selected: list[dict[str, Any]] = []
+    for code, candidates in sorted(keyed.items()):
+        ordered = sorted(candidates, key=priority)
+        primary = dict(ordered[0])
+        best_rank = priority(ordered[0])[0]
+        equal_rank = [entry for entry in ordered if priority(entry)[0] == best_rank]
+        # Same-code, same-priority candidate histories are genuinely ambiguous.
+        primary["_discovery_ambiguous_history"] = len(equal_rank) > 1
+        primary["_alternative_history_paths"] = [
+            str(entry.get("daily_history_path", ""))
+            for entry in ordered[1:]
+            if str(entry.get("daily_history_path", "")) != str(primary.get("daily_history_path", ""))
+        ]
+        selected.append(primary)
+    selected.extend(unkeyed)
+    return selected
 
 
 def _sibling(path: Path, names: tuple[str, ...]) -> str:
@@ -560,6 +637,7 @@ def run_pipeline(
     decisions, raw_out, quality_out, adjusted_out = [], [], [], []
     event_out, factor_out, quarantine_out, queue_out, research_out, inventory = [], [], [], [], [], []
     cache: dict[str, Any] = {}
+    payload_indexes: dict[str, Any] = {}
     hashes_all: dict[str, str] = {}
     codes: defaultdict[str, int] = defaultdict(int)
     for item in items:
@@ -581,6 +659,20 @@ def run_pipeline(
             if path and not path.is_absolute():
                 paths[k] = (base / path).resolve()
         payloads, input_hashes, errors = {}, {}, []
+        if item.get("_discovery_ambiguous_history"):
+            errors.append("discovery:multiple_equal_priority_history_files_for_instrument")
+        for alternative in item.get("_alternative_history_paths", []):
+            alt_path = Path(str(alternative)).expanduser()
+            try:
+                alt_hash = file_hash(alt_path) if alt_path.is_file() else ""
+                alt_status = "alternative_history_not_selected_lower_priority"
+                alt_error = "Primary file selected by deterministic filename priority; reconcile if data differs."
+            except OSError as exc:
+                alt_hash, alt_status, alt_error = "", "alternative_history_unreadable", type(exc).__name__
+            inventory.append({"instrument_code": code, "symbol": symbol,
+                              "input_kind": "alternative_history_not_selected",
+                              "path": str(alt_path), "sha256": alt_hash,
+                              "status": alt_status, "error": alt_error})
         for kind, path in paths.items():
             if path is None:
                 continue
@@ -591,7 +683,9 @@ def run_pipeline(
                 if key not in cache:
                     cache[key] = read_payload(path)
                 input_hashes[kind] = file_hash(path)
-                payloads[kind] = filter_for_instrument(cache[key], code)
+                payloads[kind] = filter_for_instrument(
+                    cache[key], code, index_cache=payload_indexes, cache_key=key
+                )
                 hashes_all[key] = input_hashes[kind]
                 inventory.append({"instrument_code": code, "symbol": symbol, "input_kind": kind,
                                   "path": key, "sha256": input_hashes[kind], "status": "read", "error": ""})
@@ -686,7 +780,7 @@ def run_pipeline(
                     "reason_codes": ";".join(row_reasons),
                 })
                 adj = chart.get(d) if d else None
-                ratio = adj["close"] / row["close"] if adj and row["close"] else ""
+                ratio = adj["close"] / row["close"] if price_semantics == "raw_unadjusted" and adj and row["close"] else ""
                 adjusted_out.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin, "date": row["date"],
                     "close_input_candidate": raw_close, "last_input_candidate": raw_last,
