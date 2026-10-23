@@ -38,6 +38,8 @@ Use a CSV if the local corpus has nonstandard filenames. Required columns are:
 - `adjusted_chart_path`
 - `adjustment_events_path`
 
+For research-eligibility, also declare `history_close_semantics=raw_unadjusted` only if the reviewed evidence proves the selected input history is raw/unadjusted. Other accepted values are `provider_adjusted` and `unknown`, but they intentionally block factor-ratio acceptance and feature/label creation from the selected input. Header names or a nonempty OHLC field do not prove that a series is unadjusted.
+
 Paths may be absolute or relative to the manifest's directory. Daily history
 payloads may be a list of rows or a JSON object with a recognized daily-row array
 such as `closingPriceDaily`; per-instrument CSV files are supported too. The
@@ -47,8 +49,8 @@ normalized date-to-field object, or the legacy semicolon/comma-delimited respons
 Example manifest:
 
 ```csv
-instrument_code,symbol,isin,daily_history_path,adjusted_chart_path,adjustment_events_path,rights_status,semantics_verified,independent_reconciliation_passed,corporate_action_completeness_verified,identity_match_evidence_ref,rights_evidence_ref,semantics_evidence_ref,independent_reconciliation_evidence_ref,corporate_action_completeness_evidence_ref
-46348559193224090,FOLAD,IRO1FOLD0001,raw/daily_history_raw.json,raw/chart_adjusted_raw.json,raw/price_adjustments_raw.json,unreviewed,false,false,false,,,,,
+instrument_code,symbol,isin,daily_history_path,adjusted_chart_path,adjustment_events_path,history_close_semantics,rights_status,semantics_verified,independent_reconciliation_passed,corporate_action_completeness_verified,identity_match_evidence_ref,rights_evidence_ref,semantics_evidence_ref,independent_reconciliation_evidence_ref,corporate_action_completeness_evidence_ref
+46348559193224090,FOLAD,IRO1FOLD0001,raw/daily_history_raw.json,raw/chart_adjusted_raw.json,raw/price_adjustments_raw.json,unknown,unreviewed,false,false,false,,,,,
 ```
 
 Evidence gates require a traceable reference for identity, usage rights, semantics/
@@ -65,7 +67,7 @@ python3 user/analysis-engine/scripts/run_tsetmc_acceptance_pipeline.py \
 
 The initial triage rules are versioned defaults, not evidence that a series is
 correct: at least 252 valid history rows, adjusted-chart coverage of at least 95%,
-and adjusted/raw ratio range 0.05–20. You can override them explicitly for
+and adjusted/input ratio range 0.05–20. Ratio triage is computed only when input semantics are explicitly `raw_unadjusted`; an unverified input is not labelled raw just because the filenames or field names look familiar. You can override them explicitly for
 sensitivity checks with `--min-history-rows`, `--min-adjusted-coverage`,
 `--factor-min`, and `--factor-max`. Do not change thresholds simply to turn
 a failing series into a pass.
@@ -77,8 +79,9 @@ Each run directory contains:
 | Output | Purpose |
 | --- | --- |
 | `instrument_decisions.csv` | One decision, reason codes, coverage, gaps and quality counters per instrument |
-| `raw_history_candidate.csv` | Separate local raw-history normalization; original input stays untouched |
-| `raw_history_quality.csv` | Row-level malformed date/value, duplicate-date and OHLC flags |
+| `input_history_candidate.csv` | Input observations under neutral “candidate” names plus declared/inferred semantics; original input stays untouched |
+| `raw_history_quality.csv` | Row-level malformed date/value, duplicate-date and input-OHLC flags |
+| `adjusted_candidate_daily.csv` | Separate provider-adjusted candidate values with adjusted-OHLC QA flags and no fallback/fill |
 | `adjusted_candidate_daily.csv` | Raw and provider-adjusted fields side by side; missing adjusted dates remain blank |
 | `event_reconciliation.csv` | Event-date overlap with raw history/chart as evidence, not automatic confirmation |
 | `adjustment_factor_audit.csv` | Adjusted/raw ratios, extrema, out-of-range factors and abrupt factor changes |
