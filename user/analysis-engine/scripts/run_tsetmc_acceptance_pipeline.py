@@ -46,7 +46,7 @@ DECISION_COLUMNS = [
     "ohlc_violation_rows", "adjusted_ohlc_violation_rows", "first_date", "last_date", "max_calendar_gap_days",
     "adjusted_chart_rows", "adjusted_close_coverage", "factor_ratio_outlier_rows",
     "factor_step_change_count", "event_rows", "event_dates_unrecognized",
-    "event_dates_exact_history_match", "raw_history_preserved",
+    "event_dates_exact_history_match", "event_dates_exact_adjusted_chart_match", "raw_history_preserved",
     "eligible_for_research", "eligible_for_scoring", "eligible_for_backtest",
 ]
 RAW_COLUMNS = [
@@ -877,7 +877,11 @@ def run_pipeline(
             reasons.append("ADJUSTED_COVERAGE_BELOW_TRIAGE_THRESHOLD")
         if ratio_bad:
             reasons.append("ADJUSTMENT_RATIO_OUTLIER_OR_STEP_CHANGE")
-        if event_bad:
+        if event_payload_missing:
+            reasons.append("CORPORATE_ACTION_EVENT_PAYLOAD_MISSING")
+        if event_error:
+            reasons.append("CORPORATE_ACTION_EVENT_PAYLOAD_PARSE_ERROR")
+        if event_unrecognized:
             reasons.append("EVENT_DATE_FIELDS_UNRESOLVED")
         if not rights_ok:
             reasons.append("USAGE_RIGHTS_NOT_VERIFIED_OR_EVIDENCE_REFERENCE_MISSING")
@@ -940,7 +944,7 @@ def run_pipeline(
                 "required_action": "Resolve reason codes using reviewed evidence; do not retry unless input hash or evidence changes.",
                 "resolution_status": "open",
             })
-            stage = "history_quality_or_input" if errors or bad_history else "adjustment_factor_audit" if ratio_bad else "adjusted_history_coverage" if low_coverage else "event_reconciliation" if event_bad else "source_evidence"
+            stage = "history_quality_or_input" if errors or bad_history else "adjusted_history_quality" if bad_adjusted_history else "adjustment_factor_audit" if ratio_bad else "adjusted_history_coverage" if low_coverage else "event_reconciliation" if event_bad else "source_evidence"
             queue_out.append({
                 "instrument_code": code, "symbol": symbol, "stage": stage,
                 "reason_code": reason_text,
