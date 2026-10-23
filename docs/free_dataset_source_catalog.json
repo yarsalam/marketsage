@@ -1,6 +1,6 @@
 {
   "catalog_version": "1.0.0",
-  "last_reviewed": "2026-10-22",
+  "last_reviewed": "2026-10-23",
   "policy": {
     "prefer_no_subscription": true,
     "free_access_is_not_a_reuse_license": true,
@@ -547,6 +547,34 @@
           "source lineage, reliability and historical corrections",
           "independent reconciliation against a separately reviewed reference",
           "attribution, collection, storage, commercial and model-use rights"
+        ]
+      },
+      "latest_quality_audit_evidence": {
+        "reported_date": "2026-10-23",
+        "run_id": "run_20261023T074318140271Z",
+        "source_payload_sha256": "0498c8a91ea9b080367c1447660f3bf6c555f3d6f20da462634473afd70ee50e",
+        "audit_status": "COMPLETED_CANDIDATE_AUDIT",
+        "series_count": 28,
+        "normalized_rows": 91245,
+        "invalid_iso_date_rows": 0,
+        "invalid_or_nonpositive_numeric_value_rows": 0,
+        "jalali_gregorian_mismatch_rows": 0,
+        "duplicate_date_excess_rows": 0,
+        "conflicting_duplicate_dates": 0,
+        "observation_change_pairs_abs_pct_ge_20": 182,
+        "observation_change_pairs_abs_pct_ge_50": 117,
+        "observation_change_pairs_abs_pct_ge_100": 48,
+        "change_metric_note": "Absolute change between adjacent unique, non-conflicting observed dates; adjacent observations may span multiple calendar days.",
+        "large_changes_are_accepted": false,
+        "source_approved": false,
+        "eligible_for_scoring": false,
+        "adjusted_returns_approved": false,
+        "backtest_approved": false,
+        "next_review": [
+          "inspect per-series outlier counts and largest-change dates from the local quality_audit.json",
+          "reconcile representative observations against an independently reviewed source",
+          "verify units, quote conventions, series meaning, stale values and provider corrections",
+          "review attribution, data retention and model/commercial usage rights"
         ]
       }
     }
