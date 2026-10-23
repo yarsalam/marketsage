@@ -127,6 +127,12 @@ def test_complete_pipeline_emits_features_and_six_month_labels_only_after_eviden
     assert (out / "input_history_candidate.csv").is_file()
     assert (out / "adjusted_candidate_daily.csv").is_file()
     assert (out / "event_reconciliation.csv").is_file()
+    with (out / "event_reconciliation.csv").open(encoding="utf-8", newline="") as f:
+        reconciled_events = list(csv.DictReader(f))
+    assert {row["event_family"] for row in reconciled_events} == {"price_adjustment", "share_change"}
+    assert decision["eligible_for_backtest"] == "False"
+    assert summary["flags"]["backtest_approved"] is False
+    assert (out / "history_gap_audit.csv").is_file()
     assert (out / "adjustment_factor_audit.csv").is_file()
     assert (out / "reprocessing_queue.csv").is_file()
 
