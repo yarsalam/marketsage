@@ -131,3 +131,9 @@ Treat these files as superseded for future runs: `adjust_pipeline.py` v0.2.0, `a
 The recorded integrated runner `run_20261023T095517508480Z` is **not the full-corpus acceptance result**: it found only 47 instruments, quarantined all 47, and produced zero research features / labels, while previous corpus inventory notes record approximately 1,220 normalized histories. Do not rerun that same discovery path. Diagnose/fix its instrument coverage only if this runner is retained; otherwise use the existing full-corpus v0.2.5 → forensic-v3 → candidate-v1.1 workflow above.
 
 The ZIPs and patches in the owner's listing are archival-only unless their exact content is inspected and a specific missing change is identified. Do not unpack/run overlapping package versions or apply successive patch files blindly.
+
+### Previously generated full-corpus candidate output — reuse, do not regenerate blindly
+
+Earlier project notes record a conservative TSETMC candidate builder producing **128 adjusted candidate series, 167,912 research-feature rows, and 151,784 forward-label rows**. Those outputs remain research-only. The remembered prior output root is `/tmp/marketsage-tsetmc-adjustments`; the exact run child and its manifest hashes must be preserved by the local centralization utility before that temporary directory is lost.
+
+This prior work is why the 47-instrument run from `run_tsetmc_acceptance_pipeline.py` must not trigger another adjustment cycle. The 47-run is a separate incomplete discovery pass. The immediate task is to **preserve/index existing output and compare its run/input hashes**, not automatically re-run v0.2.5, forensic v3, builder v1.1, or the final QA suite. Re-run any of those stages only if no completed output exists or the recorded input/code hashes prove it stale. A candidate output's presence does not grant source licensing/semantics approval or enable investment scoring.
