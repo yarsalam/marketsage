@@ -954,7 +954,7 @@ def run_pipeline(
             "event_rows": len(event_list), "event_dates_unrecognized": event_unrecognized,
             "event_dates_exact_history_match": event_exact, "event_dates_exact_adjusted_chart_match": event_chart_exact, "input_history_preserved": True,
             "eligible_for_research": eligible, "eligible_for_scoring": False,
-            "eligible_for_backtest": eligible,
+            "eligible_for_backtest": False,
         }
         decisions.append(decision)
 
@@ -1036,7 +1036,9 @@ def run_pipeline(
         "research_feature_rows": len(features), "forward_label_rows": len(labels),
         "flags": {"raw_inputs_overwritten": False, "network_requests_made": False,
                   "automatic_adjustment_applied": False, "forward_fill_applied": False,
-                  "production_scoring_enabled": False, "backtest_run": False},
+                  "production_scoring_enabled": False, "eligible_for_scoring": False,
+                  "adjusted_returns_approved": False, "eligible_for_backtest": False,
+                  "backtest_approved": False, "backtest_run": False},
         "rules": {"minimum_history_rows_for_six_month_research": min_history,
                   "minimum_adjusted_coverage_triage_only": min_coverage,
                   "adjusted_to_input_ratio_range_triage_only_when_input_semantics_explicitly_raw": [factor_min, factor_max],
