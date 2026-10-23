@@ -90,12 +90,16 @@ echo "Identity crosswalk: $DETAILS"
 echo "Crosswalk is read from repository root; explicit history/event paths still point to canonical data root."
 echo "Market-data network requests: none expected"
 
-for p in "$REPO" "$CORPUS" "$HISTORY" "$RAW" "$DETAILS"; do
+for p in "$REPO" "$CORPUS" "$HISTORY" "$RAW"; do
   if [ ! -d "$p" ]; then
     echo "ERROR: required directory missing: $p"
     exit 10
   fi
 done
+if [ ! -s "$DETAILS" ]; then
+  echo "ERROR: required identity crosswalk file missing or empty: $DETAILS"
+  exit 10
+fi
 for p in "$ADJ" "$FORENSIC" "$BUILDER" "$PIPELINE" "$QA"; do
   if [ ! -s "$p" ]; then
     echo "ERROR: required script missing/empty: $p"
