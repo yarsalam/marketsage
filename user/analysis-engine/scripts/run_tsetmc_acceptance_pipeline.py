@@ -1032,9 +1032,11 @@ def run_pipeline(
         "backtest_run": False, "eligible_for_scoring": False, "eligible_for_backtest": False,
         "reason": "The data pipeline prepares causal features and six-calendar-month forward labels only after evidence gates pass. A separate chronological strategy evaluation with realistic costs, liquidity constraints, drawdown and holdout protocol is required.",
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_files = sorted(p for p in out.iterdir() if p.is_file() and p.name != "run_manifest.json")
+    output_hashes = {p.name: file_hash(p) for p in output_files}
     (out / "run_manifest.json").write_text(json.dumps({
         "pipeline_version": VERSION, "run_id": run_id, "input_hashes": hashes_all,
-        "output_files": sorted(p.name for p in out.iterdir() if p.is_file()),
+        "output_files": [p.name for p in output_files], "output_hashes_sha256": output_hashes,
         "raw_inputs_overwritten": False, "outputs_are_candidate_only": True,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return report
