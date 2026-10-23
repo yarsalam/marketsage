@@ -40,7 +40,8 @@ Use a CSV if the local corpus has nonstandard filenames. Required columns are:
 - `instrument_code`, `symbol`, `isin`
 - `daily_history_path`
 - `adjusted_chart_path`
-- `adjustment_events_path`
+- `adjustment_events_path` for price-adjustment events
+- `share_change_events_path` for share-count/capital-change events
 
 For research-eligibility, also declare `history_close_semantics=raw_unadjusted` only if the reviewed evidence proves the selected input history is raw/unadjusted. Other accepted values are `provider_adjusted` and `unknown`, but they intentionally block factor-ratio acceptance and feature/label creation from the selected input. Header names or a nonempty OHLC field do not prove that a series is unadjusted.
 
@@ -53,8 +54,8 @@ normalized date-to-field object, or the legacy semicolon/comma-delimited respons
 Example manifest:
 
 ```csv
-instrument_code,symbol,isin,daily_history_path,adjusted_chart_path,adjustment_events_path,history_close_semantics,rights_status,semantics_verified,independent_reconciliation_passed,corporate_action_completeness_verified,identity_match_evidence_ref,rights_evidence_ref,semantics_evidence_ref,independent_reconciliation_evidence_ref,corporate_action_completeness_evidence_ref
-46348559193224090,FOLAD,IRO1FOLD0001,raw/daily_history_raw.json,raw/chart_adjusted_raw.json,raw/price_adjustments_raw.json,unknown,unreviewed,false,false,false,,,,,
+instrument_code,symbol,isin,daily_history_path,adjusted_chart_path,adjustment_events_path,share_change_events_path,history_close_semantics,rights_status,semantics_verified,independent_reconciliation_passed,corporate_action_completeness_verified,identity_match_evidence_ref,rights_evidence_ref,semantics_evidence_ref,independent_reconciliation_evidence_ref,corporate_action_completeness_evidence_ref
+46348559193224090,FOLAD,IRO1FOLD0001,raw/daily_history_raw.json,raw/chart_adjusted_raw.json,raw/price_adjustments_raw.json,raw/share_changes_raw.json,unknown,unreviewed,false,false,false,,,,,
 ```
 
 Evidence gates require a traceable reference for identity, usage rights, semantics/
@@ -89,7 +90,7 @@ Each run directory contains:
 | `history_gap_audit.csv` | Every interval over seven calendar days; gaps over 30 days block research until calendar/suspension/missing-data review |
 | `adjusted_candidate_daily.csv` | Separate provider-adjusted candidate values with adjusted-OHLC QA flags and no fallback/fill |
 
-| `event_reconciliation.csv` | Event-date overlap with raw history/chart as evidence, not automatic confirmation |
+| `event_reconciliation.csv` | Separately labeled price-adjustment and share-change event dates matched against input history/chart; overlap is evidence, not automatic confirmation |
 | `adjustment_factor_audit.csv` | Adjusted/input ratios (only when input semantics are explicitly raw), extrema, out-of-range factors and abrupt factor changes |
 | `research_eligible_manifest.csv` | Only series passing structural gates and traceable evidence gates |
 | `quarantine.csv` | Open issues with reason codes and required action |
@@ -122,7 +123,8 @@ the source registry.
 - `needs_reprocessing`: unreadable inputs, invalid date/close fields, duplicate dates,
   non-monotonic row ordering, or OHLC defects.
 - `quarantine_needs_independent_evidence`: identity evidence missing, suspicious
-  adjusted/raw ratios or factor steps, or unparseable corporate-action dates.
+  adjusted/input ratios or factor steps, long history gaps requiring calendar/suspension
+  review, or missing/unparseable price-adjustment/share-change event payloads.
 - `retain_candidate_insufficient_history`: fewer than the minimum rows for
   six-month research.
 - `retain_candidate_pending_evidence`: technical checks pass but one or more
