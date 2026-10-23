@@ -424,5 +424,21 @@ Interpretation and next steps:
 - The audit flags 48 adjacent-observation transitions of at least 100% absolute change. These are not automatically errors. The comparisons may span multiple calendar days, and source units, key semantics, quote convention, stale-value behavior, source revisions and the expected trading calendar are still unverified.
 - Review the per-series section and its largest-change dates from the local `quality_audit.json`, then reconcile a small number of representative observations with a separately reviewed independent reference. Keep these values out of model features until the anomalies, units, semantics and usage rights are resolved.
 
+
+
+### Per-series outlier triage from the owner’s 2026-10-23 console output
+
+The owner subsequently printed the per-series counters and largest-change dates from the local audit. The strongest concentration is:
+
+| Candidate key | Absolute change >=20% | >=50% | >=100% | Maximum calendar-day gap | Reported largest changes |
+|---|---:|---:|---:|---:|---|
+| `iqd` | 158 | 109 | 44 | 373 days | 2017-12-30: 102,930.3030%; 2016-02-14: 85,292.8571%; 2017-04-02: 58,190.3226% |
+| `silver` | 11 | 6 | 3 | 84 days | 2021-08-30: 2,493.9024%; 2021-08-11: 2,387.5000%; 2022-09-30: 893.9634% |
+| `tether` | 2 | 2 | 1 | 84 days | 2021-07-01: 2,536,200.0000%; 2021-06-30: 99.9960%; 2025-06-12: 10.9105% |
+
+These three series account for all 48 observed adjacent-observation changes with absolute magnitude at least 100% (44 IQD, 3 silver, 1 Tether). The report indicates that the dates and positive numeric values passed structural parsing, but this does not make the changes economically valid. IQD’s 373-day gap, plus 84-day gaps in silver, Tether and also the `bitcoin` candidate, mean some comparisons can span long periods rather than a single session. For that reason, change counters are anomaly triage, not daily-return validation.
+
+**Current handling:** isolate `iqd`, `silver`, and `tether` from feature generation pending inspection of the immediately preceding/current local observations and independent reconciliation. Also review the 84-day Bitcoin gap as a coverage issue, even though its report contains no >=20% adjacent-observation change. Do not auto-delete these rows or infer a fix without checking quote scale/unit, key meaning, historical gaps, and an independent reference. All source/scoring/backtest approval flags remain false.
+
 This audit is local descriptive QA only. It does not establish economic correctness, coverage completeness, source lineage, data-use rights or predictive value. `source_approved=false`, `eligible_for_scoring=false`, `adjusted_returns_approved=false`, and `backtest_approved=false` remain unchanged.
 
