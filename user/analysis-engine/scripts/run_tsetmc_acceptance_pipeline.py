@@ -184,8 +184,8 @@ def classify_price_input_semantics(rows: list[dict[str, Any]], declared: Any) ->
         return "raw_unadjusted"
     if declared_text in {"provider_adjusted", "adjusted"}:
         return "provider_adjusted"
-    if declared_text in {"unknown", "unknown_unverified", ""}:
-        pass
+    if declared_text in {"unknown", "unknown_unverified"}:
+        return "unknown_unverified"
     # This is diagnostic only: these names hint at a raw TSETMC contract, but do not
     # constitute proof that the stored series is unadjusted.
     sample = rows[: min(20, len(rows))]
