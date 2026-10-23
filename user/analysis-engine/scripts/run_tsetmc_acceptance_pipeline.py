@@ -30,7 +30,7 @@ DEFAULT_FACTOR_MAX = 20.0
 
 MANIFEST_COLUMNS = [
     "instrument_code", "symbol", "isin", "daily_history_path",
-    "adjusted_chart_path", "adjustment_events_path", "rights_status",
+    "adjusted_chart_path", "adjustment_events_path", "history_close_semantics", "rights_status",
     "semantics_verified", "independent_reconciliation_passed",
     "corporate_action_completeness_verified", "identity_match_evidence_ref",
     "rights_evidence_ref", "semantics_evidence_ref",
@@ -38,7 +38,7 @@ MANIFEST_COLUMNS = [
     "corporate_action_completeness_evidence_ref",
 ]
 DECISION_COLUMNS = [
-    "instrument_code", "symbol", "isin", "identity_verified", "decision_status",
+    "instrument_code", "symbol", "isin", "price_input_semantics", "identity_verified", "decision_status",
     "decision_reason_codes", "input_hashes_json", "history_rows",
     "valid_history_rows", "unique_history_dates", "invalid_date_rows",
     "invalid_or_nonpositive_close_rows", "invalid_numeric_field_rows",
@@ -50,22 +50,23 @@ DECISION_COLUMNS = [
     "eligible_for_research", "eligible_for_scoring", "eligible_for_backtest",
 ]
 RAW_COLUMNS = [
-    "instrument_code", "symbol", "isin", "date", "close_raw", "last_raw",
-    "open_raw", "high_raw", "low_raw", "prev_close_raw", "volume_raw",
-    "trade_value_raw", "source_response_sha256", "normalization_status",
-    "eligible_for_scoring",
+    "instrument_code", "symbol", "isin", "date", "close_input_candidate", "last_input_candidate",
+    "open_input_candidate", "high_input_candidate", "low_input_candidate", "prev_close_input_candidate",
+    "volume_input_candidate", "trade_value_input_candidate", "price_input_semantics",
+    "source_response_sha256", "normalization_status", "eligible_for_scoring",
 ]
 QUALITY_COLUMNS = [
-    "instrument_code", "symbol", "date", "raw_close", "raw_open", "raw_high",
-    "raw_low", "raw_volume", "row_status", "reason_codes",
+    "instrument_code", "symbol", "date", "input_close_candidate", "input_open_candidate", "input_high_candidate",
+    "input_low_candidate", "input_volume_candidate", "price_input_semantics", "row_status", "reason_codes",
 ]
 ADJUSTED_COLUMNS = [
-    "instrument_code", "symbol", "isin", "date", "raw_close", "raw_last",
-    "raw_open", "raw_high", "raw_low", "raw_volume", "raw_turnover",
+    "instrument_code", "symbol", "isin", "date", "close_input_candidate", "last_input_candidate",
+    "open_input_candidate", "high_input_candidate", "low_input_candidate", "volume_input_candidate", "turnover_input_candidate",
+    "price_input_semantics",
     "adjusted_open_candidate", "adjusted_high_candidate",
     "adjusted_low_candidate", "adjusted_last_candidate",
     "adjusted_close_candidate", "adjusted_chart_volume",
-    "adjusted_chart_row_present", "adjusted_to_raw_close_ratio",
+    "adjusted_chart_row_present", "adjusted_to_input_close_ratio",
     "adjustment_source", "adjustment_status", "source_response_sha256",
     "eligible_for_scoring",
 ]
@@ -91,7 +92,7 @@ QUEUE_COLUMNS = [
 ]
 RESEARCH_COLUMNS = [
     "instrument_code", "symbol", "isin", "daily_history_path",
-    "adjusted_chart_path", "adjustment_events_path", "first_date", "last_date",
+    "adjusted_chart_path", "adjustment_events_path", "history_close_semantics", "first_date", "last_date",
     "history_rows", "adjusted_close_coverage", "input_hashes_json",
     "identity_match_evidence_ref", "rights_evidence_ref", "semantics_evidence_ref",
     "independent_reconciliation_evidence_ref",
@@ -170,10 +171,27 @@ def row_list(payload: Any) -> tuple[list[dict[str, Any]] | None, str | None]:
 def looks_like_history(payload: Any) -> bool:
     rows, _ = row_list(payload)
     return bool(rows and any(
-        field(r, "dEven", "date", "observation_date", "Date", "date_key") not in (None, "")
-        and field(r, "pClosing", "close_raw", "close", "close_candidate", "adjusted_close_candidate") not in (None, "")
+        field(r, "dEven", "date", "observation_date", "Date", "date_key", "DTYYYYMMDD", "<DTYYYYMMDD>") not in (None, "")
+        and field(r, "pClosing", "close_raw", "close", "CLOSE", "<CLOSE>", "close_candidate", "adjusted_close_candidate") not in (None, "")
         for r in rows[:3]
     ))
+
+
+def classify_price_input_semantics(rows: list[dict[str, Any]], declared: Any) -> str:
+    """Return a conservative semantics label; structure never proves raw-vs-adjusted."""
+    declared_text = str(declared or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if declared_text == "raw_unadjusted":
+        return "raw_unadjusted"
+    if declared_text in {"provider_adjusted", "adjusted"}:
+        return "provider_adjusted"
+    if declared_text in {"unknown", "unknown_unverified", ""}:
+        pass
+    # This is diagnostic only: these names hint at a raw TSETMC contract, but do not
+    # constitute proof that the stored series is unadjusted.
+    sample = rows[: min(20, len(rows))]
+    if sample and any("pClosing" in row for row in sample):
+        return "tsetmc_pClosing_candidate_unverified"
+    return "unknown_unverified"
 
 
 def read_payload(path: Path) -> Any:
@@ -316,12 +334,12 @@ def audit_history(rows: list[dict[str, Any]]) -> dict[str, Any]:
     order: list[date] = []
     bad_date = bad_close = bad_optional = bad_ohlc = 0
     for i, raw in enumerate(rows):
-        d = parse_date(field(raw, "dEven", "date", "observation_date", "Date", "date_key"))
-        close_raw = field(raw, "pClosing", "close_raw", "close", "close_candidate")
-        open_raw = field(raw, "priceFirst", "open_raw", "open", "open_candidate")
-        high_raw = field(raw, "priceMax", "high_raw", "high", "high_candidate")
-        low_raw = field(raw, "priceMin", "low_raw", "low", "low_candidate")
-        volume_raw = field(raw, "qTotTran5J", "volume_raw", "volume", "volume_candidate")
+        d = parse_date(field(raw, "dEven", "date", "observation_date", "Date", "date_key", "DTYYYYMMDD", "<DTYYYYMMDD>"))
+        close_raw = field(raw, "pClosing", "close_raw", "close", "CLOSE", "<CLOSE>", "close_candidate")
+        open_raw = field(raw, "priceFirst", "open_raw", "open", "OPEN", "<OPEN>", "open_candidate")
+        high_raw = field(raw, "priceMax", "high_raw", "high", "HIGH", "<HIGH>", "high_candidate")
+        low_raw = field(raw, "priceMin", "low_raw", "low", "LOW", "<LOW>", "low_candidate")
+        volume_raw = field(raw, "qTotTran5J", "volume_raw", "volume", "VOL", "<VOL>", "volume", "<VOLUME>", "volume_candidate")
         close, opn = number(close_raw, positive=True), number(open_raw, positive=True)
         high, low = number(high_raw, positive=True), number(low_raw, positive=True)
         volume = number(volume_raw, nonnegative=True)
@@ -403,12 +421,12 @@ def parse_chart(payload: Any) -> dict[date, dict[str, float | None]]:
         if isinstance(values, dict):
             d = parse_date(field(values, "date", "dEven", "observation_date") or key)
             row = {
-                "open": number(field(values, "open_adj", "adjusted_open", "open"), positive=True),
-                "high": number(field(values, "high_adj", "adjusted_high", "high"), positive=True),
-                "low": number(field(values, "low_adj", "adjusted_low", "low"), positive=True),
+                "open": number(field(values, "open_adj", "adjusted_open", "OPEN", "<OPEN>", "open"), positive=True),
+                "high": number(field(values, "high_adj", "adjusted_high", "HIGH", "<HIGH>", "high"), positive=True),
+                "low": number(field(values, "low_adj", "adjusted_low", "LOW", "<LOW>", "low"), positive=True),
                 "last": number(field(values, "last_adj", "adjusted_last", "last"), positive=True),
                 "volume": number(field(values, "chart_volume", "volume"), nonnegative=True),
-                "close": number(field(values, "close_adj", "adjusted_close", "close"), positive=True),
+                "close": number(field(values, "close_adj", "adjusted_close", "CLOSE", "<CLOSE>", "close"), positive=True),
             }
         elif isinstance(values, (list, tuple)) and len(values) >= 7:
             d = parse_date(key if key not in (None, "") else values[0])
@@ -588,9 +606,15 @@ def run_pipeline(
         hash_json = json.dumps(input_hashes, sort_keys=True, separators=(",", ":"))
 
         h = None
+        raw_history_rows: list[dict[str, Any]] = []
+        price_semantics = "unknown_unverified"
         if "daily_history_path" in payloads:
             try:
-                h = audit_history(extract_history(payloads["daily_history_path"]))
+                raw_history_rows = extract_history(payloads["daily_history_path"])
+                price_semantics = classify_price_input_semantics(
+                    raw_history_rows, item.get("history_close_semantics")
+                )
+                h = audit_history(raw_history_rows)
             except PipelineError as exc:
                 errors.append(f"history_parse:{exc}")
         chart = {}
@@ -611,7 +635,8 @@ def run_pipeline(
         coverage = len(unique_dates.intersection(chart)) / len(unique_dates) if unique_dates else 0.0
         ratios = sorted(
             [(d, adj["close"] / row["close"]) for row in (h["rows"] if h else [])
-             if (d := row["date_obj"]) and row["close"] and row["close"] > 0
+             if price_semantics == "raw_unadjusted"
+             and (d := row["date_obj"]) and row["close"] and row["close"] > 0
              and (adj := chart.get(d)) and adj["close"] > 0],
             key=lambda x: x[0],
         )
@@ -633,27 +658,30 @@ def run_pipeline(
                 duplicate = bool(d and len(h["dates_seen"].get(d, [])) > 1)
                 row_reasons = row["reasons"] + (["DUPLICATE_HISTORY_DATE"] if duplicate else [])
                 raw = row["raw"]
-                raw_close = field(raw, "pClosing", "close_raw", "close", "close_candidate")
-                raw_open = field(raw, "priceFirst", "open_raw", "open", "open_candidate")
-                raw_high = field(raw, "priceMax", "high_raw", "high", "high_candidate")
-                raw_low = field(raw, "priceMin", "low_raw", "low", "low_candidate")
-                raw_vol = field(raw, "qTotTran5J", "volume_raw", "volume", "volume_candidate")
+                raw_close = field(raw, "pClosing", "close_raw", "close", "CLOSE", "<CLOSE>", "close_candidate")
+                raw_open = field(raw, "priceFirst", "open_raw", "open", "OPEN", "<OPEN>", "open_candidate")
+                raw_high = field(raw, "priceMax", "high_raw", "high", "HIGH", "<HIGH>", "high_candidate")
+                raw_low = field(raw, "priceMin", "low_raw", "low", "LOW", "<LOW>", "low_candidate")
+                raw_vol = field(raw, "qTotTran5J", "volume_raw", "volume", "VOL", "<VOL>", "volume", "<VOLUME>", "volume_candidate")
                 raw_last = field(raw, "pDrCotVal", "last_raw", "last")
                 raw_prev = field(raw, "priceYesterday", "prev_close_raw", "previous_close")
                 raw_turnover = field(raw, "qTotCap", "trade_value_raw", "turnover")
                 raw_out.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin, "date": row["date"],
-                    "close_raw": raw_close, "last_raw": raw_last, "open_raw": raw_open,
-                    "high_raw": raw_high, "low_raw": raw_low, "prev_close_raw": raw_prev,
-                    "volume_raw": raw_vol, "trade_value_raw": raw_turnover,
+                    "close_input_candidate": raw_close, "last_input_candidate": raw_last,
+                    "open_input_candidate": raw_open, "high_input_candidate": raw_high,
+                    "low_input_candidate": raw_low, "prev_close_input_candidate": raw_prev,
+                    "volume_input_candidate": raw_vol, "trade_value_input_candidate": raw_turnover,
+                    "price_input_semantics": price_semantics,
                     "source_response_sha256": input_hashes.get("daily_history_path", ""),
                     "normalization_status": "candidate_quarantined_raw_history" if row_reasons or not identity_ok else "candidate_raw_unapproved",
                     "eligible_for_scoring": False,
                 })
                 quality_out.append({
                     "instrument_code": code, "symbol": symbol, "date": row["date"],
-                    "raw_close": raw_close, "raw_open": raw_open, "raw_high": raw_high,
-                    "raw_low": raw_low, "raw_volume": raw_vol,
+                    "input_close_candidate": raw_close, "input_open_candidate": raw_open,
+                    "input_high_candidate": raw_high, "input_low_candidate": raw_low,
+                    "input_volume_candidate": raw_vol, "price_input_semantics": price_semantics,
                     "row_status": "QUARANTINE" if row_reasons else "VALID_STRUCTURAL_CANDIDATE",
                     "reason_codes": ";".join(row_reasons),
                 })
@@ -661,9 +689,10 @@ def run_pipeline(
                 ratio = adj["close"] / row["close"] if adj and row["close"] else ""
                 adjusted_out.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin, "date": row["date"],
-                    "raw_close": raw_close, "raw_last": raw_last, "raw_open": raw_open,
-                    "raw_high": raw_high, "raw_low": raw_low, "raw_volume": raw_vol,
-                    "raw_turnover": raw_turnover,
+                    "close_input_candidate": raw_close, "last_input_candidate": raw_last,
+                    "open_input_candidate": raw_open, "high_input_candidate": raw_high,
+                    "low_input_candidate": raw_low, "volume_input_candidate": raw_vol,
+                    "turnover_input_candidate": raw_turnover, "price_input_semantics": price_semantics,
                     "adjusted_open_candidate": adj["open"] if adj else "",
                     "adjusted_high_candidate": adj["high"] if adj else "",
                     "adjusted_low_candidate": adj["low"] if adj else "",
@@ -671,7 +700,7 @@ def run_pipeline(
                     "adjusted_close_candidate": adj["close"] if adj else "",
                     "adjusted_chart_volume": adj["volume"] if adj else "",
                     "adjusted_chart_row_present": bool(adj),
-                    "adjusted_to_raw_close_ratio": ratio,
+                    "adjusted_to_input_close_ratio": ratio,
                     "adjustment_source": "tsetmc_legacy_chart_a1",
                     "adjustment_status": "provider_supplied_unvalidated" if adj else "missing_adjusted_chart_row",
                     "source_response_sha256": input_hashes.get("adjusted_chart_path", ""),
@@ -702,13 +731,18 @@ def run_pipeline(
         short_history = bool(h and h["valid_history_rows"] < min_history)
         low_coverage = not h or not chart or coverage < min_coverage
         ratio_bad = bool(outlier_count or step_count)
-        event_bad = bool(event_unrecognized)
+        event_payload_missing = paths["adjustment_events_path"] is None or "adjustment_events_path" not in payloads
+        event_bad = bool(event_unrecognized or event_payload_missing or event_error)
         rights_ref = evidence_reference_ok(item.get("rights_evidence_ref"), base)
         semantics_ref = evidence_reference_ok(item.get("semantics_evidence_ref"), base)
         independent_ref = evidence_reference_ok(item.get("independent_reconciliation_evidence_ref"), base)
         actions_ref = evidence_reference_ok(item.get("corporate_action_completeness_evidence_ref"), base)
         rights_ok = str(item.get("rights_status", "unreviewed")).lower() in {"approved", "verified", "permitted"} and rights_ref
-        semantics_ok = flag(item, "semantics_verified") and semantics_ref
+        semantics_ok = (
+            flag(item, "semantics_verified")
+            and semantics_ref
+            and price_semantics == "raw_unadjusted"
+        )
         independent_ok = flag(item, "independent_reconciliation_passed") and independent_ref
         actions_ok = flag(item, "corporate_action_completeness_verified") and actions_ref
         all_evidence = identity_ok and rights_ok and semantics_ok and independent_ok and actions_ok
@@ -731,6 +765,8 @@ def run_pipeline(
             reasons.append("EVENT_DATE_FIELDS_UNRESOLVED")
         if not rights_ok:
             reasons.append("USAGE_RIGHTS_NOT_VERIFIED_OR_EVIDENCE_REFERENCE_MISSING")
+        if price_semantics != "raw_unadjusted":
+            reasons.append("PRICE_INPUT_SEMANTICS_NOT_EXPLICITLY_RAW_UNADJUSTED")
         if not semantics_ok:
             reasons.append("PRICE_SEMANTICS_OR_UNITS_NOT_VERIFIED_OR_EVIDENCE_REFERENCE_MISSING")
         if not independent_ok:
@@ -754,6 +790,7 @@ def run_pipeline(
 
         decision = {
             "instrument_code": code, "symbol": symbol, "isin": isin,
+            "price_input_semantics": price_semantics,
             "identity_verified": identity_ok, "decision_status": status,
             "decision_reason_codes": ";".join(reasons or ["TECHNICAL_AND_EVIDENCE_GATES_PASSED"]),
             "input_hashes_json": hash_json, "history_rows": h["history_rows"] if h else 0,
@@ -805,6 +842,7 @@ def run_pipeline(
                 "history_rows": h["history_rows"], "adjusted_close_coverage": round(coverage, 6),
                 "input_hashes_json": hash_json,
                 "identity_match_evidence_ref": item.get("identity_match_evidence_ref", ""),
+                "history_close_semantics": price_semantics,
                 "rights_evidence_ref": item.get("rights_evidence_ref", ""),
                 "semantics_evidence_ref": item.get("semantics_evidence_ref", ""),
                 "independent_reconciliation_evidence_ref": item.get("independent_reconciliation_evidence_ref", ""),
