@@ -112,3 +112,22 @@ python3 "$INSTALL" --repo-root "$REPO" --data-root "$HOME/marketsage-data"
 ```
 
 This copies the existing TSETMC corpus to `~/marketsage-data/tsetmc/tsetmc_history_pipeline/`, persists the known multi-asset run from `/tmp` if it is still present, records the existing TSETMC acceptance report, and generates `registry/local_data_index.json` plus local per-file SHA-256 manifests. It **does not merge different instruments into a misleading single CSV**; a common canonical registry/schema comes first, and normalized observations remain distinct where their units, time semantics, or adjustment status are not yet comparable. The script never deletes its source. If the old multi-asset folder has already disappeared from `/tmp`, the index records that fact rather than pretending the output was persisted.
+
+## Downloads tool triage (2026-10-23)
+
+The owner supplied a Downloads listing and the relevant Python files for static review. The selected canonical TSETMC sequence is:
+1. `adjust_pipeline_v025.py` (v0.2.5): newest adjustment/evidence engine. Its v0.2.5 change makes the exact ISIN → insCode map from preferred `instrument_details.jsonl` authoritative, correcting the earlier false-ambiguity problem caused by weak symbol/name aliases. It operates offline and keeps generated adjusted series as unapproved candidates.
+2. `audit_tsetmc_forensic_v3.py`: whole-corpus read-only raw/normalized/event-edge forensic audit with calendar/gap diagnostics and placebo controls.
+3. `build_tsetmc_research_candidates_v1_1.py`: newest candidate builder; unlike v1.0 it can retain a valid close-only candidate when OHLC is not eligible, without fabricating OHLC.
+4. `run_tsetmc_research_pipeline_v1_1.py`: orchestrates inventory, forensic re-use/rebuild, candidate build and validation.
+5. `audit_tsetmc_research_candidate_suite_v1.py`: final QA once after the complete research-pipeline run.
+   
+**Known mismatch in the downloaded v1.1 orchestrator:** its default candidate helper lookup still names `build_tsetmc_research_candidates_v1.py`. Always pass the explicit v1.1 builder path, e.g. `--candidate-script ~/Downloads/build_tsetmc_research_candidates_v1_1.py`. The orchestration script's prior-run auto-discovery also doesn't explicitly list `/tmp/marketsage-tsetmc-adjustments`; supply the exact prior v0.2.5 run directory with `--prior-run` if that is where the matching adjustment result lives. Before reuse, validate that its `input_manifest.csv` hashes match the current normalized history and event inputs.
+
+Use `audit_tsetmc_raw_normalization_v2.py`, not the earlier normalization audit: v2 adds the raw-source date key `dEvenRLC`. Keep `marketsage_multi_asset_bootstrap_v1.py` as the collector but do not rerun it just to reproduce the already-recorded run under `/tmp/marketsage-multi-asset-collection/run_20261022T185104629734Z`. Use existing `reconcile_tsetmc_corpus.py` results unless relevant inputs change.
+
+Treat these files as superseded for future runs: `adjust_pipeline.py` v0.2.0, `adjust_pipeline_v021.py`–`adjust_pipeline_v024.py`, `build_tsetmc_research_candidates_v1.py`, `run_tsetmc_research_pipeline.py` v1.0, and `audit_tsetmc_raw_normalization.py`. `patch_tsetmc_corpus_semantics.py` modifies source code and must not be reapplied without reviewing its diff/backup. The older/parallel `stage_tsetmc_corpus_acceptance.py` is not part of the canonical sequence because it overlaps the current decision/queue outputs.
+
+The recorded integrated runner `run_20261023T095517508480Z` is **not the full-corpus acceptance result**: it found only 47 instruments, quarantined all 47, and produced zero research features / labels, while previous corpus inventory notes record approximately 1,220 normalized histories. Do not rerun that same discovery path. Diagnose/fix its instrument coverage only if this runner is retained; otherwise use the existing full-corpus v0.2.5 → forensic-v3 → candidate-v1.1 workflow above.
+
+The ZIPs and patches in the owner's listing are archival-only unless their exact content is inspected and a specific missing change is identified. Do not unpack/run overlapping package versions or apply successive patch files blindly.
