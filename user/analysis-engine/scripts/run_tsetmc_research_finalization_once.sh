@@ -122,7 +122,7 @@ python3 -u "$PIPELINE" \
   --output-root "$PIPE_ROOT"
 
 # Block empty candidate outputs; upstream validation currently allows an empty manifest.
-PIPELINE_RUN="$(find "$PIPE_ROOT" -mindepth 2 -maxdepth 2 -type f -name 'pipeline_report.json' -printf '%h\\n' | sort | tail -n 1)"
+PIPELINE_RUN="$(find "$PIPE_ROOT" -mindepth 2 -maxdepth 2 -type f -name 'pipeline_report.json' -printf '%h\n' | sort | tail -n 1)"
 VALIDATION_REPORT="$PIPELINE_RUN/validation_report.json"
 if [ -z "$PIPELINE_RUN" ] || [ ! -s "$VALIDATION_REPORT" ]; then
   echo "ERROR: pipeline validation report is missing; final QA was not run."
@@ -150,7 +150,7 @@ if not all(checks.values()):
         "checks": checks,
         "instruction": "Do not rerun audits individually. Resolve this run's specific pipeline blocker before another full pass.",
     }
-    blocker_path.write_text(json.dumps(blocker, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    blocker_path.write_text(json.dumps(blocker, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("ERROR: final QA not run because the research outputs are empty or incomplete.")
     raise SystemExit(31)
 PY
