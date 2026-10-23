@@ -196,3 +196,22 @@ Corrected runner commit: `f45ffa7bba9b1f30072997b7dcb4edacff40c1be`. This justif
 The next attempt stopped before any data-processing stage because the runner's generic directory loop included `DETAILS`, even though `DETAILS` is the `instrument_details.jsonl` **file**. The log said “required directory missing” for a file that exists; this was a runner guard defect, not missing corpus data. Fixed by checking only repository/corpus/history/raw paths with `-d`, then checking the crosswalk separately with `-s` and a file-specific error message.
 
 Fix commit: `4766c9bea3addad2d79c8d90e90ef59b02561e4a` on `feature/iran-live-data-dashboard`. The previous failed run is preserved; launch the current branch runner once more. No market-data download is needed. This patch has not been merged, and does not approve source semantics, research scoring, or backtesting.
+
+
+### Full-corpus TSETMC finalization result (2026-10-23; completed)
+
+The corrected one-pass runner completed successfully on the existing centralized corpus. Run root: `~/marketsage-data/tsetmc-research/finalize_14050801T182936Z`. Final summary: `finalization_summary.json`. No market-data network requests were made and raw inputs were not overwritten.
+
+Observed stage-1 input evidence:
+- 1,220 raw `history_archive.json` files and 1,220 normalized history CSVs.
+- Authoritative identity crosswalk: 1,220 valid ISIN→insCode mappings, zero conflicts.
+- v0.2.5 read 1,220 history instruments and 1,677,202 history rows.
+- v0.2.5 instrument decisions: 1,086 `KEEP_RAW_QUARANTINE_ADJUSTMENT`, 47 `QUARANTINE`, 87 `REPROCESS`; it emitted zero production research series/features/labels by design.
+
+Stage-2 candidate pipeline report: `research-pipeline/run_20261023T184756Z/pipeline_report.json`; validation report status `PASSED`. It produced 128 candidate series, 167,912 candidate feature rows, and 151,784 forward-label rows. The final internal QA report `research-pipeline/run_20261023T184756Z/final_qa/research_acceptance_suite.json` reports `PASS_INTERNAL_QA_RESEARCH_ONLY`, 21/21 checks passed, two full-OHLC series and 126 close-only series, zero formula mismatches for features and labels, and 1,093 reprocessing-triage rows.
+
+Interpretation and remaining blockers:
+- This closes the *mechanical full-corpus ingestion, candidate generation, and internal output-integrity QA run*; no repeat of this full pipeline or market-data download is needed unless a concrete defect is found.
+- It does **not** establish that all adjustment factors are economically correct, that official corporate-action/event semantics or licensing are accepted, that dividends/total return or volume adjustment are handled correctly, or that every historical date is explained by authoritative trading-calendar/halt evidence.
+- The candidate CSV deliberately has `research_only=1`, `adjusted_returns_allowed=0`, `scoring_allowed=0`, `backtest_approved=0`. Production scoring, adjusted-return approval, and backtesting remain disabled. No strategy backtest was run.
+- The runner type-check defect was fixed in commit `4766c9bea3addad2d79c8d90e90ef59b02561e4a`; this successful run is the evidence that the fix works end-to-end.
