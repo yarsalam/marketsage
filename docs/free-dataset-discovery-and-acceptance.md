@@ -438,6 +438,18 @@ The owner subsequently printed the per-series counters and largest-change dates 
 
 These three series account for all 48 observed adjacent-observation changes with absolute magnitude at least 100% (44 IQD, 3 silver, 1 Tether). The report indicates that the dates and positive numeric values passed structural parsing, but this does not make the changes economically valid. IQD’s 373-day gap, plus 84-day gaps in silver, Tether and also the `bitcoin` candidate, mean some comparisons can span long periods rather than a single session. For that reason, change counters are anomaly triage, not daily-return validation.
 
+
+
+### Manual adjacent-observation inspection (owner output, 2026-10-23)
+
+The owner inspected the actual immediately preceding and flagged observations from the local normalized CSV. To avoid committing raw price rows, this repository records only the dates and derived scale/change diagnostics:
+
+- **`iqd`:** three inspected transitions were on 2016-02-14, 2017-04-02, and 2017-12-30, with neighboring dates 1, 4, and 3 calendar days apart. The reported successive-value scale ratios were approximately 854x, 583x, and 1,030x respectively. Their scale factors are not consistent with one simple fixed unit multiplier. Treat this series as a probable schema/scale discontinuity until source semantics and an independent reference explain it.
+- **`silver`:** transitions on 2021-08-11 and 2021-08-30 were approximately 24.9x and 26.0x; the 2022-09-30 transition was approximately 9.9x. The repetition of roughly 25x changes and a distinct later factor suggests a unit/schema change or mixed semantics is plausible, but does not prove which explanation is correct.
+- **`tether`:** the 2021-06-30 observation fell from the prior day's scale to a value of 1; the following day reverted to the earlier roughly 25-thousand scale. This one-day isolated value is strongly suspicious as a sentinel, bad observation, or schema/scale inconsistency. Do not silently replace it or forward-fill the previous observation.
+
+These inspections strengthen the exclusion decision but do not establish a root cause. No automatic correction, scaling, row deletion, or adjusted-price transformation is approved. Keep all three series out of feature generation until their provider key meanings, units/quote convention, source update history, and independent reference comparison are resolved. The raw values remain only in the owner's local file and were not added to Git.
+
 **Current handling:** isolate `iqd`, `silver`, and `tether` from feature generation pending inspection of the immediately preceding/current local observations and independent reconciliation. Also review the 84-day Bitcoin gap as a coverage issue, even though its report contains no >=20% adjacent-observation change. Do not auto-delete these rows or infer a fix without checking quote scale/unit, key meaning, historical gaps, and an independent reference. All source/scoring/backtest approval flags remain false.
 
 This audit is local descriptive QA only. It does not establish economic correctness, coverage completeness, source lineage, data-use rights or predictive value. `source_approved=false`, `eligible_for_scoring=false`, `adjusted_returns_approved=false`, and `backtest_approved=false` remain unchanged.
