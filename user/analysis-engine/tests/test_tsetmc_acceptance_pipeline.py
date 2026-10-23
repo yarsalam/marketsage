@@ -188,6 +188,38 @@ def test_standard_tsetmc_angle_bracket_csv_headers_are_recognized_but_semantics_
     assert classify_price_input_semantics([{"dEven": 20200101, "pClosing": 100}], "") == "tsetmc_pClosing_candidate_unverified"
 
 
+def test_long_history_gaps_are_quarantined_and_reported_without_filling(tmp_path: Path) -> None:
+    manifest, inputs = _fixture(tmp_path / "input")
+    daily_path, chart_path = inputs[0], inputs[1]
+    payload = json.loads(daily_path.read_text(encoding="utf-8"))
+    rows = payload["closingPriceDaily"]
+    kept = rows[:150] + rows[195:]
+    keep_dates = {str(row["dEven"]) for row in kept}
+    payload["closingPriceDaily"] = kept
+    daily_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    chart = json.loads(chart_path.read_text(encoding="utf-8"))
+    chart_path.write_text(json.dumps({day: row for day, row in chart.items() if day in keep_dates}), encoding="utf-8")
+
+    summary = run_pipeline(load_manifest(manifest), manifest_path=manifest, output_root=tmp_path / "out", min_history=252)
+    out = Path(summary["output_dir"])
+    with (out / "instrument_decisions.csv").open(encoding="utf-8", newline="") as f:
+        decision = next(csv.DictReader(f))
+    assert decision["decision_status"] == "quarantine_needs_independent_evidence"
+    assert int(decision["gap_intervals_gt_30_days"]) == 1
+    assert "LONG_HISTORY_GAPS_NEED_CALENDAR_OR_SUSPENSION_REVIEW" in decision["decision_reason_codes"]
+    assert summary["research_eligible_count"] == 0
+    assert summary["research_feature_rows"] == 0
+    assert summary["forward_label_rows"] == 0
+
+    with (out / "history_gap_audit.csv").open(encoding="utf-8", newline="") as f:
+        gaps = list(csv.DictReader(f))
+    long_gaps = [row for row in gaps if row["severity"] == "LONG_GAP_OVER_30_DAYS"]
+    assert len(long_gaps) == 1
+    assert int(long_gaps[0]["calendar_gap_days"]) > 30
+    assert long_gaps[0]["review_status"] == "pending_calendar_suspension_or_missing-data_review"
+
+
 def test_history_audit_flags_invalid_dates_values_duplicate_and_ohlc() -> None:
     result = audit_history([
         {"dEven": 20200101, "pClosing": 100, "priceFirst": 101, "priceMax": 99, "priceMin": 95},
