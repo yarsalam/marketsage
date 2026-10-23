@@ -119,7 +119,7 @@ def test_complete_pipeline_emits_features_and_six_month_labels_only_after_eviden
     assert all(int(row["horizon_calendar_days"]) >= 180 for row in labels)
     assert all(row["instrument_code"] == "46348559193224090" for row in features)
     assert {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs} == before
-    assert (out / "raw_history_candidate.csv").is_file()
+    assert (out / "input_history_candidate.csv").is_file()
     assert (out / "adjusted_candidate_daily.csv").is_file()
     assert (out / "event_reconciliation.csv").is_file()
     assert (out / "adjustment_factor_audit.csv").is_file()
