@@ -17,7 +17,11 @@ directory. The discovery mode recognizes common raw-history JSON/CSV names and
 also looks for observation-date plus close fields in candidate files. For a
 combined CSV with an instrument-code column it splits inventory rows by code.
 Discovery is deliberately conservative about identity: a folder or filename is
-not treated as ISIN evidence.
+not treated as ISIN evidence. If raw and derived files coexist, known raw-history
+filenames receive deterministic priority and alternate file paths/hashes are kept
+in the inventory; equally ranked candidates for the same instrument block acceptance
+instead of being silently merged. Discovery alone cannot assert the selected series
+is raw/unadjusted.
 
 ```bash
 cd ~/projects/marketsage-acceptance
@@ -82,6 +86,7 @@ Each run directory contains:
 | `instrument_decisions.csv` | One decision, reason codes, coverage, gaps and quality counters per instrument |
 | `input_history_candidate.csv` | Input observations under neutral “candidate” names plus declared/inferred semantics; original input stays untouched |
 | `raw_history_quality.csv` | Row-level malformed date/value, duplicate-date and input-OHLC flags |
+| `history_gap_audit.csv` | Every interval over seven calendar days; gaps over 30 days block research until calendar/suspension/missing-data review |
 | `adjusted_candidate_daily.csv` | Separate provider-adjusted candidate values with adjusted-OHLC QA flags and no fallback/fill |
 
 | `event_reconciliation.csv` | Event-date overlap with raw history/chart as evidence, not automatic confirmation |
@@ -103,6 +108,10 @@ automatic correction rules.
 Feature rows and six-month labels are created only if the manifest has complete,
 traceable evidence for identity, source use, semantics/units, independent
 reconciliation and corporate-action completeness and the technical gates pass.
+Input dates are checked for large calendar gaps. Every gap longer than seven days
+is recorded; any gap over 30 calendar days blocks research eligibility until an
+exchange-calendar, suspension/delisting, or missing-collection explanation is
+reviewed. These are triage thresholds, not an assumption that every gap is bad.
 Missing data is never forward-filled. A chronological strategy backtest with
 transaction costs, liquidity, drawdown, baseline comparisons and an untouched
 holdout remains a separate review stage. Production scoring remains disabled by
