@@ -575,7 +575,79 @@
           "reconcile representative observations against an independently reviewed source",
           "verify units, quote conventions, series meaning, stale values and provider corrections",
           "review attribution, data retention and model/commercial usage rights"
-        ]
+        ],
+        "per_series_outlier_triage": {
+          "reported_date": "2026-10-23",
+          "iqd": {
+            "abs_change_ge_20_pct": 158,
+            "abs_change_ge_50_pct": 109,
+            "abs_change_ge_100_pct": 44,
+            "maximum_calendar_gap_days": 373,
+            "largest_reported_change_dates": [
+              {
+                "date": "2017-12-30",
+                "abs_change_pct": "102930.3030"
+              },
+              {
+                "date": "2016-02-14",
+                "abs_change_pct": "85292.8571"
+              },
+              {
+                "date": "2017-04-02",
+                "abs_change_pct": "58190.3226"
+              }
+            ],
+            "disposition": "QUARANTINE_FROM_FEATURES_PENDING_REVIEW"
+          },
+          "silver": {
+            "abs_change_ge_20_pct": 11,
+            "abs_change_ge_50_pct": 6,
+            "abs_change_ge_100_pct": 3,
+            "maximum_calendar_gap_days": 84,
+            "largest_reported_change_dates": [
+              {
+                "date": "2021-08-30",
+                "abs_change_pct": "2493.9024"
+              },
+              {
+                "date": "2021-08-11",
+                "abs_change_pct": "2387.5000"
+              },
+              {
+                "date": "2022-09-30",
+                "abs_change_pct": "893.9634"
+              }
+            ],
+            "disposition": "QUARANTINE_FROM_FEATURES_PENDING_REVIEW"
+          },
+          "tether": {
+            "abs_change_ge_20_pct": 2,
+            "abs_change_ge_50_pct": 2,
+            "abs_change_ge_100_pct": 1,
+            "maximum_calendar_gap_days": 84,
+            "largest_reported_change_dates": [
+              {
+                "date": "2021-07-01",
+                "abs_change_pct": "2536200.0000"
+              },
+              {
+                "date": "2021-06-30",
+                "abs_change_pct": "99.9960"
+              },
+              {
+                "date": "2025-06-12",
+                "abs_change_pct": "10.9105"
+              }
+            ],
+            "disposition": "QUARANTINE_FROM_FEATURES_PENDING_REVIEW"
+          },
+          "bitcoin": {
+            "abs_change_ge_20_pct": 0,
+            "maximum_calendar_gap_days": 84,
+            "disposition": "COVERAGE_REVIEW_REQUIRED"
+          },
+          "interpretation": "Adjacent observed-date change flags; intervals may span many calendar days. These are not proof of invalid observations but block acceptance pending unit/scale, key meaning, gap and independent-reference reconciliation."
+        }
       }
     }
   ]
