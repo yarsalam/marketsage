@@ -199,7 +199,7 @@ def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp
             "cIsin": "IRO1FOLD0001",
         }]
     }), encoding="utf-8")
-    items = discover_manifest(tmp_path / "raw")
+    items = discover_manifest(corpus / "raw")
     assert len(items) == 1
     assert items[0]["instrument_code"] == "46348559193224090"
     assert items[0]["isin"] == "IRO1FOLD0001"
