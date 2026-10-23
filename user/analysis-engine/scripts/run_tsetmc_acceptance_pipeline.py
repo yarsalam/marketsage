@@ -1030,6 +1030,8 @@ def run_pipeline(
         "input_hash_count": len(hashes_all), "decision_status_counts": dict(status_counts),
         "research_eligible_count": len(research_out), "quarantine_count": len(quarantine_out),
         "reprocessing_queue_count": len(queue_out), "aggregate_history_rows": sum(r["history_rows"] for r in decisions),
+        "history_gap_intervals_over_7_days": len(gap_out),
+        "history_gap_intervals_over_30_days": sum(r["severity"] == "LONG_GAP_OVER_30_DAYS" for r in gap_out),
         "aggregate_adjusted_candidate_rows": len(adjusted_out), "event_rows_audited": len(event_out),
         "research_feature_rows": len(features), "forward_label_rows": len(labels),
         "flags": {"raw_inputs_overwritten": False, "network_requests_made": False,
@@ -1037,7 +1039,7 @@ def run_pipeline(
                   "production_scoring_enabled": False, "backtest_run": False},
         "rules": {"minimum_history_rows_for_six_month_research": min_history,
                   "minimum_adjusted_coverage_triage_only": min_coverage,
-                  "adjusted_raw_factor_range_triage_only": [factor_min, factor_max],
+                  "adjusted_to_input_ratio_range_triage_only_when_input_semantics_explicitly_raw": [factor_min, factor_max],
                   "research_acceptance_requires_traceable_identity_rights_semantics_independent_reference_and_corporate_action_evidence": True},
         "limitations": [
             "Local payload acceptance only: this pipeline makes no TSETMC requests.",
