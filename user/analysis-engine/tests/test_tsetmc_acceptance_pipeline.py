@@ -181,8 +181,8 @@ def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp
     adjusted_dir.mkdir(parents=True)
     adjusted_csv = adjusted_dir / "IRO1FOLD0001.adjusted_candidate.csv"
     adjusted_csv.write_text(
-        "date,instrument_code,open_adj,high_adj,low_adj,last_adj,close_adj,chart_volume\\n"
-        "2020-01-01,46348559193224090,98,105,95,100,100,1000\\n",
+        "date,instrument_code,open_adj,high_adj,low_adj,last_adj,close_adj,chart_volume\n"
+        "2020-01-01,46348559193224090,98,105,95,100,100,1000\n",
         encoding="utf-8",
     )
     rows = [
