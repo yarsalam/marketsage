@@ -95,3 +95,20 @@ Recorded rows in the supplied files: AYAR 123; BTCUSDT 184; 18K gold 184; free-m
 ## Update protocol
 
 Every new collection or audit updates this document with: exact source/run ID, durable local path, code commit, row counts, start/end date, structural findings, unresolved contract/licensing checks, and status. Do not write “done,” “fixed,” or “accepted” when only the request succeeded or the test fixture passed.
+
+## One-time local consolidation command
+
+After the change reaches your Git remote, run this once from a terminal. It only fetches the script file into `~/.local/share`; it does **not** check out a branch or touch your working-tree changes. The script itself is offline.
+
+```bash
+set -euo pipefail
+REPO="$HOME/projects/marketsage-acceptance"
+INSTALL="$HOME/.local/share/marketsage/centralize_market_data.py"
+
+mkdir -p "$(dirname "$INSTALL")"
+git -C "$REPO" fetch origin feature/iran-live-data-dashboard
+git -C "$REPO" show "FETCH_HEAD:user/analysis-engine/scripts/centralize_market_data.py" > "$INSTALL"
+python3 "$INSTALL" --repo-root "$REPO" --data-root "$HOME/marketsage-data"
+```
+
+This copies the existing TSETMC corpus to `~/marketsage-data/tsetmc/tsetmc_history_pipeline/`, persists the known multi-asset run from `/tmp` if it is still present, records the existing TSETMC acceptance report, and generates `registry/local_data_index.json` plus local per-file SHA-256 manifests. It **does not merge different instruments into a misleading single CSV**; a common canonical registry/schema comes first, and normalized observations remain distinct where their units, time semantics, or adjustment status are not yet comparable. The script never deletes its source. If the old multi-asset folder has already disappeared from `/tmp`, the index records that fact rather than pretending the output was persisted.
