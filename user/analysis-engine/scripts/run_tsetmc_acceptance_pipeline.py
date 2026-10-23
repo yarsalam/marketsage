@@ -46,7 +46,7 @@ DECISION_COLUMNS = [
     "ohlc_violation_rows", "adjusted_ohlc_violation_rows", "first_date", "last_date", "max_calendar_gap_days",
     "adjusted_chart_rows", "adjusted_close_coverage", "factor_ratio_outlier_rows",
     "factor_step_change_count", "event_rows", "event_dates_unrecognized",
-    "event_dates_exact_history_match", "event_dates_exact_adjusted_chart_match", "raw_history_preserved",
+    "event_dates_exact_history_match", "event_dates_exact_adjusted_chart_match", "input_history_preserved",
     "eligible_for_research", "eligible_for_scoring", "eligible_for_backtest",
 ]
 RAW_COLUMNS = [
@@ -496,13 +496,13 @@ def parse_chart(payload: Any) -> dict[date, dict[str, float | None]]:
     result = {}
     for i, (key, values) in enumerate(items):
         if isinstance(values, dict):
-            d = parse_date(field(values, "date", "dEven", "observation_date") or key)
+            d = parse_date(field(values, "date", "dEven", "observation_date", "Date", "DTYYYYMMDD", "<DTYYYYMMDD>") or key)
             row = {
                 "open": number(field(values, "open_adj", "adjusted_open", "OPEN", "<OPEN>", "open"), positive=True),
                 "high": number(field(values, "high_adj", "adjusted_high", "HIGH", "<HIGH>", "high"), positive=True),
                 "low": number(field(values, "low_adj", "adjusted_low", "LOW", "<LOW>", "low"), positive=True),
                 "last": number(field(values, "last_adj", "adjusted_last", "last"), positive=True),
-                "volume": number(field(values, "chart_volume", "volume"), nonnegative=True),
+                "volume": number(field(values, "chart_volume", "volume", "VOL", "<VOL>", "<VOLUME>"), nonnegative=True),
                 "close": number(field(values, "close_adj", "adjusted_close", "CLOSE", "<CLOSE>", "close"), positive=True),
             }
         elif isinstance(values, (list, tuple)) and len(values) >= 7:
@@ -536,7 +536,7 @@ def parse_events(payload: Any) -> list[dict[str, Any]]:
 
 def event_date(row: dict[str, Any]) -> tuple[date | None, str, str]:
     event_type = str(field(row, "type", "eventType", "cDesc", "desc", "description", "eventName") or "")[:120]
-    for key in ("dEven", "date", "eventDate", "effectiveDate", "dEffective", "date_event", "dEvenDate", "adjustmentDate", "observation_date"):
+    for key in ("dEven", "date", "eventDate", "effectiveDate", "dEffective", "date_event", "dEvenDate", "adjustmentDate", "observation_date", "Date", "DTYYYYMMDD", "<DTYYYYMMDD>"):
         if row.get(key) not in (None, ""):
             d = parse_date(row[key])
             if d:
@@ -773,7 +773,7 @@ def run_pipeline(
                     "volume_input_candidate": raw_vol, "trade_value_input_candidate": raw_turnover,
                     "price_input_semantics": price_semantics,
                     "source_response_sha256": input_hashes.get("daily_history_path", ""),
-                    "normalization_status": "candidate_quarantined_raw_history" if row_reasons or not identity_ok else "candidate_raw_unapproved",
+                    "normalization_status": "candidate_quarantined_input_history" if row_reasons or not identity_ok else "candidate_input_unapproved",
                     "eligible_for_scoring": False,
                 })
                 quality_out.append({
@@ -929,7 +929,7 @@ def run_pipeline(
             "adjusted_chart_rows": len(chart), "adjusted_close_coverage": round(coverage, 6),
             "factor_ratio_outlier_rows": outlier_count, "factor_step_change_count": step_count,
             "event_rows": len(event_list), "event_dates_unrecognized": event_unrecognized,
-            "event_dates_exact_history_match": event_exact, "event_dates_exact_adjusted_chart_match": event_chart_exact, "raw_history_preserved": True,
+            "event_dates_exact_history_match": event_exact, "event_dates_exact_adjusted_chart_match": event_chart_exact, "input_history_preserved": True,
             "eligible_for_research": eligible, "eligible_for_scoring": False,
             "eligible_for_backtest": eligible,
         }
@@ -1000,7 +1000,8 @@ def run_pipeline(
         "mode": "local_offline_acceptance_pipeline", "source_id": SOURCE_ID,
         "input_manifest": str(manifest_path) if manifest_path else None,
         "input_manifest_sha256": file_hash(manifest_path) if manifest_path and manifest_path.is_file() else None,
-        "instrument_count": len(decisions), "input_files_read": sum(r["status"] == "read" for r in inventory),
+        "instrument_count": len(decisions), "input_references_read": sum(r["status"] == "read" for r in inventory),
+        "unique_input_files_hashed": len(hashes_all),
         "input_file_read_errors": sum(r["status"] == "error" for r in inventory),
         "input_hash_count": len(hashes_all), "decision_status_counts": dict(status_counts),
         "research_eligible_count": len(research_out), "quarantine_count": len(quarantine_out),
