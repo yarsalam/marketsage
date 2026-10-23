@@ -43,7 +43,7 @@ DECISION_COLUMNS = [
     "valid_history_rows", "unique_history_dates", "invalid_date_rows",
     "invalid_or_nonpositive_close_rows", "invalid_numeric_field_rows",
     "duplicate_history_date_rows", "input_order_inversions", "input_order_status",
-    "ohlc_violation_rows", "adjusted_ohlc_violation_rows", "first_date", "last_date", "max_calendar_gap_days",
+    "ohlc_violation_rows", "gap_intervals_gt_7_days", "gap_intervals_gt_30_days", "adjusted_ohlc_violation_rows", "first_date", "last_date", "max_calendar_gap_days",
     "adjusted_chart_rows", "adjusted_close_coverage", "factor_ratio_outlier_rows",
     "factor_step_change_count", "event_rows", "event_dates_unrecognized",
     "event_dates_exact_history_match", "event_dates_exact_adjusted_chart_match", "input_history_preserved",
@@ -58,6 +58,10 @@ RAW_COLUMNS = [
 QUALITY_COLUMNS = [
     "instrument_code", "symbol", "date", "input_close_candidate", "input_open_candidate", "input_high_candidate",
     "input_low_candidate", "input_volume_candidate", "price_input_semantics", "row_status", "reason_codes",
+]
+HISTORY_GAP_COLUMNS = [
+    "instrument_code", "symbol", "date_before", "date_after", "calendar_gap_days",
+    "severity", "source_response_sha256", "review_status", "required_action",
 ]
 ADJUSTED_COLUMNS = [
     "instrument_code", "symbol", "isin", "date", "close_input_candidate", "last_input_candidate",
@@ -638,7 +642,7 @@ def run_pipeline(
     run_id = datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%S%fZ")
     out = output_root / run_id
     out.mkdir(parents=True, exist_ok=False)
-    decisions, raw_out, quality_out, adjusted_out = [], [], [], []
+    decisions, raw_out, quality_out, adjusted_out, gap_out = [], [], [], [], []
     event_out, factor_out, quarantine_out, queue_out, research_out, inventory = [], [], [], [], [], []
     cache: dict[str, Any] = {}
     payload_indexes: dict[str, Any] = {}
@@ -731,6 +735,20 @@ def run_pipeline(
 
         unique_dates = set(h["unique_dates"]) if h else set()
         coverage = len(unique_dates.intersection(chart)) / len(unique_dates) if unique_dates else 0.0
+        if h:
+            unique_ordered_dates = sorted(h["unique_dates"])
+            for before, after in zip(unique_ordered_dates, unique_ordered_dates[1:]):
+                gap_days = (after - before).days
+                if gap_days > 7:
+                    gap_out.append({
+                        "instrument_code": code, "symbol": symbol,
+                        "date_before": before.isoformat(), "date_after": after.isoformat(),
+                        "calendar_gap_days": gap_days,
+                        "severity": "LONG_GAP_OVER_30_DAYS" if gap_days > 30 else "GAP_OVER_7_DAYS",
+                        "source_response_sha256": input_hashes.get("daily_history_path", ""),
+                        "review_status": "pending_calendar_suspension_or_missing-data_review",
+                        "required_action": "Determine exchange calendar, suspension/delisting, or missing collection; do not forward-fill or infer prices.",
+                    })
         ratios = sorted(
             [(d, adj["close"] / row["close"]) for row in (h["rows"] if h else [])
              if price_semantics == "raw_unadjusted"
@@ -837,6 +855,7 @@ def run_pipeline(
                 })
 
         bad_adjusted_history = adjusted_ohlc_violation_rows > 0
+        long_gap_bad = bool(h and h["gaps_gt_30_days"] > 0)
         bad_history = bool(h and (
             h["invalid_date_rows"] or h["invalid_or_nonpositive_close_rows"]
             or h["invalid_numeric_field_rows"] or h["duplicate_history_date_rows"]
@@ -871,6 +890,8 @@ def run_pipeline(
             reasons.append("RAW_HISTORY_STRUCTURAL_DEFECTS")
         if bad_adjusted_history:
             reasons.append("ADJUSTED_CHART_OHLC_STRUCTURAL_DEFECTS")
+        if long_gap_bad:
+            reasons.append("LONG_HISTORY_GAPS_NEED_CALENDAR_OR_SUSPENSION_REVIEW")
         if short_history:
             reasons.append("HISTORY_TOO_SHORT_FOR_SIX_MONTH_RESEARCH")
         if low_coverage:
@@ -896,7 +917,7 @@ def run_pipeline(
 
         if errors or bad_history or bad_adjusted_history:
             status = "needs_reprocessing"
-        elif ratio_bad or event_bad or not identity_ok:
+        elif ratio_bad or event_bad or not identity_ok or long_gap_bad:
             status = "quarantine_needs_independent_evidence"
         elif low_coverage:
             status = "needs_reprocessing"
@@ -906,7 +927,7 @@ def run_pipeline(
             status = "retain_candidate_pending_evidence"
         else:
             status = "research_eligible_after_explicit_evidence_review"
-        eligible = bool(status == "research_eligible_after_explicit_evidence_review" and all_evidence and h and not bad_history and not bad_adjusted_history and not short_history and not low_coverage and not ratio_bad and not errors)
+        eligible = bool(status == "research_eligible_after_explicit_evidence_review" and all_evidence and h and not bad_history and not bad_adjusted_history and not long_gap_bad and not short_history and not low_coverage and not ratio_bad and not errors)
 
         decision = {
             "instrument_code": code, "symbol": symbol, "isin": isin,
@@ -923,6 +944,8 @@ def run_pipeline(
             "input_order_inversions": h["input_order_inversions"] if h else 0,
             "input_order_status": h["input_order_status"] if h else "unknown",
             "ohlc_violation_rows": h["ohlc_violation_rows"] if h else 0,
+            "gap_intervals_gt_7_days": h["gaps_gt_7_days"] if h else 0,
+            "gap_intervals_gt_30_days": h["gaps_gt_30_days"] if h else 0,
             "adjusted_ohlc_violation_rows": adjusted_ohlc_violation_rows,
             "first_date": h["first_date"] if h else "", "last_date": h["last_date"] if h else "",
             "max_calendar_gap_days": h["max_calendar_gap_days"] if h else 0,
@@ -944,7 +967,7 @@ def run_pipeline(
                 "required_action": "Resolve reason codes using reviewed evidence; do not retry unless input hash or evidence changes.",
                 "resolution_status": "open",
             })
-            stage = "history_quality_or_input" if errors or bad_history else "adjusted_history_quality" if bad_adjusted_history else "adjustment_factor_audit" if ratio_bad else "adjusted_history_coverage" if low_coverage else "event_reconciliation" if event_bad else "source_evidence"
+            stage = "history_quality_or_input" if errors or bad_history else "adjusted_history_quality" if bad_adjusted_history else "history_gap_reconciliation" if long_gap_bad else "adjustment_factor_audit" if ratio_bad else "adjusted_history_coverage" if low_coverage else "event_reconciliation" if event_bad else "source_evidence"
             queue_out.append({
                 "instrument_code": code, "symbol": symbol, "stage": stage,
                 "reason_code": reason_text,
@@ -979,6 +1002,7 @@ def run_pipeline(
     write_csv(out / "instrument_decisions.csv", DECISION_COLUMNS, decisions)
     write_csv(out / "input_history_candidate.csv", RAW_COLUMNS, raw_out)
     write_csv(out / "raw_history_quality.csv", QUALITY_COLUMNS, quality_out)
+    write_csv(out / "history_gap_audit.csv", HISTORY_GAP_COLUMNS, gap_out)
     write_csv(out / "adjusted_candidate_daily.csv", ADJUSTED_COLUMNS, adjusted_out)
     write_csv(out / "event_reconciliation.csv", EVENT_COLUMNS, event_out)
     write_csv(out / "adjustment_factor_audit.csv", FACTOR_COLUMNS, factor_out)
