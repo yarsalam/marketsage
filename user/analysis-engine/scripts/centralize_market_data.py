@@ -229,6 +229,56 @@ def main() -> int:
             data_root / "multi-asset-collection" / args.multi_asset_run.name,
         ),
     ]
+    # Persist existing offline adjustment/research outputs too. These are source
+    # artifacts from earlier work, not instructions to rerun their pipelines.
+    # Missing optional output roots are recorded but never trigger new collection.
+    tmp_root = Path("/tmp")
+    known_run_roots = [
+        ("tsetmc_adjustment_v025", tmp_root / "marketsage-tsetmc-adjustments"),
+        ("tsetmc_adjust_v025", tmp_root / "marketsage-tsetmc-adjust-v025"),
+        ("tsetmc_adjust_legacy", tmp_root / "marketsage-tsetmc-adjust"),
+        ("tsetmc_acceptance_legacy", tmp_root / "tsetmc_acceptance_runs"),
+        ("tsetmc_research_pipeline", tmp_root / "marketsage-tsetmc-research-pipeline"),
+        ("tsetmc_research_pipeline_v1_1", tmp_root / "marketsage-tsetmc-research-pipeline-v1_1"),
+    ]
+    seen_run_paths: set[Path] = set()
+    for key, source in known_run_roots:
+        try:
+            source_resolved = source.resolve()
+        except OSError:
+            source_resolved = source
+        if source_resolved in seen_run_paths:
+            continue
+        seen_run_paths.add(source_resolved)
+        specs.append((
+            key,
+            source,
+            data_root / "tsetmc-research" / "previous_runs" / source.name,
+        ))
+
+    # Preserve prior compatible forensic reports and any other explicitly versioned
+    # v0.2.5/research run roots, without crawling the whole /tmp tree.
+    glob_specs = [
+        ("tsetmc_forensic", "marketsage-tsetmc-forensic-v3*"),
+        ("tsetmc_adjust_versioned", "marketsage-tsetmc-adjust-*"),
+        ("tsetmc_research_versioned", "marketsage-tsetmc-research-pipeline*"),
+    ]
+    for prefix, pattern in glob_specs:
+        for source in sorted(tmp_root.glob(pattern)):
+            try:
+                source_resolved = source.resolve()
+            except OSError:
+                source_resolved = source
+            if source_resolved in seen_run_paths or not source.is_dir():
+                continue
+            seen_run_paths.add(source_resolved)
+            safe_name = "".join(c if c.isalnum() or c in "._-" else "_" for c in source.name)
+            specs.append((
+                f"{prefix}_{safe_name}",
+                source,
+                data_root / "tsetmc-research" / "previous_runs" / safe_name,
+            ))
+
     if args.streamdata_dir is not None:
         stream_source = args.streamdata_dir.expanduser().resolve()
         specs.append(
@@ -272,6 +322,8 @@ def main() -> int:
             "This index and its hash manifests are local operational metadata; do not commit them.",
             "Collected does not mean research-accepted or scoring-approved.",
             "The original source trees are retained; this tool only adds verified copies.",
+            "Existing /tmp adjustment, forensic, and research-run outputs are copied for preservation; no pipeline is rerun.",
+            "Missing optional /tmp run roots are indexed as missing, not re-downloaded.",
         ],
     }
     index_path = registry_dir / "local_data_index.json"
@@ -287,7 +339,7 @@ def main() -> int:
             f"bytes={result['total_bytes']}"
         )
         if result["status"] in {"source_missing", "source_empty"}:
-            print(f"  SOURCE NOT COPIED: {result['source_path']}")
+            print(f"  SOURCE NOT COPIED (no rerun attempted): {result['source_path']}")
     print(
         "tsetmc_acceptance: "
         f"status={acceptance['status']} path={acceptance.get('path', '')}"
