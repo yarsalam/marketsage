@@ -43,7 +43,7 @@ DECISION_COLUMNS = [
     "valid_history_rows", "unique_history_dates", "invalid_date_rows",
     "invalid_or_nonpositive_close_rows", "invalid_numeric_field_rows",
     "duplicate_history_date_rows", "input_order_inversions", "input_order_status",
-    "ohlc_violation_rows", "first_date", "last_date", "max_calendar_gap_days",
+    "ohlc_violation_rows", "adjusted_ohlc_violation_rows", "first_date", "last_date", "max_calendar_gap_days",
     "adjusted_chart_rows", "adjusted_close_coverage", "factor_ratio_outlier_rows",
     "factor_step_change_count", "event_rows", "event_dates_unrecognized",
     "event_dates_exact_history_match", "raw_history_preserved",
@@ -66,7 +66,7 @@ ADJUSTED_COLUMNS = [
     "adjusted_open_candidate", "adjusted_high_candidate",
     "adjusted_low_candidate", "adjusted_last_candidate",
     "adjusted_close_candidate", "adjusted_chart_volume",
-    "adjusted_chart_row_present", "adjusted_to_input_close_ratio",
+    "adjusted_chart_row_present", "adjusted_ohlc_status", "adjusted_ohlc_reason_codes", "adjusted_to_input_close_ratio",
     "adjustment_source", "adjustment_status", "source_response_sha256",
     "eligible_for_scoring",
 ]
@@ -173,7 +173,7 @@ def looks_like_history(payload: Any) -> bool:
     return bool(rows and any(
         field(r, "dEven", "date", "observation_date", "Date", "date_key", "DTYYYYMMDD", "<DTYYYYMMDD>") not in (None, "")
         and field(r, "pClosing", "close_raw", "close", "CLOSE", "<CLOSE>", "close_candidate", "adjusted_close_candidate") not in (None, "")
-        for r in rows[:3]
+        for r in rows[:20]
     ))
 
 
@@ -323,8 +323,8 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                 rows.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin,
                     "daily_history_path": str(path.resolve()),
-                    "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json")),
-                    "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json")),
+                    "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv")),
+                    "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
                     "_base_dir": str(root.resolve()), "_discovered": True,
                 })
         else:
@@ -397,7 +397,7 @@ def extract_history(payload: Any) -> list[dict[str, Any]]:
     if isinstance(payload, list):
         rows = payload
     elif isinstance(payload, dict):
-        rows = next((payload[k] for k in ("closingPriceDaily", "dailyHistory", "daily_history", "rows") if isinstance(payload.get(k), list)), None)
+        rows = next((payload[k] for k in ("closingPriceDaily", "dailyHistory", "daily_history", "rows", "data", "history") if isinstance(payload.get(k), list)), None)
     else:
         rows = None
     if not isinstance(rows, list) or not rows or any(not isinstance(r, dict) for r in rows):
@@ -597,7 +597,11 @@ def build_features_labels(rows: list[dict[str, Any]], eligible_codes: set[str]) 
             returns.append(closes[i] / closes[i - 1] - 1 if (days[i] - days[i - 1]).days <= 7 else None)
         for i, d in enumerate(days):
             def lagged(n: int) -> float | str:
-                return closes[i] / closes[i - n] - 1 if i >= n and closes[i - n] > 0 else ""
+                if i < n or closes[i - n] <= 0:
+                    return ""
+                if any((days[k] - days[k - 1]).days > 7 for k in range(i - n + 1, i + 1)):
+                    return ""
+                return closes[i] / closes[i - n] - 1
             recent = [r for r in returns[max(1, i - 19):i + 1] if r is not None]
             volatility = statistics.stdev(recent) * math.sqrt(252) if len(recent) >= 20 else ""
             peak = max(closes[max(0, i - 125):i + 1])
@@ -613,7 +617,7 @@ def build_features_labels(rows: list[dict[str, Any]], eligible_codes: set[str]) 
         for _, i in sorted(month_last.items()):
             target_cutoff = add_months(days[i], 6)
             target = next((j for j in range(i + 1, len(days)) if days[j] >= target_cutoff), None)
-            if target is not None:
+            if target is not None and (days[target] - target_cutoff).days <= 7:
                 labels.append({
                     "instrument_code": code, "symbol": symbol,
                     "decision_date": days[i].isoformat(), "target_date": days[target].isoformat(),
@@ -745,7 +749,8 @@ def run_pipeline(
             "factor_max_threshold": factor_max, "interpretation": "PRELIMINARY_TRIAGE_ONLY_NOT_FACTOR_VALIDATION",
         })
 
-        event_unrecognized = event_exact = 0
+        event_unrecognized = event_exact = event_chart_exact = 0
+        adjusted_ohlc_violation_rows = 0
         if h:
             for row in h["rows"]:
                 d = row["date_obj"]
@@ -780,6 +785,17 @@ def run_pipeline(
                     "reason_codes": ";".join(row_reasons),
                 })
                 adj = chart.get(d) if d else None
+                adj_reasons: list[str] = []
+                if adj:
+                    adj_high, adj_low = adj.get("high"), adj.get("low")
+                    adj_open, adj_close = adj.get("open"), adj.get("close")
+                    if adj_high is not None and adj_low is not None and adj_high < adj_low:
+                        adj_reasons.append("ADJUSTED_HIGH_BELOW_LOW")
+                    if adj_high is not None and any(v is not None and adj_high < v for v in (adj_open, adj_close)):
+                        adj_reasons.append("ADJUSTED_HIGH_BELOW_OPEN_OR_CLOSE")
+                    if adj_low is not None and any(v is not None and adj_low > v for v in (adj_open, adj_close)):
+                        adj_reasons.append("ADJUSTED_LOW_ABOVE_OPEN_OR_CLOSE")
+                adjusted_ohlc_violation_rows += int(bool(adj_reasons))
                 ratio = adj["close"] / row["close"] if price_semantics == "raw_unadjusted" and adj and row["close"] else ""
                 adjusted_out.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin, "date": row["date"],
@@ -794,6 +810,8 @@ def run_pipeline(
                     "adjusted_close_candidate": adj["close"] if adj else "",
                     "adjusted_chart_volume": adj["volume"] if adj else "",
                     "adjusted_chart_row_present": bool(adj),
+                    "adjusted_ohlc_status": ("MISSING_ADJUSTED_CHART_ROW" if not adj else "QUARANTINE" if adj_reasons else "VALID_STRUCTURAL_CANDIDATE"),
+                    "adjusted_ohlc_reason_codes": ";".join(adj_reasons),
                     "adjusted_to_input_close_ratio": ratio,
                     "adjustment_source": "tsetmc_legacy_chart_a1",
                     "adjustment_status": "provider_supplied_unvalidated" if adj else "missing_adjusted_chart_row",
@@ -806,6 +824,7 @@ def run_pipeline(
                     event_unrecognized += 1
                 else:
                     event_exact += int(d in unique_dates)
+                    event_chart_exact += int(d in chart)
                 event_out.append({
                     "instrument_code": code, "symbol": symbol, "event_index": idx,
                     "event_date": d.isoformat() if d else "", "date_field": date_field,
@@ -817,6 +836,7 @@ def run_pipeline(
                     "decision_note": "Exact date overlap is descriptive; event effective-date semantics require verification.",
                 })
 
+        bad_adjusted_history = adjusted_ohlc_violation_rows > 0
         bad_history = bool(h and (
             h["invalid_date_rows"] or h["invalid_or_nonpositive_close_rows"]
             or h["invalid_numeric_field_rows"] or h["duplicate_history_date_rows"]
@@ -849,6 +869,8 @@ def run_pipeline(
             reasons.append("INPUT_OR_PARSER_ERROR")
         if bad_history:
             reasons.append("RAW_HISTORY_STRUCTURAL_DEFECTS")
+        if bad_adjusted_history:
+            reasons.append("ADJUSTED_CHART_OHLC_STRUCTURAL_DEFECTS")
         if short_history:
             reasons.append("HISTORY_TOO_SHORT_FOR_SIX_MONTH_RESEARCH")
         if low_coverage:
@@ -868,7 +890,7 @@ def run_pipeline(
         if not actions_ok:
             reasons.append("CORPORATE_ACTION_COMPLETENESS_NOT_VERIFIED_OR_EVIDENCE_REFERENCE_MISSING")
 
-        if errors or bad_history:
+        if errors or bad_history or bad_adjusted_history:
             status = "needs_reprocessing"
         elif ratio_bad or event_bad or not identity_ok:
             status = "quarantine_needs_independent_evidence"
@@ -880,7 +902,7 @@ def run_pipeline(
             status = "retain_candidate_pending_evidence"
         else:
             status = "research_eligible_after_explicit_evidence_review"
-        eligible = bool(status == "research_eligible_after_explicit_evidence_review" and all_evidence and h and not bad_history and not short_history and not low_coverage and not ratio_bad and not errors)
+        eligible = bool(status == "research_eligible_after_explicit_evidence_review" and all_evidence and h and not bad_history and not bad_adjusted_history and not short_history and not low_coverage and not ratio_bad and not errors)
 
         decision = {
             "instrument_code": code, "symbol": symbol, "isin": isin,
@@ -897,12 +919,13 @@ def run_pipeline(
             "input_order_inversions": h["input_order_inversions"] if h else 0,
             "input_order_status": h["input_order_status"] if h else "unknown",
             "ohlc_violation_rows": h["ohlc_violation_rows"] if h else 0,
+            "adjusted_ohlc_violation_rows": adjusted_ohlc_violation_rows,
             "first_date": h["first_date"] if h else "", "last_date": h["last_date"] if h else "",
             "max_calendar_gap_days": h["max_calendar_gap_days"] if h else 0,
             "adjusted_chart_rows": len(chart), "adjusted_close_coverage": round(coverage, 6),
             "factor_ratio_outlier_rows": outlier_count, "factor_step_change_count": step_count,
             "event_rows": len(event_list), "event_dates_unrecognized": event_unrecognized,
-            "event_dates_exact_history_match": event_exact, "raw_history_preserved": True,
+            "event_dates_exact_history_match": event_exact, "event_dates_exact_adjusted_chart_match": event_chart_exact, "raw_history_preserved": True,
             "eligible_for_research": eligible, "eligible_for_scoring": False,
             "eligible_for_backtest": eligible,
         }
@@ -950,7 +973,7 @@ def run_pipeline(
     eligible_codes = {str(r["instrument_code"]) for r in research_out}
     features, labels = build_features_labels(adjusted_out, eligible_codes)
     write_csv(out / "instrument_decisions.csv", DECISION_COLUMNS, decisions)
-    write_csv(out / "raw_history_candidate.csv", RAW_COLUMNS, raw_out)
+    write_csv(out / "input_history_candidate.csv", RAW_COLUMNS, raw_out)
     write_csv(out / "raw_history_quality.csv", QUALITY_COLUMNS, quality_out)
     write_csv(out / "adjusted_candidate_daily.csv", ADJUSTED_COLUMNS, adjusted_out)
     write_csv(out / "event_reconciliation.csv", EVENT_COLUMNS, event_out)
