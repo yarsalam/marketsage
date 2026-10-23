@@ -1,5 +1,6 @@
 "use client";
 const tabs = [
+  { id: "iran", label: "🇮🇷 داده‌های بازار ایران" },
   { id: "decision", label: "🎯 تصمیم سرمایه‌گذاری" },
   { id: "momentum", label: "📈 مانیتور مومنتوم" },
   { id: "regime", label: "🌍 رژیم بازار" },

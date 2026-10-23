@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import logging
 import os
@@ -19,12 +20,57 @@ from iran_market_data import provider_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from research_pipeline import build_research_snapshot
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
+from iran_live_data import (
+    get_iran_data_status,
+    get_iran_opportunities,
+    get_latest_currency_rates,
+    refresh_tindex_currency_rates,
+)
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("marketsage.analysis")
 app = FastAPI(title="MarketSage Analysis API", version="0.3.0")
+
+_iran_auto_refresh_stop = threading.Event()
+_iran_auto_refresh_thread: threading.Thread | None = None
+
+
+def _iran_auto_refresh_loop() -> None:
+    # Keep the schedule conservative: no more than one request per hour.
+    interval = max(3600, int(os.getenv("IRAN_DATA_REFRESH_INTERVAL_SECONDS", "3600")))
+    while not _iran_auto_refresh_stop.wait(interval):
+        try:
+            refresh_tindex_currency_rates()
+            logger.info("Scheduled Iranian source refresh completed")
+        except Exception as exc:
+            logger.warning("Scheduled Iranian source refresh failed: %s", type(exc).__name__)
+
+
+@app.on_event("startup")
+def start_iran_auto_refresh() -> None:
+    global _iran_auto_refresh_thread
+    if os.getenv("IRAN_DATA_AUTO_REFRESH_ENABLED", "false").strip().lower() != "true":
+        return
+    if not get_iran_data_status()["configured"]:
+        logger.warning("Iran auto-refresh requested but Tindex credentials are not configured")
+        return
+    _iran_auto_refresh_stop.clear()
+    _iran_auto_refresh_thread = threading.Thread(
+        target=_iran_auto_refresh_loop,
+        name="marketsage-iran-refresh",
+        daemon=True,
+    )
+    _iran_auto_refresh_thread.start()
+    logger.info("Iran auto-refresh enabled with an interval of at least one hour")
+
+
+@app.on_event("shutdown")
+def stop_iran_auto_refresh() -> None:
+    _iran_auto_refresh_stop.set()
+    if _iran_auto_refresh_thread and _iran_auto_refresh_thread.is_alive():
+        _iran_auto_refresh_thread.join(timeout=2)
 
 TICKERS = {
     "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana",
@@ -381,6 +427,42 @@ def sources() -> dict:
 def iran_market_providers() -> dict:
     """Report provider readiness without presenting unverified data as live."""
     return provider_catalog()
+
+
+@app.get("/iran/data-status")
+def iran_data_status() -> dict:
+    """Report Tindex connection and persisted Iranian-market data coverage."""
+    return get_iran_data_status()
+
+
+@app.get("/iran/currency-rates")
+def iran_currency_rates() -> dict:
+    """Return the latest persisted Tindex rates; never triggers provider requests."""
+    return get_latest_currency_rates()
+
+
+@app.get("/iran/opportunities")
+def iran_opportunities() -> dict:
+    """Return only production-eligible Iranian opportunities; fail closed otherwise."""
+    return get_iran_opportunities()
+
+
+@app.post("/iran/refresh")
+def refresh_iran_data(x_iran_refresh_token: str | None = Header(default=None)) -> dict:
+    """Manually fetch one Tindex endpoint; requires a server-side refresh token."""
+    expected_token = os.getenv("IRAN_REFRESH_TOKEN", "").strip()
+    if not expected_token:
+        raise HTTPException(status_code=503, detail="Iran data refresh is disabled until IRAN_REFRESH_TOKEN is configured.")
+    if not x_iran_refresh_token or not hmac.compare_digest(x_iran_refresh_token, expected_token):
+        raise HTTPException(status_code=403, detail="Iran data refresh authorization failed.")
+    try:
+        return refresh_tindex_currency_rates()
+    except Exception as exc:
+        logger.warning("Iran source refresh failed: %s", type(exc).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Tindex refresh failed ({type(exc).__name__}). Check server-side configuration and provider access.",
+        ) from None
 
 
 @app.get("/data-status")

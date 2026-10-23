@@ -1,0 +1,52 @@
+name: Iran free-data live smoke
+
+on:
+  push:
+    branches:
+      - research/iran-free-data-smoke
+    paths:
+      - ".github/workflows/iran-free-data-smoke.yml"
+      - "user/analysis-engine/scripts/collect_iran_free_data_smoke.py"
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Exact TSETMC instrument name (start with فولاد)"
+        required: true
+        default: "فولاد"
+      confirm_live_request:
+        description: "Confirm this makes at most two read-only requests to TSETMC"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  tsetmc-smoke:
+    if: github.event_name == 'push' || inputs.confirm_live_request == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install minimal dependencies
+        run: python -m pip install --disable-pip-version-check "pandas>=2.2,<3.0" "requests>=2.31,<3.0"
+      - name: Run bounded TSETMC smoke
+        working-directory: user/analysis-engine
+        run: |
+          python scripts/collect_iran_free_data_smoke.py \
+            --symbol "${{ inputs.symbol || 'فولاد' }}" \
+            --out-dir "${{ runner.temp }}/iran-free-data-smoke"
+      - name: Upload sanitized report and returned history
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iran-free-data-smoke
+          path: ${{ runner.temp }}/iran-free-data-smoke/
+          if-no-files-found: warn
+          retention-days: 7

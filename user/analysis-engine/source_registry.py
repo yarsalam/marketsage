@@ -65,12 +65,34 @@ SOURCES: tuple[SourceDefinition, ...] = (
         status="adapter_implemented_not_scheduled",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("daily_ohlcv_candidate", "adjusted_price_candidate", "fund_quote_candidate"),
+        data_kinds=("daily_ohlcv_candidate", "daily_ohlcv_adjusted_candidate",
+                    "adjusted_price_candidate", "fund_quote_candidate"),
         timestamp_quality="not_verified",
         required_checks=("actual_host_connectivity", "terms_and_access_permission",
                          "symbol_identity", "adjusted_history", "suspensions",
                          "historical_depth", "unit_and_currency"),
-        notes="Read-only adapter and mocked tests added; endpoint is reverse-engineered, history/adjustments/terms remain unverified, and scoring stays disabled.",
+        notes=("Raw and provider-adjusted history are stored as separate candidate series. "
+               "The legacy chart mapping is empirical, coverage can be incomplete, price units "
+               "and terms remain unverified, and scoring stays disabled."),
+    ),
+    SourceDefinition(
+        source_id="vendor.streamdata_export",
+        market_scope="iran_and_global",
+        asset_family="seller_supplied_gold_fund_crypto_gold_fx_csv",
+        provider="Seller-provided StreamData CSV export (provider identity pending confirmation)",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("ohlcv_vendor_csv_candidate",),
+        timestamp_quality="observation date available; source clock, timezone and publication time unknown",
+        required_checks=("seller_identity_and_contract", "redistribution_and_derived_data_rights",
+                         "instrument_identity_and_venue", "unit_currency_and_quote_convention",
+                         "timezone_and_candle_boundary", "raw_vs_adjusted_status",
+                         "historical_reconciliation_and_missing_sessions",
+                         "corrections_and_versioning_policy", "ohlc_quality_anomalies"),
+        notes=("Local-only CSV exports identified as Ayar gold fund, BTCUSDT, 18K gold and free-market USD. "
+               "Values are preserved without assuming price units, currencies or adjustment state. "
+               "Do not commit vendor data files to this public repository; candidate scoring remains disabled."),
     ),
     SourceDefinition(
         source_id="iran.codal",
@@ -104,18 +126,20 @@ SOURCES: tuple[SourceDefinition, ...] = (
         source_id="iran.tindex.public_api",
         market_scope="iran_and_global",
         asset_family="currency_precious_metals_crypto",
-        provider="Tindex public developer API (free tier; current enabled endpoints only)",
+        provider="Tindex developer API (vendor-provided account; current enabled endpoints only)",
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("currency_rate", "precious_metal_quote", "crypto_indicator"),
-        timestamp_quality="not_verified",
+        data_kinds=("currency_rate", "indicator_candle_candidate",
+                    "precious_metal_quote", "crypto_indicator"),
+        timestamp_quality="provider observation dates available for candles; publication timestamp and account access remain unverified",
         required_checks=("terms_and_commercial_rights", "automated_collection_permission",
                          "payload_schema_and_units", "historical_depth", "publication_and_retrieval_times",
                          "revisions_and_missing_intervals", "independent_reconciliation"),
-        notes=("Dashboard notice disables TSE/equities, news, inflation/macro, housing, and calendar "
-               "endpoints (410 Gone). Only currency, precious metals, and crypto are candidate families; "
-               "this entry is not production approval."),
+        notes=("Access is through a vendor-provided account; plan, quotas, and commercial display/redistribution rights "
+               "must follow the vendor agreement. The documented candle-history endpoint is limited to a recent window "
+               "of up to 100 days and requires delta-date decoding; account-level 410 responses must remain disabled. "
+               "Only successfully fetched, schema-validated series are stored as candidates, never for scoring."),
     ),
     SourceDefinition(
         source_id="iran.gold_fx",
