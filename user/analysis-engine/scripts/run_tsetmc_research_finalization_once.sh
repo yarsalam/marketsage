@@ -11,6 +11,10 @@ DL="${MARKETSAGE_DOWNLOADS:-$HOME/Downloads}"
 CORPUS="$DATA/tsetmc/tsetmc_history_pipeline"
 HISTORY="$CORPUS/normalized"
 RAW="$CORPUS/raw"
+DETAILS="$REPO/data/source_snapshots/tsetmc_history_pipeline/corpus_reconciliation_v2/instrument_details.jsonl"
+if [ ! -s "$DETAILS" ]; then
+  DETAILS="$REPO/data/source_snapshots/tsetmc_history_pipeline/corpus_reconciliation/instrument_details.jsonl"
+fi
 
 ADJ="$DL/adjust_pipeline_v025.py"
 FORENSIC="$DL/audit_tsetmc_forensic_v3.py"
@@ -82,9 +86,11 @@ echo "Repository: $REPO"
 echo "Corpus: $CORPUS"
 echo "Normalized histories: $HISTORY"
 echo "Raw histories/events: $RAW"
+echo "Identity crosswalk: $DETAILS"
+echo "Crosswalk is read from repository root; explicit history/event paths still point to canonical data root."
 echo "Market-data network requests: none expected"
 
-for p in "$REPO" "$CORPUS" "$HISTORY" "$RAW"; do
+for p in "$REPO" "$CORPUS" "$HISTORY" "$RAW" "$DETAILS"; do
   if [ ! -d "$p" ]; then
     echo "ERROR: required directory missing: $p"
     exit 10
@@ -113,6 +119,33 @@ if [ "$HISTORY_COUNT" -lt 1000 ] || [ "$HISTORY_COUNT" -ne "$RAW_COUNT" ]; then
   echo "No processing stages were started; do not rerun with guessed paths."
   exit 13
 fi
+python3 - "$DETAILS" <<'PY'
+import json, re, sys
+from pathlib import Path
+path = Path(sys.argv[1])
+pairs = {}
+conflicts = set()
+for line in path.read_text(encoding="utf-8-sig").splitlines():
+    if not line.strip():
+        continue
+    try:
+        row = json.loads(line)
+    except json.JSONDecodeError:
+        continue
+    isin = str(row.get("isin") or "").strip().upper()
+    code = str(row.get("inscode") or "").strip()
+    if re.fullmatch(r"IR[A-Z0-9]{8,}", isin) and re.fullmatch(r"\d{6,24}", code):
+        if isin in pairs and pairs[isin] != code:
+            conflicts.add(isin)
+        else:
+            pairs[isin] = code
+valid = set(pairs) - conflicts
+print(f"Authoritative identity crosswalk: valid ISIN mappings={len(valid)}, conflicts={len(conflicts)}")
+if len(valid) < 1000:
+    print("ERROR: the repository crosswalk does not contain enough valid ISIN→insCode mappings.")
+    print("No processing stages were started.")
+    raise SystemExit(14)
+PY
 printf "Existing adjusted candidate CSVs: "
 find "$CORPUS/corpus_reconciliation/adjusted_candidates_research_only" \
   -type f -name '*.adjusted_candidate.csv' 2>/dev/null | wc -l
@@ -120,7 +153,7 @@ df -h "$DATA"
 
 echo "===== Stage 1/3: one whole-corpus v0.2.5 run ====="
 python3 -u "$ADJ" \
-  --input "$CORPUS" \
+  --input "$REPO" \
   --out-dir "$V025_ROOT" \
   --history-dir "$HISTORY" \
   --events-dir "$RAW" \
