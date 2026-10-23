@@ -195,7 +195,7 @@ Corrected runner commit: `f45ffa7bba9b1f30072997b7dcb4edacff40c1be`. This justif
 
 The next attempt stopped before any data-processing stage because the runner's generic directory loop included `DETAILS`, even though `DETAILS` is the `instrument_details.jsonl` **file**. The log said “required directory missing” for a file that exists; this was a runner guard defect, not missing corpus data. Fixed by checking only repository/corpus/history/raw paths with `-d`, then checking the crosswalk separately with `-s` and a file-specific error message.
 
-Fix commit: `4766c9bea3addad2d79c8d90e90ef59b02561e4a` on `feature/iran-live-data-dashboard`. The previous failed run is preserved; launch the current branch runner once more. No market-data download is needed. This patch has not been merged, and does not approve source semantics, research scoring, or backtesting.
+Fix commit: `4766c9bea3addad2d79c8d90e90ef59b02561e4a` on `feature/iran-live-data-dashboard`. The previous failed run is preserved. The corrected runner was later completed successfully; see the full-corpus result below. No market-data download is needed. This patch has not been merged, and does not approve source semantics, research scoring, or backtesting.
 
 
 ### Full-corpus TSETMC finalization result (2026-10-23; completed)
@@ -215,3 +215,16 @@ Interpretation and remaining blockers:
 - It does **not** establish that all adjustment factors are economically correct, that official corporate-action/event semantics or licensing are accepted, that dividends/total return or volume adjustment are handled correctly, or that every historical date is explained by authoritative trading-calendar/halt evidence.
 - The candidate CSV deliberately has `research_only=1`, `adjusted_returns_allowed=0`, `scoring_allowed=0`, `backtest_approved=0`. Production scoring, adjusted-return approval, and backtesting remain disabled. No strategy backtest was run.
 - The runner type-check defect was fixed in commit `4766c9bea3addad2d79c8d90e90ef59b02561e4a`; this successful run is the evidence that the fix works end-to-end.
+
+
+### Read-only acceptance blocker review script (2026-10-23)
+
+Added `user/analysis-engine/scripts/review_acceptance_blockers_once.py` on `feature/iran-live-data-dashboard` (commit `386048ef470f506bd792a0c29f8d35c53c312947`). It reads the latest existing `~/marketsage-data/tsetmc-research/finalize_*` reports by default, inventories known persisted multi-asset summary files, and emits JSON plus Markdown under `~/marketsage-data/acceptance-review/<UTC timestamp>/`. Override `--run-root` to inspect a specific existing run or `--output-dir` to choose output location.
+
+Run:
+```bash
+cd ~/projects/marketsage-acceptance
+python3 user/analysis-engine/scripts/review_acceptance_blockers_once.py
+```
+
+This is a read-only report generator: no provider requests, downloads, normalization/adjustment, feature/label generation, raw-data writes, scoring or backtest. It tracks TSETMC corporate-action economics, missing-date/calendar evidence, licensing and return semantics; other asset families (gold/funds, coins, free FX, global proxies, crypto, macro, news/sentiment, housing/vehicles); and separate research-only deployment gates. Its static asset statuses are a worklist, not source acceptance. The script does not claim to verify a live server or set a calendar deadline. Source acceptance still requires human review of independent evidence; production scoring and backtesting remain disabled.
