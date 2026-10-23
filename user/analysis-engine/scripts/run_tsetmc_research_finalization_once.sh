@@ -9,7 +9,7 @@ REPO="${MARKETSAGE_REPO:-$HOME/projects/marketsage-acceptance}"
 DATA="${MARKETSAGE_DATA_ROOT:-$HOME/marketsage-data}"
 DL="${MARKETSAGE_DOWNLOADS:-$HOME/Downloads}"
 CORPUS="$DATA/tsetmc/tsetmc_history_pipeline"
-HISTORY="$CORPUS/corpus_reconciliation_v2"
+HISTORY="$CORPUS/normalized"
 RAW="$CORPUS/raw"
 
 ADJ="$DL/adjust_pipeline_v025.py"
@@ -58,10 +58,17 @@ if ! command -v flock >/dev/null 2>&1; then
 fi
 
 echo "===== Input corpus inventory (existing files only) ====="
-printf "History archives: "
-find "$RAW" -mindepth 2 -maxdepth 2 -type f -name 'history_archive.json' | wc -l
-printf "Normalized CSV files: "
-find "$HISTORY" -type f -name '*.csv' | wc -l
+RAW_COUNT="$(find "$RAW" -mindepth 2 -maxdepth 2 -type f -name 'history_archive.json' | wc -l | tr -d '[:space:]')"
+HISTORY_COUNT="$(find "$HISTORY" -maxdepth 1 -type f -name '*.history.csv' | wc -l | tr -d '[:space:]')"
+echo "History archives: $RAW_COUNT"
+echo "Normalized history CSVs (*.history.csv): $HISTORY_COUNT"
+if [ "$HISTORY_COUNT" -lt 1000 ] || [ "$HISTORY_COUNT" -ne "$RAW_COUNT" ]; then
+  echo "ERROR: history preflight rejected this run. Expected the known full corpus (~1,220 normalized histories) and matching raw archive coverage."
+  echo "Resolved history directory: $HISTORY"
+  echo "Normalized history files: $HISTORY_COUNT; raw archive files: $RAW_COUNT"
+  echo "No processing stages were started; do not rerun with guessed paths."
+  exit 13
+fi
 printf "Existing adjusted candidate CSVs: "
 find "$CORPUS/corpus_reconciliation/adjusted_candidates_research_only" \
   -type f -name '*.adjusted_candidate.csv' 2>/dev/null | wc -l
@@ -73,7 +80,7 @@ python3 -u "$ADJ" \
   --out-dir "$V025_ROOT" \
   --history-dir "$HISTORY" \
   --events-dir "$RAW" \
-  --share-events-dir "$RAW"
+  --share-events-dir "$RAW" 2>&1 | tee "$RUN_ROOT/v025.log"
 
 PRIOR_RUN="$(
   find "$V025_ROOT" -type f -name 'instrument_decisions.csv' -printf '%T@ %h\n' \
@@ -87,6 +94,24 @@ if [ -z "$PRIOR_RUN" ] || [ ! -s "$PRIOR_RUN/instrument_decisions.csv" ] || [ ! 
 fi
 echo "v0.2.5 prior run selected: $PRIOR_RUN"
 
+# Require actual history observations before any downstream forensic/candidate step.
+python3 - "$PRIOR_RUN/data_quality_report.json" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1])
+if not p.is_file():
+    print("ERROR: v0.2.5 summary is missing:", p)
+    raise SystemExit(21)
+d = json.loads(p.read_text(encoding="utf-8"))
+hist = int(d.get("history_instruments", 0) or 0)
+rows = int(d.get("history_rows_read", 0) or 0)
+print(f"v0.2.5 observed history instruments={hist}; history rows={rows}")
+if hist < 1000 or rows < 1_000_000:
+    print("ERROR: refusing to continue: v0.2.5 did not ingest the known full history corpus.")
+    print("This is an input-path/coverage failure, not a successful empty research run.")
+    raise SystemExit(22)
+PY
+
 echo "===== Stage 2/3: forensic-v3 + candidate builder v1.1 ====="
 python3 -u "$PIPELINE" \
   --repo "$REPO" \
@@ -95,6 +120,40 @@ python3 -u "$PIPELINE" \
   --forensic-script "$FORENSIC" \
   --candidate-script "$BUILDER" \
   --output-root "$PIPE_ROOT"
+
+# Block empty candidate outputs; upstream validation currently allows an empty manifest.
+PIPELINE_RUN="$(find "$PIPE_ROOT" -mindepth 2 -maxdepth 2 -type f -name 'pipeline_report.json' -printf '%h\\n' | sort | tail -n 1)"
+VALIDATION_REPORT="$PIPELINE_RUN/validation_report.json"
+if [ -z "$PIPELINE_RUN" ] || [ ! -s "$VALIDATION_REPORT" ]; then
+  echo "ERROR: pipeline validation report is missing; final QA was not run."
+  exit 30
+fi
+python3 - "$VALIDATION_REPORT" "$RUN_ROOT/finalization_blocker.json" <<'PY'
+import json, sys
+from pathlib import Path
+report_path, blocker_path = map(Path, sys.argv[1:])
+v = json.loads(report_path.read_text(encoding="utf-8"))
+counts = v.get("counts", {})
+checks = {
+    "validation_status_is_passed": v.get("status") == "PASSED",
+    "normalized_history_coverage_at_least_1000": int(counts.get("normalized_history_files", 0) or 0) >= 1000,
+    "candidate_series_nonempty": int(counts.get("candidate_series", 0) or 0) > 0,
+    "feature_rows_nonempty": int(counts.get("feature_rows", 0) or 0) > 0,
+    "forward_labels_nonempty": int(counts.get("forward_label_rows", 0) or 0) > 0,
+}
+print("Pre-QA completeness checks:", json.dumps(checks, ensure_ascii=False))
+if not all(checks.values()):
+    blocker = {
+        "status": "BLOCKED_INCOMPLETE_OR_EMPTY_OUTPUT",
+        "validation_report": str(report_path),
+        "counts": counts,
+        "checks": checks,
+        "instruction": "Do not rerun audits individually. Resolve this run's specific pipeline blocker before another full pass.",
+    }
+    blocker_path.write_text(json.dumps(blocker, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    print("ERROR: final QA not run because the research outputs are empty or incomplete.")
+    raise SystemExit(31)
+PY
 
 echo "===== Stage 3/3: final candidate-suite QA (once) ====="
 python3 -u "$QA" --output-root "$PIPE_ROOT"
@@ -176,7 +235,9 @@ for path in sorted(run_root.rglob("*")):
 summary_csvs = [
     p for p in run_root.rglob("*.csv")
     if p.name in {"research_features.csv", "forward_labels_6m.csv",
-                  "candidate_features.csv", "candidate_forward_labels.csv"}
+                  "candidate_features.csv", "candidate_forward_labels.csv",
+                  "research_features_candidate_only.csv",
+                  "forward_labels_126obs_candidate_only.csv"}
 ]
 result["key_csv_row_counts"] = {}
 for p in summary_csvs:
