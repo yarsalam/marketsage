@@ -62,7 +62,7 @@ runs["tsetmc_research_finalization"] = {
     "backtest_approved": False,
 }
 tmp = idx_path.with_suffix(".json.tmp")
-tmp.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+tmp.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 tmp.replace(idx_path)
 PY
 }
