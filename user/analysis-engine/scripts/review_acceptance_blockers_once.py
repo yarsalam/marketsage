@@ -228,7 +228,7 @@ def render_md(r: dict[str, Any]) -> str:
     lines += ["", "## Safety", ""]
     lines.extend("- " + k + ": " + str(v).lower() for k, v in r["safety"].items())
     lines += ["", "This is an evidence tracker, not an acceptance decision.", ""]
-    return "\\n".join(lines)
+    return "\n".join(lines)
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
@@ -242,8 +242,8 @@ def main() -> int:
     output = args.output_dir.expanduser() if args.output_dir else args.data_root.expanduser() / "acceptance-review" / stamp
     output.mkdir(parents=True, exist_ok=True)
     jp, mp = output / "acceptance_blocker_review.json", output / "acceptance_blocker_review.md"
-    jp.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
-    mp.write_text(render_md(report) + "\\n", encoding="utf-8")
+    jp.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    mp.write_text(render_md(report) + "\n", encoding="utf-8")
     print("MARKETSAGE ACCEPTANCE BLOCKER REVIEW")
     print("MODE:", report["mode"])
     print("TSETMC_RUN:", report["tsetmc"].get("run_root") or "NOT_FOUND")
