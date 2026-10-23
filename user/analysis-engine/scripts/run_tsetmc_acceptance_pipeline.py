@@ -162,7 +162,7 @@ def row_list(payload: Any) -> tuple[list[dict[str, Any]] | None, str | None]:
     rows = payload
     if isinstance(payload, dict):
         rows = next((payload[k] for k in (
-            "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data"
+            "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data", "history", "instrumentSearch"
         ) if isinstance(payload.get(k), list)), None)
     if not isinstance(rows, list) or not rows or not all(isinstance(r, dict) for r in rows[:min(3, len(rows))]):
         return None, None
@@ -292,6 +292,46 @@ def load_manifest(path: Path) -> list[dict[str, Any]]:
     return result
 
 
+def discover_instrument_identity(history_path: Path) -> dict[str, str]:
+    """Resolve insCode/ISIN from this instrument folder's own search response, if present."""
+    folder_hint = history_path.parent.name.strip()
+    search_files = sorted(history_path.parent.glob("instrument_search*.json"))
+    if not search_files:
+        return {"instrument_code": "", "symbol": "", "isin": ""}
+    candidates: list[dict[str, Any]] = []
+    for search_path in search_files:
+        try:
+            payload = read_payload(search_path)
+        except PipelineError:
+            continue
+        if isinstance(payload, dict):
+            rows = payload.get("instrumentSearch")
+            if not isinstance(rows, list):
+                rows = payload.get("data")
+        else:
+            rows = payload
+        if isinstance(rows, list):
+            candidates.extend(r for r in rows if isinstance(r, dict))
+    if not candidates:
+        return {"instrument_code": "", "symbol": "", "isin": ""}
+    isin_keys = ("cIsin", "isin", "ISIN", "lIsin", "cISIN")
+    folder_isin = folder_hint if re.fullmatch(r"[A-Za-z0-9]{12}", folder_hint) else ""
+    matching = []
+    if folder_isin:
+        matching = [
+            row for row in candidates
+            if str(field(row, *isin_keys) or "").strip().upper() == folder_isin.upper()
+        ]
+    # Prefer exact ISIN; use a singleton only when the folder's query had one result.
+    chosen = matching[0] if len(matching) == 1 else candidates[0] if not folder_isin and len(candidates) == 1 else None
+    if chosen is None:
+        return {"instrument_code": "", "symbol": "", "isin": folder_isin}
+    code = str(field(chosen, "insCode", "instrument_code", "instrumentCode") or "").strip()
+    symbol = str(field(chosen, "lVal18AFC", "symbol", "ticker", "lVal30", "name") or "").strip()
+    isin = str(field(chosen, *isin_keys) or folder_isin).strip()
+    return {"instrument_code": code, "symbol": symbol, "isin": isin}
+
+
 def discover_manifest(root: Path) -> list[dict[str, Any]]:
     if not root.is_dir():
         raise PipelineError(f"discovery root is not a directory: {root}")
@@ -334,13 +374,16 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                     "_base_dir": str(root.resolve()), "_discovered": True,
                 })
         else:
+            identity = discover_instrument_identity(path)
             codes = re.findall(r"(?<!\d)\d{10,22}(?!\d)", str(path))
-            code = codes[0] if codes else ""
+            code = identity["instrument_code"] or (codes[0] if codes else "")
+            symbol = identity["symbol"] or path.parent.name or path.stem
+            isin = identity["isin"]
             rows.append({
-                "instrument_code": code, "symbol": path.parent.name or path.stem, "isin": "",
+                "instrument_code": code, "symbol": symbol, "isin": isin,
                 "daily_history_path": str(path.resolve()),
-                "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json")),
-                "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json")),
+                "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv")),
+                "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
                 "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
                 "_base_dir": str(root.resolve()), "_discovered": True,
             })
