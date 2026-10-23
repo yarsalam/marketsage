@@ -157,6 +157,77 @@ def inventory_existing_summaries(data_root: Path) -> dict[str, Any]:
             "files": [{"path": str(p), "parsed": read_json(p) is not None} for p in files[:50]],
             "note": "Only existing summary/manifest files are inspected; no market payload is downloaded or copied."}
 
+def evidence_records(path: Path) -> list[dict[str, Any]]:
+    """Read existing report artifacts only; never inspect raw history archives."""
+    try:
+        if path.suffix.lower() == ".csv":
+            with path.open("r", encoding="utf-8-sig", newline="") as f:
+                return [dict(x) for x in csv.DictReader(f)]
+        if path.suffix.lower() == ".jsonl":
+            rows = []
+            for line in path.read_text(encoding="utf-8-sig").splitlines():
+                try:
+                    value = json.loads(line)
+                    if isinstance(value, dict):
+                        rows.append(value)
+                except json.JSONDecodeError:
+                    continue
+            return rows
+        if path.suffix.lower() == ".json":
+            value = read_json(path)
+            if isinstance(value, list):
+                return [x if isinstance(x, dict) else {"value": x} for x in value]
+            if isinstance(value, dict):
+                rows = []
+                for key, val in value.items():
+                    if isinstance(val, list):
+                        rows.extend(x if isinstance(x, dict) else {"section": key, "value": x} for x in val)
+                return rows or [value]
+    except (OSError, UnicodeDecodeError, csv.Error):
+        return []
+    return []
+
+def write_evidence_ledgers(run_root: Path | None, output: Path) -> dict[str, Any]:
+    """Turn relevant existing report rows into human-review queues; never assert correctness."""
+    event_rows, gap_rows, scanned = [], [], []
+    if run_root and run_root.is_dir():
+        for path in run_root.rglob("*"):
+            if not path.is_file() or path.suffix.lower() not in {".csv", ".json", ".jsonl"}:
+                continue
+            name = path.name.lower()
+            if not any(word in name for word in ("event", "adjust", "corporate", "triage", "gap", "missing", "calendar", "reconcil", "coverage")):
+                continue
+            scanned.append(str(path))
+            rows = evidence_records(path)
+            for index, row in enumerate(rows, start=1):
+                blob = (name + " " + json.dumps(row, ensure_ascii=False, default=str)).lower()
+                base = {
+                    "evidence_file": str(path),
+                    "source_row": index,
+                    "review_status": "NEEDS_INDEPENDENT_SOURCE_REVIEW",
+                    "record_json": json.dumps(row, ensure_ascii=False, sort_keys=True, default=str),
+                }
+                if any(word in blob for word in ("adjust", "corporate", "dividend", "split", "factor", "sharechange", "price_event", "capital increase", "تعدیل", "افزایش سرمایه", "سود نقدی")):
+                    event_rows.append(base)
+                if any(word in blob for word in ("missing", "gap", "calendar", "suspend", "coverage", "non-trading", "trading day", "date mismatch", "missing date", "تاریخ غایب", "تعلیق", "تقویم معاملاتی")):
+                    gap_rows.append(base)
+    headers = ["evidence_file", "source_row", "review_status", "record_json"]
+    event_path, gap_path = output / "corporate_action_evidence_review.csv", output / "date_gap_evidence_review.csv"
+    for path, rows in ((event_path, event_rows), (gap_path, gap_rows)):
+        with path.open("w", encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(rows)
+    return {
+        "existing_report_files_scanned": len(scanned),
+        "scanned_files": scanned,
+        "corporate_action_rows_queued": len(event_rows),
+        "corporate_action_ledger": str(event_path),
+        "date_gap_rows_queued": len(gap_rows),
+        "date_gap_ledger": str(gap_path),
+        "interpretation": "These are candidate rows extracted from existing report artifacts only. They are review queues, not independently verified facts; empty ledgers mean no matching report rows were found, not that no events/gaps exist.",
+    }
+
 def make_report(args: argparse.Namespace) -> dict[str, Any]:
     data_root = args.data_root.expanduser()
     run = args.run_root.expanduser() if args.run_root else latest_run(data_root)
@@ -212,7 +283,15 @@ def render_md(r: dict[str, Any]) -> str:
                      ", distinct dates=" + str(x.get("distinct_dates", "?")))
         if x.get("safety_flags"):
             lines.append("  - safety flags: " + json.dumps(x["safety_flags"], ensure_ascii=False, sort_keys=True))
-    lines += ["", "## Acceptance gates", ""]
+    ledger = r.get("existing_report_evidence_ledgers", {})
+    lines += ["", "## Existing-report review queues", "",
+              "These are rows extracted from existing reports, not verified acceptance evidence.",
+              "- Corporate-action rows queued: " + str(ledger.get("corporate_action_rows_queued", 0)),
+              "- Corporate-action ledger: " + str(ledger.get("corporate_action_ledger")),
+              "- Date-gap rows queued: " + str(ledger.get("date_gap_rows_queued", 0)),
+              "- Date-gap ledger: " + str(ledger.get("date_gap_ledger")),
+              "- " + str(ledger.get("interpretation", "")), "",
+              "## Acceptance gates", ""]
     for x in r["acceptance_blockers"]:
         lines += ["### " + x["id"] + " — " + x["gate"] + " [" + x["status"] + "]", "", x["required_evidence"], ""]
     lines += ["## Other assets", "", "| Family | Existing evidence | Status | Next gate |",
@@ -241,6 +320,9 @@ def main() -> int:
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output = args.output_dir.expanduser() if args.output_dir else args.data_root.expanduser() / "acceptance-review" / stamp
     output.mkdir(parents=True, exist_ok=True)
+    report["existing_report_evidence_ledgers"] = write_evidence_ledgers(
+        Path(report["tsetmc"]["run_root"]) if report["tsetmc"].get("run_root") else None, output
+    )
     jp, mp = output / "acceptance_blocker_review.json", output / "acceptance_blocker_review.md"
     jp.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     mp.write_text(render_md(report) + "\n", encoding="utf-8")
