@@ -30,7 +30,51 @@ STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_ROOT="$DATA/tsetmc-research/finalize_$STAMP"
 V025_ROOT="$RUN_ROOT/v025-runs"
 PIPE_ROOT="$RUN_ROOT/research-pipeline"
-mkdir -p "$V025_ROOT" "$PIPE_ROOT"
+INDEX_PATH="$DATA/registry/local_data_index.json"
+mkdir -p "$V025_ROOT" "$PIPE_ROOT" "$(dirname "$INDEX_PATH")"
+
+index_run_state() {
+  python3 - "$INDEX_PATH" "$RUN_ROOT" "$1" "$2" <<'PY'
+import json, sys
+from datetime import datetime, timezone
+from pathlib import Path
+idx_path, run_root, status, message = sys.argv[1:]
+idx_path = Path(idx_path)
+idx_path.parent.mkdir(parents=True, exist_ok=True)
+try:
+    index = json.loads(idx_path.read_text(encoding="utf-8")) if idx_path.exists() else {}
+except Exception:
+    index = {}
+runs = index.setdefault("existing_runs", {})
+previous = runs.get("tsetmc_research_finalization")
+if status == "RUNNING" and previous and previous.get("run_root") != run_root:
+    history = index.setdefault("tsetmc_research_finalization_history", [])
+    history.append(previous)
+    index["tsetmc_research_finalization_history"] = history[-20:]
+runs["tsetmc_research_finalization"] = {
+    "status": status,
+    "run_root": run_root,
+    "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+    "message": message,
+    "market_data_network_requests": False,
+    "raw_inputs_overwritten": False,
+    "production_scoring_enabled": False,
+    "backtest_approved": False,
+}
+tmp = idx_path.with_suffix(".json.tmp")
+tmp.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+tmp.replace(idx_path)
+PY
+}
+
+index_run_state "RUNNING" "full-corpus TSETMC candidate finalization started"
+on_exit() {
+  local rc=$?
+  if [ "$rc" -ne 0 ]; then
+    index_run_state "BLOCKED_OR_FAILED" "finalization exited with status $rc; inspect this run's log/report before deciding next action" || true
+  fi
+}
+trap on_exit EXIT
 
 echo "TSETMC finalization started at $(date -Is)"
 echo "Run root: $RUN_ROOT"
