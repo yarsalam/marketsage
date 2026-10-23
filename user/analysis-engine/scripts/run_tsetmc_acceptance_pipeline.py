@@ -30,7 +30,7 @@ DEFAULT_FACTOR_MAX = 20.0
 
 MANIFEST_COLUMNS = [
     "instrument_code", "symbol", "isin", "daily_history_path",
-    "adjusted_chart_path", "adjustment_events_path", "history_close_semantics", "rights_status",
+    "adjusted_chart_path", "adjustment_events_path", "share_change_events_path", "history_close_semantics", "rights_status",
     "semantics_verified", "independent_reconciliation_passed",
     "corporate_action_completeness_verified", "identity_match_evidence_ref",
     "rights_evidence_ref", "semantics_evidence_ref",
@@ -75,7 +75,7 @@ ADJUSTED_COLUMNS = [
     "eligible_for_scoring",
 ]
 EVENT_COLUMNS = [
-    "instrument_code", "symbol", "event_index", "event_date", "date_field",
+    "instrument_code", "symbol", "event_family", "event_index", "event_date", "date_field",
     "date_parse_status", "history_date_exact_match", "adjusted_chart_date_match",
     "event_type_candidate", "event_source_hash", "decision_note",
 ]
@@ -96,7 +96,7 @@ QUEUE_COLUMNS = [
 ]
 RESEARCH_COLUMNS = [
     "instrument_code", "symbol", "isin", "daily_history_path",
-    "adjusted_chart_path", "adjustment_events_path", "history_close_semantics", "first_date", "last_date",
+    "adjusted_chart_path", "adjustment_events_path", "share_change_events_path", "history_close_semantics", "first_date", "last_date",
     "history_rows", "adjusted_close_coverage", "input_hashes_json",
     "identity_match_evidence_ref", "rights_evidence_ref", "semantics_evidence_ref",
     "independent_reconciliation_evidence_ref",
@@ -243,7 +243,7 @@ def filter_for_instrument(
             cloned = dict(payload)
             for key in (
                 "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data",
-                "priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "events",
+                "priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "instrumentShareChange", "instrumentShareChangeList", "shareChange", "shareChanges", "share_change", "share_change_list", "events",
             ):
                 if isinstance(cloned.get(key), list):
                     cloned[key] = selected
@@ -260,7 +260,7 @@ def filter_for_instrument(
         cloned = dict(payload)
         for key in (
             "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data",
-            "priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "events",
+            "priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "instrumentShareChange", "instrumentShareChangeList", "shareChange", "shareChanges", "share_change", "share_change_list", "events",
         ):
             if isinstance(cloned.get(key), list):
                 cloned[key] = filtered(cloned[key])
@@ -278,6 +278,7 @@ def load_manifest(path: Path) -> list[dict[str, Any]]:
             "daily_history_path": ("daily_history_path", "history_path", "raw_history_path", "daily_json"),
             "adjusted_chart_path": ("adjusted_chart_path", "chart_adjusted_path", "adjusted_history_path", "chart_path"),
             "adjustment_events_path": ("adjustment_events_path", "price_adjustments_path", "events_path", "event_path"),
+            "share_change_events_path": ("share_change_events_path", "share_changes_path", "share_change_path", "share_change_json", "share_change_csv"),
         }
         result = []
         for row in reader:
@@ -329,6 +330,7 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                     "daily_history_path": str(path.resolve()),
                     "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv")),
                     "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
+                    "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
                     "_base_dir": str(root.resolve()), "_discovered": True,
                 })
         else:
@@ -339,6 +341,7 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                 "daily_history_path": str(path.resolve()),
                 "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json")),
                 "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json")),
+                "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
                 "_base_dir": str(root.resolve()), "_discovered": True,
             })
     if not rows:
@@ -532,7 +535,7 @@ def parse_events(payload: Any) -> list[dict[str, Any]]:
     if isinstance(payload, list) and all(isinstance(r, dict) for r in payload):
         return payload
     if isinstance(payload, dict):
-        for key in ("priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "events", "data"):
+        for key in ("priceAdjust", "priceAdjustment", "priceAdjustList", "price_adjustments", "instrumentShareChange", "instrumentShareChangeList", "shareChange", "shareChanges", "share_change", "share_change_list", "events", "data"):
             if isinstance(payload.get(key), list):
                 return [r for r in payload[key] if isinstance(r, dict)]
     raise PipelineError("unrecognized event payload shape")
@@ -662,7 +665,7 @@ def run_pipeline(
         identity_fields = bool(code.isdigit() and 10 <= len(code) <= 22 and symbol and re.fullmatch(r"[A-Za-z0-9]{12}", isin) and code not in duplicate_codes)
         identity_ok = identity_fields and evidence_reference_ok(item.get("identity_match_evidence_ref"), base)
         paths = {k: (Path(str(item.get(k, "")).strip()).expanduser() if str(item.get(k, "")).strip() else None)
-                 for k in ("daily_history_path", "adjusted_chart_path", "adjustment_events_path")}
+                 for k in ("daily_history_path", "adjusted_chart_path", "adjustment_events_path", "share_change_events_path")}
         for k, path in paths.items():
             if path and not path.is_absolute():
                 paths[k] = (base / path).resolve()
@@ -725,13 +728,20 @@ def run_pipeline(
                 chart = parse_chart(payloads["adjusted_chart_path"])
             except PipelineError as exc:
                 errors.append(f"chart_parse:{exc}")
-        event_list, event_error = [], ""
-        if "adjustment_events_path" in payloads:
-            try:
-                event_list = parse_events(payloads["adjustment_events_path"])
-            except PipelineError as exc:
-                event_error = str(exc)
-                errors.append(f"events_parse:{exc}")
+        event_lists: dict[str, list[dict[str, Any]]] = {"price_adjustment": [], "share_change": []}
+        event_path_by_family = {
+            "price_adjustment": "adjustment_events_path",
+            "share_change": "share_change_events_path",
+        }
+        event_errors: dict[str, str] = {}
+        for family, path_key in event_path_by_family.items():
+            if path_key in payloads:
+                try:
+                    event_lists[family] = parse_events(payloads[path_key])
+                except PipelineError as exc:
+                    event_errors[family] = str(exc)
+                    errors.append(f"{path_key}:{exc}")
+        event_error = ";".join(f"{family}:{message}" for family, message in event_errors.items())
 
         unique_dates = set(h["unique_dates"]) if h else set()
         coverage = len(unique_dates.intersection(chart)) / len(unique_dates) if unique_dates else 0.0
@@ -836,23 +846,25 @@ def run_pipeline(
                     "source_response_sha256": input_hashes.get("adjusted_chart_path", ""),
                     "eligible_for_scoring": False,
                 })
-            for idx, event in enumerate(event_list):
-                d, date_field, event_type = event_date(event)
-                if d is None:
-                    event_unrecognized += 1
-                else:
-                    event_exact += int(d in unique_dates)
-                    event_chart_exact += int(d in chart)
-                event_out.append({
-                    "instrument_code": code, "symbol": symbol, "event_index": idx,
-                    "event_date": d.isoformat() if d else "", "date_field": date_field,
-                    "date_parse_status": "parsed" if d else "unrecognized",
-                    "history_date_exact_match": bool(d and d in unique_dates),
-                    "adjusted_chart_date_match": bool(d and d in chart),
-                    "event_type_candidate": event_type,
-                    "event_source_hash": input_hashes.get("adjustment_events_path", ""),
-                    "decision_note": "Exact date overlap is descriptive; event effective-date semantics require verification.",
-                })
+            for family, family_events in event_lists.items():
+                path_key = event_path_by_family[family]
+                for idx, event in enumerate(family_events):
+                    d, date_field, event_type = event_date(event)
+                    if d is None:
+                        event_unrecognized += 1
+                    else:
+                        event_exact += int(d in unique_dates)
+                        event_chart_exact += int(d in chart)
+                    event_out.append({
+                        "instrument_code": code, "symbol": symbol, "event_family": family,
+                        "event_index": idx, "event_date": d.isoformat() if d else "",
+                        "date_field": date_field, "date_parse_status": "parsed" if d else "unrecognized",
+                        "history_date_exact_match": bool(d and d in unique_dates),
+                        "adjusted_chart_date_match": bool(d and d in chart),
+                        "event_type_candidate": event_type,
+                        "event_source_hash": input_hashes.get(path_key, ""),
+                        "decision_note": "Exact date overlap is descriptive; event effective-date and corporate-action semantics require verification.",
+                    })
 
         bad_adjusted_history = adjusted_ohlc_violation_rows > 0
         long_gap_bad = bool(h and h["gaps_gt_30_days"] > 0)
@@ -864,7 +876,10 @@ def run_pipeline(
         short_history = bool(h and h["valid_history_rows"] < min_history)
         low_coverage = not h or not chart or coverage < min_coverage
         ratio_bad = bool(outlier_count or step_count)
-        event_payload_missing = paths["adjustment_events_path"] is None or "adjustment_events_path" not in payloads
+        event_payload_missing = any(
+            paths[path_key] is None or path_key not in payloads
+            for path_key in event_path_by_family.values()
+        )
         event_bad = bool(event_unrecognized or event_payload_missing or event_error)
         rights_ref = evidence_reference_ok(item.get("rights_evidence_ref"), base)
         semantics_ref = evidence_reference_ok(item.get("semantics_evidence_ref"), base)
@@ -951,7 +966,7 @@ def run_pipeline(
             "max_calendar_gap_days": h["max_calendar_gap_days"] if h else 0,
             "adjusted_chart_rows": len(chart), "adjusted_close_coverage": round(coverage, 6),
             "factor_ratio_outlier_rows": outlier_count, "factor_step_change_count": step_count,
-            "event_rows": len(event_list), "event_dates_unrecognized": event_unrecognized,
+            "event_rows": sum(len(events) for events in event_lists.values()), "event_dates_unrecognized": event_unrecognized,
             "event_dates_exact_history_match": event_exact, "event_dates_exact_adjusted_chart_match": event_chart_exact, "input_history_preserved": True,
             "eligible_for_research": eligible, "eligible_for_scoring": False,
             "eligible_for_backtest": False,
@@ -982,6 +997,7 @@ def run_pipeline(
                 "daily_history_path": str(paths["daily_history_path"]),
                 "adjusted_chart_path": str(paths["adjusted_chart_path"]),
                 "adjustment_events_path": str(paths["adjustment_events_path"]),
+                "share_change_events_path": str(paths["share_change_events_path"]),
                 "first_date": h["first_date"], "last_date": h["last_date"],
                 "history_rows": h["history_rows"], "adjusted_close_coverage": round(coverage, 6),
                 "input_hashes_json": hash_json,
