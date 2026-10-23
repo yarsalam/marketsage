@@ -190,6 +190,7 @@ def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp
         {"dEven": 20200102, "pClosing": 101},
     ]
     (folder / "history_archive.json").write_text(json.dumps(rows), encoding="utf-8")
+    (folder / "closing_price_daily_fallback.json").write_text(json.dumps(rows[:1]), encoding="utf-8")
     (folder / "instrument_search_1.json").write_text(json.dumps({
         "instrumentSearch": [{
             "insCode": "46348559193224090",
@@ -204,6 +205,8 @@ def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp
     assert items[0]["isin"] == "IRO1FOLD0001"
     assert items[0]["symbol"] == "فولاد"
     assert items[0]["daily_history_path"].endswith("history_archive.json")
+    assert items[0]["_discovery_ambiguous_history"] is False
+    assert any(path.endswith("closing_price_daily_fallback.json") for path in items[0]["_alternative_history_paths"])
     assert items[0]["adjusted_chart_path"] == str(adjusted_csv.resolve())
     parsed_chart = parse_chart(json.loads(json.dumps([
         {"date": "2020-01-01", "open_adj": 98, "high_adj": 105, "low_adj": 95,
