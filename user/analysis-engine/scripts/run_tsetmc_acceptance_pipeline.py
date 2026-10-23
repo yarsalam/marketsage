@@ -162,7 +162,7 @@ def row_list(payload: Any) -> tuple[list[dict[str, Any]] | None, str | None]:
     rows = payload
     if isinstance(payload, dict):
         rows = next((payload[k] for k in (
-            "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data", "history", "instrumentSearch"
+            "closingPriceDaily", "dailyHistory", "daily_history", "rows", "data", "history", "history_archive", "historyArchive", "closing_price_daily", "instrumentSearch"
         ) if isinstance(payload.get(k), list)), None)
     if not isinstance(rows, list) or not rows or not all(isinstance(r, dict) for r in rows[:min(3, len(rows))]):
         return None, None
@@ -470,7 +470,7 @@ def extract_history(payload: Any) -> list[dict[str, Any]]:
     if isinstance(payload, list):
         rows = payload
     elif isinstance(payload, dict):
-        rows = next((payload[k] for k in ("closingPriceDaily", "dailyHistory", "daily_history", "rows", "data", "history") if isinstance(payload.get(k), list)), None)
+        rows = next((payload[k] for k in ("closingPriceDaily", "dailyHistory", "daily_history", "rows", "data", "history", "history_archive", "historyArchive", "closing_price_daily") if isinstance(payload.get(k), list)), None)
     else:
         rows = None
     if not isinstance(rows, list) or not rows or any(not isinstance(r, dict) for r in rows):
