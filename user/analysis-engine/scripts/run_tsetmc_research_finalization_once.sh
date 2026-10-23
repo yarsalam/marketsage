@@ -77,7 +77,7 @@ python3 -u "$ADJ" \
 
 PRIOR_RUN="$(
   find "$V025_ROOT" -type f -name 'instrument_decisions.csv' -printf '%T@ %h\n' \
-    | sort -nr | head -n 1 | sed 's/^[^ ]* //'
+    | sort -nr | awk 'NR==1 {sub(/^[^ ]* /, ""); print}'
 )"
 if [ -z "$PRIOR_RUN" ] || [ ! -s "$PRIOR_RUN/instrument_decisions.csv" ] || [ ! -s "$PRIOR_RUN/event_reconciliation.csv" ]; then
   echo "ERROR: v0.2.5 did not produce the decision/event files required for downstream reuse."
@@ -185,6 +185,33 @@ for p in summary_csvs:
 
 summary_path = run_root / "finalization_summary.json"
 summary_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+# Update the local index at the end, so next sessions start from the last run
+# rather than asking the owner to rediscover paths and repeat work.
+index_path = run_root.parent.parent / "registry" / "local_data_index.json"
+try:
+    if index_path.is_file():
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+    else:
+        index = {"schema_version": 1, "data_root": str(run_root.parent.parent)}
+    index.setdefault("existing_runs", {})["tsetmc_research_finalization"] = {
+        "status": result["status"],
+        "run_root": str(run_root),
+        "summary_path": str(summary_path),
+        "artifact_file_count": len(result["artifacts"]),
+        "market_data_network_requests": False,
+        "raw_inputs_overwritten": False,
+        "production_scoring_enabled": False,
+        "backtest_approved": False,
+        "strategy_backtest_run": False,
+    }
+    temporary_index = index_path.with_suffix(".json.tmp")
+    temporary_index.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary_index.replace(index_path)
+    result["local_data_index_updated"] = str(index_path)
+    summary_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+except Exception as exc:
+    print("WARNING: local index update failed:", type(exc).__name__, str(exc))
 print("FINAL_SUMMARY:", summary_path)
 print("ARTIFACT_FILES:", len(result["artifacts"]))
 print("KEY_CSV_ROW_COUNTS:", json.dumps(result["key_csv_row_counts"], ensure_ascii=False))
