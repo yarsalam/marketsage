@@ -172,6 +172,30 @@ def test_discovery_splits_combined_csv_by_instrument_code(tmp_path: Path) -> Non
     assert {row["instrument_code"] for row in items} == {"46348559193224090", "12345678901234567"}
 
 
+def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp_path: Path) -> None:
+    folder = tmp_path / "raw" / "IRO1FOLD0001"
+    folder.mkdir(parents=True)
+    rows = [
+        {"dEven": 20200101, "pClosing": 100},
+        {"dEven": 20200102, "pClosing": 101},
+    ]
+    (folder / "history_archive.json").write_text(json.dumps(rows), encoding="utf-8")
+    (folder / "instrument_search_1.json").write_text(json.dumps({
+        "instrumentSearch": [{
+            "insCode": "46348559193224090",
+            "lVal18AFC": "فولاد",
+            "lVal30": "فولاد مبارکه اصفهان",
+            "cIsin": "IRO1FOLD0001",
+        }]
+    }), encoding="utf-8")
+    items = discover_manifest(tmp_path / "raw")
+    assert len(items) == 1
+    assert items[0]["instrument_code"] == "46348559193224090"
+    assert items[0]["isin"] == "IRO1FOLD0001"
+    assert items[0]["symbol"] == "فولاد"
+    assert items[0]["daily_history_path"].endswith("history_archive.json")
+
+
 def test_unknown_input_semantics_blocks_feature_and_label_creation(tmp_path: Path) -> None:
     manifest, _ = _fixture(tmp_path / "input", history_semantics="unknown")
     summary = run_pipeline(load_manifest(manifest), manifest_path=manifest, output_root=tmp_path / "out", min_history=252)
