@@ -16,6 +16,7 @@ from run_tsetmc_acceptance_pipeline import (  # noqa: E402
     discover_manifest,
     load_manifest,
     looks_like_history,
+    parse_chart,
     run_pipeline,
 )
 
@@ -173,8 +174,17 @@ def test_discovery_splits_combined_csv_by_instrument_code(tmp_path: Path) -> Non
 
 
 def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp_path: Path) -> None:
-    folder = tmp_path / "raw" / "IRO1FOLD0001"
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    folder = corpus / "raw" / "IRO1FOLD0001"
     folder.mkdir(parents=True)
+    adjusted_dir = corpus / "corpus_reconciliation" / "adjusted_candidates_research_only"
+    adjusted_dir.mkdir(parents=True)
+    adjusted_csv = adjusted_dir / "IRO1FOLD0001.adjusted_candidate.csv"
+    adjusted_csv.write_text(
+        "date,instrument_code,open_adj,high_adj,low_adj,last_adj,close_adj,chart_volume\\n"
+        "2020-01-01,46348559193224090,98,105,95,100,100,1000\\n",
+        encoding="utf-8",
+    )
     rows = [
         {"dEven": 20200101, "pClosing": 100},
         {"dEven": 20200102, "pClosing": 101},
@@ -194,6 +204,15 @@ def test_history_archive_uses_sibling_instrument_search_for_inscode_and_isin(tmp
     assert items[0]["isin"] == "IRO1FOLD0001"
     assert items[0]["symbol"] == "فولاد"
     assert items[0]["daily_history_path"].endswith("history_archive.json")
+    assert items[0]["adjusted_chart_path"] == str(adjusted_csv.resolve())
+    parsed_chart = parse_chart(json.loads(json.dumps([
+        {"date": "2020-01-01", "open_adj": 98, "high_adj": 105, "low_adj": 95,
+         "last_adj": 100, "close_adj": 100, "chart_volume": 1000}
+    ])))
+    assert parsed_chart[date(2020, 1, 1)]["close"] == 100
+    with adjusted_csv.open(encoding="utf-8", newline="") as handle:
+        parsed_csv = list(csv.DictReader(handle))
+    assert parse_chart(parsed_csv)[date(2020, 1, 1)]["close"] == 100
 
 
 def test_unknown_input_semantics_blocks_feature_and_label_creation(tmp_path: Path) -> None:
