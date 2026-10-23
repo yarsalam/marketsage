@@ -44,10 +44,14 @@ def _fixture(root: Path, *, duplicate_date: bool = False, with_evidence: bool = 
         ]
     if duplicate_date:
         daily.append(dict(daily[10]))
-    daily_path, chart_path, event_path = root / "daily_history_raw.json", root / "chart_adjusted_raw.json", root / "price_adjustments_raw.json"
+    daily_path, chart_path, event_path, share_path = (
+        root / "daily_history_raw.json", root / "chart_adjusted_raw.json",
+        root / "price_adjustments_raw.json", root / "share_changes_raw.json",
+    )
     daily_path.write_text(json.dumps({"closingPriceDaily": daily}), encoding="utf-8")
     chart_path.write_text(json.dumps(chart), encoding="utf-8")
     event_path.write_text(json.dumps({"priceAdjust": [{"dEven": "20200111", "eventType": "split"}]}), encoding="utf-8")
+    share_path.write_text(json.dumps({"instrumentShareChange": [{"dEven": "20200211", "eventType": "share_change"}]}), encoding="utf-8")
 
     evidence = {}
     evidence_paths = []
@@ -61,7 +65,7 @@ def _fixture(root: Path, *, duplicate_date: bool = False, with_evidence: bool = 
     manifest = root / "manifest.csv"
     columns = [
         "instrument_code", "symbol", "isin", "daily_history_path", "adjusted_chart_path",
-        "adjustment_events_path", "history_close_semantics", "rights_status", "semantics_verified",
+        "adjustment_events_path", "share_change_events_path", "history_close_semantics", "rights_status", "semantics_verified",
         "independent_reconciliation_passed", "corporate_action_completeness_verified",
         "identity_match_evidence_ref", "rights_evidence_ref", "semantics_evidence_ref",
         "independent_reconciliation_evidence_ref", "corporate_action_completeness_evidence_ref",
@@ -76,6 +80,7 @@ def _fixture(root: Path, *, duplicate_date: bool = False, with_evidence: bool = 
             "daily_history_path": str(daily_path),
             "adjusted_chart_path": str(chart_path),
             "adjustment_events_path": str(event_path),
+            "share_change_events_path": str(share_path),
             "history_close_semantics": history_semantics,
             "rights_status": "approved",
             "semantics_verified": "true",
@@ -91,7 +96,7 @@ def _fixture(root: Path, *, duplicate_date: bool = False, with_evidence: bool = 
                 "corporate_action_completeness_evidence_ref": evidence["corporate_actions"],
             })
         writer.writerow(row)
-    return manifest, [daily_path, chart_path, event_path, *evidence_paths]
+    return manifest, [daily_path, chart_path, event_path, share_path, *evidence_paths]
 
 
 def test_complete_pipeline_emits_features_and_six_month_labels_only_after_evidence(tmp_path: Path) -> None:
