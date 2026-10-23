@@ -323,7 +323,7 @@ def discover_instrument_identity(history_path: Path) -> dict[str, str]:
             if str(field(row, *isin_keys) or "").strip().upper() == folder_isin.upper()
         ]
     # Prefer exact ISIN; use a singleton only when the folder's query had one result.
-    chosen = matching[0] if len(matching) == 1 else candidates[0] if not folder_isin and len(candidates) == 1 else None
+    chosen = matching[0] if len(matching) == 1 else candidates[0] if len(candidates) == 1 else None
     if chosen is None:
         return {"instrument_code": "", "symbol": "", "isin": folder_isin}
     code = str(field(chosen, "insCode", "instrument_code", "instrumentCode") or "").strip()
@@ -363,10 +363,14 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                     code_groups[code].append(item)
         if code_groups:
             for code, members in sorted(code_groups.items()):
-                symbol = next((str(field(r, "symbol", "ticker") or "").strip() for r in members if field(r, "symbol", "ticker")), path.parent.name)
-                isin = next((str(field(r, "isin", "ISIN") or "").strip() for r in members if field(r, "isin", "ISIN")), "")
+                identity = discover_instrument_identity(path)
+                row_symbol = next((str(field(r, "symbol", "ticker", "lVal18AFC") or "").strip() for r in members if field(r, "symbol", "ticker", "lVal18AFC")), "")
+                row_isin = next((str(field(r, "isin", "ISIN", "cIsin") or "").strip() for r in members if field(r, "isin", "ISIN", "cIsin")), "")
+                symbol = row_symbol or identity["symbol"] or path.parent.name
+                isin = row_isin or identity["isin"]
                 rows.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin,
+                    "_discovery_identity_conflict": bool(identity["instrument_code"] and identity["instrument_code"] != code),
                     "daily_history_path": str(path.resolve()),
                     "adjusted_chart_path": _sibling(path, ("chart_adjusted_raw.json", "adjusted_chart_raw.json", "chart_adjusted.json", "adjusted_chart.json", "chart_adjusted.csv", "adjusted_chart.csv", "adjusted_history.csv")),
                     "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
@@ -715,6 +719,8 @@ def run_pipeline(
         payloads, input_hashes, errors = {}, {}, []
         if item.get("_discovery_ambiguous_history"):
             errors.append("discovery:multiple_equal_priority_history_files_for_instrument")
+        if item.get("_discovery_identity_conflict"):
+            errors.append("discovery:insCode_conflicts_with_sibling_search_metadata")
         for alternative in item.get("_alternative_history_paths", []):
             alt_path = Path(str(alternative)).expanduser()
             try:
