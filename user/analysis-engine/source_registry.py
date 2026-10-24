@@ -95,6 +95,41 @@ SOURCES: tuple[SourceDefinition, ...] = (
                "Do not commit vendor data files to this public repository; candidate scoring remains disabled."),
     ),
     SourceDefinition(
+        source_id="global.world_bank_indicators",
+        market_scope="global_and_iran",
+        asset_family="annual_macro_indicators",
+        provider="World Bank Indicators API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("annual_macro_observation_candidate",),
+        timestamp_quality="observation year known; exact publication timestamp unavailable",
+        required_checks=("indicator_identity_and_definition", "historical_coverage",
+                         "data_revisions_and_vintages", "country_and_unit_semantics",
+                         "api_terms_and_reuse_rights", "point_in_time_release_availability"),
+        notes=("Public no-key API adapter for bounded annual series. These are macro "
+               "observations, not daily prices; release-time and revision semantics remain "
+               "unverified and every row remains ineligible for scoring."),
+    ),
+    SourceDefinition(
+        source_id="global.binance_spot_public",
+        market_scope="global_crypto_venue_specific",
+        asset_family="crypto_spot_ohlcv",
+        provider="Binance Spot public market-data API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("venue_specific_spot_ohlcv_candidate",),
+        timestamp_quality="candle open/close UTC times; publication timestamp unavailable",
+        required_checks=("instrument_pair_and_venue_identity", "history_completeness_and_pagination",
+                         "timezone_and_candle_boundary", "ohlcv_and_volume_reconciliation",
+                         "terms_and_geographic_access", "rate_limit_and_failure_backoff",
+                         "partial_candle_policy"),
+        notes=("Unauthenticated public kline adapter. Pair and venue stay explicit; quote "
+               "currency is not inferred from the symbol text. Terms, geography, historical "
+               "completeness, and market-data semantics require acceptance."),
+    ),
+    SourceDefinition(
         source_id="iran.codal",
         market_scope="iran",
         asset_family="company_filings_and_corporate_events",
@@ -136,10 +171,31 @@ SOURCES: tuple[SourceDefinition, ...] = (
         required_checks=("terms_and_commercial_rights", "automated_collection_permission",
                          "payload_schema_and_units", "historical_depth", "publication_and_retrieval_times",
                          "revisions_and_missing_intervals", "independent_reconciliation"),
-        notes=("Access is through a vendor-provided account; plan, quotas, and commercial display/redistribution rights "
-               "must follow the vendor agreement. The documented candle-history endpoint is limited to a recent window "
-               "of up to 100 days and requires delta-date decoding; account-level 410 responses must remain disabled. "
-               "Only successfully fetched, schema-validated series are stored as candidates, never for scoring."),
+        notes=("Access is through a vendor-provided account; current public Free tier docs state 1 request/minute and "
+               "100 successful requests/day, with one active token per account. The public docs describe currency rate "
+               "as Toman per unit and state Markets & Indicators values have been in Toman since 2026-07-20; retain "
+               "normalized units as unconfirmed until a sanitized account payload reconciles independently. The documented "
+               "candle-history window is at most 100 days and requires delta-date decoding; 403/410/429 must remain "
+               "fail-closed. Only fetched, schema-validated rows are candidates, never scoring-ready."),
+    ),
+    SourceDefinition(
+        source_id="iran.nerkhsanj.rates_archive",
+        market_scope="iran",
+        asset_family="free_fx_gold_coins_selected_crypto",
+        provider="Nerkhsanj public JSON rates/archive (publisher-announced candidate; not yet verified)",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("daily_rates_candidate", "gold_quote_candidate", "coin_quote_candidate"),
+        timestamp_quality="publisher claims Jalali observation dates; exact schema and availability have not been observed",
+        required_checks=("live_schema_fixture", "publisher_identity_and_upstream_lineage",
+                         "terms_attribution_and_commercial_rights", "series_key_identity",
+                         "toman_unit_and_jalali_conversion", "daily_history_coverage_and_gaps",
+                         "independent_reconciliation", "corrections_and_retrieval_time"),
+        notes=("A third-party announcement describes a no-key JSON API with live rates and daily history since 2010 for "
+               "selected series. This remains a discovery candidate only: no live response has been accepted, actual "
+               "coverage and source lineage are unverified, and the publisher requests attribution. Never poll /calc "
+               "per record or enable this source for scoring before terms and independent validation pass."),
     ),
     SourceDefinition(
         source_id="iran.gold_fx",

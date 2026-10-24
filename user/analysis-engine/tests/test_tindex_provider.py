@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import httpx
+import tindex_provider
 import pytest
 
 from tindex_provider import (
@@ -11,6 +12,17 @@ from tindex_provider import (
     TindexRateLimitError,
     tindex_connection_status,
 )
+
+
+@pytest.fixture(autouse=True)
+def reset_process_local_quota():
+    with tindex_provider._RATE_LOCK:
+        tindex_provider._REQUEST_TIMES.clear()
+        tindex_provider._SUCCESSFUL_REQUEST_TIMES.clear()
+    yield
+    with tindex_provider._RATE_LOCK:
+        tindex_provider._REQUEST_TIMES.clear()
+        tindex_provider._SUCCESSFUL_REQUEST_TIMES.clear()
 
 
 def client_for(handler, **kwargs):
@@ -83,21 +95,43 @@ def test_path_segments_cannot_inject_extra_routes():
             client.board("../currency-rates")
 
 
-def test_local_rate_limit_is_three_requests_per_minute():
+def test_local_rate_limit_is_one_request_per_minute_across_clients():
     calls = []
+    now = [0.0]
 
     def handler(request):
         calls.append(request.url.path)
         return httpx.Response(200, json={"ok": True})
 
-    with client_for(handler) as client:
-        client.currency_rates()
-        client.boards()
-        client.categories()
-        with pytest.raises(TindexRateLimitError, match="Local Tindex limit"):
-            client.movers()
+    with client_for(handler, clock=lambda: now[0]) as first:
+        first.currency_rates()
+        with client_for(handler, clock=lambda: now[0]) as second:
+            with pytest.raises(TindexRateLimitError, match="Local Tindex limit"):
+                second.boards()
+            now[0] = 60.0
+            second.boards()
 
-    assert len(calls) == 3
+    assert len(calls) == 2
+
+
+def test_local_success_daily_budget_is_enforced(monkeypatch):
+    calls = []
+    now = [0.0]
+    monkeypatch.setattr(tindex_provider, "MAX_SUCCESSFUL_REQUESTS_PER_DAY", 2)
+
+    def handler(request):
+        calls.append(request.url.path)
+        return httpx.Response(200, json={"ok": True})
+
+    with client_for(handler, clock=lambda: now[0]) as client:
+        client.currency_rates()
+        now[0] = 60.0
+        client.boards()
+        now[0] = 120.0
+        with pytest.raises(TindexRateLimitError, match="daily success budget"):
+            client.categories()
+
+    assert len(calls) == 2
 
 
 def test_missing_configuration_fails_closed(monkeypatch):
@@ -114,6 +148,8 @@ def test_status_does_not_expose_token(monkeypatch):
     assert status["configured"] is True
     assert status["network_tested"] is False
     assert status["production_approved"] is False
+    assert status["quota"]["requests_per_minute"] == 1
+    assert status["quota"]["successful_requests_per_day"] == 100
     assert "do-not-expose-me" not in repr(status)
     assert "stock_energy_indices" in status["documented_data_families"]
     assert "news_feed" in status["not_implemented_or_not_confirmed"]
