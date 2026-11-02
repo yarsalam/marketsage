@@ -40,6 +40,10 @@ main → #6 (open; not authorized to merge to main)
         └─ #16 [open; independent evidence reconciliation]
 ```
 
+## Local Runner activation gate
+
+The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. No Runner is registered. Owner-side branch protection/ruleset, dedicated unprivileged account, restricted data/output directories and repository-scoped ephemeral Runner registration are required before local data execution.
+
 ## Execution policy
 
 Merge dependent PRs sequentially. Independent data inventory, source review and methodology work may proceed in parallel. A blocked network smoke does not freeze unrelated work. Update this register and `PROJECT_STATE.md` after each material transition. CI green is not source acceptance, strategy validation or deployment authorization.
