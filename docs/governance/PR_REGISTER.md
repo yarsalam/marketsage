@@ -11,7 +11,7 @@
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old fix branch ← `research/iran-free-data-smoke` | Open | Parked network diagnostic; TSETMC request timed out from GitHub-hosted runner. |
 | [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 branch ← `feature/tsetmc-integrated-acceptance-pipeline` | Merged | All five required CI job types passed on exact head `4bd179263f55b90854d00f1ea3b1287da0393b03`; merge commit `f267c49efcbf72e7ddc17099ff93f38ade269a7b`. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Draft | Governance docs; includes parallel independent work policy. |
-| [#16](https://github.com/yarsalam/marketsage/pull/16) | #6 branch ← `research/2026-11-source-evidence-reconciliation` | Open | Source matrix/registry evidence reconciliation; CI run `41405595704` queued; no approval flags changed. |
+| [#17](https://github.com/yarsalam/marketsage/pull/17) | #6 branch ← `fix/stage4-cost-sensitivity-scenarios` | Open | Stage 4 cost-scenario label/stress correction; CI run `41406215664` is completing. |
 
 ## Merged PRs relevant to the integration path
 
@@ -37,7 +37,8 @@ main → #6 (open; not authorized to merge to main)
         ├─ #9 [merged]
         ├─ #13 [merged]
         ├─ #14 [merged]
-        └─ #16 [open; independent evidence reconciliation]
+        ├─ #16 [merged; source evidence reconciliation]
+        └─ #17 [open; Stage 4 cost sensitivity fix]
 ```
 
 ## Local Runner activation gate
