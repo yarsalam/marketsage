@@ -46,14 +46,16 @@ PROVIDERS: tuple[ProviderDefinition, ...] = (
         enabled_for_scoring=False,
         source="TSETMC community-documented endpoints",
         notes=(
-            "Historical daily prices and adjusted-price endpoints are candidates, "
-            "not yet verified as a stable API contract. Validate symbol mapping, "
-            "corporate actions, suspensions, history depth and access from the server."
+            "Raw daily history and the legacy a=1 adjusted chart are ingested as separate "
+            "candidate price fields. The chart's positional schema is empirical, adjusted "
+            "dates can be missing, and symbols, terms, price units, corporate actions, "
+            "suspensions and production-host access remain unverified."
         ),
         candidate_endpoints=(
             "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/{query}",
             "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/{insCode}/0",
             "https://cdn.tsetmc.com/api/ClosingPrice/GetPriceAdjustList/{insCode}",
+            "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i={insCode}&t=ph&a=1",
         ),
     ),
     ProviderDefinition(
