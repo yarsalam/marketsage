@@ -26,7 +26,8 @@ main
        ├─ #9 Iranian market dashboard            [merged]
        ├─ #13 free-dataset discovery             [merged]
        ├─ #14 TSETMC acceptance pipeline         [merged; CI green]
-       └─ #16 source-evidence reconciliation     [open; CI queued]
+       ├─ #16 source-evidence reconciliation     [merged; CI green]
+       └─ #17 Stage 4 cost sensitivity fix       [open; CI running]
 
 #8 research/iran-free-data-smoke — parked network diagnostic
 #15 governance — documentation PR, Draft
@@ -44,7 +45,7 @@ main
 | [#13](https://github.com/yarsalam/marketsage/pull/13) | #6 branch | Merged | Free-dataset discovery, source catalog, candidate audit/ingestion tools; all five required CI job types passed on exact head before merge. |
 | [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 branch ← `feature/tsetmc-integrated-acceptance-pipeline` | Merged | Exact-head run `41401668921` completed successfully; all five required job types passed. Merge commit `f267c49efcbf72e7ddc17099ff93f38ade269a7b`. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Open, Draft | Updated constitution allows independent work in parallel. Keep Draft until governance adoption/enforcement decision. |
-| [#16](https://github.com/yarsalam/marketsage/pull/16) | #6 branch ← `research/2026-11-source-evidence-reconciliation` | Open | Reconciles Nerkhsanj and Binance evidence in the matrix/registry; current head `420ede0476fbd9a6abe444b397fd9d4fcea91dff`; CI run `41405595704` queued. No source approval changes. |
+| [#17](https://github.com/yarsalam/marketsage/pull/17) | #6 branch ← `fix/stage4-cost-sensitivity-scenarios` | Open | Fixes duplicate cost-scenario labels and ensures higher-cost stress exceeds configured costs where bounds permit; current head `74bf96ff1607e213ee9abdf259a7059ceca454da`; CI run `41406215664` is completing. |
 
 CI results apply only to exact head commits. PR #14 passed all five required job types before merge. PR #6 stays open and unmerged to main; there is no deployment or scoring authorization.
 
@@ -57,7 +58,9 @@ CI results apply only to exact head commits. PR #14 passed all five required job
 5. PR #9 rebased and merged into #6 after green CI.
 6. PR #13 rebased and merged into #6 after green CI.
 7. PR #14 passed all five required CI job types on its exact head and was merged into #6; #6 advanced to `f267c49efcbf72e7ddc17099ff93f38ade269a7b`.
-8. Opened independent PR #16 to reconcile the Nerkhsanj and Binance source evidence; its CI is queued.
+8. PR #16 reconciled Nerkhsanj and Binance evidence; all five CI job types passed on exact head `420ede0476fbd9a6abe444b397fd9d4fcea91dff`, then it was merged into #6 at `77d25986627664b6482e515fbd4bd9791a041797`.
+9. Post-#16 merge CI run `41405927116` passed all five required job types.
+10. Opened PR #17 after review found a cost-sensitivity scenario-label defect in Stage 4; exact-head CI is running.
 
 ## Parallel work policy
 
@@ -83,7 +86,7 @@ Local dataset inventory remains unverified because this session has no access to
 ## Next actions
 
 1. Post-merge CI run `41404741827` on #6 completed successfully with all five required job types green.
-2. Complete CI on PR #16; if its exact head passes, merge it into #6 and refresh the state.
+2. Complete CI on PR #17; if its exact head passes, merge it into #6 and refresh the state.
 2. Continue independent source-evidence screening and resolve the specific Nerkhsanj anomalies/rights and TSETMC event-window reconciliation.
 3. Execute the integrated TSETMC pipeline and Stage 4 evaluation only through a trusted least-privilege local runner; the owner's full local corpus remains inaccessible here.
 4. Fix only demonstrated defects; do not repeat the parked GitHub-hosted TSETMC live probe.
