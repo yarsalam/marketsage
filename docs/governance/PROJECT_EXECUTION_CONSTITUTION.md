@@ -83,13 +83,14 @@ Data acceptance must consider, as applicable:
 
 Unknown is not pass. A failed or unverified data gate must remain visible and must not silently feed investment scoring.
 
-### Rule 5 — One bounded work item and one canonical PR at a time
+### Rule 5 — One ordered integration path; independent work may proceed in parallel
 
-- Work is organized as one active strategic work item with one canonical feature branch and one PR.
-- The branch must be based on the agreed integration base; dependencies on another unmerged PR must be explicit.
+- Keep one canonical integration path for changes that depend on one another. Merge dependent PRs in dependency order; do not merge stacked PRs in parallel.
+- Independent research, local-data inventory, source evaluation, documentation, and separately scoped engineering work may proceed in parallel when their inputs and outputs are isolated and they do not compete to modify the same integration branch.
+- Each work item must have one owner, one objective, explicit dependencies, a bounded output, and a clear acceptance/stop condition.
 - Do not create duplicate PRs for the same objective or leave ambiguous competing implementations.
 - A PR must state its strategic objective, scope, files/artifacts produced, evidence, tests actually run, limitations, and follow-up decision.
-- Before another implementation task starts, the current PR must be merged, closed, or explicitly parked with an owner and reason.
+- A blocked PR does not freeze unrelated work. Record the blocker and continue with independent work that does not rely on it.
 - No change is considered complete until the Git record and project-state register are updated.
 
 ### Rule 6 — Tests are decision tools, not a work stream
