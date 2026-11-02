@@ -1,4 +1,5 @@
 from gdelt_news_provider import GdeltError
+from fred_alfred_provider import FredProviderError
 from scripts.probe_source_acceptance_pack import (
     SOURCE_IDS,
     parse_source_selection,
@@ -31,3 +32,11 @@ def test_source_selection_can_include_multiple_sources():
 
 def test_source_selection_defaults_to_full_pack():
     assert parse_source_selection([]) == set(SOURCE_IDS)
+
+
+
+def test_fred_safe_error_detail_only_exposes_sanitized_provider_errors():
+    error = FredProviderError("FRED network timeout (ConnectTimeout); no automatic retry was made")
+    assert safe_error_detail("us.fred.alfred", error) == str(error)
+    arbitrary = RuntimeError("api_key=must-not-leak")
+    assert safe_error_detail("us.fred.alfred", arbitrary) is None
