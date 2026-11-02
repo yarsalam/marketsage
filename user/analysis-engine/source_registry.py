@@ -187,15 +187,20 @@ SOURCES: tuple[SourceDefinition, ...] = (
         used_by_research_engine=False,
         approved_for_production=False,
         data_kinds=("daily_rates_candidate", "gold_quote_candidate", "coin_quote_candidate"),
-        timestamp_quality="publisher claims Jalali observation dates; exact schema and availability have not been observed",
+        timestamp_quality="owner-run ingestion round-trip-validated Jalali observation dates; exact observation-time and publication/update semantics remain unknown",
         required_checks=("live_schema_fixture", "publisher_identity_and_upstream_lineage",
                          "terms_attribution_and_commercial_rights", "series_key_identity",
                          "toman_unit_and_jalali_conversion", "daily_history_coverage_and_gaps",
                          "independent_reconciliation", "corrections_and_retrieval_time"),
-        notes=("A third-party announcement describes a no-key JSON API with live rates and daily history since 2010 for "
-               "selected series. This remains a discovery candidate only: no live response has been accepted, actual "
-               "coverage and source lineage are unverified, and the publisher requests attribution. Never poll /calc "
-               "per record or enable this source for scoring before terms and independent validation pass."),
+        notes=("One owner-run bounded archive request on 2026-10-22 parsed 28 candidate keys and 91,245 pairs; the "
+               "2026-10-23 local audit reported no invalid dates, non-positive values or duplicate-date conflicts, but "
+               "flagged 182 adjacent changes >=20% and 48 >=100%, concentrated in IQD, silver and Tether, plus long "
+               "gaps including 373 days for IQD and up to 84 days for silver, Tether and Bitcoin. These are owner-reported "
+               "summaries, not independent validation; the raw response was not retained as a reusable fixture. This "
+               "remains candidate-only: key/series identity, units, quote convention, daily-value semantics, source and "
+               "upstream lineage, attribution, commercial/model-use rights, calendar, corrections, completeness and "
+               "independent reconciliation are unverified. Keep IQD, silver and Tether out of features; do not rescale, "
+               "delete or forward-fill records. Never poll /calc per record or enable this source for scoring."),
     ),
     SourceDefinition(
         source_id="iran.gold_fx",
