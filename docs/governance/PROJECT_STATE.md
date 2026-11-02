@@ -4,13 +4,13 @@
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Default branch:** `main`  
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
-**Status:** PR #1 baseline is in main. Tindex/FRED fixes, Iranian dashboard, free-dataset discovery and the integrated TSETMC acceptance pipeline are now consolidated in open PR #6. Post-#14 software CI is green; data-source acceptance and strategy validation remain incomplete.
+**Status:** PR #1 baseline is in main. Tindex/FRED fixes, Iranian dashboard, free-dataset discovery, integrated TSETMC acceptance and evidence/Stage 4 corrections are consolidated in open PR #6. Post-#17 CI is still completing; data-source acceptance and strategy validation remain incomplete.
 
 ## Verified repository state
 
 - Repository visibility is `private`.
 - PR #1 integrated the application baseline into `main`; no deployment occurred.
-- PR #6 remains open and unmerged to `main` under the explicit owner boundary. Its current head is `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; post-#14 merge CI run `41404741827` passed all five required job types.
+- PR #6 remains open and unmerged to `main` under the explicit owner boundary. Its current head is `c821f6423ee5734590b4852eb5fab307834f0b51`; post-#17 merge CI run `41406540206` has four job types green and production-images still running.
 - PR #7 was merged into #6; PR #9 was merged into #6; PR #13 was merged into #6.
 - PR #14 was merged into #6 on 2026-11-02 after all five required CI job types passed on exact head `4bd179263f55b90854d00f1ea3b1287da0393b03`; merge commit is `f267c49efcbf72e7ddc17099ff93f38ade269a7b`.
 - PR #13 passed all five required CI job types on its exact pre-merge head and was merged into #6.
@@ -39,7 +39,7 @@ main
 | PR | Base ← head | State | Checks / handling |
 |---|---|---|---|
 | [#1](https://github.com/yarsalam/marketsage/pull/1) | `main` ← `deploy/production-readiness` | Merged | Application baseline integrated; no deployment. |
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open, unmerged | Current head `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; latest run `41404741827` completed successfully; all five required job types are green. Keep open at main boundary. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open, unmerged | Current head `c821f6423ee5734590b4852eb5fab307834f0b51`; latest run `41406540206` has analysis, backend, frontend and admin green; production-images is still running. Keep open at main boundary. |
 | [#7](https://github.com/yarsalam/marketsage/pull/7) | #6 branch | Merged | Tindex documented route/history updates, safe FRED network diagnostics, regression tests and strict 1/minute + 100/day client guard. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old fix branch ← `research/iran-free-data-smoke` | Open, parked | Standard CI passed; separate live TSETMC probe timed out from GitHub-hosted runner. Do not repeat from same network. |
 | [#9](https://github.com/yarsalam/marketsage/pull/9) | #6 branch | Merged | Iranian market dashboard and research-only readiness/staging configuration; all five unique required CI job types passed before merge. |
@@ -87,7 +87,7 @@ Local dataset inventory remains unverified because this session has no access to
 
 ## Next actions
 
-1. Post-#17 merge CI run `41406540206` on #6 is still running; inspect its five required job types before the next integration.
+1. Complete post-#17 merge CI run `41406540206` on #6; four required job types are green and production-images remains in progress.
 2. Complete CI on PR #18; if its exact head passes, merge it into #6 and refresh the state.
 2. Continue independent source-evidence screening and resolve the specific Nerkhsanj anomalies/rights and TSETMC event-window reconciliation.
 3. Execute the integrated TSETMC pipeline and Stage 4 evaluation only through a trusted least-privilege local runner; the owner's full local corpus remains inaccessible here.
