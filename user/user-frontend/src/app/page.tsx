@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { IranMarketDashboard } from "@/components/IranMarketDashboard";
 import { AIChatbot } from "@/components/layout/AIChatbot";
 import { InvestmentDecision } from "@/components/InvestmentDecision";
 import { RiskAnalysis } from "@/components/RiskAnalysis";
@@ -11,6 +12,7 @@ import {
 
 type TabComponent = React.FC<{ onNavigate: (tab: string) => void }>;
 const tabComponents: Record<string, TabComponent> = {
+  iran: IranMarketDashboard as TabComponent,
   decision: InvestmentDecision,
   momentum: MomentumMonitor,
   regime: MarketRegime,
@@ -24,7 +26,7 @@ const tabComponents: Record<string, TabComponent> = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("decision");
+  const [activeTab, setActiveTab] = useState("iran");
   const ActiveComponent = tabComponents[activeTab] ?? InvestmentDecision;
   return (
     <div className="flex h-screen bg-background text-text">

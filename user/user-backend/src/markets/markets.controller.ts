@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { MarketsService } from './markets.service';
 
 @Controller('api/markets')
@@ -29,6 +29,26 @@ export class MarketsController {
       throw new BadRequestException('transaction_cost_bps must be between 0 and 1000');
     }
     return this.marketsService.getBacktest(String(topNValue), String(costValue));
+  }
+
+  @Get('iran/data-status')
+  getIranDataStatus() {
+    return this.marketsService.getIranDataStatus();
+  }
+
+  @Get('iran/currency-rates')
+  getIranCurrencyRates() {
+    return this.marketsService.getIranCurrencyRates();
+  }
+
+  @Get('iran/opportunities')
+  getIranOpportunities() {
+    return this.marketsService.getIranOpportunities();
+  }
+
+  @Post('iran/refresh')
+  refreshIranData(@Headers('x-iran-refresh-token') refreshToken?: string) {
+    return this.marketsService.refreshIranData(refreshToken ?? '');
   }
 
   @Get('data-status')
