@@ -7,7 +7,7 @@
 
 | PR | Base ← head | State | Handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open | Current head `f267c49efcbf72e7ddc17099ff93f38ade269a7b` includes #7, #9, #13 and #14; latest CI run `41404741827` has four job types green and production-images still in progress at snapshot. Keep unmerged into main. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open | Current head `f267c49efcbf72e7ddc17099ff93f38ade269a7b` includes #7, #9, #13 and #14; latest CI run `41404741827` completed successfully with all five required job types green. Keep unmerged into main. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old fix branch ← `research/iran-free-data-smoke` | Open | Parked network diagnostic; TSETMC request timed out from GitHub-hosted runner. |
 | [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 branch ← `feature/tsetmc-integrated-acceptance-pipeline` | Merged | All five required CI job types passed on exact head `4bd179263f55b90854d00f1ea3b1287da0393b03`; merge commit `f267c49efcbf72e7ddc17099ff93f38ade269a7b`. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Draft | Governance docs; includes parallel independent work policy. |
