@@ -84,3 +84,23 @@ def test_cost_sensitivity_is_predeclared_and_higher_costs_do_not_improve_return(
     assert scenarios["higher_cost_stress"]["period_cost_fractions"]["total"] >= (
         scenarios["configured_costs"]["period_cost_fractions"]["total"]
     )
+
+
+def test_cost_scenarios_keep_distinct_labels_when_configured_costs_are_zero():
+    report = evaluate_monthly_strategies(
+        make_prices(),
+        BacktestConfig(
+            top_n=2, momentum_months=3, volatility_months=6,
+            transaction_cost_bps=0, slippage_bps=0,
+        ),
+        holdout_months=12,
+        min_train_months=24,
+        fold_months=6,
+    )
+    scenarios = {item["scenario"]: item for item in report["cost_sensitivity"]}
+    assert {"zero_cost_reference", "configured_costs", "higher_cost_stress"} == set(scenarios)
+    assert scenarios["configured_costs"]["transaction_cost_bps"] == 0
+    assert scenarios["configured_costs"]["slippage_bps"] == 0
+    assert scenarios["higher_cost_stress"]["strictly_higher_than_configured"] is True
+    assert scenarios["higher_cost_stress"]["transaction_cost_bps"] > 0
+    assert scenarios["higher_cost_stress"]["slippage_bps"] > 0
