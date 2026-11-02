@@ -4,84 +4,79 @@
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Default branch:** `main`  
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
-**Status:** Initial application baseline is now integrated into `main`; the remaining feature stack is being consolidated sequentially.
+**Status:** Base application is in main. The Tindex/FRED fixes are integrated into the open #6 branch; downstream Iranian-data PRs have been rebased onto the current integration base and are being validated.
 
 ## Verified repository state
 
 - Repository visibility is `private`.
-- PR #1 was merged into `main`. This brought the existing application/research code baseline into the default branch. **No production deployment occurred.**
-- `main` now contains the baseline previously held on `deploy/production-readiness`.
-- PR #6 was retargeted from `deploy/production-readiness` to `main`; GitHub currently reports it clean/mergeable. It remains open and unmerged.
-- All inspected branches were reported unprotected. The GitHub connection cannot configure repository settings or branch protection.
-- A prior ruleset settings read returned a plan-related HTTP 403. Do not assume private-branch enforcement is available on the current plan.
-- No local Runner has been registered. Do not register one until the trusted-workflow boundary and restricted data access are validated.
-- This snapshot does not inspect local uncommitted files or the owner's private research-data directory.
+- PR #1 integrated the application baseline into `main`. This was a Git merge only; no production deployment occurred.
+- PR #6 targets `main` and is still open/unmerged by explicit owner boundary. Its current branch includes the fixes formerly in PR #7.
+- PR #7 was merged into the PR #6 feature branch, not into `main`.
+- All inspected branches remain unprotected. The connected GitHub integration cannot configure repository settings or branch protection.
+- No local Runner has been registered. Its security boundary must be implemented before local datasets can be accessed through automated jobs.
+- Local uncommitted files and the owner's private data directory have not been inspected in this GitHub-only pass.
 
-## Active PRs — verified 2026-11-02
-
-| PR | Base ← head | State | Mergeability / checks | Handling |
-|---|---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open | Clean; 5/5 observed CI jobs passed | Retargeted to main; remains unmerged under prior owner restriction |
-| [#7](https://github.com/yarsalam/marketsage/pull/7) | `feat/tindex-free-data-connector` ← `fix/gdelt-fred-tindex-current-docs` | Open | **Dirty / not mergeable**; 5/5 checks passed | Resolve branch divergence before merge |
-| [#8](https://github.com/yarsalam/marketsage/pull/8) | `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Open | Unstable; `tsetmc-smoke` failed | Park until the smoke failure is explained |
-| [#9](https://github.com/yarsalam/marketsage/pull/9) | `fix/gdelt-fred-tindex-current-docs` ← `feature/iran-live-data-dashboard` | Open | Clean; 5 unique CI jobs passed | Depends on #7 |
-| [#13](https://github.com/yarsalam/marketsage/pull/13) | `feature/iran-live-data-dashboard` ← `feature/free-dataset-discovery-acceptance` | Open | Clean; 5/5 passed | After #9; integrate sequentially with #14 |
-| [#14](https://github.com/yarsalam/marketsage/pull/14) | `feature/iran-live-data-dashboard` ← `feature/tsetmc-integrated-acceptance-pipeline` | Open | Clean; 5/5 passed | After #9; update/revalidate after #13 or vice versa |
-| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Open, Draft | Clean; no check runs on its documentation-only head | Hold until governance and enforcement choices are finalized |
-
-CI results refer to the observed commit SHAs only. A changed commit requires fresh validation. Green CI does not imply source acceptance, investment approval or deployment readiness.
-
-## Recently merged PRs
-
-| PR | Merged into | Subject |
-|---|---|---|
-| #1 | `main` | Integrate MarketSage application baseline (no deployment) |
-| #2 | `deploy/production-readiness` | Leakage-aware research backtest baseline and data-contract tests |
-| #3 | `deploy/production-readiness` | Quality-gated Iranian market data contracts |
-| #4 | `deploy/production-readiness` | Admin workspace CI and production-gate clarification |
-| #5 | `deploy/production-readiness` | Point-in-time data-lineage foundation |
-| #10 | `feature/iran-live-data-dashboard` | TSETMC adjusted-history validation probe |
-| #11 | `feature/iran-live-data-dashboard` | StreamData CSV audit and normalization |
-| #12 | `feature/iran-live-data-dashboard` | Tindex historical candle ingestion |
-
-## Current integration order
+## Current integration graph
 
 ```text
 main
-  └─ #6 → feat/tindex-free-data-connector
-       └─ #7 → fix/gdelt-fred-tindex-current-docs
-            ├─ #8 → research/iran-free-data-smoke       [failed smoke; park]
-            └─ #9 → feature/iran-live-data-dashboard
-                 ├─ #13 → feature/free-dataset-discovery-acceptance
-                 └─ #14 → feature/tsetmc-integrated-acceptance-pipeline
+  └─ #6 feat/tindex-free-data-connector
+       ├─ includes #7 priority-source fixes (already merged into this branch)
+       └─ #9 feature/iran-live-data-dashboard
+            ├─ #13 free-dataset-discovery-acceptance
+            └─ #14 tsetmc-integrated-acceptance-pipeline
+
+#8 research/iran-free-data-smoke — separate diagnostic PR; keep parked
+#15 governance — documentation PR; remains Draft pending final governance/branch controls
 ```
 
-#7 is the current dependency blocker. Do not merge its children before resolving it. #13 and #14 are siblings; merge one, update the other against the resulting base, then run the affected CI once.
+## PR status — observed 2026-11-02
 
-## Strategic evidence inherited from earlier records
+| PR | Current branch / base | State | Checks / handling |
+|---|---|---|---|
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open, unmerged | Clean; all five unique CI job types passed. Do not merge to main without explicit owner authorization. |
+| [#7](https://github.com/yarsalam/marketsage/pull/7) | `feat/tindex-free-data-connector` | Merged | Merged at `3b5d8a67bcaae6234afa9b4a1d71cd7c2ad7cb47`; Tindex API fixes and sanitized FRED network diagnostics are now in #6. |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | Old fix branch ← `research/iran-free-data-smoke` | Open, parked | Five standard CI jobs passed; the separate live TSETMC probe failed with `ConnectTimeout` to `cdn.tsetmc.com` from GitHub-hosted runner. Not evidence of a code failure or a blocker to unrelated work. |
+| [#9](https://github.com/yarsalam/marketsage/pull/9) | `feat/tindex-free-data-connector` ← `feature/iran-live-data-dashboard` | Open | Current head `1acbc172d79403fa614d040e6c55c443157f7beb`; analysis/backend/frontend/admin checks passed; production image checks still running at snapshot. |
+| [#13](https://github.com/yarsalam/marketsage/pull/13) | `feature/iran-live-data-dashboard` ← `feature/free-dataset-discovery-acceptance` | Open | Current head `ae9a1072b2a8c1d7748b5159acc76f46999cc073`; analysis/backend/frontend/admin checks passed; production image checks still running at snapshot. |
+| [#14](https://github.com/yarsalam/marketsage/pull/14) | `feature/iran-live-data-dashboard` ← `feature/tsetmc-integrated-acceptance-pipeline` | Open | Current head `6fdc2805849561ede14b9c6d7ace303d5113457d`; analysis/backend/frontend/admin checks passed; production image checks still running at snapshot. |
+| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Open, Draft | Updated governance documents; keep Draft until final adoption and private-branch enforcement decision. |
 
-These are reported findings, not a new local-data audit:
+Check status applies only to the listed head commits. The remaining production-image checks must complete successfully before merging the corresponding downstream PRs.
 
-- TSETMC فولاد: 4,250 raw rows; 285 raw OHLC violations and 41 in the adjusted candidate; 23 adjustment events examined. Not certified adjusted history.
-- TSETMC and CODAL were reachable in a prior VPN-off probe. Reachability is not acceptance; CODAL publication timestamp semantics remained unresolved.
-- Tindex historical candles were reported to have an approximately 100-day provider limit, insufficient alone for a six-month backtest.
-- StreamData exports for AYAR, BTCUSDT, 18K gold and free-market USD were audited; units/timezone/market semantics remain unresolved.
-- Yahoo-derived global proxies and an initial momentum/backtest foundation are not a certified, point-in-time tradable universe.
-- Investment scoring/ranking remains fail-closed. No profitability claim or future-return guarantee is established.
+## Changes made in this execution pass
+
+1. Merged PR #1 into `main` as a code-baseline integration; no deployment.
+2. Retargeted PR #6 to `main`; kept it open/unmerged.
+3. Reconciled PR #7 with the newer PR #6 Tindex quota implementation (1 request/minute, 100 successful requests/day), retained the documented indicator/history API changes and FRED sanitized error handling, then merged #7 into #6.
+4. Corrected CI triggers so pull requests targeting feature/fix branches are validated; retained the free-dataset validation step and staging configuration checks.
+5. Rebased/synchronized PR #9, #13 and #14 onto the current dependency chain, preserving their separate code changes.
+
+## Work that can proceed in parallel
+
+A dependency blocker does not stop unrelated work. These workstreams may proceed in parallel as separate, bounded tasks:
+
+- audit existing local datasets and manifests without rerunning prior probes;
+- broaden candidate-source discovery across Iranian and global assets;
+- review source rights, coverage, unit/timestamp semantics and independent-reference options;
+- prepare the evaluation protocol and baseline comparisons without activating production scoring;
+- continue CI and integration of the dependent PR chain in its prescribed order.
+
+Local dataset inspection is not yet completed because this session has no access to the owner's laptop data directory and no trusted local Runner is installed. Do not claim it has been audited.
 
 ## Operating constraints
 
-1. No investment scoring/ranking activation or real-money trade execution.
-2. No data source is accepted solely because an endpoint responds or CI passes.
-3. Merging code into `main` is not authorization to deploy it.
-4. No local Runner registration before trusted-workflow and least-privilege controls are tested.
-5. Raw datasets, credentials and private captures stay outside Git; use manifests and hashes.
-6. Re-run tests only after a material change to code, data hash, configuration, environment or dependencies.
+- Investment scoring/ranking remains fail-closed; no real-money trades or allocation changes.
+- Endpoint reachability or green CI does not constitute data-source acceptance.
+- Merging code into `main` is not authorization to deploy.
+- PR #6 remains unmerged into `main` until the owner explicitly authorizes it.
+- No self-hosted Runner registration before trusted-workflow and least-privilege controls are reviewed.
+- Keep raw datasets, credentials and private captures outside Git; use manifests and hashes.
 
-## Next work
+## Next execution order
 
-1. Resolve PR #7's divergence against the updated #6 base.
-2. Revalidate and integrate #7; then integrate #9.
-3. Integrate #13 and #14 sequentially, with one canonical integration PR at a time.
-4. Keep #8 parked until its failing TSETMC smoke check is diagnosed.
-5. After the stack is coherent, resume strategic work with the broad candidate-data screen and local evidence inventory—not another connector/test loop.
+1. Let the current CI complete for #9, #13 and #14; fix only a demonstrated failure.
+2. Merge #9 into the #6 integration branch after all required checks pass.
+3. Merge #13 and #14 sequentially into the #9/dashboard branch, updating and validating the sibling after the first merge.
+4. Continue independent source/data inventory work in parallel; do not wait for the whole PR chain to finish.
+5. Keep #6 open at the main boundary until explicit owner authorization; no deployment is implied.
