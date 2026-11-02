@@ -7,19 +7,19 @@
 
 | PR | Base ← head | State | Handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open | Clean; 5 CI job types passed; contains merged #7; remains unmerged into main under owner boundary |
-| [#8](https://github.com/yarsalam/marketsage/pull/8) | old fix branch ← `research/iran-free-data-smoke` | Open | Parked diagnostic; TSETMC live request timed out from GitHub runner |
-| [#9](https://github.com/yarsalam/marketsage/pull/9) | `feat/tindex-free-data-connector` ← `feature/iran-live-data-dashboard` | Open | Current head `1acbc172...`; core checks green; production-image jobs pending |
-| [#13](https://github.com/yarsalam/marketsage/pull/13) | `feature/iran-live-data-dashboard` ← `feature/free-dataset-discovery-acceptance` | Open | Current head `ae9a1072...`; core checks green; production-image jobs pending |
-| [#14](https://github.com/yarsalam/marketsage/pull/14) | `feature/iran-live-data-dashboard` ← `feature/tsetmc-integrated-acceptance-pipeline` | Open | Current head `6fdc2805...`; core checks green; production-image jobs pending |
-| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Draft | Governance docs; pending final adoption and branch-enforcement plan |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | Open | Current head includes #7 and #9; clean/mergeable. Keep unmerged into main under owner boundary. |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | old fix branch ← `research/iran-free-data-smoke` | Open | Parked diagnostic; live TSETMC request timed out from GitHub-hosted runner. |
+| [#13](https://github.com/yarsalam/marketsage/pull/13) | #6 branch ← `feature/free-dataset-discovery-acceptance` | Open | Current head `1398ca3369c8...`; fresh CI in progress after rebase. |
+| [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 branch ← `feature/tsetmc-integrated-acceptance-pipeline` | Open | Current head `9a6b5109c938...`; fresh CI in progress after rebase. |
+| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Draft | Governance; keeps branch enforcement and Runner controls explicit. |
 
 ## Merged PRs relevant to the integration chain
 
 | PR | Merged into | Result |
 |---|---|---|
 | [#1](https://github.com/yarsalam/marketsage/pull/1) | `main` | Application baseline integrated; no deployment |
-| [#7](https://github.com/yarsalam/marketsage/pull/7) | #6 feature branch | Tindex documented routes/history, safe FRED network errors, tests; retained 1/minute and 100/day quota guard |
+| [#7](https://github.com/yarsalam/marketsage/pull/7) | #6 feature branch | Tindex documented endpoints/history, FRED network diagnostics, tests, strict quota guard |
+| [#9](https://github.com/yarsalam/marketsage/pull/9) | #6 feature branch | Iranian dashboard, candidate ingestion, research-only readiness and staging configuration |
 | [#2](https://github.com/yarsalam/marketsage/pull/2) | deployment branch | Backtest baseline |
 | [#3](https://github.com/yarsalam/marketsage/pull/3) | deployment branch | Iranian market data contracts |
 | [#4](https://github.com/yarsalam/marketsage/pull/4) | deployment branch | Admin workspace CI and production-gate audit |
@@ -28,20 +28,20 @@
 | [#11](https://github.com/yarsalam/marketsage/pull/11) | dashboard branch | StreamData audit |
 | [#12](https://github.com/yarsalam/marketsage/pull/12) | dashboard branch | Tindex candle ingestion |
 
-## Current integration order
+## Current integration graph
 
 ```text
-main → #6 (open; not yet merged to main)
-        └─ #9 (pending production-image checks)
-             ├─ #13 (pending production-image checks)
-             └─ #14 (pending production-image checks)
+main → #6 (open; deliberately not merged to main)
+        ├─ #7 [merged]
+        ├─ #9 [merged]
+        ├─ #13 [open; CI]
+        └─ #14 [open; CI]
 
-#7 is already merged into #6.
-#8 is a separate network smoke diagnostic and is parked.
+#8 is a separate parked network smoke.
 ```
 
 ## Execution rule
 
-Keep dependent merges sequential. Independent data inventory, source evaluation, and research preparation may continue in parallel when their scope is isolated. A blocked smoke probe does not freeze unrelated work.
+Dependent PR merges are sequential, but independent data inventory, source evaluation, methodology work and separately scoped engineering may proceed in parallel. A blocked smoke probe does not freeze unrelated work.
 
-After each PR transition, update this register and `PROJECT_STATE.md`. CI success is not data-source acceptance, investment approval, or deployment approval.
+After each PR transition, update this register and `PROJECT_STATE.md`. CI success is not data-source acceptance, investment approval or deployment approval.
