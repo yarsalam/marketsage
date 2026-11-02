@@ -15,7 +15,7 @@
 - PR #14 was merged into #6 on 2026-11-02 after all five required CI job types passed on exact head `4bd179263f55b90854d00f1ea3b1287da0393b03`; merge commit is `f267c49efcbf72e7ddc17099ff93f38ade269a7b`.
 - PR #13 passed all five required CI job types on its exact pre-merge head and was merged into #6.
 - All inspected branches remain unprotected. The connected GitHub integration cannot configure repository settings or branch protection.
-- No local Runner is registered. The local data directory has not been inspected in this GitHub-only pass.
+- No local Runner is registered. The local data directory has not been inspected in this GitHub-only pass. A least-privilege trust-boundary design is recorded in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`; owner-side branch protection and host setup are required before activation.
 
 ## Current integration graph
 
@@ -115,4 +115,4 @@ This is a review of existing committed documentation and owner-reported sanitize
 
 ### Research readiness
 
-The Stage 4 protocol and evaluation runner are present, including cash, equal-weight and monthly momentum baselines, chronological folds, a locked holdout, cost/slippage scenarios and report-integrity checks. No empirical result from a permissioned, representative, point-in-time dataset has been accepted. The full local corpus and local evaluation files are unavailable to this GitHub-only execution; local audit and strategy evaluation are therefore **BLOCKED pending a trusted, least-privilege runner and local data access**. CI and parser fixtures are not investment evidence.
+The Stage 4 protocol and evaluation runner are present, including cash, equal-weight and monthly momentum baselines, chronological folds, a locked holdout, cost/slippage scenarios and report-integrity checks. No empirical result from a permissioned, representative, point-in-time dataset has been accepted. The full local corpus and local evaluation files are unavailable to this GitHub-only execution; local audit and strategy evaluation are therefore **BLOCKED pending a trusted, least-privilege runner and local data access**. The connected GitHub integration cannot configure or verify repository rulesets; owner-side branch protection, dedicated OS account/directories and repository-scoped ephemeral Runner registration are required as described in `LOCAL_RUNNER_TRUST_BOUNDARY.md`. CI and parser fixtures are not investment evidence.
