@@ -28,7 +28,7 @@ main
        ├─ #14 TSETMC acceptance pipeline         [merged; CI green]
        ├─ #16 source-evidence reconciliation     [merged; CI green]
        ├─ #17 Stage 4 cost sensitivity fix       [merged; CI green]
-       └─ #18 monthly calendar validation       [open; CI pending]
+       └─ #18 monthly calendar validation       [merged; CI green]
 
 #8 research/iran-free-data-smoke — parked network diagnostic
 #15 governance — documentation PR, Draft
@@ -46,7 +46,7 @@ main
 | [#13](https://github.com/yarsalam/marketsage/pull/13) | #6 branch | Merged | Free-dataset discovery, source catalog, candidate audit/ingestion tools; all five required CI job types passed on exact head before merge. |
 | [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 branch ← `feature/tsetmc-integrated-acceptance-pipeline` | Merged | Exact-head run `41401668921` completed successfully; all five required job types passed. Merge commit `f267c49efcbf72e7ddc17099ff93f38ade269a7b`. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Open, Draft | Updated constitution allows independent work in parallel. Keep Draft until governance adoption/enforcement decision. |
-| [#18](https://github.com/yarsalam/marketsage/pull/18) | #6 branch ← `fix/stage4-monthly-calendar-validation` | Open | Enforces one observation per consecutive calendar month so monthly annualization and six-month labels cannot silently span missing months; current head `f4754cfce3a4ccba5d177a44c8b2b6850671ff31`; CI result not yet visible. |
+| [#18](https://github.com/yarsalam/marketsage/pull/18) | #6 branch ← `fix/stage4-monthly-calendar-validation` | Merged | Exact-head CI run `41406678452` passed all five required job types; merge commit `d468d06eb0fb4adcc90f04be38a61f4f1164ad57`. |
 
 CI results apply only to exact head commits. PR #14 passed all five required job types before merge. PR #6 stays open and unmerged to main; there is no deployment or scoring authorization.
 
@@ -62,7 +62,7 @@ CI results apply only to exact head commits. PR #14 passed all five required job
 8. PR #16 reconciled Nerkhsanj and Binance evidence; all five CI job types passed on exact head `420ede0476fbd9a6abe444b397fd9d4fcea91dff`, then it was merged into #6 at `77d25986627664b6482e515fbd4bd9791a041797`.
 9. Post-#16 merge CI run `41405927116` passed all five required job types.
 10. PR #17 fixed cost-sensitivity scenario deduplication; all five CI job types passed on exact head `74bf96ff1607e213ee9abdf259a7059ceca454da`, then it was merged into #6 at `c821f6423ee5734590b4852eb5fab307834f0b51`.
-11. Opened PR #18 to reject duplicate or missing calendar months in Stage 4 inputs; exact-head CI is pending.
+11. PR #18 added the monthly calendar integrity gate; all five required CI job types passed on exact head `f4754cfce3a4ccba5d177a44c8b2b6850671ff31`, then it was merged into #6 at `d468d06eb0fb4adcc90f04be38a61f4f1164ad57`.
 
 ## Parallel work policy
 
@@ -87,7 +87,7 @@ Local dataset inventory remains unverified because this session has no access to
 
 ## Next actions
 
-1. Post-#17 merge CI run `41406540206` on #6 completed successfully with all five required job types green.
+1. Complete post-#18 merge CI run `41407020273` on #6; it is queued at this snapshot.
 2. Complete CI on PR #18; if its exact head passes, merge it into #6 and refresh the state.
 2. Continue independent source-evidence screening and resolve the specific Nerkhsanj anomalies/rights and TSETMC event-window reconciliation.
 3. Execute the integrated TSETMC pipeline and Stage 4 evaluation only through a trusted least-privilege local runner; the owner's full local corpus remains inaccessible here.
