@@ -19,6 +19,8 @@ This protocol is intended to be fixed before inspecting comparative performance.
 
 For every file and series, record its path, format, byte size, row count, schema, date range, missingness, duplicate timestamps, non-positive/non-finite prices, frequency, source/provider, symbol, currency, units, and any known transformations. Never print credentials or raw data values in audit logs.
 
+The monthly evaluation input must contain exactly one observation per calendar month, in consecutive month order. The evaluator rejects duplicate months and missing calendar months because monthly annualization and six-month row shifts would otherwise represent inconsistent horizons. Each timestamp must represent the latest valid observation available for that market month; that last-session semantics must be documented in the data manifest.
+
 The audit must explicitly classify each criterion as **pass**, **fail**, or **unknown**:
 
 1. Provenance and permission to use/store the data.
