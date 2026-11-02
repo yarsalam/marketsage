@@ -1,17 +1,18 @@
-// src/lib/axiosWithAuth.ts
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// Use a same-origin reverse-proxy path in production; set this to
+// http://localhost:4500 for local development.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { "Content-Type": "application/json" },
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== "undefined") {
+    const token = window.localStorage.getItem("auth_token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
@@ -19,10 +20,11 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
-      // می‌توانید کاربر را به صفحه لاگین هدایت کنید
-      window.location.href = '/auth/login';
+    if (typeof window !== "undefined" && error.response?.status === 401) {
+      window.localStorage.removeItem("auth_token");
+      if (window.location.pathname !== "/auth/login") {
+        window.location.href = "/auth/login";
+      }
     }
     return Promise.reject(error);
   },

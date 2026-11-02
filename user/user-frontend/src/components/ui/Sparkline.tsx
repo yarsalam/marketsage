@@ -28,7 +28,7 @@ export const Sparkline = ({ data, color = "#3B82F6", height = 40 }: SparklinePro
       lineColor: color,
       topColor: `${color}30`,
       bottomColor: `${color}00`,
-      lineWidth: 1.5,
+      lineWidth: 2,
     });
     series.setData(data);
     chart.timeScale().fitContent();

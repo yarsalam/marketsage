@@ -1,0 +1,101 @@
+name: MarketSage CI
+
+on:
+  push:
+    branches: [main, "deploy/**", "research/**", "ci/**"]
+  pull_request:
+    branches: [main, "deploy/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: user/analysis-engine/requirements-dev.txt
+      - name: Install analysis dependencies
+        working-directory: user/analysis-engine
+        run: python -m pip install -r requirements-dev.txt
+      - name: Test analysis API and research backtests
+        working-directory: user/analysis-engine
+        run: pytest -q
+
+  user-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: user/user-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Test
+        run: pnpm exec jest --runInBand
+
+  user-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: user/user-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_URL: ""
+        run: pnpm build
+
+  admin-workspace:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin-panel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install admin workspace dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build admin web
+        run: pnpm --filter web build
+      - name: Build admin API starter
+        run: pnpm --filter server build
+      - name: Test admin API starter
+        run: pnpm --filter server exec jest --runInBand
+
+  production-images:
+    needs: [analysis, user-backend, user-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production Compose configuration
+        run: |
+          cp .env.production.example .env.production
+          docker compose --env-file .env.production -f docker-compose.production.yml config -q
+      - name: Build all production images
+        run: docker compose --env-file .env.production -f docker-compose.production.yml build

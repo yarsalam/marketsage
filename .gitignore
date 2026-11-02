@@ -21,6 +21,7 @@ env/
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # IDE / OS
 .vscode/
@@ -28,7 +29,7 @@ env/
 .DS_Store
 *.swp
 
-# Data
+# Data and model artifacts
 *.pkl
 *.h5
 *.pt

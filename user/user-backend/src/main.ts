@@ -1,17 +1,20 @@
-// src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configuredOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
-  // فعال‌سازی CORS برای همه درخواست‌ها (در محیط توسعه)
   app.enableCors({
-    origin: 'http://localhost:3000', // آدرس فرانت
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: configuredOrigins,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 4500);
+  const port = Number(process.env.PORT ?? 4500);
+  await app.listen(port, '0.0.0.0');
 }
-bootstrap();
+void bootstrap();
