@@ -10,10 +10,10 @@
 
 This is a read-only snapshot of GitHub state observed while preparing the execution constitution. It is not a complete audit of the owner's laptop, local uncommitted files, private data stores, or every historical PR diff.
 
-- Repository visibility was `public` at the time of inspection. The owner has instructed that it be changed to private; the visibility change is still pending.
-- The repository connection reports admin permissions, but the currently available GitHub operations can manage code/branches/PRs and read repository metadata; they do not expose the repository-visibility administration action.
-- No repository rulesets were returned.
-- The `main` branch and the listed branches were reported as unprotected.
+- Repository visibility was verified as `private` on 2026-11-02 after the owner's change.
+- The GitHub connection reports admin permissions and can read/write repository contents, branches, commits, and PRs; it does not expose repository-settings or branch-protection write operations.
+- A rulesets read returned HTTP 403 with GitHub's message: upgrade to GitHub Pro or make the repository public. This indicates the current account/repository plan does not currently expose private-repository rulesets through that endpoint.
+- The `main` branch and the listed branches are still reported as unprotected. No protection is active yet.
 - The recursive tree of `main` contained no `.github/workflows/` path.
 - Root of `main` contained `.gitignore`, `admin-panel/`, and `user/`; no governance documentation directory existed on this branch at snapshot time.
 - The governance branch for this document is `governance/execution-constitution-v1`.
@@ -46,8 +46,8 @@ This is the recent-PR inventory returned by the current GitHub listing, not an a
 
 ## Confirmed repository-level blockers
 
-1. Repository must be made private before a self-hosted runner is registered.
-2. Branch protection/rulesets are not configured.
+1. Repository is now private.
+2. Branch protection/rulesets are not configured; GitHub returned a plan-related 403 for private-repository rulesets. Protected branches/rulesets for private repositories require an eligible paid plan; see GitHub's current plan documentation.
 3. A trusted CI workflow and a separately controlled local-runner workflow must be established.
 4. The existing PR graph must be audited before choosing the single active integration path.
 5. Existing local evidence and data must be inventoried by manifest/hash before any prior data work is repeated.
@@ -66,9 +66,9 @@ These are inherited project facts from earlier handoff/context and have not been
 ## Next authorized work
 
 **Phase 1 — governance only**
-1. Complete repository privatization.
+1. Repository privatization completed and verified.
 2. Adopt and merge the execution constitution and current-state records.
-3. Configure main-branch rulesets.
+3. Resolve plan eligibility for private-branch protection, then configure a main-branch protection rule (PR-only, required checks when available, no force-push/deletion).
 4. Reconcile open PRs into one canonical integration plan without merging unrelated feature work.
 
 **Phase 2 — local execution**
@@ -81,4 +81,4 @@ Begin only after Phases 1 and 2 are complete. The first work item must be the br
 
 ## Current single next action
 
-Owner changes `yarsalam/marketsage` visibility to Private in GitHub Settings. After confirmation, continue with repository rulesets and runner setup.
+Owner selects an eligible GitHub plan for private branch protection OR explicitly chooses a documented fallback with weaker enforcement. Do not register the local self-hosted runner until trusted-workflow controls are defined.
