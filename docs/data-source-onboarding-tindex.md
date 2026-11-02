@@ -4,7 +4,7 @@ This document tracks integration status and acceptance gates for the currently i
 
 ## Tindex public API (free-tier)
 
-The Tindex connector is opt-in and read-only. It uses an HTTPS origin and Bearer token from environment variables, enforces the current documented free-tier ceiling of 1 request/minute and 100 successful requests/day with a process-memory guard, does not automatically retry 401/403/410/429, and treats HTTP 410 as a disabled endpoint. The local daily guard is not persistent and cannot account for other processes/hosts using the same token; provider-side quota remains authoritative. The provider's current dashboard notice disables Iranian equities/TSE, news/articles, inflation/macroeconomics, housing, calendar, and indicators in disabled categories. Do not bypass this by scraping alternate routes.
+The Tindex connector is opt-in and read-only. It uses the documented HTTPS origin `https://tindex.app` and a Bearer token from environment variables. The local client enforces the conservative free-tier ceiling of 1 request/minute and 100 successful requests/day with a process-memory guard; this guard is not persistent and cannot account for other processes or hosts using the same account. Provider-side quota remains authoritative. The official developer page documents indicator categories including currency, precious metals, crypto, stock/energy indices, housing, automotive and macro-economy; this category list does not prove that every series is exposed to the current account or has usable historical coverage. Do not request undocumented routes or bypass unavailable endpoints through scraping. HTTP 410 remains disabled, and 401/403/410/429 are not retried.
 
 A real authenticated request to `/api/public/currency-rates` previously returned HTTP 200 with `success` (boolean) and `data` (list); observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). `tindex_normalizer.py` validates these types and preserves `rate` as Decimal. The current public Tindex docs now state that currency-rate `rate` values are expressed in Toman per quoted unit, and that since 2026-07-20 values in Markets & Indicators are returned in Toman. However, until the user's currently enabled account payload and a second lawful reference are reconciled, the normalized `unit` must remain unknown and `eligible_for_scoring=False`. Official/free-market meaning, history completeness, licensing, and model-training permission remain unapproved.
 
@@ -61,7 +61,7 @@ python -m pytest -q tests/test_tsetmc_provider.py tests/test_codal_provider.py
 
 ## Iranian gold and free-market FX: TGJU candidate, not enabled
 
-TGJU is listed as a candidate source for gold, coin and free-market FX discovery. A verified public API contract and automated-collection/license permission have not been established, so **no live TGJU scraper is enabled**. Do not silently scrape or parse unstable page markup. The source must first pass terms/access review, then fixed sanitized fixtures must confirm series identity, free-vs-official market convention, Rial-vs-Toman unit, update/correction semantics and historical coverage. Keep 18k gram gold, each coin type, USD free-market FX, and official FX as separate series. Tindex may expose currency/precious-metal families, but its current payload semantics are not enough to identify or score these series yet.
+TGJU is listed as a candidate source for gold, coin and free-market FX discovery. A verified public API contract and automated-collection/license permission have not been established, so **no live TGJU scraper is enabled**. Do not silently scrape or parse unstable page markup. The source must first pass terms/access review, then fixed sanitized fixtures must confirm series identity, free-vs-official market convention, Rial-vs-Toman unit, update/correction semantics and historical coverage. Keep 18k gram gold, each coin type, USD free-market FX, and official FX as separate series. Tindex exposes documented currency/precious-metal families and other indicator categories, but payload semantics, units, source lineage, market definition, history completeness and licensing are not enough to identify or score these series yet.
 
 
 ## News discovery: GDELT DOC 2.0
@@ -138,7 +138,7 @@ else
 fi
 ```
 
-The Tindex probe calls only the currency-rates endpoint; respect the current provider docs' 1 request/minute and 100 successful requests/day limits.
+The Tindex probe makes one request to the documented USD indicator-history endpoint; respect the current provider docs' conservative 1 request/minute and 100 successful requests/day limits.
 
 ### External providers — VPN ON
 
