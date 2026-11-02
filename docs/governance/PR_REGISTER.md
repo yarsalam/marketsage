@@ -11,7 +11,7 @@
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old fix branch ← `research/iran-free-data-smoke` | Open | Parked network diagnostic; TSETMC request timed out from GitHub-hosted runner. |
 | [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 branch ← `feature/tsetmc-integrated-acceptance-pipeline` | Merged | All five required CI job types passed on exact head `4bd179263f55b90854d00f1ea3b1287da0393b03`; merge commit `f267c49efcbf72e7ddc17099ff93f38ade269a7b`. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Draft | Governance docs; includes parallel independent work policy. |
-| [#18](https://github.com/yarsalam/marketsage/pull/18) | #6 branch ← `fix/stage4-monthly-calendar-validation` | Open | Stage 4 input calendar validation; exact-head CI result is not yet visible. |
+
 
 ## Merged PRs relevant to the integration path
 
@@ -39,7 +39,7 @@ main → #6 (open; not authorized to merge to main)
         ├─ #14 [merged]
         ├─ #16 [merged; source evidence reconciliation]
         ├─ #17 [merged; Stage 4 cost sensitivity fix]
-        └─ #18 [open; monthly calendar validation]
+        └─ #18 [merged; monthly calendar validation]
 ```
 
 ## Local Runner activation gate
