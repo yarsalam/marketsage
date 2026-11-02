@@ -2,9 +2,8 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**", "ci/**"]
+    branches: [main, "deploy/**", "research/**", "ci/**", "feat/**", "feature/**", "fix/**", "governance/**"]
   pull_request:
-    branches: [main, "deploy/**"]
 
 permissions:
   contents: read
