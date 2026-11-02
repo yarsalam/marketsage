@@ -77,3 +77,19 @@ def test_bad_dates_and_pagination_are_rejected_before_request():
             client.observations("DGS10", observation_start="01-01-2024")
         with pytest.raises(ValueError, match="limit"):
             client.observations("DGS10", limit=0)
+
+
+
+def test_network_timeout_is_sanitized_and_not_retried():
+    calls = []
+
+    def handler(request):
+        calls.append(request.url.path)
+        raise httpx.ConnectTimeout("private host and query details")
+
+    with FredAlfredClient("test-key", transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(FredProviderError, match=r"FRED network timeout \(ConnectTimeout\)") as exc:
+            client.observations("DGS10", limit=1)
+
+    assert calls == ["/fred/series/observations"]
+    assert "private host" not in str(exc.value)
