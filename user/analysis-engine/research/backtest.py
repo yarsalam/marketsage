@@ -40,6 +40,14 @@ def validate_monthly_prices(prices: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("prices index must not contain duplicate dates")
     if not prices.index.is_monotonic_increasing:
         raise ValueError("prices must be sorted oldest to newest")
+    # Monthly returns, annualization and six-month labels are row-based. Require
+    # exactly one observation per calendar month and no missing months so that
+    # one row always represents one month and shift(-6) means six months.
+    month_ordinals = prices.index.year * 12 + prices.index.month
+    if len(np.unique(month_ordinals)) != len(month_ordinals):
+        raise ValueError("prices must contain exactly one observation per calendar month")
+    if len(month_ordinals) > 1 and not np.all(np.diff(month_ordinals) == 1):
+        raise ValueError("prices must cover consecutive calendar months without gaps")
     if prices.columns.has_duplicates or prices.shape[1] < 1:
         raise ValueError("asset columns must be unique and non-empty")
     out = prices.apply(pd.to_numeric, errors="coerce").astype(float)
