@@ -139,22 +139,15 @@ def evaluate_monthly_strategies(
         for name, series in returns_by_name.items()
     }
     # Predeclared cost stress cases; do not select a case after inspecting the holdout.
+    stress_transaction_bps = min(max(cfg.transaction_cost_bps + 15.0, 25.0), 1000.0)
+    stress_slippage_bps = min(max(cfg.slippage_bps + 25.0, 50.0), 1000.0)
     scenarios = [
         ("zero_cost_reference", 0.0, 0.0),
         ("configured_costs", cfg.transaction_cost_bps, cfg.slippage_bps),
-        (
-            "higher_cost_stress",
-            max(cfg.transaction_cost_bps, 25.0),
-            max(cfg.slippage_bps, 50.0),
-        ),
+        ("higher_cost_stress", stress_transaction_bps, stress_slippage_bps),
     ]
     cost_sensitivity = []
-    seen_scenarios = set()
     for label, transaction_bps, slippage_bps in scenarios:
-        key = (float(transaction_bps), float(slippage_bps))
-        if key in seen_scenarios:
-            continue
-        seen_scenarios.add(key)
         scenario_cfg = replace(
             cfg,
             transaction_cost_bps=float(transaction_bps),
@@ -166,6 +159,15 @@ def evaluate_monthly_strategies(
             "scenario": label,
             "transaction_cost_bps": float(transaction_bps),
             "slippage_bps": float(slippage_bps),
+            "strictly_higher_than_configured": (
+                float(transaction_bps) > cfg.transaction_cost_bps
+                or float(slippage_bps) > cfg.slippage_bps
+            ),
+            "stress_cap_reached": (
+                label == "higher_cost_stress"
+                and float(transaction_bps) == cfg.transaction_cost_bps
+                and float(slippage_bps) == cfg.slippage_bps
+            ),
             "full_period_metrics": _metric_summary(scenario_returns, scenario_cfg),
             "locked_holdout_metrics": _metric_summary(
                 scenario_returns.loc[holdout_dates], scenario_cfg
