@@ -224,3 +224,56 @@ def test_candidate_adapter_does_not_enable_production_scoring():
     assert gate["eligible_for_production_scoring"] is False
     assert "production_approval_missing" in gate["blocked_reasons"]
     assert "timestamp_quality_not_verified" in gate["blocked_reasons"]
+
+
+
+def test_adjusted_chart_rejects_duplicate_dates_in_provider_text():
+    duplicate = (
+        "20261015,12500,9800,11000,9877,100000,9876;"
+        "20261015,12600,9700,11100,9880,100100,9879;"
+    )
+    with pytest.raises(tsetmc_adapter.TSETMCDataError, match="duplicate date"):
+        tsetmc_adapter.parse_adjusted_chart(duplicate)
+
+
+@pytest.mark.parametrize(
+    ("chart", "message"),
+    [
+        ({"20261015": ["20261015", "12500", "9800"]}, "at least seven"),
+        ({"20261015": ["20261016", "12500", "9800", "11000", "9877", "100000", "9876"]}, "disagree"),
+        ({"20261015": ["20261015", "12500", "9800", "11000", "9877", "100000", "0"]}, "chart close_adj"),
+        ({"20261015": {"high_adj": 12500}}, "fields are incomplete"),
+    ],
+)
+def test_adjusted_chart_rejects_incomplete_or_inconsistent_rows(chart, message):
+    with pytest.raises(tsetmc_adapter.TSETMCDataError, match=message):
+        tsetmc_adapter.parse_adjusted_chart(chart)
+
+
+def test_adjusted_ingestion_does_not_store_partial_rows_when_chart_fetch_fails(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setattr(
+        tsetmc_adapter,
+        "fetch_daily_history",
+        lambda ins_code, timeout=20.0: (sample_payload(), "a" * 64),
+    )
+
+    def fail_adjusted_chart(ins_code, timeout=20.0):
+        raise tsetmc_adapter.TSETMCDataError("synthetic chart failure")
+
+    monkeypatch.setattr(tsetmc_adapter, "fetch_adjusted_chart", fail_adjusted_chart)
+    store = PointInTimeStore(tmp_path / "atomic-temporal.sqlite3")
+
+    with pytest.raises(tsetmc_adapter.TSETMCDataError, match="synthetic chart failure"):
+        tsetmc_adapter.ingest_adjusted_history(
+            store, INS_CODE, retrieved_at=RETRIEVED_AT
+        )
+
+    captured = store.as_of(
+        as_of=datetime(2026, 10, 18, tzinfo=timezone.utc),
+        market="iran_candidate",
+        data_kind="daily_ohlcv_adjusted_candidate",
+        availability_basis="captured",
+    )
+    assert captured == []
