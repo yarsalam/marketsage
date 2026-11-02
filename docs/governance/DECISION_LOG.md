@@ -17,8 +17,8 @@ All decisions below are durable records. New decisions must be appended; do not 
 
 **Repository privacy**
 - Owner instructed that `yarsalam/marketsage` be changed from Public to Private.
-- This was not completed by the current GitHub connection; the owner must make the one-time setting change in GitHub.
-- Do not register a self-hosted runner while the repository remains public.
+- Completed by the owner on 2026-11-02; repository metadata now reports `visibility: private`.
+- A subsequent rulesets API read returned HTTP 403 with GitHub's message to upgrade to Pro or make the repository public. Private branch-protection/ruleset support is therefore a plan-level blocker in the current account. Do not register a self-hosted runner until branch and trusted-workflow controls are resolved.
 
 **Runner principle**
 - Owner has authorized provision of access needed for the runner and execution lead.
