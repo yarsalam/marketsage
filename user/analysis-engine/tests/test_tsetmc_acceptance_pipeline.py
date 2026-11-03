@@ -421,3 +421,33 @@ def test_discovery_uses_legacy_identity_crosswalk_only_when_v2_is_absent(tmp_pat
     assert items[0]["identity_resolution_method"] == "legacy_v1_fallback"
     assert items[0]["identity_crosswalk_path"] == str(v1.resolve())
     assert not items[0].get("identity_match_evidence_ref")
+
+
+def test_discovery_flags_row_isin_conflict_with_authoritative_crosswalk(tmp_path: Path) -> None:
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    raw_root = corpus / "raw"
+    folder = raw_root / "IRTEST000001"
+    folder.mkdir(parents=True)
+    v2 = corpus / "corpus_reconciliation_v2" / "instrument_details.jsonl"
+    v2.parent.mkdir(parents=True)
+    v2.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "1234567890123",
+        "symbol": "FOLAD",
+    }) + "\n", encoding="utf-8")
+    rows = []
+    for i in range(3):
+        day = date(2020, 1, 1) + timedelta(days=i)
+        rows.append({
+            "insCode": "1234567890123",
+            "cIsin": "IRTEST000002",
+            "dEven": int(day.strftime("%Y%m%d")),
+            "pClosing": 1000 + i,
+        })
+    (folder / "history_archive.json").write_text(json.dumps({"closingPriceDaily": rows}), encoding="utf-8")
+
+    items = discover_manifest(raw_root)
+    assert len(items) == 1
+    assert items[0]["instrument_code"] == "1234567890123"
+    assert items[0]["isin"] == "IRTEST000002"
+    assert items[0]["_discovery_identity_conflict"] is True
