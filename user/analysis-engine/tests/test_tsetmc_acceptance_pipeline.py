@@ -400,3 +400,24 @@ def test_ambiguous_v2_identity_crosswalk_does_not_fall_back_to_legacy_v1(tmp_pat
     assert items[0]["isin"] == "IRTEST000001"
     assert items[0]["identity_resolution_method"] == "corpus_reconciliation_v2_no_unique_mapping"
     assert items[0]["identity_crosswalk_path"] == str(v2.resolve())
+
+
+def test_discovery_uses_legacy_identity_crosswalk_only_when_v2_is_absent(tmp_path: Path) -> None:
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    raw_root = corpus / "raw"
+    _write_crosswalk_discovery_history(raw_root)
+    v1 = corpus / "corpus_reconciliation" / "instrument_details.jsonl"
+    v1.parent.mkdir(parents=True)
+    v1.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "1234567890123",
+        "symbol": "FOLAD",
+        "name": "Foolad",
+    }) + "\n", encoding="utf-8")
+
+    items = discover_manifest(raw_root)
+    assert len(items) == 1
+    assert items[0]["instrument_code"] == "1234567890123"
+    assert items[0]["identity_resolution_method"] == "legacy_v1_fallback"
+    assert items[0]["identity_crosswalk_path"] == str(v1.resolve())
+    assert not items[0].get("identity_match_evidence_ref")
