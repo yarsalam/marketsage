@@ -212,7 +212,7 @@ def _run_one(
             if len(slugs) > 1:
                 raise ValueError("only one Tindex slug can be queried in a single run under the current free-tier quota")
             results = []
-            # Reuse a single client so the local three-requests/minute limiter is effective.
+            # One slug/request per invocation; the client enforces 1 request/minute locally.
             with TindexClient(timeout=15.0) as client:
                 for slug in slugs:
                     item: dict[str, Any] = {
@@ -243,7 +243,9 @@ def _run_one(
                 ) else "probe_failed",
                 requests_attempted=len(slugs),
                 results=results,
-                note="Tindex quota is shared account-wide; no more than three requests were made.",
+                note=("At most one candle request is attempted per invocation; the provider quota is "
+                      "account-wide (1 request/minute, 100 successful requests/day). The local guard "
+                      "is process-memory only."),
             )
         elif source_id == "us.fred.alfred":
             with FredAlfredClient(timeout=15.0) as client:
