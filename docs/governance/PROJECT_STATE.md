@@ -6,7 +6,7 @@
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
 **Integration HEAD:** `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`  
-**Post-#19 integration CI:** run `41598989190` is queued on exact head `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; do not treat the post-merge check as complete until all five job types succeed.  
+**Post-#19 integration CI:** run `41598989190` completed successfully on exact head `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; all five required job types succeeded.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -15,6 +15,7 @@
 - PRs #7, #9, #13, #14, #16, #17 and #18 are merged into PR #6 in dependency order.
 - PR #6 remains open and **must not be merged into `main` without explicit owner approval**.
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` passed all five required job types. The new post-merge #6 run `41598989190` is queued.
+- PR #20 is the next integration PR, adding a fail-closed candidate identity crosswalk to the PR #14 TSETMC runner. Its exact head is `c58cde2c87c698ec4a33a58ff2d3caeeecd70569`; run `41600402263` is in progress. Do not merge until all five required job types pass on this exact head.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
 - PR #15 governance remains Draft; its documents are updated on the governance branch, but the PR is not merged.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
@@ -35,12 +36,13 @@ main
 #8  research/iran-free-data-smoke                    [open; parked]
 #15 governance/execution-constitution-v1              [open; Draft]
 #19 research/2026-11-03-source-evidence-refresh       [merged into #6]
+#20 fix/tsetmc-identity-crosswalk-discovery            [open; CI in progress]
 ```
 
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; post-merge run `41598989190` queued | Open; do not merge to main |
+| #6 | Head `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; post-#19 run `41598989190` passed all five required job types | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -51,6 +53,7 @@ main
 | #17 | Exact-head CI passed; merge `c821f6423ee5734590b4852eb5fab307834f0b51` | Merged into #6 |
 | #18 | Exact-head CI passed; merge `d468d06eb0fb4adcc90f04be38a61f4f1164ad57` | Merged into #6 |
 | #19 | Exact-head run `41598599936` passed all five required job types; merge `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b` | Merged into #6 |
+| #20 | Head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569`; run `41600402263` in progress | Open; do not merge until all five required job types pass on this exact head |
 
 ## Source and dataset evidence
 
@@ -107,6 +110,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Opened and merged PR #19 after all five exact-head CI job types passed. It refreshes the source catalog and evidence-led candidate triage, recording Nerkhsanj anomalies/quarantine, previous TSETMC whole-corpus evidence/scope mismatch, and Tindex Rial/Toman/account-scope constraints. No provider probe or local raw-data access occurred.
 - Verified the current source registry has 18 registered entries and every `approved_for_production` flag is false.
 - Reviewed the Stage 4 protocol, empirical review and backtest code. No new empirical run was attempted because the permissioned local input is unavailable and the known extreme fold requires attribution, not a repeated blind run.
+- Static review found the PR #14 discovery runner did not consume the corpus's preferred `corpus_reconciliation_v2/instrument_details.jsonl` ISIN → insCode map. PR #20 adds unique candidate identity resolution, v2-over-v1 precedence, ambiguity quarantine and SHA-256 provenance; it deliberately does not create identity evidence or enable research/scoring.
 
 ## Operating constraints
 
@@ -119,8 +123,8 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. Complete all five required CI job types on exact post-merge #6 head `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b` (run `41598989190`); if any fails, inspect logs and make one bounded correction.
-2. Update this state and the PR register with the post-merge #6 CI result; keep PR #15 Draft.
+1. Complete all five required CI job types on exact PR #20 head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`); if all pass, merge #20 into #6 and verify the new #6 head and post-merge CI.
+2. Update this state and the PR register with the exact PR #20 merge SHA and post-merge #6 CI result; keep PR #15 Draft.
 3. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
 4. Once trusted local execution is available, compare the exact PR #14 runner/discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory, then run the integrated offline pipeline once against the designated corpus.
 5. Review existing corporate-action/date-gap queues against official evidence; do not regenerate candidate histories or silently repair gaps.
