@@ -5,8 +5,8 @@
 **Default branch:** `main`  
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
-**Integration HEAD:** `4191dd3715173265193163e30281ab555b9d12fb`  
-**Post-#20 integration CI:** push run `41601055518` and PR run `41601064135` are running on exact head `4191dd3715173265193163e30281ab555b9d12fb`; do not treat post-merge CI as complete yet.  
+**Integration HEAD:** `21c591223c9e7d61e6046a06f51522e979530f08`  
+**Post-#21 integration CI:** push run `41601942608` and PR run `41601948914` are running on exact head `21c591223c9e7d61e6046a06f51522e979530f08`; four of five job types are complete-success and `production-images` remains in progress.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -15,8 +15,9 @@
 - PRs #7, #9, #13, #14, #16, #17 and #18 are merged into PR #6 in dependency order.
 - PR #6 remains open and **must not be merged into `main` without explicit owner approval**.
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` and post-merge #6 run `41598989190` passed all five required job types.
-- PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Post-merge push/PR CI is running (runs `41601055518` / `41601064135`).
-- PR #21 corrects stale Tindex quota wording in the discovery report and adds a mocked regression test. Exact head `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9`; run `41601260850` is in progress. Do not merge until all five required job types pass on this exact head.
+- PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Both post-merge runs `41601055518` (push) and `41601064135` (pull_request) subsequently passed all five job types.
+- PR #21 corrected stale Tindex quota wording and added a mocked regression test. All five required exact-head job types passed on `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9` (run `41601260850`); it was merged into #6 at `21c591223c9e7d61e6046a06f51522e979530f08`.
+- PR #22 adds five official global source candidates (ECB, US Treasury, EIA, SEC EDGAR and IMF) with rights/time/history caveats and fail-closed registry tests. Exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82`; PR run `41602083315` is in progress and push run `41602045431` is queued. Do not merge until all five required job types pass on the exact PR head.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
 - PR #15 governance remains Draft; its documents are updated on the governance branch, but the PR is not merged.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
@@ -43,7 +44,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `4191dd3715173265193163e30281ab555b9d12fb`; post-#20 push/PR runs `41601055518` / `41601064135` in progress | Open; do not merge to main |
+| #6 | Head `21c591223c9e7d61e6046a06f51522e979530f08`; post-#21 runs `41601942608` / `41601948914` in progress (production-images pending) | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -55,7 +56,8 @@ main
 | #18 | Exact-head CI passed; merge `d468d06eb0fb4adcc90f04be38a61f4f1164ad57` | Merged into #6 |
 | #19 | Exact-head run `41598599936` passed all five required job types; merge `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b` | Merged into #6 |
 | #20 | Exact-head run `41600402263` passed all five required job types; merge `4191dd3715173265193163e30281ab555b9d12fb` | Merged into #6 |
-| #21 | Head `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9`; run `41601260850` in progress | Open; do not merge until all five required job types pass on this exact head |
+| #21 | Exact-head run `41601260850` passed all five required job types; merge `21c591223c9e7d61e6046a06f51522e979530f08` | Merged into #6 |
+| #22 | Head `6eff5daf8c2b86a96015992d3f9d3f17beacab82`; PR run `41602083315` in progress, push run `41602045431` queued | Open; do not merge until all five required job types pass on this exact head |
 
 ## Source and dataset evidence
 
@@ -86,6 +88,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 - **Yahoo Finance:** existing proxy captures may support exploratory research only. Reuse existing captures; do not redownload without a changed acceptance question. Terms, adjustments, symbol/currency mapping, survivorship and point-in-time limitations remain open. US ETFs are not a representative Iran universe.
 - **FRED/ALFRED:** API key/access was previously unavailable. Observation period and day-level vintage are not exact intraday release time; do not repeat the same probe until secure access/network changes.
 - **GDELT:** prior HTTP 429 remains in cooldown. `seendate` is first-seen/index time, not publisher publication time. No validated Persian/English sentiment/event benchmark exists.
+- **New official global candidates (PR #22):** ECB SDMX for reference FX/yields/macros (supports `updatedAfter`/`includeHistory`, with attribution/no-modification and third-party exclusions); US Treasury XML for daily yields (observation date, pagination and reuse terms still need review); EIA API v2 for energy (registered key and ToS; public-domain/third-party distinction); SEC EDGAR for filings/XBRL (no key, 10 requests/sec and declared User-Agent; acceptance vs availability and corrections); IMF SDMX (Swagger account requirement; endpoint auth, quotas, vintages and rights unresolved). All five are catalog/registry candidates only, not wired into research, not default-probed and not approved.
 - **StreamData:** seller-provided, not free. Rights/contract, AYAR OHLC anomaly, units, timestamps and independent reconciliation remain unresolved.
 
 ## Stage 4 — backtest readiness and evidence
@@ -110,10 +113,11 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Reviewed the live repository, PR graph and governance documents.
 - Confirmed PR #14 is already merged into #6 and the post-#18 #6 CI run passed all five required job types.
 - Opened and merged PR #19 after all five exact-head CI job types passed. It refreshes the source catalog and evidence-led candidate triage, recording Nerkhsanj anomalies/quarantine, previous TSETMC whole-corpus evidence/scope mismatch, and Tindex Rial/Toman/account-scope constraints. No provider probe or local raw-data access occurred.
-- Verified the current source registry has 18 registered entries and every `approved_for_production` flag is false.
+- Verified the source registry had 18 entries before the new global-source screen; PR #22 expands it to 22 registered entries, while the catalog grows from 13 to 18. The five new catalog entries are not default-probed, not wired into research and remain unapproved.
 - Reviewed the Stage 4 protocol, empirical review and backtest code. No new empirical run was attempted because the permissioned local input is unavailable and the known extreme fold requires attribution, not a repeated blind run.
 - Static review found the PR #14 discovery runner did not consume the corpus's preferred `corpus_reconciliation_v2/instrument_details.jsonl` ISIN → insCode map. PR #20 added unique candidate identity resolution, v2-over-v1 precedence, ambiguity quarantine and SHA-256 provenance; exact-head CI passed and it was merged at `4191dd3715173265193163e30281ab555b9d12fb`. It does not create identity evidence or enable research/scoring.
-- PR #21 fixes two stale Tindex quota descriptions in `discover_free_datasets.py` that still referred to a three-request/minute limiter despite the connector enforcing 1 request/minute and 100 successful requests/day. A mocked test asserts the corrected one-request-per-invocation report. No Tindex endpoint was contacted.
+- PR #21 fixes two stale Tindex quota descriptions in `discover_free_datasets.py` that still referred to a three-request/minute limiter despite the connector enforcing 1 request/minute and 100 successful requests/day. Its exact-head CI passed all five job types and it was merged at `21c591223c9e7d61e6046a06f51522e979530f08`. No Tindex endpoint was contacted.
+- PR #22 reviewed official documentation for ECB, US Treasury, EIA, SEC EDGAR and IMF; added five candidates, source-specific rights/time/history gates, and fail-closed regression tests. No data API was called, no key was used, and no adapter/default probe was added.
 
 ## Operating constraints
 
@@ -126,8 +130,8 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. Confirm all five required job types pass on post-#20 #6 head `4191dd3715173265193163e30281ab555b9d12fb` (runs `41601055518` and `41601064135`).
-2. Complete all five required CI job types on exact PR #21 head `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9` (run `41601260850`); if green, merge #21 into #6 and verify the new #6 head and post-merge CI.
+1. Confirm all five required job types pass on post-#21 #6 head `21c591223c9e7d61e6046a06f51522e979530f08` (runs `41601942608` and `41601948914`; `production-images` was still running at the latest check).
+2. Complete all five required CI job types on exact PR #22 head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` (run `41602083315`); if green, merge #22 into #6 and verify the new #6 head and post-merge CI.
 3. Keep PR #15 Draft and update this state/register after each material transition.
 4. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
 5. Once trusted local execution is available, compare the exact PR #14 runner/discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory, then run the integrated offline pipeline once against the designated corpus.
