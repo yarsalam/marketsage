@@ -1,5 +1,5 @@
 {
-  "catalog_version": "1.0.0",
+  "catalog_version": "1.1.0",
   "last_reviewed": "2026-11-03",
   "policy": {
     "prefer_no_subscription": true,
@@ -729,6 +729,140 @@
           ]
         }
       }
+    },
+    {
+      "source_id": "global.sec_edgar",
+      "label": "SEC EDGAR submissions and XBRL company-facts APIs",
+      "free_access_class": "public_api_no_key",
+      "authentication": "Official data.sec.gov submissions and XBRL APIs require no API key; automated clients must declare a descriptive User-Agent.",
+      "probe_mode": "No probe in this review; after VPN-on reminder, one exact issuer/CIK history request only.",
+      "data_families": [
+        "US issuer filings",
+        "XBRL company facts",
+        "corporate disclosures and events"
+      ],
+      "history_limit": "EDGAR public filing indexes extend to 1994Q3; company submissions JSON contains at least one year or 1,000 recent filings (whichever is greater), with older filing-history files where applicable.",
+      "limitations": [
+        "Filing acceptance time and public-document availability are different; SEC guidance says filings are often available 1–3 minutes after EDGAR acceptance, with no guarantee.",
+        "Post-acceptance corrections/deletions can alter later indexes; preserve accession numbers and correction history rather than assuming a static index.",
+        "Fair Access is at most 10 requests/second per user across machines; declare a descriptive User-Agent and do not use unclassified bots.",
+        "Public access is not a blanket license for every downstream reuse; review source-specific reuse terms.",
+        "This is issuer-disclosure/fundamental data, not market-price history; XBRL context, units, periods and amendments need mapping."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+        "https://www.sec.gov/about/developer-resources",
+        "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+        "https://www.sec.gov/about/webmaster-frequently-asked-questions"
+      ]
+    },
+    {
+      "source_id": "global.ecb_data_portal",
+      "label": "ECB Data Portal SDMX API",
+      "free_access_class": "public_sdmx_api_candidate",
+      "authentication": "Public HTTPS SDMX REST API; current public documentation does not describe an API-key requirement, but confirm access behavior before a bounded request.",
+      "probe_mode": "First discover one exact dataflow/series; then one short daily reference-FX or yield-curve range only after VPN-on reminder.",
+      "data_families": [
+        "daily reference exchange rates",
+        "yield curves and interest-rate statistics",
+        "global/euro-area macroeconomic statistics"
+      ],
+      "history_limit": "Dataset-specific. ECB documentation lists daily reference exchange-rate history since 1999; API supports start/end periods, updatedAfter deltas and includeHistory for prior data versions.",
+      "limitations": [
+        "ESCB public statistics may be reused free of charge with source attribution and without modifying the statistics/metadata; third-party data are excluded absent permission.",
+        "Revisions, updates and discontinued series must be preserved; current production values alone are not point-in-time history.",
+        "Reference FX is not an executable bid/ask quote; euro-centered series and currency direction must be explicit.",
+        "Observation period is not necessarily the public release/availability timestamp.",
+        "No local-market price series for Iran is supplied."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://data.ecb.europa.eu/help/api/data",
+        "https://data.ecb.europa.eu/help/api/overview",
+        "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html"
+      ]
+    },
+    {
+      "source_id": "global.us_treasury_yield_curve",
+      "label": "US Treasury daily interest-rate XML feeds",
+      "free_access_class": "public_xml_feed_candidate",
+      "authentication": "Official public XML feed guide shows HTTPS GET and no API key parameter; verify availability with one bounded request.",
+      "probe_mode": "One exact yield-curve type and one calendar-year range after VPN-on reminder; do not crawl all history.",
+      "data_families": [
+        "daily Treasury par yield curve",
+        "daily Treasury bill rates",
+        "daily real-yield and long-term rate series"
+      ],
+      "history_limit": "Official guide lists daily par yields from 1990, bill rates from 2002, long-term rates from 2000 and real-yield series from 2003; default response is 300 rows and all-history retrieval is paginated from page=0.",
+      "limitations": [
+        "Par yields and bill rates are rate observations, not bond prices or total-return indexes.",
+        "Maturity labels, day-count conventions, curve construction and rate units need explicit mapping.",
+        "Observation date is available; exact publication/availability timestamp and correction-vintage behavior need review.",
+        "Feed schema can evolve; Treasury published new XML elements for 2025 maturity additions.",
+        "Reuse/redistribution terms were not fully resolved in this screen; do not infer blanket permission."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://home.treasury.gov/treasury-daily-interest-rate-xml-feed",
+        "https://home.treasury.gov/developer-notice-xml-changes",
+        "https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rate-xml-files"
+      ]
+    },
+    {
+      "source_id": "global.eia_energy_api",
+      "label": "US Energy Information Administration API v2",
+      "free_access_class": "public_api_key_required",
+      "authentication": "Free API key registration is required for API v2; official documentation says bulk downloads do not require a key.",
+      "probe_mode": "No probe in this review; after VPN-on reminder and key setup, request one exact series/frequency/date range.",
+      "data_families": [
+        "crude-oil and petroleum prices/inventories",
+        "natural-gas and electricity data",
+        "international energy production/trade/consumption"
+      ],
+      "history_limit": "Series- and dataset-specific, spanning hourly, weekly, monthly and annual frequencies; API v2 supports date/frequency and facet filters. Coverage must be checked per series.",
+      "limitations": [
+        "API access is subject to the EIA API Terms of Service; API data are free and use must follow the Copyrights and Reuse policy.",
+        "EIA government data are generally public domain with acknowledgment, but third-party contributed/licensed materials may remain protected.",
+        "Observation period and release/publication time are different; revisions and release calendars need series-level handling.",
+        "Energy statistics and spot/futures market prices are different instruments; do not treat inventory or production as an executable oil-price series.",
+        "API key is a credential and must remain outside Git and reports."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://www.eia.gov/opendata/documentation.php",
+        "https://www.eia.gov/opendata/terms-of-service.php",
+        "https://www.eia.gov/about/copyrights_reuse.php"
+      ]
+    },
+    {
+      "source_id": "global.imf_sdmx_api",
+      "label": "IMF Data API (SDMX 2.1 and 3.0)",
+      "free_access_class": "public_sdmx_api_access_unverified",
+      "authentication": "IMF documentation advertises SDMX 2.1/3.0 APIs; API explorer/Swagger requires a beta portal account. Exact data-endpoint authentication and quotas remain unverified.",
+      "probe_mode": "No probe in this review; first identify one dataflow and its access requirements, then make one bounded series query after VPN-on reminder.",
+      "data_families": [
+        "international macroeconomic indicators",
+        "balance of payments and external-sector data",
+        "country-level monetary and financial statistics"
+      ],
+      "history_limit": "Dataflow- and series-specific; SDMX APIs expose dataset structures, but historical depth and revision/vintage availability must be verified per dataflow.",
+      "limitations": [
+        "A beta portal account is required to explore the documented Swagger interface; do not assume this proves API-key or public anonymous access.",
+        "Series definitions, country coverage, frequency, units and release calendars vary by dataflow.",
+        "Observation period is not release/availability time; point-in-time vintage support must be demonstrated for each selected dataset.",
+        "Reuse and redistribution terms were not resolved in this screen.",
+        "This is macro context, not a substitute for daily tradable asset prices."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://data.imf.org/en/Resource-Pages/IMF-API"
+      ]
     }
   ]
 }
