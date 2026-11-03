@@ -76,7 +76,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ### Global candidates
 
-- **World Bank Indicators:** prior export reports 26 annual Iran CPI observations for 2000–2025. Annual observation year is not release/availability time; revisions and series definitions must be preserved. It is macro context, not daily market pricing.
+- **World Bank Indicators:** prior export reports 26 annual Iran CPI rows for 2000–2025; the non-null value count was not reported. Annual observation year is not release/availability time; revisions and series definitions must be preserved. It is macro context, not daily market pricing.
 - **Binance Spot:** owner-reported Iran-network attempts returned HTTP 451 for BTCUSDT/ETHUSDT/SOLUSDT. Keep the route blocked; do not seek alternate hosts to bypass it. A separate small foreign sample is not multi-year coverage or rights acceptance.
 - **Yahoo Finance:** existing proxy captures may support exploratory research only. Reuse existing captures; do not redownload without a changed acceptance question. Terms, adjustments, symbol/currency mapping, survivorship and point-in-time limitations remain open. US ETFs are not a representative Iran universe.
 - **FRED/ALFRED:** API key/access was previously unavailable. Observation period and day-level vintage are not exact intraday release time; do not repeat the same probe until secure access/network changes.
