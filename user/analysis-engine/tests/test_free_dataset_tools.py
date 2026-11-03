@@ -4,6 +4,7 @@ from pathlib import Path
 
 from scripts.audit_candidate_dataset import audit_file, normalize_header
 from scripts.create_source_evidence_templates import build_template
+from scripts import discover_free_datasets
 from scripts.discover_free_datasets import _summarize_search, parse_args
 
 
@@ -85,3 +86,45 @@ def test_missing_csv_is_reported_instead_of_crashing(tmp_path: Path):
     assert report["status"] == "audit_failed"
     assert report["error_type"] == "FileNotFoundError"
     assert report["raw_values_emitted"] is False
+
+
+
+def test_tindex_discovery_report_states_the_strict_account_quota(monkeypatch):
+    calls = []
+
+    class FakeTindexClient:
+        def __init__(self, *, timeout):
+            assert timeout == 15.0
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return None
+
+        def indicator_candles(self, slug, *, range, interval):
+            calls.append((slug, range, interval))
+            return {"success": True}
+
+    monkeypatch.setattr(discover_free_datasets, "TindexClient", FakeTindexClient)
+    monkeypatch.setattr(
+        discover_free_datasets,
+        "normalize_indicator_candles",
+        lambda payload: [{"observation_date": "2026-11-03", "unit": "Toman"}],
+    )
+
+    record = discover_free_datasets._run_one(
+        "iran.tindex.candles",
+        export_dir=None,
+        tsetmc_queries=[],
+        tindex_slugs=["GOLD-18K"],
+    )
+
+    assert calls == [("GOLD-18K", "3m", "daily")]
+    assert record["requests_attempted"] == 1
+    assert "1 request/minute" in record["note"]
+    assert "100 successful requests/day" in record["note"]
+    assert "account-wide" in record["note"]
+    assert "process-memory only" in record["note"]
+    assert "three requests" not in record["note"]
+    assert record["eligible_for_scoring"] is False
