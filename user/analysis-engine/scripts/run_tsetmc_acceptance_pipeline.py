@@ -36,9 +36,11 @@ MANIFEST_COLUMNS = [
     "rights_evidence_ref", "semantics_evidence_ref",
     "independent_reconciliation_evidence_ref",
     "corporate_action_completeness_evidence_ref",
+    "identity_crosswalk_path", "identity_resolution_method",
 ]
 DECISION_COLUMNS = [
-    "instrument_code", "symbol", "isin", "price_input_semantics", "identity_verified", "decision_status",
+    "instrument_code", "symbol", "isin", "price_input_semantics", "identity_verified",
+    "identity_resolution_method", "identity_crosswalk_sha256", "decision_status",
     "decision_reason_codes", "input_hashes_json", "history_rows",
     "valid_history_rows", "unique_history_dates", "invalid_date_rows",
     "invalid_or_nonpositive_close_rows", "invalid_numeric_field_rows",
@@ -100,7 +102,8 @@ RESEARCH_COLUMNS = [
     "history_rows", "adjusted_close_coverage", "input_hashes_json",
     "identity_match_evidence_ref", "rights_evidence_ref", "semantics_evidence_ref",
     "independent_reconciliation_evidence_ref",
-    "corporate_action_completeness_evidence_ref", "eligible_for_scoring",
+    "corporate_action_completeness_evidence_ref", "identity_resolution_method",
+    "identity_crosswalk_sha256", "eligible_for_scoring",
     "eligibility_scope",
 ]
 FEATURE_COLUMNS = [
@@ -292,7 +295,154 @@ def load_manifest(path: Path) -> list[dict[str, Any]]:
     return result
 
 
-def discover_instrument_identity(history_path: Path) -> dict[str, str]:
+def load_identity_crosswalk(
+    root: Path, explicit_path: Path | None = None
+) -> tuple[dict[str, dict[str, str]], Path | None, str]:
+    """Load exact top-level ISIN -> insCode mappings; never treat them as acceptance evidence."""
+    selected: Path | None = None
+    method = "unavailable"
+    if explicit_path is not None:
+        selected = explicit_path.expanduser().resolve()
+        if not selected.is_file():
+            raise PipelineError(f"identity crosswalk not found: {selected}")
+        method = "explicit_identity_crosswalk"
+    else:
+        v2_candidates: list[Path] = []
+        v1_candidates: list[Path] = []
+        for base in (root, *root.parents):
+            v2_candidates.extend((
+                base / "corpus_reconciliation_v2" / "instrument_details.jsonl",
+                base / "data" / "source_snapshots" / "tsetmc_history_pipeline" / "corpus_reconciliation_v2" / "instrument_details.jsonl",
+                base / "tsetmc_history_pipeline" / "corpus_reconciliation_v2" / "instrument_details.jsonl",
+            ))
+            v1_candidates.extend((
+                base / "corpus_reconciliation" / "instrument_details.jsonl",
+                base / "data" / "source_snapshots" / "tsetmc_history_pipeline" / "corpus_reconciliation" / "instrument_details.jsonl",
+                base / "tsetmc_history_pipeline" / "corpus_reconciliation" / "instrument_details.jsonl",
+            ))
+        selected = next((p for p in dict.fromkeys(v2_candidates) if p.is_file()), None)
+        if selected is not None:
+            method = "corpus_reconciliation_v2"
+        else:
+            selected = next((p for p in dict.fromkeys(v1_candidates) if p.is_file()), None)
+            if selected is not None:
+                method = "legacy_v1_fallback"
+    if selected is None:
+        return {}, None, method
+
+    buckets: dict[str, dict[str, set[str]]] = {}
+    try:
+        with selected.open("r", encoding="utf-8-sig") as handle:
+            for line_number, line in enumerate(handle, start=1):
+                if not line.strip():
+                    continue
+                try:
+                    obj = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    raise PipelineError(f"invalid identity crosswalk JSONL at line {line_number}") from exc
+                if not isinstance(obj, dict):
+                    continue
+                isin = str(obj.get("isin") or "").strip().upper()
+                code = str(obj.get("inscode") or "").strip()
+                if not re.fullmatch(r"[A-Z0-9]{12}", isin) or not re.fullmatch(r"\d{10,22}", code):
+                    continue
+                bucket = buckets.setdefault(isin, {"codes": set(), "symbols": set(), "names": set()})
+                bucket["codes"].add(code)
+                symbol = str(obj.get("symbol") or "").strip()
+                name = str(obj.get("name") or "").strip()
+                if symbol:
+                    bucket["symbols"].add(symbol)
+                if name:
+                    bucket["names"].add(name)
+    except OSError:
+        raise PipelineError(f"cannot read identity crosswalk: {type(exc).__name__}") from None
+
+    mapping: dict[str, dict[str, str]] = {}
+    for isin, bucket in buckets.items():
+        # Conflicting insCode mappings are deliberately left unresolved.
+        if len(bucket["codes"]) != 1:
+            continue
+        symbol = next(iter(bucket["symbols"])) if len(bucket["symbols"]) == 1 else ""
+        if not symbol and len(bucket["names"]) == 1:
+            symbol = next(iter(bucket["names"]))
+        mapping[isin] = {
+            "instrument_code": next(iter(bucket["codes"])),
+            "symbol": symbol,
+            "isin": isin,
+        }
+    return mapping, selected.resolve(), method
+
+
+def discover_instrument_identity(
+    history_path: Path, crosswalk: dict[str, dict[str, str]] | None = None,
+    crosswalk_method: str = "unavailable",
+) -> dict[str, Any]:
+    """Resolve candidate identity; a crosswalk never supplies an evidence approval."""
+    folder_hint = history_path.parent.name.strip()
+    folder_isin = folder_hint.upper() if re.fullmatch(r"[A-Za-z0-9]{12}", folder_hint) else ""
+    mapped = (crosswalk or {}).get(folder_isin) if folder_isin else None
+    search_files = sorted(history_path.parent.glob("instrument_search*.json"))
+    if not search_files:
+        if mapped:
+            return {**mapped, "_identity_conflict": False, "_identity_resolution_method": crosswalk_method}
+        return {
+            "instrument_code": "", "symbol": "", "isin": folder_isin,
+            "_identity_conflict": False,
+            "_identity_resolution_method": f"{crosswalk_method}_no_unique_mapping" if crosswalk_method != "unavailable" else ("folder_isin_only" if folder_isin else "unresolved"),
+        }
+    candidates: list[dict[str, Any]] = []
+    for search_path in search_files:
+        try:
+            payload = read_payload(search_path)
+        except PipelineError:
+            continue
+        if isinstance(payload, dict):
+            rows = payload.get("instrumentSearch")
+            if not isinstance(rows, list):
+                rows = payload.get("data")
+        else:
+            rows = payload
+        if isinstance(rows, list):
+            candidates.extend(r for r in rows if isinstance(r, dict))
+    if not candidates:
+        if mapped:
+            return {**mapped, "_identity_conflict": False, "_identity_resolution_method": crosswalk_method}
+        return {
+            "instrument_code": "", "symbol": "", "isin": folder_isin,
+            "_identity_conflict": False, "_identity_resolution_method": "empty_instrument_search",
+        }
+    isin_keys = ("cIsin", "isin", "ISIN", "lIsin", "cISIN")
+    matching = [
+        row for row in candidates
+        if folder_isin and str(field(row, *isin_keys) or "").strip().upper() == folder_isin
+    ]
+    chosen = matching[0] if len(matching) == 1 else candidates[0] if len(candidates) == 1 else None
+    candidate_codes = {str(field(row, "insCode", "instrument_code", "instrumentCode") or "").strip() for row in (matching or candidates)}
+    candidate_codes.discard("")
+    if chosen is None:
+        if mapped:
+            conflict = bool(candidate_codes and candidate_codes != {mapped["instrument_code"]})
+            return {**mapped, "_identity_conflict": conflict, "_identity_resolution_method": crosswalk_method}
+        return {
+            "instrument_code": "", "symbol": "", "isin": folder_isin,
+            "_identity_conflict": False, "_identity_resolution_method": "ambiguous_instrument_search",
+        }
+    code = str(field(chosen, "insCode", "instrument_code", "instrumentCode") or "").strip()
+    symbol = str(field(chosen, "lVal18AFC", "symbol", "ticker", "lVal30", "name") or "").strip()
+    isin = str(field(chosen, *isin_keys) or folder_isin).strip()
+    conflict = bool(mapped and code and mapped["instrument_code"] != code)
+    if mapped:
+        code = code or mapped["instrument_code"]
+        symbol = symbol or mapped["symbol"]
+        isin = isin or mapped["isin"]
+    return {
+        "instrument_code": code, "symbol": symbol, "isin": isin,
+        "_identity_conflict": conflict,
+        "_identity_resolution_method": crosswalk_method if mapped else "instrument_search_response",
+    }
+
+
+
     """Resolve insCode/ISIN from this instrument folder's own search response, if present."""
     folder_hint = history_path.parent.name.strip()
     search_files = sorted(history_path.parent.glob("instrument_search*.json"))
@@ -332,9 +482,10 @@ def discover_instrument_identity(history_path: Path) -> dict[str, str]:
     return {"instrument_code": code, "symbol": symbol, "isin": isin}
 
 
-def discover_manifest(root: Path) -> list[dict[str, Any]]:
+def discover_manifest(root: Path, identity_crosswalk_path: Path | None = None) -> list[dict[str, Any]]:
     if not root.is_dir():
         raise PipelineError(f"discovery root is not a directory: {root}")
+    crosswalk, crosswalk_path, crosswalk_method = load_identity_crosswalk(root, identity_crosswalk_path)
     rows: list[dict[str, Any]] = []
     excluded = ("chart", "adjust", "event", "priceadjust", "manifest", "report", "audit", "quarantine", "candidate")
     allowed_suffixes = {".json", ".csv"}
@@ -363,18 +514,20 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                     code_groups[code].append(item)
         if code_groups:
             for code, members in sorted(code_groups.items()):
-                identity = discover_instrument_identity(path)
+                identity = discover_instrument_identity(path, crosswalk, crosswalk_method)
                 row_symbol = next((str(field(r, "symbol", "ticker", "lVal18AFC") or "").strip() for r in members if field(r, "symbol", "ticker", "lVal18AFC")), "")
                 row_isin = next((str(field(r, "isin", "ISIN", "cIsin") or "").strip() for r in members if field(r, "isin", "ISIN", "cIsin")), "")
                 symbol = row_symbol or identity["symbol"] or path.parent.name
                 isin = row_isin or identity["isin"]
                 rows.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin,
-                    "_discovery_identity_conflict": bool(identity["instrument_code"] and identity["instrument_code"] != code),
+                    "_discovery_identity_conflict": bool(identity.get("_identity_conflict") or (identity["instrument_code"] and identity["instrument_code"] != code)),
                     "daily_history_path": str(path.resolve()),
                     "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                     "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
                     "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
+                    "identity_crosswalk_path": str(crosswalk_path) if crosswalk_path else "",
+                    "identity_resolution_method": identity.get("_identity_resolution_method", "unresolved"),
                     "_base_dir": str(root.resolve()), "_discovered": True,
                 })
         else:
@@ -389,6 +542,8 @@ def discover_manifest(root: Path) -> list[dict[str, Any]]:
                 "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                 "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
                 "share_change_events_path": _sibling(path, ("share_changes_raw.json", "share_change_raw.json", "instrument_share_change_raw.json", "share_changes.json", "share_change.json", "share_changes.csv", "share_change.csv")),
+                "identity_crosswalk_path": str(crosswalk_path) if crosswalk_path else "",
+                "identity_resolution_method": identity.get("_identity_resolution_method", "unresolved"),
                 "_base_dir": str(root.resolve()), "_discovered": True,
             })
     if not rows:
@@ -738,6 +893,25 @@ def run_pipeline(
             if path and not path.is_absolute():
                 paths[k] = (base / path).resolve()
         payloads, input_hashes, errors = {}, {}, []
+        crosswalk_value = str(item.get("identity_crosswalk_path", "") or "").strip()
+        if crosswalk_value:
+            crosswalk_input = Path(crosswalk_value).expanduser()
+            if not crosswalk_input.is_absolute():
+                crosswalk_input = (base / crosswalk_input).resolve()
+            try:
+                if not crosswalk_input.is_file():
+                    raise PipelineError(f"identity crosswalk file not found: {crosswalk_input}")
+                crosswalk_digest = file_hash(crosswalk_input)
+                input_hashes["identity_crosswalk_path"] = crosswalk_digest
+                hashes_all[str(crosswalk_input)] = crosswalk_digest
+                inventory.append({"instrument_code": code, "symbol": symbol,
+                                  "input_kind": "identity_crosswalk", "path": str(crosswalk_input),
+                                  "sha256": crosswalk_digest, "status": "read_candidate_identity_only", "error": ""})
+            except (PipelineError, OSError) as exc:
+                errors.append(f"identity_crosswalk:{exc}")
+                inventory.append({"instrument_code": code, "symbol": symbol,
+                                  "input_kind": "identity_crosswalk", "path": str(crosswalk_input),
+                                  "sha256": "", "status": "error", "error": str(exc)})
         if item.get("_discovery_ambiguous_history"):
             errors.append("discovery:multiple_equal_priority_history_files_for_instrument")
         if item.get("_discovery_identity_conflict"):
@@ -1017,7 +1191,10 @@ def run_pipeline(
         decision = {
             "instrument_code": code, "symbol": symbol, "isin": isin,
             "price_input_semantics": price_semantics,
-            "identity_verified": identity_ok, "decision_status": status,
+            "identity_verified": identity_ok,
+            "identity_resolution_method": item.get("identity_resolution_method", "manifest_fields"),
+            "identity_crosswalk_sha256": input_hashes.get("identity_crosswalk_path", ""),
+            "decision_status": status,
             "decision_reason_codes": ";".join(reasons or ["TECHNICAL_AND_EVIDENCE_GATES_PASSED"]),
             "input_hashes_json": hash_json, "history_rows": h["history_rows"] if h else 0,
             "valid_history_rows": h["valid_history_rows"] if h else 0,
@@ -1072,6 +1249,8 @@ def run_pipeline(
                 "history_rows": h["history_rows"], "adjusted_close_coverage": round(coverage, 6),
                 "input_hashes_json": hash_json,
                 "identity_match_evidence_ref": item.get("identity_match_evidence_ref", ""),
+                "identity_resolution_method": item.get("identity_resolution_method", "manifest_fields"),
+                "identity_crosswalk_sha256": input_hashes.get("identity_crosswalk_path", ""),
                 "history_close_semantics": price_semantics,
                 "rights_evidence_ref": item.get("rights_evidence_ref", ""),
                 "semantics_evidence_ref": item.get("semantics_evidence_ref", ""),
@@ -1104,6 +1283,10 @@ def run_pipeline(
     status_counts: defaultdict[str, int] = defaultdict(int)
     for row in decisions:
         status_counts[row["decision_status"]] += 1
+    identity_method_counts: dict[str, int] = {}
+    for item in items:
+        method = str(item.get("identity_resolution_method", "manifest_fields") or "manifest_fields")
+        identity_method_counts[method] = identity_method_counts.get(method, 0) + 1
     report = {
         "pipeline_version": VERSION, "run_id": run_id,
         "created_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -1114,6 +1297,8 @@ def run_pipeline(
         "unique_input_files_hashed": len(hashes_all),
         "input_file_read_errors": sum(r["status"] == "error" for r in inventory),
         "input_hash_count": len(hashes_all), "decision_status_counts": dict(status_counts),
+        "identity_resolution_method_counts": identity_method_counts,
+        "identity_crosswalk_paths": sorted({str(item.get("identity_crosswalk_path")) for item in items if item.get("identity_crosswalk_path")}),
         "research_eligible_count": len(research_out), "quarantine_count": len(quarantine_out),
         "reprocessing_queue_count": len(queue_out), "aggregate_history_rows": sum(r["history_rows"] for r in decisions),
         "history_gap_intervals_over_7_days": len(gap_out),
@@ -1135,6 +1320,7 @@ def run_pipeline(
             "Exact event-date overlap does not by itself establish effective-date or publication-time semantics.",
             "Coverage and ratio thresholds are preliminary triage rules, not proof of corporate-action correctness.",
             "The user must point discovery mode at the data corpus itself, not the whole repository or output directory.",
+            "A discovered identity crosswalk is hashed and may populate candidate identity fields only; it never substitutes for an explicit identity evidence reference or grants research/scoring eligibility.",
             "Only series with explicit traceable evidence references can pass research gating; production scoring remains separately disabled.",
             "Chronological strategy backtesting with real transaction costs, liquidity, drawdown and out-of-sample evaluation is not performed by this ingestion/acceptance stage.",
         ],
@@ -1163,6 +1349,7 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--manifest", help="CSV with instrument_code,symbol,isin and per-instrument local payload paths")
     group.add_argument("--discover-root", help="Discover known raw-history JSON/CSV schemas under a data-only folder")
     parser.add_argument("--output-root", default=str(Path.home() / "marketsage-data" / "tsetmc-acceptance"))
+    parser.add_argument("--identity-crosswalk", default="", help="optional exact instrument_details.jsonl path for discovery mode; candidate identity only")
     parser.add_argument("--min-history-rows", type=int, default=DEFAULT_MIN_HISTORY)
     parser.add_argument("--min-adjusted-coverage", type=float, default=DEFAULT_MIN_COVERAGE)
     parser.add_argument("--factor-min", type=float, default=DEFAULT_FACTOR_MIN)
@@ -1170,7 +1357,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         manifest_path = Path(args.manifest).expanduser().resolve() if args.manifest else None
-        items = load_manifest(manifest_path) if manifest_path else discover_manifest(Path(args.discover_root).expanduser().resolve())
+        explicit_crosswalk = Path(args.identity_crosswalk).expanduser().resolve() if args.identity_crosswalk else None
+        if manifest_path and explicit_crosswalk:
+            raise PipelineError("--identity-crosswalk is only valid with --discover-root")
+        items = load_manifest(manifest_path) if manifest_path else discover_manifest(
+            Path(args.discover_root).expanduser().resolve(), identity_crosswalk_path=explicit_crosswalk
+        )
         report = run_pipeline(
             items, manifest_path=manifest_path, output_root=Path(args.output_root).expanduser().resolve(),
             min_history=args.min_history_rows, min_coverage=args.min_adjusted_coverage,
