@@ -100,7 +100,9 @@
         "Current docs describe currency rate in Toman per quoted unit and say Markets & Indicators values are in Toman since 2026-07-20; reconcile against a sanitized account payload and independent reference before setting a confirmed unit",
         "Free tier documents 1 request/minute and 100 successful requests/day; local guard is not account-wide across hosts/processes",
         "Commercial/high-volume use, durable storage, derived display and redistribution rights require review",
-        "Never infer official/free-market market semantics from the name alone"
+        "Never infer official/free-market market semantics from the name alone",
+        "A previously shared review of the public developer documentation described a TSE stock screener with 1,644 active instruments and stock-history endpoints capped at 100 days; actual configured-account access remains unverified, so do not schedule a bulk crawl under the 100-success/day account quota.",
+        "The same documentation review distinguished TSE stock-price endpoints in Rial from other Markets & Indicators values in Toman since 2026-07-20. Keep these endpoint families separate; do not combine or convert units without exact endpoint-level payload and independent-reference reconciliation."
       ],
       "default_live_probe": false,
       "production_approved": false
