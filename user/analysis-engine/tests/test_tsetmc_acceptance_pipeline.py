@@ -287,3 +287,167 @@ def test_history_audit_flags_invalid_dates_values_duplicate_and_ohlc() -> None:
     assert result["invalid_or_nonpositive_close_rows"] == 1
     assert result["duplicate_history_date_rows"] == 1
     assert result["ohlc_violation_rows"] >= 1
+
+
+def _write_crosswalk_discovery_history(raw_root: Path) -> Path:
+    folder = raw_root / "IRTEST000001"
+    folder.mkdir(parents=True)
+    rows = []
+    start = date(2020, 1, 1)
+    for i in range(300):
+        day = start + timedelta(days=i)
+        close = 1000 + i
+        rows.append({
+            "dEven": int(day.strftime("%Y%m%d")),
+            "pClosing": close,
+            "pDrCotVal": close + 1,
+            "priceFirst": close - 2,
+            "priceMax": close + 4,
+            "priceMin": close - 4,
+        })
+    history = folder / "history_archive.json"
+    history.write_text(json.dumps({"closingPriceDaily": rows}), encoding="utf-8")
+    return history
+
+
+def test_discovery_uses_v2_identity_crosswalk_as_candidate_only_and_hashes_it(tmp_path: Path) -> None:
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    raw_root = corpus / "raw"
+    history_path = _write_crosswalk_discovery_history(raw_root)
+    v2 = corpus / "corpus_reconciliation_v2" / "instrument_details.jsonl"
+    v2.parent.mkdir(parents=True)
+    v2.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "1234567890123",
+        "symbol": "FOLAD",
+        "name": "Foolad",
+    }) + "\n", encoding="utf-8")
+    # A conflicting legacy mapping must not override the authoritative v2 mapping.
+    v1 = corpus / "corpus_reconciliation" / "instrument_details.jsonl"
+    v1.parent.mkdir(parents=True)
+    v1.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "9999999999999",
+        "symbol": "LEGACY",
+    }) + "\n", encoding="utf-8")
+
+    items = discover_manifest(raw_root)
+    assert len(items) == 1
+    item = items[0]
+    assert item["instrument_code"] == "1234567890123"
+    assert item["symbol"] == "FOLAD"
+    assert item["isin"] == "IRTEST000001"
+    assert item["identity_resolution_method"] == "corpus_reconciliation_v2"
+    assert item["identity_crosswalk_path"] == str(v2.resolve())
+    assert not item.get("identity_match_evidence_ref")
+
+    before = history_path.read_bytes()
+    summary = run_pipeline(
+        items,
+        manifest_path=None,
+        output_root=tmp_path / "out",
+        min_history=252,
+        min_coverage=0.0,
+        discovered=True,
+    )
+    out = Path(summary["output_dir"])
+    assert summary["research_eligible_count"] == 0
+    assert summary["research_feature_rows"] == 0
+    assert summary["forward_label_rows"] == 0
+    assert summary["flags"]["eligible_for_scoring"] is False
+    assert summary["flags"]["eligible_for_backtest"] is False
+    assert summary["flags"]["backtest_run"] is False
+    assert history_path.read_bytes() == before
+
+    with (out / "instrument_decisions.csv").open(encoding="utf-8", newline="") as handle:
+        decision = next(csv.DictReader(handle))
+    assert decision["identity_resolution_method"] == "corpus_reconciliation_v2"
+    assert decision["identity_crosswalk_path"] == str(v2.resolve())
+    assert decision["identity_crosswalk_sha256"] == hashlib.sha256(v2.read_bytes()).hexdigest()
+    assert decision["identity_verified"] == "False"
+    assert decision["eligible_for_research"] == "False"
+
+    with (out / "input_inventory.csv").open(encoding="utf-8", newline="") as handle:
+        inventory = list(csv.DictReader(handle))
+    crosswalk_rows = [row for row in inventory if row["input_kind"] == "identity_crosswalk"]
+    assert crosswalk_rows
+    assert all(row["status"] == "read_candidate_identity_only" for row in crosswalk_rows)
+    assert all(row["sha256"] == hashlib.sha256(v2.read_bytes()).hexdigest() for row in crosswalk_rows)
+
+
+def test_ambiguous_v2_identity_crosswalk_does_not_fall_back_to_legacy_v1(tmp_path: Path) -> None:
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    raw_root = corpus / "raw"
+    _write_crosswalk_discovery_history(raw_root)
+    v2 = corpus / "corpus_reconciliation_v2" / "instrument_details.jsonl"
+    v2.parent.mkdir(parents=True)
+    v2.write_text(
+        json.dumps({"isin": "IRTEST000001", "inscode": "1234567890123", "symbol": "FOLAD"}) + "\n"
+        + json.dumps({"isin": "IRTEST000001", "inscode": "5555555555555", "symbol": "OTHER"}) + "\n",
+        encoding="utf-8",
+    )
+    v1 = corpus / "corpus_reconciliation" / "instrument_details.jsonl"
+    v1.parent.mkdir(parents=True)
+    v1.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "9999999999999",
+        "symbol": "LEGACY",
+    }) + "\n", encoding="utf-8")
+
+    items = discover_manifest(raw_root)
+    assert len(items) == 1
+    assert items[0]["instrument_code"] == ""
+    assert items[0]["isin"] == "IRTEST000001"
+    assert items[0]["identity_resolution_method"] == "corpus_reconciliation_v2_no_unique_mapping"
+    assert items[0]["identity_crosswalk_path"] == str(v2.resolve())
+
+
+def test_discovery_uses_legacy_identity_crosswalk_only_when_v2_is_absent(tmp_path: Path) -> None:
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    raw_root = corpus / "raw"
+    _write_crosswalk_discovery_history(raw_root)
+    v1 = corpus / "corpus_reconciliation" / "instrument_details.jsonl"
+    v1.parent.mkdir(parents=True)
+    v1.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "1234567890123",
+        "symbol": "FOLAD",
+        "name": "Foolad",
+    }) + "\n", encoding="utf-8")
+
+    items = discover_manifest(raw_root)
+    assert len(items) == 1
+    assert items[0]["instrument_code"] == "1234567890123"
+    assert items[0]["identity_resolution_method"] == "legacy_v1_fallback"
+    assert items[0]["identity_crosswalk_path"] == str(v1.resolve())
+    assert not items[0].get("identity_match_evidence_ref")
+
+
+def test_discovery_flags_row_isin_conflict_with_authoritative_crosswalk(tmp_path: Path) -> None:
+    corpus = tmp_path / "tsetmc_history_pipeline"
+    raw_root = corpus / "raw"
+    folder = raw_root / "IRTEST000001"
+    folder.mkdir(parents=True)
+    v2 = corpus / "corpus_reconciliation_v2" / "instrument_details.jsonl"
+    v2.parent.mkdir(parents=True)
+    v2.write_text(json.dumps({
+        "isin": "IRTEST000001",
+        "inscode": "1234567890123",
+        "symbol": "FOLAD",
+    }) + "\n", encoding="utf-8")
+    rows = []
+    for i in range(3):
+        day = date(2020, 1, 1) + timedelta(days=i)
+        rows.append({
+            "insCode": "1234567890123",
+            "cIsin": "IRTEST000002",
+            "dEven": int(day.strftime("%Y%m%d")),
+            "pClosing": 1000 + i,
+        })
+    (folder / "history_archive.json").write_text(json.dumps({"closingPriceDaily": rows}), encoding="utf-8")
+
+    items = discover_manifest(raw_root)
+    assert len(items) == 1
+    assert items[0]["instrument_code"] == "1234567890123"
+    assert items[0]["isin"] == "IRTEST000002"
+    assert items[0]["_discovery_identity_conflict"] is True

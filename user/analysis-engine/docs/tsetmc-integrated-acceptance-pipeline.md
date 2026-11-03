@@ -87,6 +87,25 @@ sensitivity checks with `--min-history-rows`, `--min-adjusted-coverage`,
 `--factor-min`, and `--factor-max`. Do not change thresholds simply to turn
 a failing series into a pass.
 
+## Candidate identity crosswalk
+
+Discovery mode can use the corpus reconciliation identity file to populate candidate identity fields when the instrument folder is named by ISIN and the history payload does not contain a complete identity.
+
+- The runner searches the discovery root and its ancestors for `corpus_reconciliation_v2/instrument_details.jsonl`. It prefers v2 and uses `corpus_reconciliation/instrument_details.jsonl` only when v2 is absent; it never merges the two versions.
+- Only unique exact top-level `isin` → `inscode` pairs are used. `symbol` (or a unique `name`) is a candidate display label. Conflicting `inscode` values leave the ISIN unresolved.
+- The selected crosswalk path and SHA-256 are written to the discovered manifest, input inventory, decision rows and run provenance.
+- Crosswalk mapping is **candidate identity only**. It does not populate `identity_match_evidence_ref`, does not prove an independent identity match and does not satisfy any rights, price-semantics, corporate-action or independent-reconciliation gate. `identity_verified`, research eligibility, scoring and backtest eligibility remain fail-closed until explicit traceable evidence is supplied.
+- If the repository layout differs, discovery mode accepts an explicit `--identity-crosswalk /path/to/instrument_details.jsonl` option. This option is valid only with `--discover-root`.
+
+Example with an explicit path (use the owner's actual local paths; do not commit them):
+
+```bash
+python user/analysis-engine/scripts/run_tsetmc_acceptance_pipeline.py \
+  --discover-root /path/to/tsetmc_history_pipeline/raw \
+  --identity-crosswalk /path/to/tsetmc_history_pipeline/corpus_reconciliation_v2/instrument_details.jsonl \
+  --output-root /path/to/marketsage-data/tsetmc-acceptance
+```
+
 ## Outputs
 
 Each run directory contains:
