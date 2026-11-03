@@ -533,12 +533,13 @@ def discover_manifest(root: Path, identity_crosswalk_path: Path | None = None) -
         else:
             identity = discover_instrument_identity(path, crosswalk, crosswalk_method)
             codes = re.findall(r"(?<!\d)\d{10,22}(?!\d)", str(path))
-            code = identity["instrument_code"] or (codes[0] if codes else "")
+            path_code = codes[0] if codes else ""
+            code = identity["instrument_code"] or path_code
             symbol = identity["symbol"] or path.parent.name or path.stem
             isin = identity["isin"]
             rows.append({
                 "instrument_code": code, "symbol": symbol, "isin": isin,
-                "_discovery_identity_conflict": bool(identity.get("_identity_conflict")),
+                "_discovery_identity_conflict": bool(identity.get("_identity_conflict") or (identity["instrument_code"] and path_code and identity["instrument_code"] != path_code)),
                 "daily_history_path": str(path.resolve()),
                 "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                 "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
