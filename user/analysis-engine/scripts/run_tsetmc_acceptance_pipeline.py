@@ -354,7 +354,7 @@ def load_identity_crosswalk(
                     bucket["symbols"].add(symbol)
                 if name:
                     bucket["names"].add(name)
-    except OSError:
+    except OSError as exc:
         raise PipelineError(f"cannot read identity crosswalk: {type(exc).__name__}") from None
 
     mapping: dict[str, dict[str, str]] = {}
@@ -538,6 +538,7 @@ def discover_manifest(root: Path, identity_crosswalk_path: Path | None = None) -
             isin = identity["isin"]
             rows.append({
                 "instrument_code": code, "symbol": symbol, "isin": isin,
+                "_discovery_identity_conflict": bool(identity.get("_identity_conflict")),
                 "daily_history_path": str(path.resolve()),
                 "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                 "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
