@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 SOURCE_ID = "iran.tsetmc"
 DEFAULT_MIN_HISTORY = 252
 DEFAULT_MIN_COVERAGE = 0.95
@@ -40,7 +40,7 @@ MANIFEST_COLUMNS = [
 ]
 DECISION_COLUMNS = [
     "instrument_code", "symbol", "isin", "price_input_semantics", "identity_verified",
-    "identity_resolution_method", "identity_crosswalk_sha256", "decision_status",
+    "identity_resolution_method", "identity_crosswalk_path", "identity_crosswalk_sha256", "decision_status",
     "decision_reason_codes", "input_hashes_json", "history_rows",
     "valid_history_rows", "unique_history_dates", "invalid_date_rows",
     "invalid_or_nonpositive_close_rows", "invalid_numeric_field_rows",
@@ -103,7 +103,7 @@ RESEARCH_COLUMNS = [
     "identity_match_evidence_ref", "rights_evidence_ref", "semantics_evidence_ref",
     "independent_reconciliation_evidence_ref",
     "corporate_action_completeness_evidence_ref", "identity_resolution_method",
-    "identity_crosswalk_sha256", "eligible_for_scoring",
+    "identity_crosswalk_path", "identity_crosswalk_sha256", "eligible_for_scoring",
     "eligibility_scope",
 ]
 FEATURE_COLUMNS = [
@@ -1194,6 +1194,7 @@ def run_pipeline(
             "price_input_semantics": price_semantics,
             "identity_verified": identity_ok,
             "identity_resolution_method": item.get("identity_resolution_method", "manifest_fields"),
+            "identity_crosswalk_path": item.get("identity_crosswalk_path", ""),
             "identity_crosswalk_sha256": input_hashes.get("identity_crosswalk_path", ""),
             "decision_status": status,
             "decision_reason_codes": ";".join(reasons or ["TECHNICAL_AND_EVIDENCE_GATES_PASSED"]),
@@ -1251,6 +1252,7 @@ def run_pipeline(
                 "input_hashes_json": hash_json,
                 "identity_match_evidence_ref": item.get("identity_match_evidence_ref", ""),
                 "identity_resolution_method": item.get("identity_resolution_method", "manifest_fields"),
+                "identity_crosswalk_path": item.get("identity_crosswalk_path", ""),
                 "identity_crosswalk_sha256": input_hashes.get("identity_crosswalk_path", ""),
                 "history_close_semantics": price_semantics,
                 "rights_evidence_ref": item.get("rights_evidence_ref", ""),
