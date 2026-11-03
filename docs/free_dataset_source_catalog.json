@@ -1,6 +1,6 @@
 {
   "catalog_version": "1.0.0",
-  "last_reviewed": "2026-10-23",
+  "last_reviewed": "2026-11-03",
   "policy": {
     "prefer_no_subscription": true,
     "free_access_is_not_a_reuse_license": true,
@@ -100,7 +100,9 @@
         "Current docs describe currency rate in Toman per quoted unit and say Markets & Indicators values are in Toman since 2026-07-20; reconcile against a sanitized account payload and independent reference before setting a confirmed unit",
         "Free tier documents 1 request/minute and 100 successful requests/day; local guard is not account-wide across hosts/processes",
         "Commercial/high-volume use, durable storage, derived display and redistribution rights require review",
-        "Never infer official/free-market market semantics from the name alone"
+        "Never infer official/free-market market semantics from the name alone",
+        "A previously shared review of the public developer documentation described a TSE stock screener with 1,644 active instruments and stock-history endpoints capped at 100 days; actual configured-account access remains unverified, so do not schedule a bulk crawl under the 100-success/day account quota.",
+        "The same documentation review distinguished TSE stock-price endpoints in Rial from other Markets & Indicators values in Toman since 2026-07-20. Keep these endpoint families separate; do not combine or convert units without exact endpoint-level payload and independent-reference reconciliation."
       ],
       "default_live_probe": false,
       "production_approved": false
@@ -256,13 +258,16 @@
         "coins",
         "selected crypto/local-price candidates"
       ],
-      "history_limit": "Owner-run ingestion on 2026-10-22 parsed 91,245 rows across 28 candidate series after Jalali/Gregorian round-trip checks. The full span, expected market calendar, gaps, stale values, and per-series coverage quality remain unaudited.",
+      "history_limit": "Owner-run capture on 2026-10-22 parsed 91,245 rows across 28 candidate series. Owner-reported 2026-10-23 audit flagged material scale anomalies and gaps, including an IQD maximum gap of 373 days; per-series completeness remains unaccepted.",
       "limitations": [
         "Third-party/community-operated candidate; source ownership, upstream data lineage, reliability and terms require verification",
         "Publisher announcement asks for Nerkhsanj attribution/link; confirm conditions and permitted commercial/data use before reuse",
         "The ingestion parser uses an observed response and round-trip Jalali/Gregorian calendar checks; successful date parsing does not verify units, series semantics, completeness, or economic accuracy.",
         "Market series, key names, update frequency, historical gaps and corrections must be inventoried from the actual API, not inferred from the announcement",
-        "The initial metadata-only probe parsed 28 candidate series (91,245 reported pairs) but did not validate Jalali calendar dates; a later ingestion round-trip-validated accepted rows and wrote normalized candidate files locally, not to Git. Neither step established units, source lineage, rights, or independent reconciliation."
+        "The initial metadata-only probe parsed 28 candidate series (91,245 reported pairs) but did not validate Jalali calendar dates; a later ingestion round-trip-validated accepted rows and wrote normalized candidate files locally, not to Git. Neither step established units, source lineage, rights, or independent reconciliation.",
+        "Owner-reported local audit dated 2026-10-23 flagged 182 adjacent changes >=20%, including 48 >=100%, concentrated in IQD, silver and Tether. Keep IQD, silver and Tether excluded from feature generation; retain Bitcoin as a coverage warning.",
+        "Owner-reported gaps include 373 days for IQD and up to 84 days for silver, Tether and Bitcoin. Do not rescale, delete rows or forward-fill to make these series appear continuous.",
+        "These are sanitized owner-reported findings only; this execution did not access or independently re-audit the local raw archive."
       ],
       "default_live_probe": false,
       "production_approved": false,
