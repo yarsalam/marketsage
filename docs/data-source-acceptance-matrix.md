@@ -1,6 +1,6 @@
 # MarketSage — data-source acceptance matrix
 
-**Checkpoint date:** 2026-11-02  
+**Checkpoint date:** 2026-11-03  
 **Release posture:** candidate/research-only. No source in this matrix is approved for production scoring.  
 **Workflow:** implement → identify source/series contract → automated tests → bounded live evidence → history/units/reconciliation/rights review → private staging smoke → explicit review → merge.  
 **VPN rule:** before any foreign live-source request, tell the project owner to enable VPN. Iran providers TSETMC/CODAL/Tindex use VPN off. Never mix them in one probe batch.
@@ -60,6 +60,32 @@ For TSETMC live checks, **VPN must be OFF**. The script `scripts/validate_tsetmc
 - Current public docs define currency-rate values as Toman per quoted unit and say Markets & Indicators values are Toman since 2026-07-20. Keep the normalized unit unconfirmed until a fresh account payload is compared with an independent lawful reference. The Tindex candles/history endpoint is capped at about 100 days, insufficient alone for the six-month horizon.
 - Nerkhsanj remains a discovery candidate, but the owner-run bounded archive request on 2026-10-22 did complete: 28 candidate keys and 91,245 pairs were parsed, followed by a local audit on 2026-10-23. The parser reported no invalid dates, non-positive values or duplicate-date conflicts; the audit flagged 182 adjacent changes >=20% and 48 >=100%, concentrated in IQD, silver and Tether. IQD also had a 373-day maximum gap; silver/Tether and Bitcoin had gaps up to 84 days. Keep IQD, silver and Tether excluded from features; retain Bitcoin as a coverage warning. These are owner-reported local summaries, not an independent re-audit. Raw response was not retained as a fixture. Source ownership/upstream lineage, attribution, commercial/model-use rights, key identity, price semantics, units, market convention, calendar, corrections, stale-value behavior and independent reconciliation remain unverified. Do not rescale, delete, forward-fill or poll `/calc` per record. See the owner-run sections in `free-dataset-discovery-and-acceptance.md` for sanitized counts and triage.
 - Latest Tindex quota code/runner changes must pass CI on the exact PR heads before live tests or staging.
+
+## Candidate disposition and next evidence sequence — 2026-11-03
+
+This is a decision-oriented triage of evidence already present in the repository and sanitized owner-reported summaries. No provider was probed in this update, no local raw file was accessed, and no source was approved.
+
+| Priority | Candidate | Current disposition | Next evidence required |
+|---|---|---|---|
+| 1 — Iran price-history path | TSETMC equities/funds | Best current engineering path for an Iran-market sample because the offline integrated acceptance pipeline is implemented. **Not accepted**: the owner's 1,220-instrument local corpus has not been run through it in this environment; rights, raw/adjusted semantics and independent event reconciliation remain open. | Run the offline pipeline only after the trusted local Runner gate; review instrument identity, event families, missing sessions, price semantics, and lawful independent references. |
+| 2 — Low-frequency macro context | World Bank Indicators | Candidate for annual macro context only; not a daily market-price substitute. Observation year is not release/availability time and revisions may create look-ahead. | Capture series definition, unit, release/vintage availability and revisions; preserve annual frequency and align only after a point-in-time rule is documented. |
+| 3 — Issuer events | CODAL | Discovery adapter exists, but retrieval time cannot stand in for publication time and original/corrected filings are not yet linked. | Reconcile original, amendment and publication timestamps against source documents; establish historical replay and use terms. |
+| 4 — Local multi-asset archive | Nerkhsanj | **Research-excluded pending remediation.** The owner-reported audit flagged 182 adjacent moves >=20% (48 >=100%), concentrated in IQD, silver and Tether; IQD has a 373-day maximum gap and silver/Tether/Bitcoin have gaps up to 84 days. No raw files were re-audited here. | Resolve exact key identity, scale/unit, upstream lineage, attribution and commercial/model-use rights; compare overlapping dates against a lawful independent source. Keep IQD/silver/Tether out of features and Bitcoin as a coverage warning meanwhile. |
+| 5 — Current Iran indicators | Tindex | Account-scoped candidate only. The documented latest-100-day candle history is shorter than the six-month horizon; 1 request/minute and 100 successful requests/day are shared account limits. | Do not use as a standalone six-month price history. Reconcile one authorized account payload per selected series to an independent reference, and document rights and actual account-level access. |
+| 6 — Global proxy histories | Yahoo Finance | Existing captures may support exploratory plumbing only; unofficial access/terms, adjustments, survivorship and point-in-time availability are unresolved. US ETFs are not a representative Iran universe. | Reuse existing captures; do not redownload without a changed acceptance question. Verify symbol mapping, adjustments, terms and historical availability before any performance claim. |
+| 7 — Venue-specific crypto | Binance Spot | Iran-network HTTP 451 is a blocked route. Do not bypass it or repeat the same blocked request. A separate small foreign sample is not multi-year coverage evidence. | Keep blocked for this environment; any future alternative requires its own lawful access, venue/pair identity, history, fees and rights review. |
+| 8 — News discovery | GDELT DOC | Adapter is research-only; prior HTTP 429 remains in cooldown. First-seen/index time is not publisher publication time. | No repeat probe until a materially changed acceptance question and deliberate request budget; verify original publisher/time and a labelled Persian/English event set. |
+| 9 — Macro vintages | FRED/ALFRED | Adapter exists but key/access was unavailable in the prior environment. Observation/vintage dates are not exact intraday release times. | Keep unprobed until secure key/network access is available; document series-specific release calendars and vintage semantics. |
+| 10 — Vendor and unverified local feeds | StreamData, TGJU, Iran official macro portals, fixed income and social signals | No accepted series. StreamData is vendor-supplied rather than free; TGJU automated rights are unapproved; official macro machine-readable coverage and fixed-income contract are not established; no social provider/labelled benchmark exists. | Resolve contracts/rights, exact series definition, units, timestamps, history and independent reconciliation before implementation or collection. |
+
+### Current decision
+
+- No candidate currently passes the complete source-acceptance gate for investment scoring.
+- TSETMC is the first local technical acceptance workload, not an accepted investment dataset.
+- World Bank and CODAL can only contribute low-frequency macro or event context after point-in-time semantics are resolved; neither replaces price history.
+- Nerkhsanj IQD, silver and Tether remain excluded from feature generation; Bitcoin remains flagged for coverage.
+- No source status, production-approval flag, ranking gate or scoring gate was changed.
+- The next empirical blocker is not another provider probe: it is trusted access to the owner's local corpus, followed by review of the already-recorded extreme Stage 4 fold and a locked, permissioned evaluation.
 
 ## Next execution order
 
