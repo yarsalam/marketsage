@@ -19,6 +19,20 @@
 | News / geopolitical events | GDELT DOC as discovery only; original publisher for verification | Prior GDELT request returned HTTP 429; index time is not publication time | Adapter and keyword baseline exist; no recent GDELT probe in the latest batch | Check coverage by Persian/English and country/topic, canonical deduplication, original-source/time verification, rights, labelled-event recall and no look-ahead |
 | Sentiment / social signals | No provider selected | Public posts are not automatically collectible, retainable or trainable | Lexicon baseline is a prototype only, not a validated ML model; no social signal connected to ranking | Confirm collection/retention/deletion rights; create time-stamped Persian/English labelled dataset; record annotator agreement; report held-out class-wise precision/recall/F1 and drift; abstain when uncertain |
 
+## Global official-source candidates screened — 2026-11-03
+
+A documentation-only screen added five candidates to the catalog/registry. No API endpoint was contacted, no adapter was enabled, and all entries remain excluded from scoring. See [the full source-contract screen](global-source-candidate-screen-2026-11.md).
+
+| Candidate | Intended role | Verified documentation facts | Unresolved acceptance gates |
+|---|---|---|---|
+| ECB Data Portal SDMX | Daily reference FX, euro-area yields and macro | Public SDMX REST; daily reference exchange rates documented since 1999; `updatedAfter` and `includeHistory` support update/history retrieval. ESCB public statistics are reusable with attribution and without modification; third-party data are excluded without permission. | Exact series key, currency direction, reference-vs-executable quote, release/availability time, revision replay and third-party rights. |
+| US Treasury XML | USD par yields, bills and real yields | Daily par yields from 1990; bills from 2002; real-yield series from 2003; default 300 rows and zero-based pagination. | Maturity/curve definitions, units, publication/availability timestamp, revisions/schema changes and reuse terms. Rates are not bond prices or total-return series. |
+| EIA API v2 | Oil, petroleum inventories, natural gas and electricity context | Free API; key registration required; bulk downloads do not require a key; API supports series/date/frequency/facet selection. EIA government information is generally public domain with acknowledgment, subject to API terms and third-party material exceptions. | Secure key, API terms, exact series/geography/frequency/unit, release calendar, revisions, source attribution and separation of energy statistics from tradable market prices. |
+| SEC EDGAR | US issuer filings, fundamentals and events | Public submissions/XBRL APIs require no API key; indexes extend to 1994Q3; 10 requests/second/user Fair Access and descriptive User-Agent required. Acceptance and public availability are distinct; post-acceptance corrections can alter indexes. | CIK/form identity, acceptance-vs-availability mapping, amendments/corrections, XBRL contexts/units/periods, reuse terms and point-in-time replay. Not a price feed. |
+| IMF SDMX 2.1/3.0 | International macro and external-sector context | IMF documents SDMX 2.1/3.0 APIs; its Swagger explorer requires a beta portal account. | Actual endpoint authentication/quota, exact dataflow/history, release/vintage semantics, country/units and reuse rights. |
+
+**Execution order:** start with one ECB reference-FX or yield series; then one Treasury curve; then one EIA energy series; then one SEC CIK/form history; leave IMF until its API access contract is clarified. Before each foreign live request, remind the owner to turn VPN ON. Do not batch these candidates or add them to the default probe runner.
+
 ## What is already tested vs what is not
 
 ### TSETMC adjusted history
