@@ -4,13 +4,13 @@
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Integration target:** PR #6 branch `feat/tindex-free-data-connector`
 **Current integration HEAD:** `21c591223c9e7d61e6046a06f51522e979530f08`
-**Post-#21 CI:** push run `41601942608` and PR run `41601948914` are in progress on exact head `21c591223c9e7d61e6046a06f51522e979530f08`; four of five job types succeeded and `production-images` remains in progress.
+**Post-#21 CI:** push run `41601942608` and PR run `41601948914` both passed all five required job types on exact head `21c591223c9e7d61e6046a06f51522e979530f08`.
 
 ## Open PRs
 
 | PR | Base ← head | Current head / CI | State and handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `21c591223c9e7d61e6046a06f51522e979530f08`; post-#21 runs `41601942608` / `41601948914` in progress | Open; do not merge to `main` without explicit owner approval. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `21c591223c9e7d61e6046a06f51522e979530f08`; post-#21 runs `41601942608` / `41601948914` passed all five required jobs | Open; do not merge to `main` without explicit owner approval. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Live TSETMC request timed out from GitHub-hosted runner | Open; parked. Do not repeat the same network request from that environment. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed after #20 merge and #21 creation; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
 | [#22](https://github.com/yarsalam/marketsage/pull/22) | #6 branch ← `research/global-official-source-candidates-2026-11` | Head `6eff5daf8c2b86a96015992d3f9d3f17beacab82`; PR run `41602083315` in progress, push run `41602045431` queued | Open; do not merge until all five required job types pass on this exact head. |
@@ -64,7 +64,7 @@ main
 - Tindex unit families must remain separate: previously reviewed public docs described TSE stock endpoints in Rial and other Markets & Indicators values in Toman since 2026-07-20. The 100-day history cap and 1/minute + 100-success/day account quota do not support a bulk 1,644-symbol six-month history crawl; configured-account access remains unverified.
 - Stage 4 still has no accepted representative, permissioned, point-in-time out-of-sample result. The previously recorded 240.89% six-month fold requires attribution; do not tune against the locked holdout.
 - No Runner is registered; branch protection/rulesets cannot be configured through the connected GitHub integration in the current account.
-- PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`; post-#21 CI runs `41601942608` and `41601948914` are in progress (production-images pending). PR #21 is merged; PR #22 remains open pending exact-head CI.
+- PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`; both post-#21 CI runs `41601942608` and `41601948914` passed all five required jobs. PR #21 is merged; PR #22 remains open pending exact-head CI.
 
 ## Local Runner activation gate
 
