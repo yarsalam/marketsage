@@ -531,7 +531,7 @@ def discover_manifest(root: Path, identity_crosswalk_path: Path | None = None) -
                     "_base_dir": str(root.resolve()), "_discovered": True,
                 })
         else:
-            identity = discover_instrument_identity(path)
+            identity = discover_instrument_identity(path, crosswalk, crosswalk_method)
             codes = re.findall(r"(?<!\d)\d{10,22}(?!\d)", str(path))
             code = identity["instrument_code"] or (codes[0] if codes else "")
             symbol = identity["symbol"] or path.parent.name or path.stem
