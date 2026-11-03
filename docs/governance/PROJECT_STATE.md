@@ -6,7 +6,7 @@
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
 **Integration HEAD:** `21c591223c9e7d61e6046a06f51522e979530f08`  
-**Post-#21 integration CI:** push run `41601942608` and PR run `41601948914` are running on exact head `21c591223c9e7d61e6046a06f51522e979530f08`; four of five job types are complete-success and `production-images` remains in progress.  
+**Post-#21 integration CI:** push run `41601942608` and PR run `41601948914` both completed successfully on exact head `21c591223c9e7d61e6046a06f51522e979530f08`; all five required job types passed in both runs.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -44,7 +44,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `21c591223c9e7d61e6046a06f51522e979530f08`; post-#21 runs `41601942608` / `41601948914` in progress (production-images pending) | Open; do not merge to main |
+| #6 | Head `21c591223c9e7d61e6046a06f51522e979530f08`; post-#21 runs `41601942608` / `41601948914` passed all five required job types | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -130,7 +130,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. Confirm all five required job types pass on post-#21 #6 head `21c591223c9e7d61e6046a06f51522e979530f08` (runs `41601942608` and `41601948914`; `production-images` was still running at the latest check).
+1. Post-#21 integration CI is confirmed green: runs `41601942608` and `41601948914` both passed all five required job types on #6 head `21c591223c9e7d61e6046a06f51522e979530f08`.
 2. Complete all five required CI job types on exact PR #22 head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` (run `41602083315`); if green, merge #22 into #6 and verify the new #6 head and post-merge CI.
 3. Keep PR #15 Draft and update this state/register after each material transition.
 4. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
