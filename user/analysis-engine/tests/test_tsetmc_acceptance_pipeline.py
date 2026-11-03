@@ -362,6 +362,7 @@ def test_discovery_uses_v2_identity_crosswalk_as_candidate_only_and_hashes_it(tm
     with (out / "instrument_decisions.csv").open(encoding="utf-8", newline="") as handle:
         decision = next(csv.DictReader(handle))
     assert decision["identity_resolution_method"] == "corpus_reconciliation_v2"
+    assert decision["identity_crosswalk_path"] == str(v2.resolve())
     assert decision["identity_crosswalk_sha256"] == hashlib.sha256(v2.read_bytes()).hexdigest()
     assert decision["identity_verified"] == "False"
     assert decision["eligible_for_research"] == "False"
