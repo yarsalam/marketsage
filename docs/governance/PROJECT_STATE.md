@@ -5,8 +5,8 @@
 **Default branch:** `main`  
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
-**Integration HEAD:** `21c591223c9e7d61e6046a06f51522e979530f08`  
-**Post-#21 integration CI:** push run `41601942608` and PR run `41601948914` both completed successfully on exact head `21c591223c9e7d61e6046a06f51522e979530f08`; all five required job types passed in both runs.  
+**Integration HEAD:** `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`  
+**Post-#22 integration CI:** push run `41602459792` is queued on exact head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-merge validation is not yet complete.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -17,7 +17,7 @@
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` and post-merge #6 run `41598989190` passed all five required job types.
 - PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Both post-merge runs `41601055518` (push) and `41601064135` (pull_request) subsequently passed all five job types.
 - PR #21 corrected stale Tindex quota wording and added a mocked regression test. All five required exact-head job types passed on `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9` (run `41601260850`); it was merged into #6 at `21c591223c9e7d61e6046a06f51522e979530f08`.
-- PR #22 adds five official global source candidates (ECB, US Treasury, EIA, SEC EDGAR and IMF) with rights/time/history caveats and fail-closed registry tests. Exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82`; PR run `41602083315` is in progress and push run `41602045431` is queued. Do not merge until all five required job types pass on the exact PR head.
+- PR #22 added five official global source candidates (ECB, US Treasury, EIA, SEC EDGAR and IMF) with rights/time/history caveats and fail-closed registry tests. All five required job types passed on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in PR run `41602083315` and push run `41602045431`; it was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Post-merge push run `41602459792` is queued.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
 - PR #15 governance remains Draft; its documents are updated on the governance branch, but the PR is not merged.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
@@ -44,7 +44,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `21c591223c9e7d61e6046a06f51522e979530f08`; post-#21 runs `41601942608` / `41601948914` passed all five required job types | Open; do not merge to main |
+| #6 | Head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-#22 push run `41602459792` queued | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -57,7 +57,7 @@ main
 | #19 | Exact-head run `41598599936` passed all five required job types; merge `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b` | Merged into #6 |
 | #20 | Exact-head run `41600402263` passed all five required job types; merge `4191dd3715173265193163e30281ab555b9d12fb` | Merged into #6 |
 | #21 | Exact-head run `41601260850` passed all five required job types; merge `21c591223c9e7d61e6046a06f51522e979530f08` | Merged into #6 |
-| #22 | Head `6eff5daf8c2b86a96015992d3f9d3f17beacab82`; PR run `41602083315` in progress, push run `41602045431` queued | Open; do not merge until all five required job types pass on this exact head |
+| #22 | PR run `41602083315` and push run `41602045431` passed all five required job types; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` | Merged into #6 |
 
 ## Source and dataset evidence
 
@@ -130,8 +130,8 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. Post-#21 integration CI is confirmed green: runs `41601942608` and `41601948914` both passed all five required job types on #6 head `21c591223c9e7d61e6046a06f51522e979530f08`.
-2. Complete all five required CI job types on exact PR #22 head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` (run `41602083315`); if green, merge #22 into #6 and verify the new #6 head and post-merge CI.
+1. Post-#21 integration CI was green on #6 head `21c591223c9e7d61e6046a06f51522e979530f08`: both runs `41601942608` and `41601948914` passed all five required job types.
+2. PR #22 passed all five required job types on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in both PR and push runs and was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Confirm post-merge run `41602459792` after it starts.
 3. Keep PR #15 Draft and update this state/register after each material transition.
 4. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
 5. Once trusted local execution is available, compare the exact PR #14 runner/discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory, then run the integrated offline pipeline once against the designated corpus.
