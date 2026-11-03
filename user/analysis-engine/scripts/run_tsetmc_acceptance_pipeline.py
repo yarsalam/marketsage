@@ -482,7 +482,11 @@ def discover_manifest(root: Path, identity_crosswalk_path: Path | None = None) -
                 isin = row_isin or identity["isin"]
                 rows.append({
                     "instrument_code": code, "symbol": symbol, "isin": isin,
-                    "_discovery_identity_conflict": bool(identity.get("_identity_conflict") or (identity["instrument_code"] and identity["instrument_code"] != code)),
+                    "_discovery_identity_conflict": bool(
+                        identity.get("_identity_conflict")
+                        or (identity["instrument_code"] and identity["instrument_code"] != code)
+                        or (identity["isin"] and row_isin and identity["isin"].upper() != row_isin.upper())
+                    ),
                     "daily_history_path": str(path.resolve()),
                     "adjusted_chart_path": discover_adjusted_candidate_path(path, isin),
                     "adjustment_events_path": _sibling(path, ("price_adjustments_raw.json", "price_adjustments.json", "price_adjust_list_raw.json", "events.json", "price_adjustments.csv", "events.csv")),
