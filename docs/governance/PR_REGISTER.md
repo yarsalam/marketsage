@@ -12,7 +12,7 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-#22 push run `41602459792` queued | Open; do not merge to `main` without explicit owner approval. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Live TSETMC request timed out from GitHub-hosted runner | Open; parked. Do not repeat the same network request from that environment. |
-| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed after #20 merge and #21 creation; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
+| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed through PR #22 merge; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
 
 
 ## Merged PRs relevant to the integration path
