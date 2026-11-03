@@ -59,7 +59,7 @@ For TSETMC live checks, **VPN must be OFF**. The script `scripts/validate_tsetmc
 - Current [Tindex developer docs](https://tindex.app/en/developers/) state the Free tier quota is 1 request/minute and 100 successful requests/day, with one active token per account. This supersedes the stale 3/minute and 300/day settings from earlier onboarding notes. The guarded local client now enforces a process-wide rolling minute and in-memory daily success budget, but it cannot see other hosts/processes sharing that account. Do not run concurrent jobs.
 - Current public docs define currency-rate values as Toman per quoted unit and say Markets & Indicators values are Toman since 2026-07-20. Keep the normalized unit unconfirmed until a fresh account payload is compared with an independent lawful reference. The Tindex candles/history endpoint is capped at about 100 days, insufficient alone for the six-month horizon.
 - Nerkhsanj remains a discovery candidate, but the owner-run bounded archive request on 2026-10-22 did complete: 28 candidate keys and 91,245 pairs were parsed, followed by a local audit on 2026-10-23. The parser reported no invalid dates, non-positive values or duplicate-date conflicts; the audit flagged 182 adjacent changes >=20% and 48 >=100%, concentrated in IQD, silver and Tether. IQD also had a 373-day maximum gap; silver/Tether and Bitcoin had gaps up to 84 days. Keep IQD, silver and Tether excluded from features; retain Bitcoin as a coverage warning. These are owner-reported local summaries, not an independent re-audit. Raw response was not retained as a fixture. Source ownership/upstream lineage, attribution, commercial/model-use rights, key identity, price semantics, units, market convention, calendar, corrections, stale-value behavior and independent reconciliation remain unverified. Do not rescale, delete, forward-fill or poll `/calc` per record. See the owner-run sections in `free-dataset-discovery-and-acceptance.md` for sanitized counts and triage.
-- Latest Tindex quota code/runner changes must pass CI on the exact PR heads before live tests or staging.
+- The conservative Tindex quota implementation was merged into #6 and its post-merge CI passed. Any future live probe still requires VPN OFF, one request/minute, the shared 100-success/day budget, one slug per request and the remaining source-acceptance gates. No Tindex live request was made in this update.
 
 ## Candidate disposition and next evidence sequence — 2026-11-03
 
@@ -89,8 +89,10 @@ This is a decision-oriented triage of evidence already present in the repository
 
 ## Next execution order
 
-1. Check PR #6 and PR #13 separately; never merge their different base branches together implicitly.
-2. Run the exact latest CI-green commit in private staging after proxy/authentication and rollback gates are met.
-3. For data: run the integrated TSETMC pipeline on the owner's local corpus through a trusted restricted runner; keep Binance HTTP 451 routes blocked and do not repeat prior foreign probes without a new acceptance question.
-4. Select and formalize fixed-income and social/news-labelled benchmark sources only after deciding the required data contract and use rights.
-5. Review each evidence pack before making a narrowly scoped source-registry approval change. Do not enable global ranking as a side-effect.
+1. Keep the current integration branch at its verified head; PRs #7, #9, #13, #14, #16, #17 and #18 are already merged into #6. Do not merge #6 into `main` without explicit owner approval.
+2. Do not repeat the parked GitHub-hosted TSETMC request (#8), the Binance HTTP 451 route, or GDELT's HTTP 429 request without a materially changed acceptance question and a permitted environment.
+3. After the local Runner trust boundary is satisfied, run the integrated offline TSETMC pipeline on the owner's designated corpus and review quarantined instruments; do not access raw local data through an untrusted workflow.
+4. Attribute the previously recorded extreme Stage 4 six-month fold using the same dataset hash and code/config provenance. Do not inspect or tune against the locked final holdout.
+5. Resolve rights, exact series identity, units, timestamp/publication availability, historical continuity, corporate actions and lawful independent reconciliation in the priority order above.
+6. Run a locked chronological evaluation only on permissioned, representative data; report net returns, costs/slippage, turnover, drawdown, baseline comparisons, currency assumptions and uncertainty.
+7. Keep all source approval, ranking and scoring flags fail-closed until every relevant data and empirical gate is independently satisfied.
