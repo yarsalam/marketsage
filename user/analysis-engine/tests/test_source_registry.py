@@ -31,3 +31,22 @@ def test_registry_exposes_gate_decision_for_audit_clients():
     assert vendor["approved_for_production"] is False
     assert "unit_currency_and_quote_convention" in vendor["required_checks"]
 
+
+
+
+def test_new_official_global_candidates_are_registered_but_remain_fail_closed():
+    expected = {
+        "global.sec_edgar",
+        "global.ecb_data_portal",
+        "global.us_treasury_yield_curve",
+        "global.eia_energy_api",
+        "global.imf_sdmx_api",
+    }
+    entries = {source.source_id: source for source in SOURCES}
+    assert expected <= set(entries)
+    for source_id in expected:
+        source = entries[source_id]
+        assert source.status == "candidate_requires_validation"
+        assert source.used_by_research_engine is False
+        assert source.approved_for_production is False
+        assert source_scoring_gate(source_id)["eligible_for_production_scoring"] is False

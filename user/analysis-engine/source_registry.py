@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 
-REGISTRY_VERSION = "1.0.0"
+REGISTRY_VERSION = "1.1.0"
 
 
 @dataclass(frozen=True)
@@ -246,18 +246,99 @@ SOURCES: tuple[SourceDefinition, ...] = (
         notes="Keep each venue and quote currency distinct; do not merge local and USD prices blindly.",
     ),
     SourceDefinition(
-        source_id="global.sec_edgar",
+        source_id="global.ecb_data_portal",
         market_scope="global",
-        asset_family="company_filings",
-        provider="SEC EDGAR",
+        asset_family="fx_rates_yields_macro",
+        provider="European Central Bank Data Portal SDMX API",
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("filing", "company_facts"),
-        timestamp_quality="acceptance timestamp available but field mapping needs audit",
-        required_checks=("filing_acceptance_time", "amendments", "point_in_time_field_mapping",
-                         "request_policy"),
-        notes="Candidate source for US issuer fundamentals and disclosures.",
+        data_kinds=("daily_reference_fx_candidate", "yield_curve_candidate",
+                    "macro_observation_vintage_candidate"),
+        timestamp_quality="observation periods and update/history metadata are available; exact release/availability time needs series-level validation",
+        required_checks=("series_key_and_definition", "currency_direction_and_units",
+                         "reference_rate_vs_executable_quote", "updated_after_and_historical_versions",
+                         "release_availability_time", "reuse_attribution_and_third_party_rights",
+                         "revision_and_discontinuation_policy"),
+        notes=("Public SDMX REST candidate for daily reference FX, yield curves and macro statistics. "
+               "ECB documentation describes updatedAfter and includeHistory; the ESCB reuse policy "
+               "allows public statistics to be reused with attribution and without modification, "
+               "but excludes third-party data without permission. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.us_treasury_yield_curve",
+        market_scope="global",
+        asset_family="sovereign_yields_and_rates",
+        provider="US Department of the Treasury daily interest-rate XML feeds",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("daily_par_yield_candidate", "daily_bill_rate_candidate",
+                    "daily_real_yield_candidate"),
+        timestamp_quality="daily observation date available; exact publication/availability timestamp and correction vintage need validation",
+        required_checks=("curve_type_and_maturity_mapping", "yield_definition_and_units",
+                         "calendar_and_missing_dates", "publication_availability_time",
+                         "xml_schema_drift_and_pagination", "reuse_terms_and_attribution"),
+        notes=("Official XML feeds list daily par yields from 1990 and bill/real-yield series with "
+               "different start dates; default responses contain 300 rows and all-history access "
+               "is paginated. Rates are not bond prices or total-return indexes. No live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.eia_energy_api",
+        market_scope="global",
+        asset_family="energy_oil_gas_electricity",
+        provider="US Energy Information Administration API v2",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("energy_price_candidate", "inventory_production_demand_candidate",
+                    "international_energy_statistic_candidate"),
+        timestamp_quality="series observation period and frequency are available; release calendar, publication time and revisions need series-level validation",
+        required_checks=("api_key_and_terms_of_service", "series_identity_and_frequency",
+                         "units_and_geography", "release_calendar_and_vintage",
+                         "third_party_materials_and_reuse", "history_completeness",
+                         "energy_statistic_vs_tradable_price"),
+        notes=("Free API v2 requires a registered API key; bulk downloads do not require a key. "
+               "EIA states its government information is generally public domain with acknowledgment, "
+               "but third-party contributed/licensed materials may be protected. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.imf_sdmx_api",
+        market_scope="global",
+        asset_family="international_macro_and_external_sector",
+        provider="International Monetary Fund SDMX 2.1/3.0 Data APIs",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("macro_observation_candidate", "balance_of_payments_candidate",
+                    "monetary_statistics_candidate"),
+        timestamp_quality="dataset-specific observation period; release/availability and vintage semantics not yet verified",
+        required_checks=("dataflow_and_series_definition", "authentication_and_quota",
+                         "country_frequency_and_unit_mapping", "release_calendar_and_vintage",
+                         "history_and_revision_behavior", "reuse_rights"),
+        notes=("IMF documentation advertises SDMX 2.1 and 3.0 APIs; its Swagger explorer requires "
+               "a beta portal account. Actual API authentication, quota, dataflow history and reuse "
+               "conditions remain unverified. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.sec_edgar",
+        market_scope="global",
+        asset_family="company_filings_and_fundamentals",
+        provider="SEC EDGAR submissions and XBRL company-facts APIs",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("filing_candidate", "xbrl_company_fact_candidate"),
+        timestamp_quality="filing acceptance date/time can be recovered from EDGAR metadata; public-document availability can lag and post-acceptance corrections exist",
+        required_checks=("issuer_cik_and_form_identity", "acceptance_vs_public_availability_time",
+                         "amendments_and_post_acceptance_corrections", "xbrl_context_units_and_periods",
+                         "fair_access_10_requests_per_second", "declared_user_agent",
+                         "reuse_terms_and_attribution", "point_in_time_field_mapping"),
+        notes=("Public data.sec.gov submissions and XBRL APIs require no API key; EDGAR indexes extend "
+               "to 1994Q3. SEC Fair Access limits a user to 10 requests/second across machines and "
+               "requires a descriptive User-Agent. Filings may appear 1-3 minutes after acceptance, "
+               "and corrections/deletions can change later indexes. This is issuer-event/fundamental "
+               "data, not market-price history. No adapter or live probe is enabled."),
     ),
     SourceDefinition(
         source_id="global.gdelt_doc_api",

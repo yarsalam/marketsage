@@ -128,3 +128,20 @@ def test_tindex_discovery_report_states_the_strict_account_quota(monkeypatch):
     assert "process-memory only" in record["note"]
     assert "three requests" not in record["note"]
     assert record["eligible_for_scoring"] is False
+
+
+def test_global_official_source_catalog_candidates_are_not_live_or_approved():
+    root = Path(__file__).resolve().parents[3]
+    catalog = json.loads((root / "docs" / "free_dataset_source_catalog.json").read_text(encoding="utf-8"))
+    expected = {
+        "global.sec_edgar",
+        "global.ecb_data_portal",
+        "global.us_treasury_yield_curve",
+        "global.eia_energy_api",
+        "global.imf_sdmx_api",
+    }
+    entries = {item["source_id"]: item for item in catalog["sources"]}
+    assert expected <= set(entries)
+    for source_id in expected:
+        assert entries[source_id]["default_live_probe"] is False
+        assert entries[source_id]["production_approved"] is False
