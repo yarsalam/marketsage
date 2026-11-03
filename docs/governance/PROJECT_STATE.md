@@ -6,7 +6,7 @@
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
 **Integration HEAD:** `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`  
-**Post-#22 integration CI:** push run `41602459792` is queued on exact head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-merge validation is not yet complete.  
+**Post-#22 integration CI:** push run `41602459792` passed all five required job types on exact head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; PR run `41602467771` has four job types passed and `production-images` still in progress.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -44,7 +44,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-#22 push run `41602459792` queued | Open; do not merge to main |
+| #6 | Head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-#22 push run `41602459792` passed all five; PR run `41602467771` image job in progress | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -131,7 +131,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 ## Next actions
 
 1. Post-#21 integration CI was green on #6 head `21c591223c9e7d61e6046a06f51522e979530f08`: both runs `41601942608` and `41601948914` passed all five required job types.
-2. PR #22 passed all five required job types on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in both PR and push runs and was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Confirm post-merge run `41602459792` after it starts.
+2. PR #22 passed all five required job types on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in both PR and push runs and was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Post-merge push run `41602459792` has passed all five jobs; PR run `41602467771` still has `production-images` in progress.
 3. Keep PR #15 Draft and update this state/register after each material transition.
 4. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
 5. Once trusted local execution is available, compare the exact PR #14 runner/discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory, then run the integrated offline pipeline once against the designated corpus.
