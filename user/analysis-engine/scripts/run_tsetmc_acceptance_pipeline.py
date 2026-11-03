@@ -443,45 +443,6 @@ def discover_instrument_identity(
 
 
 
-    """Resolve insCode/ISIN from this instrument folder's own search response, if present."""
-    folder_hint = history_path.parent.name.strip()
-    search_files = sorted(history_path.parent.glob("instrument_search*.json"))
-    if not search_files:
-        return {"instrument_code": "", "symbol": "", "isin": ""}
-    candidates: list[dict[str, Any]] = []
-    for search_path in search_files:
-        try:
-            payload = read_payload(search_path)
-        except PipelineError:
-            continue
-        if isinstance(payload, dict):
-            rows = payload.get("instrumentSearch")
-            if not isinstance(rows, list):
-                rows = payload.get("data")
-        else:
-            rows = payload
-        if isinstance(rows, list):
-            candidates.extend(r for r in rows if isinstance(r, dict))
-    if not candidates:
-        return {"instrument_code": "", "symbol": "", "isin": ""}
-    isin_keys = ("cIsin", "isin", "ISIN", "lIsin", "cISIN")
-    folder_isin = folder_hint if re.fullmatch(r"[A-Za-z0-9]{12}", folder_hint) else ""
-    matching = []
-    if folder_isin:
-        matching = [
-            row for row in candidates
-            if str(field(row, *isin_keys) or "").strip().upper() == folder_isin.upper()
-        ]
-    # Prefer exact ISIN; use a singleton only when the folder's query had one result.
-    chosen = matching[0] if len(matching) == 1 else candidates[0] if len(candidates) == 1 else None
-    if chosen is None:
-        return {"instrument_code": "", "symbol": "", "isin": folder_isin}
-    code = str(field(chosen, "insCode", "instrument_code", "instrumentCode") or "").strip()
-    symbol = str(field(chosen, "lVal18AFC", "symbol", "ticker", "lVal30", "name") or "").strip()
-    isin = str(field(chosen, *isin_keys) or folder_isin).strip()
-    return {"instrument_code": code, "symbol": symbol, "isin": isin}
-
-
 def discover_manifest(root: Path, identity_crosswalk_path: Path | None = None) -> list[dict[str, Any]]:
     if not root.is_dir():
         raise PipelineError(f"discovery root is not a directory: {root}")
