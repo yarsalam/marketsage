@@ -26,7 +26,7 @@ Current source catalog: [`free_dataset_source_catalog.json`](free_dataset_source
 | CODAL | Public disclosure search | Financial filings and corporate-event candidates | Retrieval time is not publication time; amendment links and historical coverage need validation |
 | World Bank Indicators API | Public API; the current official documentation says API keys are not required | Annual Iranian/global macro series, long historical spans | Annual period is not release timestamp; some series may be missing/revised and are not daily market prices |
 | Binance Spot public market data | Public klines endpoint, no API key for public market-data routes | Venue-specific crypto OHLCV | A BTCUSDT candle is not a USD quote or a universal crypto-market price; terms/geographic access remain to be reviewed |
-| Tindex | Free-tier account, environment token/origin required | Current currency snapshot and some indicator candles | Current public docs state 1 request/minute and 100 successful requests/day, indicator history up to 100 days, and Toman values since 2026-07-20; account payload, unit semantics and usage rights still require reconciliation |
+| Tindex | Free-tier account, environment token/origin required | Current currency snapshot and some indicator candles | Current public docs (rechecked 2026-11-04) state 3 requests/minute and 300 requests/day per account (429 rejections do not count toward the daily quota); MarketSage keeps a stricter local cap of 1 request/minute and 100 successful requests/day. Indicator history is limited to 100 days and Markets & Indicators are Toman since 2026-07-20; account payload, unit semantics and usage rights still require reconciliation |
 | Nerkhsanj rates archive | One owner-run metadata probe completed on 2026-10-22 | 28 candidate daily series across FX, gold/coins, local crypto and silver keys; 91,245 reported observations | Unit, key semantics, true Jalali-date validity, archive lineage, completeness, attribution and commercial/model-use rights remain unverified |
 | FRED/ALFRED | Free API key | US macro, rates and historical vintages | Observation period is not exact release time; series-specific vintage behavior matters |
 | Yahoo Finance / yfinance | Existing no-subscription research path | Global proxies and selected crypto history | Unofficial client/terms and reuse rights need review; not a certified exchange feed |
@@ -72,7 +72,7 @@ This run probes only TSETMC and CODAL. To explicitly add Tindex candles, only wh
 bash scripts/run_free_dataset_acceptance_pack.sh --live-iran --include-tindex
 ```
 
-The current public Tindex Free-plan docs state 1 request/minute and 100 successful requests/day, shared by account. The local in-memory guard is process-wide but not persistent or account-wide across other processes/hosts. The guarded runner now supports one optional slug, for example `--live-iran --include-tindex --tindex-slug "USD-EXCHANGE-RATE"`; do not poll a second slug until at least 60 seconds have elapsed. Never paste tokens into chat, command arguments, output reports, or Git. Tindex docs also describe currency-rate values as Toman per quoted unit; the project keeps units unconfirmed until the current account payload and an independent reference reconcile.
+The current public Tindex Free-plan docs (rechecked 2026-11-04) publish 3 requests/minute and 300 requests/day, shared by account; HTTP 429 rejections do not count toward the daily quota. MarketSage deliberately keeps a stricter local cap of 1 request/minute and 100 successful requests/day. The local in-memory guard is process-wide but not persistent or account-wide across other processes/hosts. The guarded runner now supports one optional slug, for example `--live-iran --include-tindex --tindex-slug "USD-EXCHANGE-RATE"`; do not poll a second slug until at least 60 seconds have elapsed. Never paste tokens into chat, command arguments, output reports, or Git. Tindex docs also describe currency-rate values as Toman per quoted unit; the project keeps units unconfirmed until the current account payload and an independent reference reconcile.
 
 ### Foreign/international provider run — VPN ON
 
@@ -124,7 +124,7 @@ TSETMC ingestion/audit scripts remain the history and adjusted-price workflow.
 
 ### Probe actual Tindex candles
 
-**VPN must be OFF before this live request.** Tindex is an Iran-provider flow in the guarded runner and requires the exact interactive `VPN-OFF` confirmation. The current public Free tier permits **one request/minute and 100 successful requests/day**. Probe only one slug per invocation:
+**VPN must be OFF before this live request.** Tindex is an Iran-provider flow in the guarded runner and requires the exact interactive `VPN-OFF` confirmation. The current public Free tier publishes **3 requests/minute and 300 requests/day per account**; the MarketSage client deliberately enforces **1 request/minute and 100 successful requests/day locally**. Probe only one slug per invocation:
 
 ```bash
 cd ~/projects/marketsage-acceptance/user/analysis-engine
