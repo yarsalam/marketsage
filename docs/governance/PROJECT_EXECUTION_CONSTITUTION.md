@@ -1,7 +1,7 @@
 # MarketSage — Project Execution Constitution
 
 **Version:** 1.0  
-**Status:** Proposed for adoption; binding after this PR is merged  
+**Status:** Adopted on main via PR #31 on 2026-11-04  
 **Owner:** Project owner  
 **Execution lead:** ChatGPT within the connected GitHub and approved local-runner capabilities  
 **Purpose:** Prevent strategic drift, repeated work, lost context, and untraceable changes.
@@ -109,7 +109,7 @@ Tests are run only to answer the acceptance question for the current commit and 
 The owner's laptop is the execution environment for tasks that require local datasets, a specific VPN/network, or local compute. The owner must not be required to download and run a succession of scripts manually.
 
 - A dedicated self-hosted runner is scoped to this private repository only.
-- Runner jobs execute only trusted, reviewed code from the protected integration branch or an explicitly approved execution branch.
+- Runner jobs execute only from a reviewed workflow on main and must check out an immutable, previously CI-validated execution commit. Because private-repository branch protection/rulesets are unavailable on the current plan, the owner must manually review the exact workflow and pinned source commit before every dispatch; this is a compensating operational control, not branch protection.
 - No self-hosted runner job may be triggered by an untrusted fork PR or arbitrary PR code.
 - The runner uses a dedicated unprivileged OS account and a dedicated work directory.
 - It receives only the minimum read/write access to the designated project-data directories. No unrestricted home-directory, browser-profile, SSH-key, password-store, trading-account, or sudo access.
