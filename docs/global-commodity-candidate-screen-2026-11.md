@@ -18,7 +18,7 @@ This is a useful candidate for **monthly global commodity regime context** (for 
   - annual prices (XLS);
   - monthly commodity-price report PDFs.
 - The monthly workbook link is discovered from the official landing page. Its document URL contains a versioned/hash-like path; do not hardcode an old file URL as a permanent endpoint.
-- The page snapshot reviewed on 2026-11-04 labels the monthly workbook "October 2026" and shows "Next update: November 3, 2026". It did not expose a newer workbook link in the retrieved page. Do not infer that October's observation data were available on October 31, or that the workbook includes October observations, from the release label alone.
+- The page snapshot reviewed on 2026-11-04 labels the monthly workbook "October 2026", shows "Latest Commodity Prices Published (10/02/2026)", and shows "Next update: November 3, 2026". It did not expose a newer workbook link in the retrieved page. These are page/release labels, not proof of the observation end date or the exact first-availability time; do not infer that October observations were available on October 31 from the workbook label.
 - The XLSX link could not be parsed by the documentation-review tool, and a direct download was not completed. The workbook's exact row/column layout, units row, source/description metadata, coverage by series and missing-value tokens remain unverified.
 - No documented stable REST/SDMX API for the Pink Sheet workbook was established in this review. Treat it as a periodically published workbook until a documented machine-readable contract is verified.
 
@@ -30,7 +30,7 @@ Official references:
 - World Bank Dataset Terms: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
 - World Bank Data Access and Licensing: https://datacatalog.worldbank.org/public-licenses
 
-The World Bank's Data Access and Licensing page states that CC BY 4.0 is the default for datasets produced by the World Bank and distributed as open data, and that this license permits commercial reuse with attribution and change notices. The same page explicitly describes exceptions: third-party datasets may use other licenses or require separate permission.
+The World Bank Commodity Markets page links to the World Bank's dataset summary terms and licensing pages. Those terms state that data may be copied, adapted, distributed and used commercially under CC BY 4.0 unless the dataset/indicator metadata says otherwise. They require attribution (generally “The World Bank: Dataset name: Data source (if known)”), linking to the terms when facilitating access, and prohibit implying World Bank endorsement. The licensing page explicitly describes exceptions: third-party datasets or components may use other licenses or require separate permission. Preserve source metadata and verify every series before commercial/model use.
 
 Therefore, do not infer that every commodity row in the Pink Sheet is covered by one blanket license. Before use, inspect the workbook's per-series source/description metadata and preserve attribution. The data-specific dataset terms linked from the Commodity Markets page govern the relevant dataset; general website content terms are not a substitute for that check.
 
