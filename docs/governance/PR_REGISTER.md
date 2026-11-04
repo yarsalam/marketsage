@@ -80,13 +80,13 @@ The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER
 ### Owner-host preparation reported 2026-11-04 (latest terminal output)
 
 - Host: Ubuntu 26.04.1 LTS, `x86_64`.
-- Dedicated account `marketsage-runner`: UID 110/GID 119, member only of its own group, not in `sudo`.
-- `/opt/actions-runner/marketsage`: owner/group `marketsage-runner`, mode `0750`.
-- A complete-looking v2.338.2 archive (228,071,396 bytes) and extracted Runner files (`config.sh`, `run.sh`, `bin/`, `externals/`) exist under personal `/home/nima/actions-runner`. That directory also contains personal `.env`, `.path` and `_diag/`; do not run the service there or copy those files.
-- The archive under `/opt/actions-runner/marketsage` is only 9,719,808 bytes and is incomplete. The displayed listing showed no `.runner`/`.credentials`; no running service/listener appeared in the `systemctl`/`ps` checks. Registration is therefore not evidenced.
-- The registration token was exposed in chat and must not be reused. A new token, if/when approved, must be entered only in the local terminal.
-- No research data roots are exposed, no workflow targets `self-hosted`, and these remain owner-reported host results rather than an independent host audit.
-- Next safe host operation is SHA-256 verification of the complete archive followed by copying/extracting only the package into the dedicated path as `marketsage-runner`. Do not copy the personal environment files.
+- Dedicated account `marketsage-runner`: UID 110/GID 119, member only of its own group, not in `sudo`; verified by `id`.
+- Runner v2.338.2 has been SHA-256 verified against `baebf204307bac6193480852732f0aba2ae97b6c5597c244f4d5558390147c40`, copied and extracted into `/opt/actions-runner/marketsage` as `marketsage-runner`. `Runner.Listener --version` reports `2.338.2`; top-level ownership/modes were inspected. The complete archive/extracted tree under personal `/home/nima/actions-runner` was not used for the service and its `.env`/`.path` files were not copied.
+- No `.runner`, `.credentials` or `.credentials_rsaparams` markers were found in the dedicated path. Previous `systemctl`/`ps` output showed no active Runner service/listener. Runner is installed as files only; it is not configured, registered or online.
+- The registration token was exposed in chat and must not be reused. A fresh token, only after activation is authorized, must be entered directly in the local terminal.
+- Access directories were created and tested: `/srv/marketsage/data` = `2750 nima:marketsage-runner`; Runner can traverse/read the directory but cannot write. `/srv/marketsage/output` = `0750 marketsage-runner:marketsage-runner`; Runner successfully created and removed a test file. Parent `/srv/marketsage` = `0755 root:root`. Data-directory contents and nested file permissions have not yet been inventoried.
+- No workflow targets `self-hosted`. These are owner-reported terminal results, not an independent host audit.
+- Next operation: safely inventory the names, types, sizes and permissions under the known project/data roots; do not copy or process the corpus until the exact data root and file-level read permissions are confirmed.
 - Registration/activation remains blocked until private-repository protection is available and verified, or the owner explicitly approves a revised trust model with residual risk. Do not attach this host to the existing `pull_request` CI workflow.
 
 ## Execution policy
