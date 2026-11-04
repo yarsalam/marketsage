@@ -12,8 +12,14 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `e19d65840d9112362209a23ea53c7fcf608c0720`; post-#24 PR run `41796506276` passed all five required jobs | Open; do not merge to `main` without explicit owner approval. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Live TSETMC request timed out from GitHub-hosted runner | Open; parked. Do not repeat the same network request from that environment. |
-| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed through PR #24, including Runner host prep and Stage 4 static audit; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
+| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Owner-approved manual-only Runner exception, completed dataset staging/hash verification and host permissions evidence added 2026-11-04 | Open; Draft; no merge/adoption transition made. |
 
+
+## Closed PRs
+
+| PR | Result |
+|---|---|
+| [#26](https://github.com/yarsalam/marketsage/pull/26) | Closed as a duplicate/superseded documentation branch; its two governance updates were fast-forwarded onto PR #15. No merge to `main`. |
 
 ## Merged PRs relevant to the integration path
 
@@ -70,25 +76,33 @@ main
 - Stage 4 still has no accepted representative, permissioned, point-in-time out-of-sample result. The previously recorded 240.89% six-month fold requires attribution; do not tune against the locked holdout.
 - Binance Spot is now hard-blocked in the discovery runner after owner-reported Iran-network HTTP 451; default probes exclude it and explicit selection returns zero requests. No alternate host is used.
 - Static Stage 4 review (2026-11-04): the backtest uses prior-month signals, next-month returns, L1 turnover costs and pre-holdout folds/locked holdout with equal-weight and cash baselines; six-month labels are inventory-only. The evaluator's complete monthly panel does not prove source rights, survivorship control, corporate-action correctness, point-in-time availability or executable liquidity. The existing fold-attribution script is ready but awaits the same pinned local dataset/config; it was not run.
-- No Runner is registered. The owner has created only the dedicated OS account and `/opt/actions-runner/marketsage` directory; no package, registration token, data mount or self-hosted workflow is in place. Branch protection/rulesets cannot be configured through the connected GitHub integration in the current account. GitHub's current plan docs say private-repository protection requires Pro/Team/Enterprise; a Free Organization alone does not satisfy the gate.
+- Owner approved the manual-only compensating-control model on 2026-11-04; this does not equal protected-branch enforcement. Runner remains unregistered/offline pending actual workflow inventory/review and final activation checks.
 - PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`. PR #21, #22, #23 and #24 are merged; PR #24 exact-head run `41796133083` and post-merge PR run `41796506276` passed all five required jobs.
 
 ## Local Runner activation gate
 
-The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. The unresolved owner decision is tracked in [Issue #25](https://github.com/yarsalam/marketsage/issues/25).
+The owner selected the manual-only compensating-control model in Issue #25 on 2026-11-04. The decision and accepted residual risk are recorded in `docs/governance/DECISION_LOG.md` and `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. This does not provide or claim GitHub private branch protection/ruleset enforcement.
 
-### Owner-host preparation reported 2026-11-04 (latest terminal output)
+### Owner-host preparation and test evidence — 2026-11-04
 
-- Host: Ubuntu 26.04.1 LTS, `x86_64`.
-- Dedicated account `marketsage-runner`: UID 110/GID 119, member only of its own group, not in `sudo`; verified by `id`.
-- Runner v2.338.2 has been SHA-256 verified against `baebf204307bac6193480852732f0aba2ae97b6c5597c244f4d5558390147c40`, copied and extracted into `/opt/actions-runner/marketsage` as `marketsage-runner`. `Runner.Listener --version` reports `2.338.2`; top-level ownership/modes were inspected. The complete archive/extracted tree under personal `/home/nima/actions-runner` was not used for the service and its `.env`/`.path` files were not copied.
-- No `.runner`, `.credentials` or `.credentials_rsaparams` markers were found in the dedicated path. Previous `systemctl`/`ps` output showed no active Runner service/listener. Runner is installed as files only; it is not configured, registered or online.
-- The registration token was exposed in chat and must not be reused. A fresh token, only after activation is authorized, must be entered directly in the local terminal.
-- Source-data root identified from owner terminal output: `/home/nima/projects/marketsage-acceptance/data`, approximately 1.3G, with TSETMC history, corpus acceptance/reconciliation (v1/v2), Foulad and market-universe candidate directories. `/srv/marketsage/data` is empty; no copy, symlink or mount has been created. Runner source-tree and nested-file read access remains unverified; the `775` mode on project/data directory entries is insufficient evidence because parent traversal and nested modes still matter.
-- Access directories were created and tested: `/srv/marketsage/data` = `2750 nima:marketsage-runner`; Runner can traverse/read the directory but cannot write. `/srv/marketsage/output` = `0750 marketsage-runner:marketsage-runner`; Runner successfully created and removed a test file. Parent `/srv/marketsage` = `0755 root:root`. Data-directory contents and nested file permissions have not yet been inventoried.
-- No workflow targets `self-hosted`. These are owner-reported terminal results, not an independent host audit.
-- Next operation: safely inventory the names, types, sizes and permissions under the known project/data roots; do not copy or process the corpus until the exact data root and file-level read permissions are confirmed.
-- Registration/activation remains blocked until private-repository protection is available and verified, or the owner explicitly approves a revised trust model with residual risk. Do not attach this host to the existing `pull_request` CI workflow.
+- Account: `marketsage-runner`, UID 110/GID 119, home `/var/lib/marketsage-runner`, shell `nologin`; member only of its own group and not in `sudo`, `docker`, `lxd` or `adm`.
+- Runner version 2.338.2 is installed under `/opt/actions-runner/marketsage`. No `.runner`, `.credentials` or `.credentials_rsaparams` markers, active Runner process, or installed/loaded service were found. It is not registered or online.
+- Any registration token previously pasted into chat is compromised and must never be reused. A fresh token must be entered locally only, after the workflow gate is satisfied.
+- Dataset staged at `/srv/marketsage/data/tsetmc_history_20261022`: 8,801 source files plus `SHA256SUMS` and `STAGING_README.txt`, 8,803 files total. Every source file hash was verified; adjusted research-only candidates were excluded and source files were not modified.
+- Dataset group is `marketsage-runner`; files are `0440`, directories `2750`. Runner read/hash/JSON/CSV checks passed on representative raw, normalized, reports, pipeline metadata, discovery, reconciliation and acceptance files. Writes to the dataset were denied. Separate `/srv/marketsage/output` write/create/delete test passed.
+- The general `/home/nima` tree is not traversable by the Runner account. No access to browser, SSH, credentials, Docker or personal project files has been granted.
+- These results are owner-supplied terminal outputs; they verify tested filesystem permissions, not workflow safety, network egress policy, kernel security or arbitrary-code containment.
+- Local Runner remains unregistered/offline. No workflow has been changed to `self-hosted`.
+
+### Remaining gates
+
+1. Inventory and inspect the exact current workflow files and every trigger, runner target, permission, action SHA, checkout ref and secret reference.
+2. Add a separate manual-only `workflow_dispatch` workflow; keep all normal CI on GitHub-hosted runners.
+3. Review exact workflow content and commit before each dispatch; use read-only token permission, no secrets, fixed trusted ref/SHA validation, serialization and sanitized output only.
+4. Verify workspace cleanup, service isolation and emergency disable/unregister instructions.
+5. Perform a final no-credentials/no-process host check, then repository-scope registration with a fresh locally entered token.
+
+No local job, data scoring, backtest admission, production deployment, broker access or trading is authorized by this setup.
 
 ## Execution policy
 
