@@ -1,6 +1,6 @@
 # MarketSage local-data Runner — trust boundary and operating procedure
 
-**Status:** Runner registered and online; first manual offline dataset-validator run passed (run 41906518123, attempt 2). The integrated TSETMC candidate pipeline is a separate, pending manual workflow.  
+**Status:** Runner registered and online; staged-dataset validator passed (run 41906518123, attempt 2); the integrated TSETMC candidate workflow is merged to main and awaits owner manual dispatch.  
 **Repository:** yarsalam/marketsage (private), repository-scoped Runner only.  
 **Authority:** owner-approved manual-only compensating-control model in Issue #25. This is not equivalent to GitHub branch protection or rulesets.
 
@@ -10,7 +10,7 @@ The laptop Runner is limited to reviewed, owner-dispatched research workflows. O
 
 Allowed local workloads:
 1. the manual staged-dataset checksum/inventory validator on main;
-2. a separately reviewed manual workflow that checks out the pinned integration commit 819f8b4028469cb0d498098fec88545a18ebacc6 and runs the offline TSETMC candidate-acceptance pipeline.
+2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, which checks out the pinned integration commit `819f8b4028469cb0d498098fec88545a18ebacc6` and runs the offline TSETMC candidate-acceptance pipeline after explicit owner dispatch.
 
 Disallowed:
 - fork/PR/issue/comment/schedule/push/workflow-run/repository-dispatch triggers;
@@ -84,9 +84,9 @@ Verified results:
 
 Attempt 1 failed during tar extraction. The service compatibility change and a sandboxed tar regression test were completed before re-running attempt 2. Attempt 2 is the accepted validator result. This validates staged corpus integrity only; it does not approve source rights, raw/adjusted semantics, corporate actions, independent reconciliation, point-in-time validity, research eligibility, backtest or scoring.
 
-## 6. Integrated TSETMC candidate workflow — pending
+## 6. Integrated TSETMC candidate workflow — merged; owner dispatch pending
 
-The separate workflow under review is .github/workflows/local-tsetmc-integrated-acceptance.yml. Its intended behavior:
+Workflow `.github/workflows/local-tsetmc-integrated-acceptance.yml` was merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`. Exact PR head `2df9e5fc523307a08894c8077210e8584aa4adcb` passed all five CI jobs in run `41911051358`; the analysis suite reported 107 passed and 7 warnings. Its behavior:
 - manual-only on main, owner-gated, explicit boolean confirmation, same Runner labels and concurrency group;
 - checks out the exact workflow commit plus immutable pipeline source commit 819f8b4028469cb0d498098fec88545a18ebacc6;
 - reads only the staged raw subtree and the explicit v2 crosswalk reconciliation_v2/instrument_details.jsonl;
@@ -97,7 +97,7 @@ The separate workflow under review is .github/workflows/local-tsetmc-integrated-
 - prints only aggregate counts and safety flags to GitHub logs;
 - does not upload artifacts, install packages, probe providers, approve sources, approve backtests, enable ranking/scoring or trade.
 
-Do not dispatch this workflow until the PR has passed all required CI jobs and the owner has reviewed the exact workflow source and pinned pipeline SHA on main. The workflow has not yet been run.
+Before dispatch, the owner must review the exact workflow source and pinned pipeline SHA on `main`. Then manually run it from Actions using branch `main` and set `confirm_integrated_acceptance=true`. The workflow has not yet been run.
 
 ## 7. Emergency stop, disable and unregister
 

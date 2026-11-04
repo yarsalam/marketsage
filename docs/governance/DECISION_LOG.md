@@ -128,3 +128,28 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - No source approval, backtest approval, investment ranking/scoring, production deployment, broker access, portfolio allocation or real-money trading is authorized by this decision.
 
 **Capital-risk impact:** None. This is an engineering/data-integrity milestone, not an investment decision.
+
+
+## 2026-11-05 — Integrated local TSETMC candidate workflow merged
+
+**Decision authority:** Routine engineering execution delegated under the adopted project constitution; owner retains source-acceptance and capital-risk authority.  
+**Status:** Workflow merged; local data execution awaiting owner dispatch.
+
+**Evidence**
+- PR #32 merged to main at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`.
+- Exact PR head `2df9e5fc523307a08894c8077210e8584aa4adcb` passed all five required CI jobs in run [41911051358](https://github.com/yarsalam/marketsage/actions/runs/41911051358); the analysis test suite reported 107 passed and 7 warnings.
+- Workflow `.github/workflows/local-tsetmc-integrated-acceptance.yml` is `workflow_dispatch` only, owner/main/input gated, contents-read only, uses full-SHA-pinned checkout actions, and checks out PR #6's integration implementation at immutable commit `819f8b4028469cb0d498098fec88545a18ebacc6`.
+- The wrapper checks local data boundaries, symlinks, path containment, file count/size, available RAM and free disk, hashes all produced local report files, and emits only aggregate reason/semantics/identity counts.
+- Candidate-level CSVs, source hashes and absolute paths remain on the laptop under the Runner-only output directory. No artifacts are uploaded and no provider/network requests are made.
+
+**Next owner action**
+- Review the current workflow and pinned implementation on main.
+- Manually dispatch from GitHub Actions on branch `main`, setting `confirm_integrated_acceptance=true`.
+- Review the sanitized results; detailed candidate CSVs remain local.
+
+**Decision effect**
+- PR #6 remains open and must not be merged into main without separate explicit owner approval.
+- The integrated run does not approve source rights, adjusted-price semantics, corporate-action correctness, independent reconciliation, point-in-time validity, strategy/backtest or scoring.
+- No investment ranking/scoring, production release, broker access, portfolio allocation or real-money trading is authorized.
+
+**Capital-risk impact:** None. This is an offline candidate-audit workflow only.
