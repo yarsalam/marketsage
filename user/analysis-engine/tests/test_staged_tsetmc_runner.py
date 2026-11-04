@@ -7,6 +7,7 @@ from pathlib import Path
 from scripts.run_staged_tsetmc_acceptance import (
     summarize_discovered_items,
     summarize_candidate_outputs,
+    build_batches,
     validate_pipeline_flags,
     SafetyGateError,
 )
@@ -55,6 +56,51 @@ class StagedTsetmcRunnerTests(unittest.TestCase):
             self.assertEqual(summary["missing_share_change_event_count"], 2)
             self.assertEqual(summary["ambiguous_history_count"], 1)
             self.assertEqual(summary["identity_conflict_count"], 1)
+
+    def test_batches_respect_item_and_unique_input_byte_budgets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            shared = root / "crosswalk.jsonl"
+            first = root / "history-1.json"
+            second = root / "history-2.json"
+            third = root / "history-3.json"
+            shared.write_bytes(b"123")
+            first.write_bytes(b"abc")
+            second.write_bytes(b"def")
+            third.write_bytes(b"wxyz")
+
+            items = [
+                {"daily_history_path": str(first), "identity_crosswalk_path": str(shared)},
+                {"daily_history_path": str(second), "identity_crosswalk_path": str(shared)},
+                {"daily_history_path": str(third), "identity_crosswalk_path": str(shared)},
+            ]
+
+            batches = build_batches(items, max_items=2, max_bytes=9)
+
+            self.assertEqual([len(batch) for batch in batches], [2, 1])
+            first_batch_paths = set()
+            for item in batches[0]:
+                first_batch_paths.update(Path(p) for p in (
+                    item["daily_history_path"],
+                    item["identity_crosswalk_path"],
+                ))
+            self.assertEqual(sum(path.stat().st_size for path in first_batch_paths), 9)
+
+    def test_single_candidate_over_batch_byte_budget_is_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            large = root / "large-history.json"
+            large.write_bytes(b"x" * 11)
+            with self.assertRaises(SafetyGateError) as caught:
+                build_batches(
+                    [{"daily_history_path": str(large)}],
+                    max_items=2,
+                    max_bytes=10,
+                )
+            self.assertEqual(
+                caught.exception.reason_code,
+                "single_candidate_input_exceeds_batch_memory_budget",
+            )
 
     def test_candidate_output_summary_reports_only_aggregate_reason_codes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

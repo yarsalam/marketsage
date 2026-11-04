@@ -46,11 +46,12 @@ PR #32 is merged to main at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`. It adds 
 - checks out this workflow's exact manually selected main commit;
 - checks out the integration implementation at the fixed SHA 819f8b4028469cb0d498098fec88545a18ebacc6;
 - requires the owner confirmation input and the repository-scoped Runner labels;
-- checks the staged dataset is readable and non-writable, checks the v2 identity crosswalk, bounds discovery size, requires at least 16 GiB available RAM and 8 GiB free output disk, and refuses symlinks/out-of-dataset inputs;
+- checks the staged dataset is readable and non-writable, checks the v2 identity crosswalk, bounds discovery size, requires at least 4 GiB effective available RAM (host and cgroup-aware) and 8 GiB free output disk, and refuses symlinks/out-of-dataset inputs;
+- divides the discovered candidates into bounded batches of at most 32 instruments and 32 MiB of unique selected input files per batch; it rechecks RAM/disk before every batch and keeps each batch's detailed outputs local;
 - makes no provider/network requests, changes no input file, and keeps row-level candidate outputs and local absolute paths on the laptop under the private output directory;
 - prints only sanitized counts and fail-closed status flags to GitHub logs; no artifacts are uploaded.
 
-This integrated workflow has not yet been dispatched. The owner must review the exact workflow on main and its pinned source SHA, then manually dispatch it with `confirm_integrated_acceptance=true`. It prints aggregate decision/quarantine reason counts and price-semantics/identity counts only; detailed CSVs and row-level data remain local. The local Runner connector cannot dispatch a new workflow on the owner's behalf.
+The first integrated dispatch, run [41912248800](https://github.com/yarsalam/marketsage/actions/runs/41912248800), reached the local Runner and checked out both exact commits successfully, but stopped before candidate analysis with `insufficient_available_memory`: the original static 16 GiB gate was higher than the laptop's available memory. No candidate batch ran; the staged dataset remained read-only and the workflow made no provider requests. PR #34 adds bounded memory-aware batches and reports the measured host/cgroup memory and free disk. After PR #34 passes CI and is merged, the owner must manually dispatch again with `confirm_integrated_acceptance=true`. It prints aggregate decision/quarantine reason counts and price-semantics/identity counts only; detailed CSVs and row-level data remain local.
 
 ## Data-source acceptance
 
@@ -76,7 +77,7 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 
 ## Current decision and next actions
 
-1. Owner manually dispatches `.github/workflows/local-tsetmc-integrated-acceptance.yml` on `main` with `confirm_integrated_acceptance=true`; then review the sanitized counts, decision statuses, quarantine reasons and reprocessing queue.
+1. Merge PR #34 only after all required CI jobs pass; then owner manually dispatches `.github/workflows/local-tsetmc-integrated-acceptance.yml` on `main` with `confirm_integrated_acceptance=true` and review the sanitized counts, decision statuses, quarantine reasons and reprocessing queue.
 2. Resolve TSETMC evidence gaps (rights, identity, semantics/units, corporate actions, independent reference, calendars and point-in-time availability) against the local-only outputs; do not upload raw rows or candidate CSVs.
 3. Obtain an immutable, permissioned and representative historical dataset before any locked walk-forward strategy evaluation.
 4. Attribute the Stage 4 extreme fold only when the exact original monthly CSV/hash/config is available; do not tune on the final holdout.

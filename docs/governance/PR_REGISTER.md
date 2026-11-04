@@ -12,6 +12,7 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
+| [#34](https://github.com/yarsalam/marketsage/pull/34) | fix/local-tsetmc-memory-bounded-batches-2026-11-05 | Corrects run #41912248800's static 16 GiB RAM preflight failure with cgroup-aware resource detection and bounded 32-item/32 MiB batches; preserves all offline/data/scoring gates | CI pending; after merge, owner must manually re-dispatch the integrated TSETMC workflow. |
 
 
 ## Merged to main

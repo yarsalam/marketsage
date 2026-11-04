@@ -153,3 +153,29 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - No investment ranking/scoring, production release, broker access, portfolio allocation or real-money trading is authorized.
 
 **Capital-risk impact:** None. This is an offline candidate-audit workflow only.
+
+
+## 2026-11-05 — Integrated TSETMC first dispatch blocked by static RAM gate; bounded-batch correction
+
+**Authority:** Routine engineering correction within the existing owner-approved local research scope.  
+**Status:** Failure diagnosed; correction proposed in PR #34.
+
+**Observed run**
+- Local workflow run [41912248800](https://github.com/yarsalam/marketsage/actions/runs/41912248800) reached Runner `marketsage-local-01`.
+- Both `actions/checkout` steps succeeded, including the exact pipeline source commit `819f8b4028469cb0d498098fec88545a18ebacc6`.
+- The analysis wrapper stopped at preflight with `insufficient_available_memory`, because the initial hard-coded minimum was 16 GiB. The integrated pipeline itself did not start; no candidate batch ran.
+- No source data was written or changed, no provider request was made, and no scoring/backtest flag was enabled.
+
+**Correction in PR #34**
+- Replace the 16 GiB static gate with a 4 GiB effective-available-memory floor measured against both host `MemAvailable` and applicable cgroup limits.
+- Process at most 32 candidates and 32 MiB of unique selected input files per batch; refuse a single candidate whose selected inputs exceed that batch budget.
+- Recheck memory and disk before each batch, garbage-collect batch-local objects, keep each batch's detailed outputs under the private output root, and write mode-0600 aggregate progress after each completed batch.
+- Preserve the 3 GiB overall input cap, 8 GiB free-disk floor, read-only input, no-network, output hash verification, no-artifact-upload, no-scoring and no-backtest controls.
+- Emit resource measurements and sanitized batch counts only; do not emit symbols, instrument codes, row data or local paths.
+
+**Decision effect**
+- The previous failed run is not treated as a data-quality result and must not be used to accept or reject TSETMC.
+- Re-dispatch only after PR #34 passes all required CI checks and is merged to main.
+- PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
+
+**Capital-risk impact:** None. This remains an offline data-audit workload.

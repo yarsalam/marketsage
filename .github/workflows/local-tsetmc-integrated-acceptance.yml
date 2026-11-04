@@ -20,7 +20,7 @@ jobs:
   integrated-offline-acceptance:
     if: github.ref == 'refs/heads/main' && github.actor == 'yarsalam' && inputs.confirm_integrated_acceptance == true
     runs-on: [self-hosted, linux, x64, marketsage-local, marketsage-research]
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - name: Checkout the exact manually selected workflow commit
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -38,7 +38,7 @@ jobs:
           persist-credentials: false
           clean: true
 
-      - name: Run local offline TSETMC acceptance and private candidate audit
+      - name: Run memory-bounded local offline TSETMC acceptance in private batches
         env:
           MARKETSAGE_DATASET_ROOT: /srv/marketsage/data/tsetmc_history_20261022
           MARKETSAGE_OUTPUT_PARENT: /srv/marketsage/output
