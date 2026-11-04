@@ -190,3 +190,11 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 - Live compare reports main at 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767 and integration PR #6 at fb64e773387f3eb7270d0dd65d8e885c1f26ba0d; the integration branch is 399 commits ahead and 2 commits behind main. The two main-only commits are the separate PR #27 manual-only offline validator workflow and its associated change. No automatic synchronization was attempted; assess the exact diff/conflicts before any future update.
 - Both post-#29 integration CI runs passed all five required jobs. PR #6 remains open and unmerged to main.
+
+
+## Stage 4 protocol implementation update — 2026-11-04
+
+- PR #30 added predeclared Sortino/downside-deviation and empirical monthly 5th-percentile/expected-shortfall reporting, plus L1 turnover, transaction/slippage/total cost-fraction sums, rebalance count, selected-asset frequency/coverage, and fully-invested/cash-exposure diagnostics for full period, locked holdout and each walk-forward fold. Small-sample tail estimates are explicitly caveated; cost-fraction sums are not compounded P&L drag.
+- PR #30 exact-head run 41850746372 passed all five required job types on fb22c350cd1f2dc23dfcd1d1bea7cf1d6e20fad8 and was merged into PR #6 at 819f8b4028469cb0d498098fec88545a18ebacc6. Post-merge PR run 41851276790 and push run 41851269421 were in progress at the time of this note; do not treat the new integration head as green until both complete successfully.
+- This change does not alter strategy parameters, universe, split dates or holdout use. No local dataset was read and no new empirical result was generated. Stage 4 remains unaccepted; no representative permissioned point-in-time result or outlier-fold attribution has been produced.
+- Current integration head is 819f8b4028469cb0d498098fec88545a18ebacc6. Live compare with main 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767 reports integration 405 commits ahead and 2 behind; no synchronization was attempted.
