@@ -23,7 +23,7 @@
 | [#7](https://github.com/yarsalam/marketsage/pull/7) | #6 feature branch | Conservative Tindex quota, documented route/history updates, FRED safe diagnostics and tests |
 | [#9](https://github.com/yarsalam/marketsage/pull/9) | #6 feature branch | Iranian market dashboard, read-only research endpoints and staging configuration |
 | [#13](https://github.com/yarsalam/marketsage/pull/13) | #6 feature branch | Free-dataset discovery, catalog and candidate audit/ingestion tools |
-| [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 feature branch | Integrated offline TSETMC acceptance pipeline; exact-head run `41401668921` passed all five required job types; merge `f267c49efcbf72e7ddc17099ff93f38ade269a7b` |
+| [#14](https://github.com/yarsalam/marketsage/pull/14) | #6 feature branch | Already merged at `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; exact-head run `41401668921` and post-merge run `41404741827` each passed all five required job types |
 | [#16](https://github.com/yarsalam/marketsage/pull/16) | #6 feature branch | Source-evidence reconciliation; merge `77d25986627664b6482e515fbd4bd9791a041797` |
 | [#17](https://github.com/yarsalam/marketsage/pull/17) | #6 feature branch | Stage 4 cost-sensitivity scenario correction; merge `c821f6423ee5734590b4852eb5fab307834f0b51` |
 | [#18](https://github.com/yarsalam/marketsage/pull/18) | #6 feature branch | Monthly calendar continuity gate; exact-head CI passed all five required job types; merge `d468d06eb0fb4adcc90f04be38a61f4f1164ad57` |
@@ -71,7 +71,17 @@ main
 
 ## Local Runner activation gate
 
-The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. No Runner is registered. Because this repository is private, GitHub Free / Free Organization does not provide the required branch protection/rulesets; Pro/Team/Enterprise or an explicitly owner-approved revised trust model is required before local data execution. Dedicated unprivileged account, restricted data/output directories, repository-scoped Runner and separate trusted workflow remain required.
+The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`.
+
+### Owner-host preparation reported 2026-11-04
+
+- Host: Ubuntu 26.04.1 LTS, `x86_64`.
+- Dedicated account `marketsage-runner` was created with UID 110/GID 119, membership only in its own group, and no `sudo` group membership.
+- `/opt/actions-runner/marketsage` was created with owner/group `marketsage-runner`, mode `0750`.
+- The owner's shell output found no prior `config.sh`/`run.sh` or `$HOME/actions-runner*` installation. No Runner package has yet been installed, configured or registered; no Runner is online, no data roots are mounted/exposed, and no workflow targets `self-hosted`.
+- These are owner-reported command results, not an independent host audit. Account and directory preparation do not satisfy the activation gate.
+- Registration remains blocked until private-repository protection is available and verified, or the owner explicitly approves a revised trust model with residual risk. Do not attach this host to the existing `pull_request` CI workflow.
+ No Runner is registered. Because this repository is private, GitHub Free / Free Organization does not provide the required branch protection/rulesets; Pro/Team/Enterprise or an explicitly owner-approved revised trust model is required before local data execution. Dedicated unprivileged account, restricted data/output directories, repository-scoped Runner and separate trusted workflow remain required.
 
 ## Execution policy
 
