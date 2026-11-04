@@ -1,18 +1,18 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-03  
+**Snapshot date:** 2026-11-04  
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Integration target:** PR #6 branch `feat/tindex-free-data-connector`
-**Current integration HEAD:** `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`
-**Post-#22 CI:** push run `41602459792` and PR run `41602467771` both passed all five required job types on exact head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`.
+**Current integration HEAD:** `a2e19c156f226241a34658d32d25e93173c99a5d`
+**Post-#23 CI:** PR run `41793156231` passed all five required job types on exact head `a2e19c156f226241a34658d32d25e93173c99a5d`; PR #23 exact-head run `41792758377` passed all five jobs before merge.
 
 ## Open PRs
 
 | PR | Base ← head | Current head / CI | State and handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-#22 runs `41602459792` / `41602467771` both passed all five required jobs | Open; do not merge to `main` without explicit owner approval. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `a2e19c156f226241a34658d32d25e93173c99a5d`; post-#23 PR run `41793156231` passed all five required jobs | Open; do not merge to `main` without explicit owner approval. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Live TSETMC request timed out from GitHub-hosted runner | Open; parked. Do not repeat the same network request from that environment. |
-| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed through PR #22 merge; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
+| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed through PR #23 and Runner plan blocker clarified; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
 
 
 ## Merged PRs relevant to the integration path
@@ -31,6 +31,7 @@
 | [#20](https://github.com/yarsalam/marketsage/pull/20) | #6 feature branch | TSETMC v2 identity crosswalk, ambiguity quarantine and SHA-256 provenance; all five exact-head jobs passed; merge `4191dd3715173265193163e30281ab555b9d12fb` |
 | [#21](https://github.com/yarsalam/marketsage/pull/21) | #6 feature branch | Tindex quota-report consistency correction; all five exact-head jobs passed; merge `21c591223c9e7d61e6046a06f51522e979530f08` |
 | [#22](https://github.com/yarsalam/marketsage/pull/22) | #6 feature branch | Five official global source candidates; all five required exact-head jobs passed in PR and push runs; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` |
+| [#23](https://github.com/yarsalam/marketsage/pull/23) | #6 feature branch | Reconciled Tindex's published 3/minute + 300/day account quota with the unchanged stricter local 1/minute + 100-success/day guard; exact-head run `41792758377` passed all five jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d` |
 
 ## Current integration graph
 
@@ -47,13 +48,14 @@ main
        ├─ #19 [merged]
        ├─ #20 [merged]
        ├─ #21 [merged]
-       └─ #22 [merged]
+       ├─ #22 [merged]
+       └─ #23 [merged]
 
 #8  [open; parked network diagnostic]
 #15 [open; Draft governance]
 ```
 
-## Independent evidence notes — 2026-11-03
+## Independent evidence notes — 2026-11-04
 
 - PR #19 is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run passed all five job types. It updates the source catalog and acceptance matrix using committed docs and previously shared sanitized summaries only. No network request or local raw-file audit was performed.
 - PR #20 addressed a static discovery limitation: the integrated runner now reads the preferred v2 `instrument_details.jsonl` crosswalk for candidate identity, never combines v1/v2, hashes the file and keeps identity evidence/research/scoring fail-closed. All five required exact-head CI jobs passed on `c58cde2c87c698ec4a33a58ff2d3caeeecd70569`; merge into #6 is `4191dd3715173265193163e30281ab555b9d12fb`.
@@ -62,14 +64,14 @@ main
 - The prior TSETMC owner-run report records 1,220 raw archives / 1,220 normalized histories / 1,677,202 history rows, plus 128 candidate series, 167,912 research-feature rows and 151,784 forward-label rows. All candidates remain research-only and fail-closed; the forward-label artifact reports zero distinct dates. Corporate-action and date-gap queues (48,902 and 48,059 rows) are candidate review queues, not verified evidence.
 - The PR #14 integrated runner has not been run on the owner's 1,220-instrument corpus. An earlier separate diagnostic found only 47 instruments and quarantined all 47; compare exact code/root/discovery scope before any new local run.
 - Nerkhsanj owner-reported audit: 182 adjacent changes >=20%, 48 >=100%, concentrated in IQD/silver/Tether; IQD gap up to 373 days and silver/Tether/Bitcoin up to 84 days. IQD/silver/Tether remain excluded; Bitcoin remains a coverage warning.
-- Tindex unit families must remain separate: previously reviewed public docs described TSE stock endpoints in Rial and other Markets & Indicators values in Toman since 2026-07-20. The 100-day history cap and 1/minute + 100-success/day account quota do not support a bulk 1,644-symbol six-month history crawl; configured-account access remains unverified.
+- Tindex unit families must remain separate: the official English and Persian developer pages rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, with one active token; HTTP 429 rejections do not consume the daily quota. MarketSage keeps the stricter local 1 request/minute and 100-success/day cap. The 100-day history cap and distinct Rial/Toman endpoint families still do not support a bulk 1,644-symbol six-month history crawl; configured-account access, units and rights remain unverified.
 - Stage 4 still has no accepted representative, permissioned, point-in-time out-of-sample result. The previously recorded 240.89% six-month fold requires attribution; do not tune against the locked holdout.
-- No Runner is registered; branch protection/rulesets cannot be configured through the connected GitHub integration in the current account.
-- PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`; post-#21 runs `41601942608` and `41601948914` both passed all five required jobs. PR #21 and PR #22 are merged; both post-#22 runs `41602459792` and `41602467771` passed all five required jobs.
+- No Runner is registered; branch protection/rulesets cannot be configured through the connected GitHub integration in the current account. GitHub's current plan docs say private-repository protection requires Pro/Team/Enterprise; a Free Organization alone does not satisfy the gate.
+- PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`. PR #21, #22 and #23 are merged; PR #23 exact-head run `41792758377` and post-merge PR run `41793156231` passed all five required jobs.
 
 ## Local Runner activation gate
 
-The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. No Runner is registered. Owner-side branch protection/ruleset, dedicated unprivileged account, restricted data/output directories and repository-scoped ephemeral Runner registration are required before local data execution.
+The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. No Runner is registered. Because this repository is private, GitHub Free / Free Organization does not provide the required branch protection/rulesets; Pro/Team/Enterprise or an explicitly owner-approved revised trust model is required before local data execution. Dedicated unprivileged account, restricted data/output directories, repository-scoped Runner and separate trusted workflow remain required.
 
 ## Execution policy
 
