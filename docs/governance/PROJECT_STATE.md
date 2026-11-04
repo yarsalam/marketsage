@@ -129,7 +129,6 @@ This section distinguishes committed documentation and previously shared sanitiz
 ## Independent work completed in this execution — 2026-11-04
 
 - Reviewed the live repository, PR graph and governance documents.
-- Confirmed PR #14 is already merged into #6 and the post-#18 #6 CI run passed all five required job types.
 - Revalidated PR #14 live metadata: it is merged into #6 at `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; exact-head run `41401668921` passed all five required jobs on head `4bd179263f55b90854d00f1ea3b1287da0393b03`. No second merge was needed. The current #6 head is now `e19d65840d9112362209a23ea53c7fcf608c0720`; post-#24 run `41796506276` passed all five required jobs.
 - PR #24 was opened after static review found the discovery script still default-probed Binance despite the owner-reported HTTP 451 block. The fix excludes it from defaults and hard-blocks explicit selection with zero requests; exact-head and post-merge CI each passed all five jobs.
 - Opened and merged PR #19 after all five exact-head CI job types passed. It refreshes the source catalog and evidence-led candidate triage, recording Nerkhsanj anomalies/quarantine, previous TSETMC whole-corpus evidence/scope mismatch, and Tindex Rial/Toman/account-scope constraints. No provider probe or local raw-data access occurred.
@@ -152,12 +151,10 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. PR #23 passed all five required job types on exact head `f400166fb184ee1d23ec3905a5d4f1c8a71f86e1` in run `41792758377` and merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`. Post-merge PR run `41793156231` passed all five required jobs on the exact integration head.
-2. PR #22's post-merge runs `41602459792` and `41602467771` both passed all five required jobs on the preceding integration head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`.
-3. Keep PR #15 Draft and update this state/register after each material transition.
-4. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
-5. Once trusted local execution is available, compare the exact PR #14 runner/discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory, then run the integrated offline pipeline once against the designated corpus.
-6. Review existing corporate-action/date-gap queues against official evidence; do not regenerate candidate histories or silently repair gaps.
-7. Attribute the 2023-10 to 2024-03 Stage 4 outlier using the same dataset hash and code/config provenance; do not inspect the locked holdout for tuning.
-8. Only after rights, units, timestamps, history, corporate actions, independent reconciliation and point-in-time gates pass, run a locked chronological evaluation with realistic costs/slippage, drawdown and predeclared baselines.
-9. Do not merge PR #6 into `main` without explicit owner approval. No deployment or scoring activation is implied by any merge.
+1. Owner decision: either obtain private-repository branch protection/rulesets with a supported plan, or explicitly approve a revised Runner trust model and its residual risk. Until then, do not register or activate a Runner.
+2. After the trust boundary and host/data permissions are verified, run the integrated PR #14 offline TSETMC pipeline once against the designated local corpus. Compare its exact discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory; do not repeat the older diagnostic blindly.
+3. Review existing corporate-action/date-gap queues against official evidence; do not regenerate candidate histories or silently repair gaps.
+4. Attribute the 2023-10 to 2024-03 Stage 4 outlier using the same pinned dataset hash and code/config provenance; do not inspect the locked holdout for tuning.
+5. Continue independent Iran/global source screening for rights, units, publication/availability time, revisions/history, completeness and lawful independent reconciliation. Keep unaccepted sources disabled.
+6. Only after the data gates pass, run a locked chronological evaluation with realistic costs/slippage, drawdown and predeclared baselines.
+7. Keep PR #15 Draft pending owner review. Do not merge PR #6 into `main` without explicit owner approval. No deployment or scoring activation is implied by any merge.
