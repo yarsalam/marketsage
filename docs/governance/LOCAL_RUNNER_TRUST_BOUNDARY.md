@@ -57,6 +57,17 @@ After all controls are active, the first job should run only:
 
 The job must preserve input hashes and produce a unique output directory. If the pipeline finds ambiguous histories, unverified raw/adjusted semantics, long gaps or missing evidence, it must quarantine the instrument rather than repair it.
 
+## Owner-host preparation status — 2026-11-04
+
+The owner reported completing only the initial OS-account and directory preparation:
+
+- Ubuntu 26.04.1 LTS, `x86_64`.
+- Account `marketsage-runner`: UID 110, GID 119, only its own group, no `sudo` group.
+- `/opt/actions-runner/marketsage`: owner/group `marketsage-runner`, mode `0750`.
+- The supplied shell output found no existing `config.sh`, `run.sh`, or `$HOME/actions-runner*` installation.
+
+This does **not** mean the Runner is installed or registered. No Runner package has been downloaded, no registration token has been used, no Runner is online, no data directory has been exposed, and no workflow has been routed to `self-hosted`. The host state is owner-reported and has not been independently inspected by the GitHub connection. Do not proceed to registration until the trust-model decision below is resolved and the remaining host/data isolation checks are completed.
+
 ## Owner-side blocker
 
 The connected GitHub integration cannot configure or verify repository rulesets/branch protection in this private repository (the relevant API calls are denied by GitHub permissions). A separate plan constraint also applies: GitHub's current documentation says branch protection is available on Free only for public repositories (including Free organizations); private repositories require Pro, Team or Enterprise. Rulesets have the same public-Free/private-paid distinction. Therefore, moving this private repository to a GitHub Free Organization alone does **not** satisfy the required protected-branch gate. See [protected-branch plan availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) and [ruleset plan availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
