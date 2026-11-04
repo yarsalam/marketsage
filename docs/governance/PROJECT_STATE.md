@@ -6,7 +6,7 @@
 **Main HEAD:** `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
 **Integration HEAD:** `21552b719513d72f7fc10eff1efa11651c3d8530`  
-**Post-#28 integration CI:** PR run `41847126900` and push run `41847115366` are still in progress on exact integration head `21552b719513d72f7fc10eff1efa11651c3d8530`. The prior post-#24 head `e19d65840d9112362209a23ea53c7fcf608c0720` had all five jobs green.  
+**Post-#28 integration CI:** PR run `41847126900` and push run `41847115366` both passed all five required job types on exact integration head `21552b719513d72f7fc10eff1efa11651c3d8530`.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -54,7 +54,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `21552b719513d72f7fc10eff1efa11651c3d8530`; PR run `41847126900` / push run `41847115366` in progress after PR #28 | Open; do not merge to main |
+| #6 | Head `21552b719513d72f7fc10eff1efa11651c3d8530`; PR run `41847126900` and push run `41847115366` passed all five required jobs | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -71,7 +71,7 @@ main
 | #23 | Exact-head run `41792758377` passed all five required jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d`; post-merge PR run `41793156231` passed all five jobs | Merged into #6 |
 | #24 | Exact-head PR run `41796133083` and post-merge PR run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` | Merged into #6 |
 | #27 | Exact-head PR run `41833221157` passed all five required jobs; merge `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767` | Merged to `main`; manual-only workflow; Runner not registered |
-| #28 | Exact-head PR run `41846337902` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530`; post-merge CI pending | Merged into #6 |
+| #28 | Exact-head PR run `41846337902` and post-merge PR/push runs `41847126900` / `41847115366` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530` | Merged into #6 |
 
 ## Source and dataset evidence
 
