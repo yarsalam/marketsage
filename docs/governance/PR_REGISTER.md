@@ -40,6 +40,7 @@
 | [#22](https://github.com/yarsalam/marketsage/pull/22) | #6 feature branch | Five official global source candidates; all five required exact-head jobs passed in PR and push runs; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` |
 | [#23](https://github.com/yarsalam/marketsage/pull/23) | #6 feature branch | Reconciled Tindex's published 3/minute + 300/day account quota with the unchanged stricter local 1/minute + 100-success/day guard; exact-head run `41792758377` passed all five jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d` |
 | [#24](https://github.com/yarsalam/marketsage/pull/24) | #6 feature branch | Removed the owner-reported HTTP 451 Binance route from default probes and hard-blocked explicit discovery selection with zero requests; exact-head run `41796133083` and post-merge run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` |
+| [#28](https://github.com/yarsalam/marketsage/pull/28) | #6 feature branch | CBI official macro/transfer-FX/weekly policy-rate and government bond-auction candidate screen; exact-head run `41846337902` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530`; post-merge CI in progress |
 
 ## Current integration graph
 
@@ -58,7 +59,8 @@ main
        ├─ #21 [merged]
        ├─ #22 [merged]
        ├─ #23 [merged]
-       └─ #24 [merged]
+       ├─ #24 [merged]
+       └─ #28 [merged]
 
 #8  [open; parked network diagnostic]
 #15 [open; Draft governance]
@@ -85,8 +87,6 @@ main
 | PR | Target | Result |
 |---|---|---|
 | [#27](https://github.com/yarsalam/marketsage/pull/27) | `main` | Manual-only offline TSETMC dataset validator workflow; merged at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`. All five required CI jobs passed on exact PR head `c60edd0f16244ab12e6602b9247e4174567f6081` in run `41833221157`. It does not register/start a Runner or execute the full PR #14 pipeline. |
-| [#28](https://github.com/yarsalam/marketsage/pull/28) | #6 integration branch | Iran official CBI macro/transfer-FX/policy-rate and government bond-auction candidate screen; exact-head run `41846337902` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530`; post-merge CI in progress |
-
 
 
 ## Local Runner activation gate
