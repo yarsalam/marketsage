@@ -152,6 +152,11 @@ def test_status_does_not_expose_token(monkeypatch):
     assert status["production_approved"] is False
     assert status["quota"]["requests_per_minute"] == 1
     assert status["quota"]["successful_requests_per_day"] == 100
+    assert status["quota"]["local_requests_per_minute"] == 1
+    assert status["quota"]["local_successful_requests_per_day"] == 100
+    assert status["quota"]["provider_documented_requests_per_minute"] == 3
+    assert status["quota"]["provider_documented_requests_per_day"] == 300
+    assert status["quota"]["quota_scope"] == "account-wide"
     assert "do-not-expose-me" not in repr(status)
     assert "stock_energy_indices" in status["documented_data_families"]
     assert "news_feed" in status["not_implemented_or_not_confirmed"]
