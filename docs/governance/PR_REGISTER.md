@@ -171,3 +171,10 @@ Merge dependent PRs sequentially after all required jobs pass on the exact curre
 - Integration PR #6 remains open and unmerged to `main`. Latest integration head after PR #30: `819f8b4028469cb0d498098fec88545a18ebacc6`; post-merge PR and push runs `41851276790` and `41851269421` both passed all five required jobs.
 - PR #29 (World Bank Pink Sheet candidate) and PR #30 (Stage 4 downside/portfolio diagnostics) are merged into integration PR #6, not into `main`. Their changes do not approve any data source or strategy.
 - Local Runner remains unregistered/offline pending the owner-side installation, hardening and fresh-token action in Issue #25.
+
+
+### Clean governance adoption PR — 2026-11-04
+
+- PR #31 (`docs/governance-adoption-clean-2026-11-04`) is the clean replacement for PR #15. It is based directly on current `main` at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767` and contains only the five governance documents; it does not import PR #15's divergent 101-ahead/89-behind history.
+- PR #31 is Draft pending exact-head CI and final documentation review. Do not merge until all five required CI job types pass.
+- PR #15 remains Draft and must not be merged as-is. It can be closed as superseded after PR #31 is safely adopted.
