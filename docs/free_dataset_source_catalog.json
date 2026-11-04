@@ -78,10 +78,11 @@
       "history_limit": "Public kline endpoint supports pagination; completeness must be audited over the requested window",
       "limitations": [
         "BTCUSDT is venue/pair-specific and is not the same as USD spot",
+        "Owner-reported Iran-network requests returned HTTP 451; do not repeat the same route or seek alternate hosts without a changed access/legal basis",
         "Network/geographic access may vary",
         "Usage terms, storage, derived outputs and commercial display rights require review"
       ],
-      "default_live_probe": true,
+      "default_live_probe": false,
       "production_approved": false
     },
     {
