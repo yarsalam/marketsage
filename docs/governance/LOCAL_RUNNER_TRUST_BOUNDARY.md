@@ -57,16 +57,22 @@ After all controls are active, the first job should run only:
 
 The job must preserve input hashes and produce a unique output directory. If the pipeline finds ambiguous histories, unverified raw/adjusted semantics, long gaps or missing evidence, it must quarantine the instrument rather than repair it.
 
-## Owner-host preparation status — 2026-11-04
+## Owner-host preparation status — 2026-11-04 (updated from latest terminal report)
 
-The owner reported completing only the initial OS-account and directory preparation:
+The owner-reported host state is:
 
 - Ubuntu 26.04.1 LTS, `x86_64`.
 - Account `marketsage-runner`: UID 110, GID 119, only its own group, no `sudo` group.
 - `/opt/actions-runner/marketsage`: owner/group `marketsage-runner`, mode `0750`.
-- The supplied shell output found no existing `config.sh`, `run.sh`, or `$HOME/actions-runner*` installation.
+- A complete-looking Actions Runner v2.338.2 archive exists at `/home/nima/actions-runner/actions-runner-linux-x64-2.338.2.tar.gz`, size **228,071,396 bytes**. Extracted files (`config.sh`, `run.sh`, `bin/`, `externals/`) are also present under this personal-account directory. This is not the dedicated service directory and must not be used to run the service.
+- The same directory contains `.env`, `.path` and `_diag/`; the shown `.env` includes personal development-environment paths (JVM, Android SDK and NVM). Do not copy those files or run the Runner under the personal `nima` account.
+- `/opt/actions-runner/marketsage/actions-runner-linux-x64-2.338.2.tar.gz` is only **9,719,808 bytes**, so it is an incomplete copy and must be replaced. No extracted Runner files were shown in that directory.
+- The displayed directory listing did not show `.runner` or `.credentials`; `systemctl` and `ps` checks showed no running Runner service or listener. Therefore no successful registration or active Runner is evidenced.
+- A Runner registration token was pasted into the chat. Treat it as exposed and do not reuse it; any new token must be entered only in the local terminal.
 
-This does **not** mean the Runner is installed or registered. No Runner package has been downloaded, no registration token has been used, no Runner is online, no data directory has been exposed, and no workflow has been routed to `self-hosted`. The host state is owner-reported and has not been independently inspected by the GitHub connection. Do not proceed to registration until the trust-model decision below is resolved and the remaining host/data isolation checks are completed.
+These are owner-reported command outputs, not an independent host audit. No research-data directory is exposed and no workflow has been routed to `self-hosted`. The complete archive should be SHA-256 verified, then copied and extracted under `/opt/actions-runner/marketsage` as `marketsage-runner`; do not copy the personal `.env`, `.path`, `_diag` or any credentials.
+
+This is package preparation only. **Do not register or activate the Runner** until the trust-model decision below is resolved and the remaining host/data isolation checks are completed.
 
 ## Owner-side blocker
 
