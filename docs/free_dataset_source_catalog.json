@@ -1,6 +1,6 @@
 {
-  "catalog_version": "1.1.0",
-  "last_reviewed": "2026-11-03",
+  "catalog_version": "1.1.1",
+  "last_reviewed": "2026-11-04",
   "policy": {
     "prefer_no_subscription": true,
     "free_access_is_not_a_reuse_license": true,
@@ -89,7 +89,7 @@
       "label": "Tindex free-tier public API",
       "free_access_class": "free_tier_account_scoped",
       "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
-      "probe_mode": "one currency-rate request per invocation; current Free plan documented at 1 request/minute and 100 successful requests/day",
+      "probe_mode": "one currency-rate request per invocation; provider docs publish 3 requests/minute and 300 requests/day/account; local cap is 1/minute and 100 successful/day",
       "data_families": [
         "currency snapshots",
         "documented indicators"
@@ -98,10 +98,10 @@
       "limitations": [
         "Account-level endpoint access is not established by public docs and can differ by token",
         "Current docs describe currency rate in Toman per quoted unit and say Markets & Indicators values are in Toman since 2026-07-20; reconcile against a sanitized account payload and independent reference before setting a confirmed unit",
-        "Free tier documents 1 request/minute and 100 successful requests/day; local guard is not account-wide across hosts/processes",
+        "Provider docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account; HTTP 429 rejections do not consume the daily quota. MarketSage local guard deliberately caps at 1 request/minute and 100 successful requests/day but is process-local, not account-wide",
         "Commercial/high-volume use, durable storage, derived display and redistribution rights require review",
         "Never infer official/free-market market semantics from the name alone",
-        "A previously shared review of the public developer documentation described a TSE stock screener with 1,644 active instruments and stock-history endpoints capped at 100 days; actual configured-account access remains unverified, so do not schedule a bulk crawl under the 100-success/day account quota.",
+        "A previously shared review of the public developer documentation described a TSE stock screener with 1,644 active instruments and stock-history endpoints capped at 100 days; actual configured-account access remains unverified, so do not schedule a bulk crawl under the 300-requests/day account quota (only successful requests count).",
         "The same documentation review distinguished TSE stock-price endpoints in Rial from other Markets & Indicators values in Toman since 2026-07-20. Keep these endpoint families separate; do not combine or convert units without exact endpoint-level payload and independent-reference reconciliation."
       ],
       "default_live_probe": false,
@@ -112,14 +112,14 @@
       "label": "Tindex indicator candle history",
       "free_access_class": "free_tier_account_scoped",
       "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
-      "probe_mode": "one explicit slug per run (current Free plan documents 1 request/minute)",
+      "probe_mode": "one explicit slug per run; provider docs publish 3 requests/minute and 300 requests/day/account; local cap is 1/minute",
       "data_families": [
         "indicator OHLC series"
       ],
       "history_limit": "At most the latest 100 days on the documented endpoint",
       "limitations": [
         "Slugs and category access must be verified against the specific account; do not bypass 410/403",
-        "One active token/account, 1 request/minute and 100 successful requests/day on the current Free plan",
+        "One active token/account; provider docs publish 3 requests/minute and 300 requests/day/account; MarketSage local cap remains 1 request/minute and 100 successful requests/day",
         "Only a recent 100-day window is documented, so not enough alone for six-month evaluation",
         "Toman semantics are documented since 2026-07-20 for Markets & Indicators, but series units need reconciliation before confirmation",
         "All outputs are research candidates only; rights and independent reconciliation remain open"

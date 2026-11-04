@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 
-REGISTRY_VERSION = "1.1.0"
+REGISTRY_VERSION = "1.1.1"
 
 
 @dataclass(frozen=True)
@@ -171,8 +171,8 @@ SOURCES: tuple[SourceDefinition, ...] = (
         required_checks=("terms_and_commercial_rights", "automated_collection_permission",
                          "payload_schema_and_units", "historical_depth", "publication_and_retrieval_times",
                          "revisions_and_missing_intervals", "independent_reconciliation"),
-        notes=("Access is through a vendor-provided account; current public Free tier docs state 1 request/minute and "
-               "100 successful requests/day, with one active token per account. The public docs describe currency rate "
+        notes=("Access is through a vendor-provided account; official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account (429 rejections do not consume the daily quota), with "
+               "one active token. MarketSage keeps a stricter local cap of 1 request/minute and 100 successful requests/day. The public docs describe currency rate "
                "as Toman per unit and state Markets & Indicators values have been in Toman since 2026-07-20; retain "
                "normalized units as unconfirmed until a sanitized account payload reconciles independently. The documented "
                "candle-history window is at most 100 days and requires delta-date decoding; 403/410/429 must remain "

@@ -272,13 +272,20 @@ def tindex_connection_status() -> dict[str, Any]:
         ],
         "empty_categories_per_current_docs": ["commodities", "technology", "sentiment"],
         "quota": {
+            # Backward-compatible fields below describe this client's local cap.
             "requests_per_minute": MAX_REQUESTS_PER_MINUTE,
             "successful_requests_per_day": MAX_SUCCESSFUL_REQUESTS_PER_DAY,
+            "local_requests_per_minute": MAX_REQUESTS_PER_MINUTE,
+            "local_successful_requests_per_day": MAX_SUCCESSFUL_REQUESTS_PER_DAY,
+            "provider_documented_requests_per_minute": 3,
+            "provider_documented_requests_per_day": 300,
+            "quota_scope": "account-wide",
             "local_daily_guard_persistent": False,
             "note": (
-                "Current public docs specify 1 request/minute and 100 successful requests/day. "
-                "The local rolling guard is process-memory only; provider accounting remains "
-                "authoritative across processes and hosts."
+                "Official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account; "
+                "HTTP 429 rejections do not count toward the daily quota. MarketSage deliberately enforces "
+                "stricter local caps of 1 request/minute and 100 successful requests/day. The local rolling "
+                "guard is process-memory only; provider accounting remains authoritative across processes and hosts."
             ),
         },
     }
