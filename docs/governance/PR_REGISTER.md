@@ -75,7 +75,7 @@ main
 
 ## Local Runner activation gate
 
-The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`.
+The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. The unresolved owner decision is tracked in [Issue #25](https://github.com/yarsalam/marketsage/issues/25).
 
 ### Owner-host preparation reported 2026-11-04 (latest terminal output)
 
