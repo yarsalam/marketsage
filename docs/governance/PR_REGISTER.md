@@ -77,15 +77,17 @@ main
 
 The least-privilege trust boundary is specified in `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`.
 
-### Owner-host preparation reported 2026-11-04
+### Owner-host preparation reported 2026-11-04 (latest terminal output)
 
 - Host: Ubuntu 26.04.1 LTS, `x86_64`.
-- Dedicated account `marketsage-runner` was created with UID 110/GID 119, membership only in its own group, and no `sudo` group membership.
-- `/opt/actions-runner/marketsage` was created with owner/group `marketsage-runner`, mode `0750`.
-- The owner's shell output found no prior `config.sh`/`run.sh` or `$HOME/actions-runner*` installation. No Runner package has yet been installed, configured or registered; no Runner is online, no data roots are mounted/exposed, and no workflow targets `self-hosted`.
-- These are owner-reported command results, not an independent host audit. Account and directory preparation do not satisfy the activation gate.
-- Registration remains blocked until private-repository protection is available and verified, or the owner explicitly approves a revised trust model with residual risk. Do not attach this host to the existing `pull_request` CI workflow.
- No Runner is registered. Because this repository is private, GitHub Free / Free Organization does not provide the required branch protection/rulesets; Pro/Team/Enterprise or an explicitly owner-approved revised trust model is required before local data execution. Dedicated unprivileged account, restricted data/output directories, repository-scoped Runner and separate trusted workflow remain required.
+- Dedicated account `marketsage-runner`: UID 110/GID 119, member only of its own group, not in `sudo`.
+- `/opt/actions-runner/marketsage`: owner/group `marketsage-runner`, mode `0750`.
+- A complete-looking v2.338.2 archive (228,071,396 bytes) and extracted Runner files (`config.sh`, `run.sh`, `bin/`, `externals/`) exist under personal `/home/nima/actions-runner`. That directory also contains personal `.env`, `.path` and `_diag/`; do not run the service there or copy those files.
+- The archive under `/opt/actions-runner/marketsage` is only 9,719,808 bytes and is incomplete. The displayed listing showed no `.runner`/`.credentials`; no running service/listener appeared in the `systemctl`/`ps` checks. Registration is therefore not evidenced.
+- The registration token was exposed in chat and must not be reused. A new token, if/when approved, must be entered only in the local terminal.
+- No research data roots are exposed, no workflow targets `self-hosted`, and these remain owner-reported host results rather than an independent host audit.
+- Next safe host operation is SHA-256 verification of the complete archive followed by copying/extracting only the package into the dedicated path as `marketsage-runner`. Do not copy the personal environment files.
+- Registration/activation remains blocked until private-repository protection is available and verified, or the owner explicitly approves a revised trust model with residual risk. Do not attach this host to the existing `pull_request` CI workflow.
 
 ## Execution policy
 
