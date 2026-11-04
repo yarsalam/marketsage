@@ -5,7 +5,7 @@ from pathlib import Path
 from scripts.audit_candidate_dataset import audit_file, normalize_header
 from scripts.create_source_evidence_templates import build_template
 from scripts import discover_free_datasets
-from scripts.discover_free_datasets import _summarize_search, parse_args
+from scripts.discover_free_datasets import DEFAULT_SOURCES, SUPPORTED_SOURCES, _summarize_search, parse_args
 
 
 def test_angle_bracket_daily_csv_headers_are_recognized(tmp_path: Path):
@@ -147,3 +147,41 @@ def test_global_official_source_catalog_candidates_are_not_live_or_approved():
     for source_id in expected:
         assert entries[source_id]["default_live_probe"] is False
         assert entries[source_id]["production_approved"] is False
+
+def test_binance_451_candidate_is_hard_blocked_even_when_explicit(monkeypatch):
+    assert "global.binance_spot_public" not in DEFAULT_SOURCES
+    assert "global.binance_spot_public" in SUPPORTED_SOURCES
+
+    def forbidden_network_client(*_args, **_kwargs):
+        raise AssertionError("Binance HTTP 451 route must never be contacted")
+
+    monkeypatch.setattr(
+        discover_free_datasets,
+        "BinancePublicClient",
+        forbidden_network_client,
+        raising=False,
+    )
+    record = discover_free_datasets._run_one(
+        "global.binance_spot_public",
+        export_dir=None,
+        tsetmc_queries=[],
+        tindex_slugs=[],
+    )
+    assert record["status"] == "blocked_owner_reported_http_451"
+    assert record["requests_attempted"] == 0
+    assert record["eligible_for_scoring"] is False
+    assert record["raw_payload_saved"] is False
+
+    root = Path(__file__).resolve().parents[3]
+    catalog = json.loads(
+        (root / "docs" / "free_dataset_source_catalog.json").read_text(encoding="utf-8")
+    )
+    entry = next(
+        item for item in catalog["sources"]
+        if item["source_id"] == "global.binance_spot_public"
+    )
+    assert entry["default_live_probe"] is False
+    assert entry["production_approved"] is False
+    assert "hard-blocked" in entry["probe_mode"]
+    assert any("HTTP 451" in item for item in entry["limitations"])
+
