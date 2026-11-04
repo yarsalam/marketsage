@@ -130,6 +130,10 @@ def test_evaluation_reports_empirical_tail_risk_and_portfolio_diagnostics():
     assert metrics["historical_expected_shortfall_95_monthly_return"] == pytest.approx(tail.mean())
     assert metrics["historical_tail_observations"] == len(tail)
 
+    holdout_diagnostics = report["locked_holdout_momentum_strategy_portfolio_diagnostics"]
+    assert holdout_diagnostics["rebalance_periods"] == 12
+    assert holdout_diagnostics["average_cash_fraction"] == 0.0
+
     diagnostics = report["momentum_strategy_portfolio_diagnostics"]
     assert diagnostics["rebalance_periods"] == len(returns)
     assert diagnostics["input_universe_asset_count"] == prices.shape[1]
