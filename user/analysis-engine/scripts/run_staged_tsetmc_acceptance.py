@@ -7,6 +7,7 @@ source hashes and local paths remain under the private Runner output directory.
 """
 from __future__ import annotations
 
+import csv
 import hashlib
 import importlib.util
 import json
@@ -176,7 +177,13 @@ def verify_local_outputs(report: dict[str, Any], output_root: Path) -> tuple[Pat
     if out_resolved.parent != root_resolved or not out_resolved.is_dir():
         raise SafetyGateError("pipeline_output_escaped_private_directory")
 
-    required = ("data_quality_report.json", "backtest_gate.json", "run_manifest.json")
+    required = (
+        "data_quality_report.json",
+        "backtest_gate.json",
+        "run_manifest.json",
+        "instrument_decisions.csv",
+        "quarantine.csv",
+    )
     for name in required:
         path = out_resolved / name
         if path.is_symlink() or not path.is_file():
@@ -216,7 +223,62 @@ def verify_local_outputs(report: dict[str, Any], output_root: Path) -> tuple[Pat
     if gate.get("eligible_for_scoring") is not False or gate.get("eligible_for_backtest") is not False:
         raise SafetyGateError("backtest_gate_invalid")
 
-    return out_resolved, {"manifest_files": len(file_names), "quality": quality, "backtest_gate": gate}
+    aggregate_candidates = summarize_candidate_outputs(out_resolved)
+    return out_resolved, {
+        "manifest_files": len(file_names),
+        "quality": quality,
+        "backtest_gate": gate,
+        "candidate_aggregates": aggregate_candidates,
+    }
+
+
+def summarize_candidate_outputs(output_dir: Path) -> dict[str, Any]:
+    """Return aggregate-only diagnostics; never return symbols, codes, rows or paths."""
+    quarantine_path = output_dir / "quarantine.csv"
+    decisions_path = output_dir / "instrument_decisions.csv"
+    for path in (quarantine_path, decisions_path):
+        if path.is_symlink() or not path.is_file():
+            raise SafetyGateError("candidate_summary_input_missing")
+
+    reason_counts: Counter[str] = Counter()
+    with quarantine_path.open("r", encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            raw_reasons = str(row.get("reason_code", "") or "")
+            for raw_reason in raw_reasons.split(";"):
+                reason = raw_reason.strip()
+                if not reason:
+                    continue
+                reason_counts[reason if re.fullmatch(r"[A-Z0-9_]+", reason) else "UNRECOGNIZED_REASON_CODE"] += 1
+
+    semantics_counts: Counter[str] = Counter()
+    identity_true = 0
+    identity_false = 0
+    identity_unknown = 0
+    decision_rows = 0
+    with decisions_path.open("r", encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            decision_rows += 1
+            raw_semantics = str(row.get("price_input_semantics", "") or "").strip().lower()
+            semantics = raw_semantics if raw_semantics in {
+                "raw_unadjusted", "provider_adjusted", "unknown_unverified"
+            } else "other_or_unrecognized"
+            semantics_counts[semantics] += 1
+            identity = str(row.get("identity_verified", "") or "").strip().lower()
+            if identity in {"true", "1", "yes"}:
+                identity_true += 1
+            elif identity in {"false", "0", "no"}:
+                identity_false += 1
+            else:
+                identity_unknown += 1
+
+    return {
+        "decision_rows": decision_rows,
+        "quarantine_reason_code_counts": dict(sorted(reason_counts.items())),
+        "price_input_semantics_counts": dict(sorted(semantics_counts.items())),
+        "identity_verified_true_count": identity_true,
+        "identity_verified_false_count": identity_false,
+        "identity_verified_unknown_count": identity_unknown,
+    }
 
 
 def _write_local_diagnostic(output_root: Path, exc: BaseException) -> bool:
@@ -251,15 +313,20 @@ def _load_pipeline(pipeline_root: Path):
 
 
 def run() -> dict[str, Any]:
-    dataset_root = _resolved(Path(os.environ["MARKETSAGE_DATASET_ROOT"]))
-    output_parent = _resolved(Path(os.environ["MARKETSAGE_OUTPUT_PARENT"]))
-    output_root = _resolved(Path(os.environ["MARKETSAGE_OUTPUT_ROOT"]))
-    pipeline_root = _resolved(Path(os.environ["MARKETSAGE_PIPELINE_ROOT"]))
+    dataset_input = Path(os.environ["MARKETSAGE_DATASET_ROOT"]).expanduser()
+    output_parent_input = Path(os.environ["MARKETSAGE_OUTPUT_PARENT"]).expanduser()
+    output_root_input = Path(os.environ["MARKETSAGE_OUTPUT_ROOT"]).expanduser()
+    pipeline_root_input = Path(os.environ["MARKETSAGE_PIPELINE_ROOT"]).expanduser()
+
+    for path in (dataset_input, output_parent_input, output_root_input, pipeline_root_input):
+        _assert_no_symlink_components(path)
+
+    dataset_root = _resolved(dataset_input)
+    output_parent = _resolved(output_parent_input)
+    output_root = _resolved(output_root_input)
+    pipeline_root = _resolved(pipeline_root_input)
     raw_root = dataset_root / "raw"
     crosswalk = dataset_root / "reconciliation_v2" / "instrument_details.jsonl"
-
-    for path in (dataset_root, raw_root, crosswalk, output_parent, output_root, pipeline_root):
-        _assert_no_symlink_components(path)
 
     if not dataset_root.is_dir() or not os.access(dataset_root, os.R_OK | os.X_OK):
         raise SafetyGateError("staged_dataset_unreadable")
@@ -288,8 +355,6 @@ def run() -> dict[str, Any]:
         raise SafetyGateError("no_history_items_discovered")
     if len(items) > MAX_DISCOVERED_ITEMS:
         raise SafetyGateError("discovery_item_cap_exceeded")
-    if preflight["duplicate_instrument_codes"] > 0:
-        raise SafetyGateError("duplicate_instrument_codes_detected")
     if preflight["selected_input_bytes"] > MAX_INPUT_BYTES:
         raise SafetyGateError("selected_input_size_cap_exceeded")
     if preflight["existing_input_files"] != preflight["unique_input_files"]:
@@ -356,6 +421,7 @@ def run() -> dict[str, Any]:
         "research_feature_rows": report.get("research_feature_rows"),
         "forward_label_rows": report.get("forward_label_rows"),
         "local_manifest_files_hash_verified": local["manifest_files"],
+        "candidate_aggregate_diagnostics": local["candidate_aggregates"],
         "network_requests_made": False,
         "raw_inputs_overwritten": False,
         "eligible_for_scoring": False,

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.run_staged_tsetmc_acceptance import (
     summarize_discovered_items,
+    summarize_candidate_outputs,
     validate_pipeline_flags,
     SafetyGateError,
 )
@@ -54,6 +55,43 @@ class StagedTsetmcRunnerTests(unittest.TestCase):
             self.assertEqual(summary["missing_share_change_event_count"], 2)
             self.assertEqual(summary["ambiguous_history_count"], 1)
             self.assertEqual(summary["identity_conflict_count"], 1)
+
+    def test_candidate_output_summary_reports_only_aggregate_reason_codes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "quarantine.csv").write_text(
+                """instrument_code,symbol,reason_code
+private-code,private-symbol,RAW_HISTORY_STRUCTURAL_DEFECTS;USAGE_RIGHTS_NOT_VERIFIED
+another-code,another-symbol,RAW_HISTORY_STRUCTURAL_DEFECTS
+""",
+                encoding="utf-8",
+            )
+            (root / "instrument_decisions.csv").write_text(
+                """instrument_code,symbol,price_input_semantics,identity_verified
+private-code,private-symbol,raw_unadjusted,true
+another-code,another-symbol,unknown_unverified,false
+third-code,third-symbol,untrusted-payload,
+""",
+                encoding="utf-8",
+            )
+
+            summary = summarize_candidate_outputs(root)
+
+            self.assertEqual(summary["decision_rows"], 3)
+            self.assertEqual(summary["quarantine_reason_code_counts"], {
+                "RAW_HISTORY_STRUCTURAL_DEFECTS": 2,
+                "USAGE_RIGHTS_NOT_VERIFIED": 1,
+            })
+            self.assertEqual(summary["price_input_semantics_counts"], {
+                "other_or_unrecognized": 1,
+                "raw_unadjusted": 1,
+                "unknown_unverified": 1,
+            })
+            self.assertEqual(summary["identity_verified_true_count"], 1)
+            self.assertEqual(summary["identity_verified_false_count"], 1)
+            self.assertEqual(summary["identity_verified_unknown_count"], 1)
+            self.assertNotIn("private-code", str(summary))
+            self.assertNotIn("private-symbol", str(summary))
 
     def test_fail_closed_report_accepts_only_false_release_flags(self) -> None:
         report = {
