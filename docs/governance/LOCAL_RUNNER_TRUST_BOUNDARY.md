@@ -64,15 +64,16 @@ The owner-reported host state is:
 - Ubuntu 26.04.1 LTS, `x86_64`.
 - Account `marketsage-runner`: UID 110, GID 119, only its own group, no `sudo` group.
 - `/opt/actions-runner/marketsage`: owner/group `marketsage-runner`, mode `0750`.
-- A complete-looking Actions Runner v2.338.2 archive exists at `/home/nima/actions-runner/actions-runner-linux-x64-2.338.2.tar.gz`, size **228,071,396 bytes**. Extracted files (`config.sh`, `run.sh`, `bin/`, `externals/`) are also present under this personal-account directory. This is not the dedicated service directory and must not be used to run the service.
-- The same directory contains `.env`, `.path` and `_diag/`; the shown `.env` includes personal development-environment paths (JVM, Android SDK and NVM). Do not copy those files or run the Runner under the personal `nima` account.
-- `/opt/actions-runner/marketsage/actions-runner-linux-x64-2.338.2.tar.gz` is only **9,719,808 bytes**, so it is an incomplete copy and must be replaced. No extracted Runner files were shown in that directory.
-- The displayed directory listing did not show `.runner` or `.credentials`; `systemctl` and `ps` checks showed no running Runner service or listener. Therefore no successful registration or active Runner is evidenced.
-- A Runner registration token was pasted into the chat. Treat it as exposed and do not reuse it; any new token must be entered only in the local terminal.
+- The complete archive (228,071,396 bytes) under personal `/home/nima/actions-runner` was SHA-256 verified against the expected v2.338.2 digest `baebf204307bac6193480852732f0aba2ae97b6c5597c244f4d5558390147c40`.
+- The package was copied into `/opt/actions-runner/marketsage` and extracted as `marketsage-runner`; `Runner.Listener --version` returned `2.338.2`. The service directory's top-level ownership/modes were checked. The personal `.env`, `.path`, diagnostics or credentials were not copied.
+- The dedicated account was verified as UID 110/GID 119, only its own group, no `sudo` membership. No `.runner`, `.credentials` or `.credentials_rsaparams` files were found; previous `systemctl`/`ps` checks showed no active Runner service/listener. It is installed as files only; not configured, registered or online.
+- A Runner registration token was pasted into the chat. Treat it as exposed and do not reuse it; any future token must be entered only in the local terminal.
+- Access directories were created and tested: `/srv/marketsage/data` mode `2750`, owner/group `nima:marketsage-runner`; Runner can traverse/read the directory but cannot write. `/srv/marketsage/output` mode `0750`, owner/group `marketsage-runner:marketsage-runner`; Runner successfully created and removed a test file. Parent `/srv/marketsage` is `0755 root:root`.
+- The data directory's actual contents and nested file/directory permissions have **not** been inventoried. Do not assume it is empty or that all existing files are safely readable. No research script has been run against that path and no workflow has been routed to `self-hosted`.
 
-These are owner-reported command outputs, not an independent host audit. No research-data directory is exposed and no workflow has been routed to `self-hosted`. The complete archive should be SHA-256 verified, then copied and extracted under `/opt/actions-runner/marketsage` as `marketsage-runner`; do not copy the personal `.env`, `.path`, `_diag` or any credentials.
+These are owner-reported command outputs, not an independent host audit. Directory-level permission checks do not establish safe file-level corpus access. The next bounded step is to inspect only the known MarketSage project/data paths (names, file types, sizes and modes) before selecting the exact corpus root or granting access to it.
 
-This is package preparation only. **Do not register or activate the Runner** until the trust-model decision below is resolved and the remaining host/data isolation checks are completed.
+This is still package and directory preparation only. **Do not register or activate the Runner** until the trust-model decision below is resolved and the remaining host/data isolation checks are completed.
 
 ## Owner-side blocker
 
