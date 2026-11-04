@@ -1,6 +1,6 @@
 # MarketSage local-data Runner — trust boundary and activation gate
 
-**Status:** Owner-approved manual-only compensating-control design; PR #27 workflow is merged to \`main\`; designated Runner installation is incomplete and Runner remains unregistered/offline pending final host checks.  
+**Status:** Owner-approved manual-only compensating-control design; PR #27 workflow is merged to `main`; designated Runner installation is incomplete and Runner remains unregistered/offline pending final host checks.  
 **Scope:** Local TSETMC corpus acceptance and bounded offline Stage 4 data evaluation.  
 **Authority:** The owner selected Option 2 in Issue #25 on 2026-11-04. This accepts residual risk caused by the lack of private-repository branch protection on the current GitHub plan.  
 **Important:** This model is not equivalent to protected branches or rulesets.
@@ -9,7 +9,7 @@
 
 Ordinary pull-request validation must remain on GitHub-hosted runners. Never add a self-hosted job to the general CI workflow. Never execute arbitrary PR heads, fork code, issue/comment content, or other untrusted contributions on the laptop Runner.
 
-The exact current workflow filenames and triggers must be inventoried from the repository before activation. Earlier documentation referred to `.github/workflows/ci.yml`; this filename and its current trigger set are not treated as verified until inspected against the current repository revision.
+Verified on 2026-11-04: `main` contains `.github/workflows/ci.yml`, whose jobs use `ubuntu-latest`; no general CI job targets self-hosted. PR #27 added the only local workflow, `.github/workflows/local-tsetmc-offline-acceptance.yml`, with `workflow_dispatch` as its only trigger. The parked PR #8 TSETMC smoke workflow on the integration branch also uses `ubuntu-latest` and must not be repeated from the same GitHub-hosted environment.
 
 A malicious or compromised workflow can execute arbitrary commands as `marketsage-runner`, read everything that account can read, write to its permitted output/workspace, and attempt network communication. Host filesystem permissions reduce local exposure but do not make workflow code safe.
 
@@ -28,7 +28,7 @@ Residual risk accepted: anyone able to change the workflow/default-branch conten
 
 ## 3. Workflow requirements before registration/activation
 
-PR #27's separate workflow is now merged to \`main\` at \`7e669749d2615bc0f2a9d6f557bb99f8e7bd0767\`. Static review and all five required CI job types passed on exact PR head \`c60edd0f16244ab12e6602b9247e4174567f6081\` in run \`41833221157\`. It has only \`workflow_dispatch\`, owner/default-branch/explicit-confirmation guards, \`contents: read\`, a full-SHA-pinned checkout, no secrets, no provider/network probes and no artifact upload. It targets the exact custom labels \`marketsage-local\` and \`marketsage-research\`. The owner must still review the exact current \`main\` SHA and workflow immediately before dispatch. The first workflow validates the staged dataset manifest and hashes; it does not yet execute the full PR #14 integrated pipeline.
+PR #27's separate workflow is now merged to `main` at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`. Static review and all five required CI job types passed on exact PR head `c60edd0f16244ab12e6602b9247e4174567f6081` in run `41833221157`. It has only `workflow_dispatch`, owner/default-branch/explicit-confirmation guards, `contents: read`, a full-SHA-pinned checkout, no secrets, no provider/network probes and no artifact upload. It targets the exact custom labels `marketsage-local` and `marketsage-research`. The owner must still review the exact current `main` SHA and workflow immediately before dispatch. The first workflow validates the staged dataset manifest and hashes; it does not yet execute the full PR #14 integrated pipeline.
 
 The local workflow must continue to satisfy all of the following:
 
@@ -48,7 +48,7 @@ The workflow file must be reviewed before Runner registration. Do not register f
 ## 4. Repository-scoped Runner
 
 - Register a repository-level Runner for `yarsalam/marketsage` only.
-- Assign a unique label such as `marketsage-research` and require it in the dedicated job's `runs-on`.
+- Assign the custom labels `marketsage-local` and `marketsage-research` and require both in the dedicated job's `runs-on`; GitHub also supplies the standard `self-hosted`, `linux` and `x64` labels.
 - Do not grant an organization-wide Runner group or access to other repositories.
 - Do not change any existing workflow to `runs-on: self-hosted`.
 - Never reuse the previously chat-exposed registration token. Generate a fresh short-lived registration token from the repository settings and enter it only in the local terminal. Never paste it into chat, a file, shell history, workflow logs or a commit.
