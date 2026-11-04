@@ -306,6 +306,9 @@ def evaluate_monthly_strategies(
         "momentum_strategy_portfolio_diagnostics": _portfolio_diagnostics(
             strategy["monthly"], prices.shape[1]
         ),
+        "locked_holdout_momentum_strategy_portfolio_diagnostics": _portfolio_diagnostics(
+            strategy["monthly"].loc[holdout_dates], prices.shape[1]
+        ),
         "walkforward_folds": folds,
         "cost_sensitivity": cost_sensitivity,
         "six_month_forward_label_inventory": label_rows,
