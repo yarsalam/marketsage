@@ -1,86 +1,126 @@
 # MarketSage local-data Runner — trust boundary and activation gate
 
-**Status:** Design only; Runner is not registered and no local data has been read by this session.  
-**Scope:** Local TSETMC corpus acceptance and Stage 4 research evaluation.  
-**Activation:** Requires owner-side repository settings and host setup. Do not register a Runner before every precondition below is met.
+**Status:** Owner-approved manual-only compensating-control design; host dataset preparation complete; Runner remains unregistered and offline until workflow review and final activation checks pass.  
+**Scope:** Local TSETMC corpus acceptance and bounded offline Stage 4 data evaluation.  
+**Authority:** The owner selected Option 2 in Issue #25 on 2026-11-04. This accepts residual risk caused by the lack of private-repository branch protection on the current GitHub plan.  
+**Important:** This model is not equivalent to protected branches or rulesets.
 
-## Why the existing CI workflow must not host local-data jobs
+## 1. Why the normal CI workflow must never use the local Runner
 
-The current `.github/workflows/ci.yml` runs on every `pull_request` and checks out the PR head. It is appropriate for GitHub-hosted ephemeral runners. It is not a trusted execution boundary for a self-hosted machine that can see private local market data.
+Ordinary pull-request validation must remain on GitHub-hosted runners. Never add a self-hosted job to the general CI workflow. Never execute arbitrary PR heads, fork code, issue/comment content, or other untrusted contributions on the laptop Runner.
 
-Never add a self-hosted job to that workflow, and never run arbitrary PR code on the local Runner. A malicious or compromised PR could read every file and credential accessible to the Runner account.
+The exact current workflow filenames and triggers must be inventoried from the repository before activation. Earlier documentation referred to `.github/workflows/ci.yml`; this filename and its current trigger set are not treated as verified until inspected against the current repository revision.
 
-## Required trust boundary
+A malicious or compromised workflow can execute arbitrary commands as `marketsage-runner`, read everything that account can read, write to its permitted output/workspace, and attempt network communication. Host filesystem permissions reduce local exposure but do not make workflow code safe.
 
-1. **Protected source branch**
-   - Protect the exact integration branch used for local research execution.
-   - Require pull requests and the required CI checks before changes reach that branch.
-   - Block force-pushes and routine bypasses.
-   - Do not treat the current open #6 branch as trusted until the protection is active and its head is reviewed.
-2. **Repository-scoped Runner**
-   - Register a dedicated self-hosted Runner for this private repository only.
-   - Restrict the Runner group to this repository and the dedicated research workflow.
-   - Prefer an ephemeral Runner that accepts one job and is removed; otherwise use a persistent service with automatic workspace cleanup and a documented update/revocation procedure.
-3. **Dedicated operating-system identity**
-   - Run as a new unprivileged account with no sudo and no membership in groups that can read other users' private files.
-   - Use a dedicated workspace and temporary directory.
-   - Grant read-only access only to the explicitly selected research-data roots; grant write access only to a separate output directory.
-   - Do not grant access to the general home directory, Downloads, browser profiles, SSH keys, password stores, cloud credentials, GitHub tokens, broker accounts, or unrelated project folders.
-4. **Separate trusted workflow**
-   - Use a new workflow that is triggered only by `workflow_dispatch` or an explicitly reviewed schedule on the protected integration branch.
-   - Reject any event other than the allowed trigger and reject any ref other than the exact protected branch.
-   - Do not use `pull_request`, `pull_request_target`, issue, comment, or fork events.
-   - Check out the exact triggering SHA; do not fetch or execute a moving PR head.
-   - Set the minimum token permissions (normally `contents: read`); pin third-party actions to reviewed immutable commit SHAs.
-   - Serialize local jobs so they cannot race over the same corpus or VPN state.
-5. **Data handling**
-   - Keep raw input files and all intermediate price rows local.
-   - Write outputs to a dedicated, non-Git directory with a unique run ID.
-   - Return only a sanitized manifest, counts, date ranges, reason codes, file hashes and aggregate metrics. Do not upload raw files or raw rows as workflow artifacts.
-   - Review every output field for accidental raw values, credentials or local paths before any report is sent to GitHub.
-6. **Network and VPN isolation**
-   - Do not let the workflow change VPN settings or inspect browser credentials.
-   - Keep Iranian providers and foreign providers in separate jobs with an explicit network-state precondition.
-   - A failed provider request must not trigger retries or alternate-route probing unless a new bounded acceptance question is approved.
-7. **Research-only execution**
-   - The TSETMC acceptance pipeline must not make network requests or modify source inputs.
-   - Stage 4 must use only a pinned, permissioned dataset and a predeclared evaluation configuration.
-   - No job may enable source approval, investment ranking, scoring, broker access, or trading.
+## 2. Approved trust model and residual risk
 
-## First allowed workload
+The owner selected the manual-only compensating-control path rather than purchasing a paid plan or making the repository public.
 
-After all controls are active, the first job should run only:
+GitHub does not enforce private-repository branch protection/rulesets for this repository on the current plan. Consequently:
+- no claim may be made that the source branch is protected;
+- manual dispatch and a code-review checklist are operational controls, not technical equivalents of branch protection;
+- every local-data run requires an owner-side review of the exact workflow content and exact source commit before dispatch;
+- the run must record the triggering SHA, actor, workflow path and run ID;
+- unexpected refs, SHAs and event types must fail closed.
 
-- the offline TSETMC integrated acceptance pipeline against the designated local corpus;
-- the metadata-only Stage 4 data inventory;
-- no network probes, no strategy parameter tuning, no production scoring, and no holdout inspection until the split and run manifest are frozen.
+Residual risk accepted: anyone able to change the workflow/default-branch content and dispatch it, or an attacker controlling an authorized account, may change what executes on the Runner. The controls in this document reduce but cannot eliminate this risk. This exception applies only to the limited research dataset and workflow; it does not authorize secrets, personal data, trading access or broad host access.
 
-The job must preserve input hashes and produce a unique output directory. If the pipeline finds ambiguous histories, unverified raw/adjusted semantics, long gaps or missing evidence, it must quarantine the instrument rather than repair it.
+## 3. Workflow requirements before registration/activation
 
-## Owner-host preparation status — 2026-11-04 (updated from latest terminal report)
+Create and review a separate workflow dedicated to the local TSETMC research workload. It must satisfy all of the following:
 
-The owner-reported host state is:
+1. `on:` contains only `workflow_dispatch`. No `push`, `pull_request`, `pull_request_target`, fork, issue, issue-comment, schedule, workflow-run or repository-dispatch trigger.
+2. The job has an explicit event/ref guard and rejects every event except `workflow_dispatch`. Dispatch must use the agreed trusted ref (initially the reviewed default-branch revision); record and verify the exact `github.sha` for every run.
+3. The owner reviews the exact workflow source and triggering commit immediately before each dispatch. If either changes, repeat the review. A user-supplied arbitrary ref must not be accepted as executable code.
+4. The job runs only on the exact labels assigned to the repository-scoped research Runner. Do not use a broad `self-hosted` target without the dedicated label.
+5. Set workflow/job token permissions to `contents: read` only. Do not define or reference repository, organization, or environment secrets in this job.
+6. Pin each third-party action to an immutable, reviewed full commit SHA. Do not use floating tags, remote scripts, unpinned container images or arbitrary downloaded executables.
+7. Use a dedicated workspace and a concurrency group so local data jobs cannot overlap.
+8. Run only the approved offline pipeline against the staged snapshot. No network probes, provider retries, VPN changes, data repair, source approval, scoring, deployment, broker access or trading.
+9. Keep raw rows and source files local. Before publishing any artifact, allow only sanitized manifests, row counts, date ranges, reason codes, file hashes and reviewed aggregate metrics. Do not upload raw data or raw row samples. Never publish secrets, local absolute paths, usernames, hostnames or environment details.
+10. A job must fail closed on missing data, checksum mismatch, unexpected file, unexpected ref/event, invalid manifest, write attempt to the source dataset, or output validation failure.
 
-- Ubuntu 26.04.1 LTS, `x86_64`.
-- Account `marketsage-runner`: UID 110, GID 119, only its own group, no `sudo` group.
-- `/opt/actions-runner/marketsage`: owner/group `marketsage-runner`, mode `0750`.
-- The complete archive (228,071,396 bytes) under personal `/home/nima/actions-runner` was SHA-256 verified against the expected v2.338.2 digest `baebf204307bac6193480852732f0aba2ae97b6c5597c244f4d5558390147c40`.
-- The package was copied into `/opt/actions-runner/marketsage` and extracted as `marketsage-runner`; `Runner.Listener --version` returned `2.338.2`. The service directory's top-level ownership/modes were checked. The personal `.env`, `.path`, diagnostics or credentials were not copied.
-- The dedicated account was verified as UID 110/GID 119, only its own group, no `sudo` membership. No `.runner`, `.credentials` or `.credentials_rsaparams` files were found; previous `systemctl`/`ps` checks showed no active Runner service/listener. It is installed as files only; not configured, registered or online.
-- A Runner registration token was pasted into the chat. Treat it as exposed and do not reuse it; any future token must be entered only in the local terminal.
-- Access directories were created and tested: `/srv/marketsage/data` mode `2750`, owner/group `nima:marketsage-runner`; Runner can traverse/read the directory but cannot write. `/srv/marketsage/output` mode `0750`, owner/group `marketsage-runner:marketsage-runner`; Runner successfully created and removed a test file. Parent `/srv/marketsage` is `0755 root:root`.
-- The data directory's actual contents and nested file/directory permissions have **not** been inventoried. Do not assume it is empty or that all existing files are safely readable. No research script has been run against that path and no workflow has been routed to `self-hosted`.
+The workflow file must be reviewed before Runner registration. Do not register first and assume the workflow can be repaired later.
 
-These are owner-reported command outputs, not an independent host audit. Directory-level permission checks do not establish safe file-level corpus access. The next bounded step is to inspect only the known MarketSage project/data paths (names, file types, sizes and modes) before selecting the exact corpus root or granting access to it.
+## 4. Repository-scoped Runner
 
-This is still package and directory preparation only. **Do not register or activate the Runner** until the trust-model decision below is resolved and the remaining host/data isolation checks are completed.
+- Register a repository-level Runner for `yarsalam/marketsage` only.
+- Assign a unique label such as `marketsage-research` and require it in the dedicated job's `runs-on`.
+- Do not grant an organization-wide Runner group or access to other repositories.
+- Do not change any existing workflow to `runs-on: self-hosted`.
+- Never reuse the previously chat-exposed registration token. Generate a fresh short-lived registration token from the repository settings and enter it only in the local terminal. Never paste it into chat, a file, shell history, workflow logs or a commit.
+- Prefer one-job/ephemeral execution where operationally feasible. If a persistent Runner is used, document service identity, workspace cleanup, update procedure, offline/online controls, and a fast disable/unregister procedure.
+- A Runner process being online does not grant approval for any job. The only permitted job is the reviewed manual workflow above.
 
-## Owner-side blocker
+## 5. Host identity and filesystem boundary — latest owner-reported audit
 
-The connected GitHub integration cannot configure or verify repository rulesets/branch protection in this private repository (the relevant API calls are denied by GitHub permissions). A separate plan constraint also applies: GitHub's current documentation says branch protection is available on Free only for public repositories (including Free organizations); private repositories require Pro, Team or Enterprise. Rulesets have the same public-Free/private-paid distinction. Therefore, moving this private repository to a GitHub Free Organization alone does **not** satisfy the required protected-branch gate. See [protected-branch plan availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) and [ruleset plan availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
+The following results were supplied by the owner from the Ubuntu laptop on 2026-11-04:
 
-The current CI workflow also executes arbitrary PR heads on GitHub-hosted runners, so it must remain separate from any local Runner. Do not attach a local Runner to the existing `pull_request` workflow or run unreviewed PR code on the host.
+### OS identity and installed Runner package
 
-**Required owner decision before activation:** either obtain a plan that supports protected branches/rulesets for this private repository, or explicitly approve a revised trust model that does not claim equivalent branch protection and is reviewed for its residual risk. This decision is tracked in [Issue #25](https://github.com/yarsalam/marketsage/issues/25). Only after that decision may the dedicated unprivileged host account, restricted data/output directories, repository-scoped Runner and separate trusted `workflow_dispatch` workflow be provisioned. Enter any Runner registration token directly on the host; never paste it into chat, a repository file, or a workflow log.
+- Account: `marketsage-runner`, UID 110, GID 119, home `/var/lib/marketsage-runner`, shell `/usr/sbin/nologin`.
+- Supplementary groups: only `marketsage-runner`; confirmed absent from `sudo`, `docker`, `lxd` and `adm`.
+- Home directory: `/var/lib/marketsage-runner`, mode `0750`, owned by `marketsage-runner:marketsage-runner`. The general user home `/home/nima` is not traversable by this account.
+- Runner installation: `/opt/actions-runner/marketsage`, files owned by `marketsage-runner:marketsage-runner`; `config.sh` and `run.sh` are executable. Parent directories are root-owned and not writable by the Runner.
+- Runner version: 2.338.2; archive checksum was verified before extraction.
+- No `.runner`, `.credentials`, or `.credentials_rsaparams` files were present in the installation directory.
+- No installed/loaded Runner service and no active `Runner.Listener`, `Runner.Worker` or `runsvc.sh` process were found.
+- Runner is not registered, online or running as a service.
 
-Until the protection/trust-model decision and host isolation are verified, local corpus audit and empirical Stage 4 execution remain **BLOCKED**. No claim of local data access or Runner readiness is made.
+### Dataset and output
+
+- Dataset path: `/srv/marketsage/data/tsetmc_history_20261022`.
+- 8,801 original source files plus `SHA256SUMS` and `STAGING_README.txt`; 8,803 files total.
+- Every one of the 8,801 source-file hashes was verified against the source during staging, then re-verified from the staged checksum manifest before publication.
+- Source files were not modified. The adjusted research-only candidates were deliberately excluded.
+- Dataset files are mode `0440`; directories are mode `2750`; group is `marketsage-runner`. The Runner can read/traverse but cannot write to the dataset.
+- Separate output path: `/srv/marketsage/output`, owned by `marketsage-runner:marketsage-runner`, mode `0750`.
+- As `marketsage-runner`, representative files from raw, normalized, reports, pipeline metadata, discovery, reconciliation and acceptance were read and SHA-256 checked. Pipeline JSON parsing and discovery CSV reading passed.
+- Write attempts to dataset root, normalized directory and a source file were denied; a deliberate create attempt at the dataset root returned `PermissionError`.
+- The Runner successfully created and deleted a temporary test file in its output directory.
+- The user account home and unrelated project directories remain inaccessible to the Runner.
+
+These are owner-reported terminal results, not an independent penetration test. They verify the tested OS permission boundary, not the safety of arbitrary workflow code, kernel exploits, supply-chain compromise or network exfiltration.
+
+## 6. Data handling and first workload
+
+The staged directory contains raw provider responses, normalized histories, reports, discovery metadata, v2 reconciliation evidence and acceptance reports.
+
+The dataset is not source-approved or approved for backtesting. Current acceptance evidence reports zero instruments automatically approved for backtesting; investment scoring remains disabled. The 79 adjusted research-only candidate outputs and the older reconciliation candidate outputs were excluded.
+
+First permitted workload after workflow review and activation:
+- verify the staged dataset checksum manifest;
+- run the offline TSETMC integrated acceptance/reconciliation inspection without network access and without modifying inputs;
+- produce a unique output directory with sanitized summaries only;
+- report quarantine/unknown states without automatically repairing or approving instruments.
+
+Do not inspect a holdout set, tune strategy parameters, calculate/enable investment scores, or infer source/legal approval from a successful parser or runner job.
+
+## 7. Network and VPN
+
+The first workload is offline and must not require provider access. The job must not change VPN settings, inspect browser profiles, read VPN credentials, modify system routes, or probe alternative network routes. Any later provider-specific network work requires a separate bounded design and network policy. Local Runner connectivity to GitHub is distinct from permission to send research data elsewhere.
+
+## 8. Activation checklist
+
+Runner registration and workflow activation remain gated until all of these checks are completed:
+
+- [x] Owner selected the documented manual-only model and accepted its residual risk (Issue #25, 2026-11-04).
+- [x] Dedicated unprivileged OS identity and group restrictions verified.
+- [x] Staged dataset copied, SHA-256 verified and made read-only to Runner.
+- [x] Runner read access and denied data writes tested; separate output write tested.
+- [ ] Exact current CI and workflow files inventoried; every trigger, permission, action reference, checkout ref and runner target reviewed.
+- [ ] Separate manual-only workflow added on an implementation branch and reviewed; no existing CI workflow changed to self-hosted.
+- [ ] Workflow token permissions, absence of secrets, immutable action SHAs, ref/event guard, sanitization and concurrency validated.
+- [ ] Runner service/workspace isolation and cleanup/disable procedure documented.
+- [ ] Final pre-registration audit confirms no stale credentials or active Runner process/service.
+- [ ] Fresh registration token generated and entered locally only; repository-level Runner registered with the dedicated label.
+- [ ] Before the first dispatch, owner reviews the exact workflow source/commit and records the run approval.
+
+Until the remaining unchecked items are complete, the Runner must remain unregistered and offline. Registration itself does not authorize unreviewed code or broader workloads.
+
+## 9. Related records
+
+- [Issue #25 — local Runner trust boundary](https://github.com/yarsalam/marketsage/issues/25)
+- [Decision log](DECISION_LOG.md)
+- [Project execution constitution](PROJECT_EXECUTION_CONSTITUTION.md)
