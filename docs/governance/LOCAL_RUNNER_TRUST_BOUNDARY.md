@@ -1,6 +1,6 @@
 # MarketSage local-data Runner — trust boundary and operating procedure
 
-**Status:** Runner registered and online; staged-dataset validator passed (run 41906518123, attempt 2); the integrated TSETMC candidate workflow is merged to main and awaits owner manual dispatch.  
+**Status:** Runner registered and online; staged-dataset validator passed (run 41906518123, attempt 2). The integrated workflow's first dispatch (run 41912248800) reached the Runner but stopped at the original 16 GiB RAM preflight; PR #34 adds bounded batching and cgroup-aware memory measurement before a retry.  
 **Repository:** yarsalam/marketsage (private), repository-scoped Runner only.  
 **Authority:** owner-approved manual-only compensating-control model in Issue #25. This is not equivalent to GitHub branch protection or rulesets.
 
@@ -90,14 +90,15 @@ Workflow `.github/workflows/local-tsetmc-integrated-acceptance.yml` was merged i
 - manual-only on main, owner-gated, explicit boolean confirmation, same Runner labels and concurrency group;
 - checks out the exact workflow commit plus immutable pipeline source commit 819f8b4028469cb0d498098fec88545a18ebacc6;
 - reads only the staged raw subtree and the explicit v2 crosswalk reconciliation_v2/instrument_details.jsonl;
-- enforces no symlinks, no input paths outside the staged dataset, no dataset writes, maximum 3,000 discovered items, maximum 3 GiB of selected inputs, at least 16 GiB available RAM and 8 GiB free output disk;
-- runs the integration pipeline once in the same Python process after preflight;
+- enforces no symlinks, no input paths outside the staged dataset, no dataset writes, maximum 3,000 discovered items and 3 GiB of selected inputs;
+- checks effective available memory using both host `MemAvailable` and applicable cgroup ancestor limits; requires at least 4 GiB effective available memory and 8 GiB free output disk;
+- batches no more than 32 candidates and no more than 32 MiB of unique selected input files per batch; it rechecks memory/disk before every batch and writes each batch to a fresh, separately hash-verified local run directory;
 - validates output hashes and all fail-closed flags;
-- writes detailed candidate CSVs/reports locally under the private output directory;
+- writes detailed candidate CSVs/reports locally under the private output directory and writes a mode-0600 aggregate progress/summary file after each completed batch;
 - prints only aggregate counts and safety flags to GitHub logs;
 - does not upload artifacts, install packages, probe providers, approve sources, approve backtests, enable ranking/scoring or trade.
 
-Before dispatch, the owner must review the exact workflow source and pinned pipeline SHA on `main`. Then manually run it from Actions using branch `main` and set `confirm_integrated_acceptance=true`. The workflow has not yet been run.
+The first dispatch [41912248800](https://github.com/yarsalam/marketsage/actions/runs/41912248800) successfully checked out the exact workflow and pinned pipeline commits but stopped before analysis because the original static 16 GiB RAM gate exceeded available memory. No candidate batch ran. PR #34 adds memory-aware batching; wait for its exact-head CI to pass and the merge to main, then review and manually dispatch the updated workflow.
 
 ## 7. Emergency stop, disable and unregister
 
