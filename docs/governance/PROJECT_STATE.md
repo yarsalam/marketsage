@@ -5,15 +5,16 @@
 **Default branch:** `main`  
 **Main HEAD:** `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
-**Integration HEAD:** `e19d65840d9112362209a23ea53c7fcf608c0720`  
-**Post-#24 integration CI:** PR run `41796506276` passed all five required job types on exact head `e19d65840d9112362209a23ea53c7fcf608c0720`; PR #24's exact-head run `41796133083` passed all five jobs before merge.  
+**Integration HEAD:** `21552b719513d72f7fc10eff1efa11651c3d8530`  
+**Post-#28 integration CI:** PR run `41847126900` and push run `41847115366` are still in progress on exact integration head `21552b719513d72f7fc10eff1efa11651c3d8530`. The prior post-#24 head `e19d65840d9112362209a23ea53c7fcf608c0720` had all five jobs green.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
 
 - PR #1 application baseline is on `main`; no production deployment occurred.
-- PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23 and #24 are merged into PR #6 in dependency order.
+- PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24 and #28 are merged into PR #6 in dependency order.
 - PR #6 remains open and **must not be merged into `main` without explicit owner approval**.
+- PR #28 added an Iran official-source candidate screen: CBI TSD annual macro, official transfer FX, weekly policy rates and government Islamic-securities auction PDFs. It added `iran.cbi.bond_auction_results`, bumped catalog/registry to 1.1.2 and added fail-closed tests. Exact-head PR run `41846337902` passed all five jobs; merged into #6 at `21552b719513d72f7fc10eff1efa11651c3d8530`; post-merge CI is in progress.
 - PR #27 adds a separate manual-only offline dataset validator workflow and is merged to `main` at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`; all five required CI jobs passed on exact PR head `c60edd0f16244ab12e6602b9247e4174567f6081` in run `41833221157`. It does not register or start a Runner.
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` and post-merge #6 run `41598989190` passed all five required job types.
 - PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Both post-merge runs `41601055518` (push) and `41601064135` (pull_request) subsequently passed all five job types.
@@ -22,7 +23,7 @@
 - PR #23 reconciled the current Tindex quota evidence: official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, while the MarketSage client retains its stricter local 1/minute and 100-success/day cap. Its exact-head run `41792758377` passed all five jobs; it merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-merge PR run `41793156231` passed all five jobs.
 - PR #24 removes Binance Spot from default probes and hard-blocks explicit discovery requests after owner-reported Iran-network HTTP 451; the runner returns `blocked_owner_reported_http_451` with `requests_attempted=0`. No network request or alternate route was used. Exact-head run `41796133083` passed all five required jobs; PR #24 merged into #6 at `e19d65840d9112362209a23ea53c7fcf608c0720`; post-merge run `41796506276` passed all five jobs.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
-- PR #15 governance remains Draft; its documents are being reconciled with PR #27 and the latest owner terminal evidence. They are not yet adopted on `main`.
+- PR #15 governance remains Draft; its documents are being reconciled with PRs #27/#28 and the latest owner terminal evidence. They are not yet adopted on `main`.
 - The governance documents referenced in this state file currently exist on PR #15's `governance/execution-constitution-v1` branch; PR #15 is still Draft and these files are not present on the default `main` branch. They are therefore a working continuity record, not yet an adopted default-branch policy.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
 
@@ -69,6 +70,7 @@ main
 | #23 | Exact-head run `41792758377` passed all five required jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d`; post-merge PR run `41793156231` passed all five jobs | Merged into #6 |
 | #24 | Exact-head PR run `41796133083` and post-merge PR run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` | Merged into #6 |
 | #27 | Exact-head PR run `41833221157` passed all five required jobs; merge `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767` | Merged to `main`; manual-only workflow; Runner not registered |
+| #28 | Exact-head PR run `41846337902` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530`; post-merge CI pending | Merged into #6 |
 
 ## Source and dataset evidence
 
@@ -144,6 +146,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Static review found the PR #14 discovery runner did not consume the corpus's preferred `corpus_reconciliation_v2/instrument_details.jsonl` ISIN → insCode map. PR #20 added unique candidate identity resolution, v2-over-v1 precedence, ambiguity quarantine and SHA-256 provenance; exact-head CI passed and it was merged at `4191dd3715173265193163e30281ab555b9d12fb`. It does not create identity evidence or enable research/scoring.
 - PR #21 fixes two stale Tindex quota descriptions in `discover_free_datasets.py` that still referred to a three-request/minute limiter despite the connector enforcing 1 request/minute and 100 successful requests/day. Its exact-head CI passed all five job types and it was merged at `21c591223c9e7d61e6046a06f51522e979530f08`. No Tindex endpoint was contacted.
 - PR #22 reviewed official documentation for ECB, US Treasury, EIA, SEC EDGAR and IMF; added five candidates, source-specific rights/time/history gates, and fail-closed regression tests. No data API was called, no key was used, and no adapter/default probe was added.
+- PR #28 screened CBI TSD, official transfer FX, weekly policy rates and government Islamic-securities auction PDFs. It documented the difference between official transfer FX and free-market FX, annual/weekly frequencies, Jalali/denomination-multiplier checks, PDF primary-market limitations and CBI reuse-rights uncertainty. The new bond-auction candidate remains disabled and fail-closed; no API request or dataset download occurred.
 - Rechecked Tindex's official English and Persian API documentation on 2026-11-04. The published account quota is 3 requests/minute and 300 requests/day (429 responses do not consume the daily quota), not the older 1/100 snapshot. Updated the source catalog and registry to version 1.1.1 and exposed provider-published versus local-enforced quotas in status output; the local 1/100 guard was not relaxed. PR #23 passed all five exact-head jobs and merged into #6; no token or API request was used.
 - On 2026-11-04 the owner approved the documented manual-only compensating-control model in Issue #25. The decision and accepted residual risk are appended to `DECISION_LOG.md`; `LOCAL_RUNNER_TRUST_BOUNDARY.md` records the exact limits and host evidence. This does not create private branch protection or claim equivalence.
 
