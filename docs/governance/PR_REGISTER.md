@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-11-05  
 **Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 11f9de85c13f3ee8bd61e6eb7aea64992a7271d4  
+**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code HEAD:** 819f8b4028469cb0d498098fec88545a18ebacc6
 
@@ -12,7 +12,7 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
-| [#34](https://github.com/yarsalam/marketsage/pull/34) | fix/local-tsetmc-memory-bounded-batches-2026-11-05 | Corrects run #41912248800's static 16 GiB RAM preflight failure with cgroup-aware resource detection and bounded 32-item/32 MiB batches; preserves all offline/data/scoring gates | CI pending; after merge, owner must manually re-dispatch the integrated TSETMC workflow. |
+
 
 
 ## Merged to main
@@ -23,6 +23,7 @@
 | [#27](https://github.com/yarsalam/marketsage/pull/27) | Manual-only staged TSETMC inventory/checksum validator; merged at 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767 |
 | [#31](https://github.com/yarsalam/marketsage/pull/31) | Clean adoption of the five governance documents; merged at 46d3a541b7fa176b5a8c5693a0c46feb8bb9b3fc |
 | [#32](https://github.com/yarsalam/marketsage/pull/32) | Manual-only integrated TSETMC candidate workflow; merged at 11f9de85c13f3ee8bd61e6eb7aea64992a7271d4. Exact PR head 2df9e5fc523307a08894c8077210e8584aa4adcb passed all five jobs in run 41911051358. Awaiting owner manual dispatch. |
+| [#34](https://github.com/yarsalam/marketsage/pull/34) | Memory-bounded/cgroup-aware TSETMC execution; merged at 554fe2200ccb3a523442b0e241e81a748becfa44. Exact PR head dcf32f46b524daf3ac63e9937962cd02948ca2f8 passed all five required jobs in run 41913385729; analysis reported 109 passed, 7 warnings. Owner re-dispatch pending. |
 
 ## Merged into integration PR #6
 
@@ -49,7 +50,8 @@ PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29 and 
 main
 - #27 merged: local staged-dataset validator
 - #31 merged: governance adoption
-- #32 merged: integrated local TSETMC candidate workflow; owner dispatch pending; checks out immutable PR #6 integration commit 819f8b4028469cb0d498098fec88545a18ebacc6
+- #32 merged: integrated local TSETMC candidate workflow
+- #34 merged: memory-bounded/cgroup-aware candidate batches; owner re-dispatch pending; checks out immutable PR #6 integration commit 819f8b4028469cb0d498098fec88545a18ebacc6
 
 PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked.
 

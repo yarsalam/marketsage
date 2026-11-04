@@ -158,7 +158,7 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 ## 2026-11-05 — Integrated TSETMC first dispatch blocked by static RAM gate; bounded-batch correction
 
 **Authority:** Routine engineering correction within the existing owner-approved local research scope.  
-**Status:** Failure diagnosed; correction proposed in PR #34.
+**Status:** Correction implemented and merged to `main` in PR #34 at `554fe2200ccb3a523442b0e241e81a748becfa44`.
 
 **Observed run**
 - Local workflow run [41912248800](https://github.com/yarsalam/marketsage/actions/runs/41912248800) reached Runner `marketsage-local-01`.
@@ -175,7 +175,7 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 
 **Decision effect**
 - The previous failed run is not treated as a data-quality result and must not be used to accept or reject TSETMC.
-- Re-dispatch only after PR #34 passes all required CI checks and is merged to main.
+- PR #34 passed all five required exact-head CI jobs in run `41913385729` (analysis: 109 passed, 7 warnings) and was merged. The remaining action is owner review and a manual re-dispatch on `main`.
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
