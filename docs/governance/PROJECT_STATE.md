@@ -3,7 +3,7 @@
 **Snapshot date:** 2026-11-04  
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Default branch:** `main`  
-**Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
+**Main HEAD:** `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
 **Integration HEAD:** `e19d65840d9112362209a23ea53c7fcf608c0720`  
 **Post-#24 integration CI:** PR run `41796506276` passed all five required job types on exact head `e19d65840d9112362209a23ea53c7fcf608c0720`; PR #24's exact-head run `41796133083` passed all five jobs before merge.  
@@ -14,6 +14,7 @@
 - PR #1 application baseline is on `main`; no production deployment occurred.
 - PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23 and #24 are merged into PR #6 in dependency order.
 - PR #6 remains open and **must not be merged into `main` without explicit owner approval**.
+- PR #27 adds a separate manual-only offline dataset validator workflow and is merged to `main` at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`; all five required CI jobs passed on exact PR head `c60edd0f16244ab12e6602b9247e4174567f6081` in run `41833221157`. It does not register or start a Runner.
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` and post-merge #6 run `41598989190` passed all five required job types.
 - PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Both post-merge runs `41601055518` (push) and `41601064135` (pull_request) subsequently passed all five job types.
 - PR #21 corrected stale Tindex quota wording and added a mocked regression test. All five required exact-head job types passed on `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9` (run `41601260850`); it was merged into #6 at `21c591223c9e7d61e6046a06f51522e979530f08`.
@@ -21,7 +22,7 @@
 - PR #23 reconciled the current Tindex quota evidence: official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, while the MarketSage client retains its stricter local 1/minute and 100-success/day cap. Its exact-head run `41792758377` passed all five jobs; it merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-merge PR run `41793156231` passed all five jobs.
 - PR #24 removes Binance Spot from default probes and hard-blocks explicit discovery requests after owner-reported Iran-network HTTP 451; the runner returns `blocked_owner_reported_http_451` with `requests_attempted=0`. No network request or alternate route was used. Exact-head run `41796133083` passed all five required jobs; PR #24 merged into #6 at `e19d65840d9112362209a23ea53c7fcf608c0720`; post-merge run `41796506276` passed all five jobs.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
-- PR #15 governance remains Draft; its documents are updated through PR #24 and record the private-repository branch-protection plan blocker and owner-reported host preparation, but the PR is not merged.
+- PR #15 governance remains Draft; its documents are being reconciled with PR #27 and the latest owner terminal evidence. They are not yet adopted on `main`.
 - The governance documents referenced in this state file currently exist on PR #15's `governance/execution-constitution-v1` branch; PR #15 is still Draft and these files are not present on the default `main` branch. They are therefore a working continuity record, not yet an adopted default-branch policy.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
 
@@ -67,6 +68,7 @@ main
 | #22 | PR run `41602083315` and push run `41602045431` passed all five required job types; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` | Merged into #6 |
 | #23 | Exact-head run `41792758377` passed all five required jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d`; post-merge PR run `41793156231` passed all five jobs | Merged into #6 |
 | #24 | Exact-head PR run `41796133083` and post-merge PR run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` | Merged into #6 |
+| #27 | Exact-head PR run `41833221157` passed all five required jobs; merge `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767` | Merged to `main`; manual-only workflow; Runner not registered |
 
 ## Source and dataset evidence
 
@@ -119,14 +121,17 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Local execution and Runner blocker
 
-- The Runner is installed as files only under `/opt/actions-runner/marketsage`, version 2.338.2. The account `marketsage-runner` is UID 110/GID 119, shell `nologin`, member only of its own group, and absent from `sudo`, `docker`, `lxd` and `adm`.
-- Host audit on 2026-11-04 found no `.runner`, `.credentials` or `.credentials_rsaparams` markers, no installed/loaded Runner service, and no active Runner.Listener/Worker/runsvc process. The general `/home/nima` tree is not traversable by the Runner account. No registration token is reusable: the token previously pasted in chat is considered compromised.
-- Dataset staged at `/srv/marketsage/data/tsetmc_history_20261022`: 8,801 source files plus `SHA256SUMS` and `STAGING_README.txt` (8,803 files total). All 8,801 source-file hashes were verified during copy and re-verified before publishing. Adjusted research-only candidate series were excluded; the original source tree was not modified.
-- Dataset files are `0440`, directories `2750`, group `marketsage-runner`. As that account, representative raw, normalized, report, pipeline metadata, discovery, reconciliation and acceptance files were read and hash-checked; JSON and CSV parsing passed. Writes to the data root and normalized files were denied. The account successfully wrote and removed a test file under the separate `/srv/marketsage/output` directory.
-- GitHub Issue #25 was resolved at the owner-decision level on 2026-11-04: the owner authorized Option 2, a manual-only compensating-control model with explicitly accepted residual risk. This is not equivalent to private branch protection/rulesets; no paid plan, public visibility or Free Organization migration is assumed.
-- PR #15 remains Draft and is the single governance PR. It now records the owner decision, the residual risk, and the completed host/data permissions evidence. PR #26 was a duplicate created during the update and has been closed as superseded by #15.
-- The local Runner is **still unregistered and offline**. No credentials, systemd service, self-hosted workflow target or local-data workflow has been created. The remaining gate is to inventory and review the actual current workflow files and triggers, add and validate a separate manual-only workflow, complete final host/service hardening, and only then register with a fresh token entered locally.
-- No local pipeline has yet been run under GitHub Actions. The staged dataset is available to the restricted OS account, but source approval, legal/terms review, backtest admission, ranking/scoring and production approval remain false/disabled.
+- Dedicated account: `marketsage-runner`, UID 110/GID 119, shell `nologin`, member only of its own group and absent from `sudo`, `docker`, `lxd` and `adm`. The general `/home/nima` tree is not traversable by this account.
+- Latest owner-provided terminal evidence corrects the earlier package-location note: `~/actions-runner/actions-runner-linux-x64-2.338.2.tar.gz` is 228,071,396 bytes and extracted files (`config.sh`, `run.sh`, `bin`, `externals`) are present in that personal directory. The extracted executable timestamps are from 2026-10-26, so their correspondence/version relative to the 2026-11-04 archive has not been verified.
+- `/opt/actions-runner/marketsage` currently contains only a 9,719,808-byte partial archive; no extracted `config.sh` or `run.sh` is present there. The Runner is therefore **not installed in its designated location**. Do not copy the personal directory's `.env`, `.path` or `_diag` files into the dedicated installation.
+- No Runner service or active Runner process was found in the latest owner-provided terminal output. No repository-level Runner is registered or online. A registration token previously pasted into chat is compromised and must never be reused; any registration must use a fresh token entered locally only.
+- Dataset staged at `/srv/marketsage/data/tsetmc_history_20261022`: 8,801 source files plus `SHA256SUMS` and `STAGING_README.txt` (8,803 files total). The owner previously reported all 8,801 source-file hashes verified, adjusted research-only candidate series excluded, and source tree unchanged.
+- Dataset files are `0440`, directories `2750`, group `marketsage-runner`. Owner-reported tests showed representative reads/hash/JSON/CSV checks passing, data writes denied, and a separate `/srv/marketsage/output` write/create/delete test passing. These remain owner-supplied terminal results, not an independent penetration test.
+- The owner selected the manual-only compensating-control model in Issue [#25](https://github.com/yarsalam/marketsage/issues/25). This accepts residual risk but is not equivalent to private branch protection/rulesets. Live GitHub branch metadata still reports `main.protected=false`.
+- Workflow inventory and review: `main` has `.github/workflows/ci.yml`, whose jobs run on `ubuntu-latest`; no existing general CI job targets self-hosted. The PR #8 TSETMC smoke workflow on the integration branch also uses `ubuntu-latest` and remains parked after ConnectTimeout. PR #27 adds the only local workflow: `workflow_dispatch` only, default-branch/owner/explicit-confirmation gates, labels `self-hosted, linux, x64, marketsage-local, marketsage-research`, `contents: read`, full-SHA-pinned checkout, no secrets, provider probes or artifact upload. It writes a sanitized validator report locally.
+- PR #27's first workflow validates the staged dataset inventory and all 8,801 hashes; it does **not** yet execute the full PR #14 integrated TSETMC acceptance pipeline. That remains a later, separately reviewed workload after the first validator and host environment are verified.
+- The GitHub-side workflow gate is complete, but the Runner must remain unregistered/offline until the full archive is hash-verified and freshly extracted under `/opt/actions-runner/marketsage`, service/workspace isolation is applied, and a final no-credentials/no-process audit passes. Owner action is tracked in [Issue #25](https://github.com/yarsalam/marketsage/issues/25).
+- No local pipeline has run under GitHub Actions. Source approval, rights approval, backtest admission, ranking/scoring and production approval remain false/disabled.
 
 ## Independent work completed in this execution — 2026-11-04
 
@@ -150,15 +155,16 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Keep raw datasets, credentials and private captures outside Git.
 - PR #8 remains parked; do not repeat the same GitHub-hosted TSETMC live probe from the same network.
 - PR #6 remains open at the `main` boundary and must not be merged without explicit owner approval.
-- The local Runner must remain unregistered/offline until the exact workflow inventory, manual-only workflow review and final host checks pass.
+- The local Runner must remain unregistered/offline until the designated install is populated from the verified archive, service/workspace isolation and final host checks pass.
 
 ## Next actions
 
-1. Inventory the actual current `.github/workflows` files from the active local checkout; inspect every trigger, `runs-on`, permission, action reference, checkout ref, secret reference and event path. Keep all existing CI on GitHub-hosted runners.
-2. Add a separate `workflow_dispatch`-only local research workflow with explicit ref/event guards, immutable action SHAs, `contents: read`, no secrets, concurrency control and sanitized-output validation. Review the exact workflow commit and record the approval before dispatch.
-3. Complete final Runner service/workspace isolation and disable/unregister procedure; confirm the registration directory still has no credentials or active process. Then register the repository-scoped Runner using a fresh token entered locally only.
-4. Run one bounded offline TSETMC integrated acceptance pipeline against the staged corpus. Compare its exact discovery scope with the prior 47-instrument diagnostic and 1,220-history inventory; preserve inputs and fail closed on ambiguous data.
-5. Review corporate-action/date-gap evidence and rights/units/point-in-time semantics. Do not regenerate candidate histories or silently repair data.
-6. Attribute the 2023-10 to 2024-03 Stage 4 outlier using the same pinned dataset hash and configuration; do not inspect the locked holdout for tuning.
-7. Only after data gates pass, run a locked chronological evaluation with realistic costs/slippage, drawdown and predeclared baselines. Keep scoring, ranking, production deployment and real-money activity disabled.
-8. Keep PR #15 Draft pending its review and required checks. Do not merge PR #6 into `main` without explicit owner approval.
+1. Verify the SHA-256 of the full local v2.338.2 archive against GitHub's published digest, then extract a fresh copy directly into `/opt/actions-runner/marketsage` as `marketsage-runner`; do not copy personal `.env`, `.path` or diagnostics.
+2. Apply service/workspace isolation, a dedicated `_work` directory, cleanup and emergency stop/unregister procedure; confirm the service runs as `marketsage-runner` without sudo or privileged groups.
+3. Perform a final local check for stale credentials/processes, then repository-scope register with a fresh token entered locally and custom labels `marketsage-local,marketsage-research`.
+4. Before first dispatch, owner reviews the exact current `main` SHA and PR #27 workflow, then manually confirms the bounded offline dataset validator.
+5. After the validator report is reviewed, add/review a separate manual workflow for the full PR #14 integrated offline TSETMC acceptance pipeline; compare discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory.
+6. Continue source rights, units, quote convention, publication/revision timestamps, history and independent reconciliation review; do not silently repair data.
+7. Attribute the 2023-10 to 2024-03 Stage 4 outlier using the same pinned dataset hash/configuration; do not inspect the locked holdout for tuning.
+8. Run locked chronological evaluation only after source/data gates pass, with predeclared baselines, realistic costs/slippage, drawdown and point-in-time controls. Keep scoring/ranking/deployment/trading disabled.
+9. Keep PR #15 Draft until its updated governance docs and required checks are reviewed. Do not merge PR #6 into `main` without explicit owner approval.
