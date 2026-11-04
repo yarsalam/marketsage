@@ -3,7 +3,9 @@
 
 This script never changes source approval, saves provider raw payloads, prints
 quotes, or puts credentials in a report. Live probes are small and opt-in by
-source; the default probes only four public-access candidates.
+source. Binance remains explicitly supported but is excluded from default probes
+because the owner reported HTTP 451 from the Iran network; do not retry the same
+route or seek alternate hosts without a changed access/legal basis.
 """
 from __future__ import annotations
 
@@ -36,10 +38,10 @@ DEFAULT_SOURCES = (
     "iran.tsetmc",
     "iran.codal",
     "global.world_bank_indicators",
-    "global.binance_spot_public",
 )
 SUPPORTED_SOURCES = (
     *DEFAULT_SOURCES,
+    "global.binance_spot_public",  # explicit opt-in only; Iran-network probe returned HTTP 451
     "iran.tindex.public_api",
     "iran.tindex.candles",
     "us.fred.alfred",
