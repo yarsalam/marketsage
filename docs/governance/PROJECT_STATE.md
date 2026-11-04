@@ -216,3 +216,9 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Integration PR #6 remains open and must not be merged to `main` without explicit owner authorization. Its latest recorded integration head after PR #30 is `819f8b4028469cb0d498098fec88545a18ebacc6`; post-merge PR run `41851276790` and push run `41851269421` passed all five required jobs.
 - Runner remains unregistered/offline. Owner action is tracked in Issue #25: verify the complete v2.338.2 archive digest, freshly extract into `/opt/actions-runner/marketsage` as `marketsage-runner`, complete workspace/service isolation and final audit, then use a fresh repository registration token entered only in the local terminal. Never reuse the token previously exposed in chat.
 - No source approval, backtest approval, ranking/scoring, production deployment, broker access or trading is authorized.
+
+
+### Clean governance adoption — 2026-11-04
+
+- PR #31 is the clean documentation-only replacement for PR #15, based on current `main` and containing only the five governance documents. PR #15's branch is 101 commits ahead and 89 behind current `main`; do not merge it as-is.
+- PR #31 remains Draft until its exact-head CI and documentation review are complete. Runner remains unregistered/offline; the only outstanding activation prerequisite is owner-side host installation, isolation and fresh-token registration recorded in Issue #25.
