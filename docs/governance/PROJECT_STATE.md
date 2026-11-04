@@ -1,12 +1,12 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-03  
+**Snapshot date:** 2026-11-04  
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Default branch:** `main`  
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
-**Integration HEAD:** `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`  
-**Post-#22 integration CI:** push run `41602459792` and PR run `41602467771` both passed all five required job types on exact head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`.  
+**Integration HEAD:** `a2e19c156f226241a34658d32d25e93173c99a5d`  
+**Post-#23 integration CI:** PR run `41793156231` passed all five required job types on exact head `a2e19c156f226241a34658d32d25e93173c99a5d`; PR #23's exact-head run `41792758377` passed all five jobs before merge.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
@@ -17,9 +17,10 @@
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` and post-merge #6 run `41598989190` passed all five required job types.
 - PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Both post-merge runs `41601055518` (push) and `41601064135` (pull_request) subsequently passed all five job types.
 - PR #21 corrected stale Tindex quota wording and added a mocked regression test. All five required exact-head job types passed on `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9` (run `41601260850`); it was merged into #6 at `21c591223c9e7d61e6046a06f51522e979530f08`.
-- PR #22 added five official global source candidates (ECB, US Treasury, EIA, SEC EDGAR and IMF) with rights/time/history caveats and fail-closed registry tests. All five required job types passed on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in PR run `41602083315` and push run `41602045431`; it was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Post-merge push run `41602459792` is queued.
+- PR #22 added five official global source candidates (ECB, US Treasury, EIA, SEC EDGAR and IMF) with rights/time/history caveats and fail-closed registry tests. All five required job types passed on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in PR run `41602083315` and push run `41602045431`; it was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Both post-merge runs `41602459792` and `41602467771` passed all five job types.
+- PR #23 reconciled the current Tindex quota evidence: official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, while the MarketSage client retains its stricter local 1/minute and 100-success/day cap. Its exact-head run `41792758377` passed all five jobs; it merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-merge PR run `41793156231` passed all five jobs.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
-- PR #15 governance remains Draft; its documents are updated on the governance branch, but the PR is not merged.
+- PR #15 governance remains Draft; its documents are updated through PR #23 and now record the private-repository branch-protection plan blocker, but the PR is not merged.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
 
 ## Verified integration graph
@@ -33,18 +34,21 @@ main
        ├─ #14 integrated offline TSETMC acceptance     [merged]
        ├─ #16 source-evidence reconciliation           [merged]
        ├─ #17 Stage 4 cost-sensitivity correction      [merged]
-       └─ #18 monthly-calendar continuity validation  [merged]
+       ├─ #18 monthly-calendar continuity validation  [merged]
+       ├─ #19 source-evidence refresh                   [merged]
+       ├─ #20 TSETMC identity crosswalk                 [merged]
+       ├─ #21 Tindex quota wording correction           [merged]
+       ├─ #22 official global source candidates         [merged]
+       └─ #23 Tindex quota evidence reconciliation     [merged]
 
 #8  research/iran-free-data-smoke                    [open; parked]
 #15 governance/execution-constitution-v1              [open; Draft]
-#19 research/2026-11-03-source-evidence-refresh       [merged into #6]
-#20 fix/tsetmc-identity-crosswalk-discovery            [open; CI in progress]
 ```
 
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`; post-#22 runs `41602459792` / `41602467771` both passed all five required jobs | Open; do not merge to main |
+| #6 | Head `a2e19c156f226241a34658d32d25e93173c99a5d`; post-#23 PR run `41793156231` passed all five required jobs | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -58,6 +62,7 @@ main
 | #20 | Exact-head run `41600402263` passed all five required job types; merge `4191dd3715173265193163e30281ab555b9d12fb` | Merged into #6 |
 | #21 | Exact-head run `41601260850` passed all five required job types; merge `21c591223c9e7d61e6046a06f51522e979530f08` | Merged into #6 |
 | #22 | PR run `41602083315` and push run `41602045431` passed all five required job types; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` | Merged into #6 |
+| #23 | Exact-head run `41792758377` passed all five required jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d`; post-merge PR run `41793156231` passed all five jobs | Merged into #6 |
 
 ## Source and dataset evidence
 
@@ -75,7 +80,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 ### Other Iran candidates
 
 - **Nerkhsanj:** prior owner-reported capture parsed 28 candidate keys / 91,245 rows. The reported audit flagged 182 adjacent moves >=20%, including 48 >=100%, concentrated in IQD, silver and Tether. IQD had a 373-day maximum gap; silver, Tether and Bitcoin had gaps up to 84 days. Keep IQD/silver/Tether excluded from feature generation; keep Bitcoin as a coverage warning. These are sanitized owner-reported summaries, not a fresh raw-data audit. Lineage, attribution, rights, units and independent reconciliation remain unresolved.
-- **Tindex:** documented free-tier limits remain 1 request/minute and 100 successful requests/day, shared account-wide; history is capped at 100 days. Previously reviewed public docs distinguish TSE stock-price endpoints in Rial from other Markets & Indicators values in Toman since 2026-07-20 and describe a 1,644-active-instrument stock screener. Actual account-specific access is unverified; do not bulk-crawl or mix endpoint unit families.
+- **Tindex:** official English and Persian docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, with one active token; HTTP 429 rejections do not count toward the daily quota. MarketSage deliberately retains a stricter local cap of 1 request/minute and 100 successful requests/day. Indicator history/candles remain capped at 100 days. Docs distinguish TSE stock-price endpoints in Rial from other Markets & Indicators values in Toman since 2026-07-20 and describe a 1,644-active-instrument stock screener. Actual account-specific access, rights and unit reconciliation remain unverified; do not bulk-crawl or mix endpoint unit families.
 - **CODAL:** discovery adapter only. Retrieval time is not publication time; original/corrected filing linkage, publication timestamps and automated-use rights remain unresolved.
 - **TGJU / physical gold / free FX:** discovery candidates only. Automated collection rights, free-vs-official FX definition, quote side, units, timestamps and lawful independent reference remain unresolved.
 - **Iran official macro:** Central Bank / Statistical Center remain candidates; machine-readable historical coverage, release time, revisions and definitions are not accepted.
@@ -104,11 +109,11 @@ This section distinguishes committed documentation and previously shared sanitiz
 ## Local execution and Runner blocker
 
 - No trusted local Runner is registered. The owner's local raw corpus and Stage 4 monthly input are not available to this execution.
-- The connected GitHub integration cannot configure or verify private repository rulesets/branch protection in the current account. All inspected branches remain unprotected.
-- The Runner trust boundary is documented in `LOCAL_RUNNER_TRUST_BOUNDARY.md`. Before activation, owner-side branch protection, a dedicated unprivileged OS account, restricted read/write data directories, repository-scoped ephemeral Runner and a separate trusted `workflow_dispatch` workflow are required.
+- The connected GitHub integration cannot configure or verify private repository rulesets/branch protection in the current account. GitHub's current plan docs say private-repository branch protection/rulesets require Pro, Team or Enterprise; moving to a Free Organization alone does not resolve this. All inspected branches remain unprotected.
+- The Runner trust boundary is documented in `LOCAL_RUNNER_TRUST_BOUNDARY.md`. Before activation, either private-repository branch protection or an explicitly approved revised trust model, a dedicated unprivileged OS account, restricted read/write data directories, repository-scoped ephemeral Runner and a separate trusted `workflow_dispatch` workflow are required.
 - Until those controls are verified, local TSETMC acceptance, local event/gap-ledger review and empirical Stage 4 execution remain **BLOCKED**. No local audit is claimed.
 
-## Independent work completed in this execution — 2026-11-03
+## Independent work completed in this execution — 2026-11-04
 
 - Reviewed the live repository, PR graph and governance documents.
 - Confirmed PR #14 is already merged into #6 and the post-#18 #6 CI run passed all five required job types.
@@ -118,6 +123,8 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Static review found the PR #14 discovery runner did not consume the corpus's preferred `corpus_reconciliation_v2/instrument_details.jsonl` ISIN → insCode map. PR #20 added unique candidate identity resolution, v2-over-v1 precedence, ambiguity quarantine and SHA-256 provenance; exact-head CI passed and it was merged at `4191dd3715173265193163e30281ab555b9d12fb`. It does not create identity evidence or enable research/scoring.
 - PR #21 fixes two stale Tindex quota descriptions in `discover_free_datasets.py` that still referred to a three-request/minute limiter despite the connector enforcing 1 request/minute and 100 successful requests/day. Its exact-head CI passed all five job types and it was merged at `21c591223c9e7d61e6046a06f51522e979530f08`. No Tindex endpoint was contacted.
 - PR #22 reviewed official documentation for ECB, US Treasury, EIA, SEC EDGAR and IMF; added five candidates, source-specific rights/time/history gates, and fail-closed regression tests. No data API was called, no key was used, and no adapter/default probe was added.
+- Rechecked Tindex's official English and Persian API documentation on 2026-11-04. The published account quota is 3 requests/minute and 300 requests/day (429 responses do not consume the daily quota), not the older 1/100 snapshot. Updated the source catalog and registry to version 1.1.1 and exposed provider-published versus local-enforced quotas in status output; the local 1/100 guard was not relaxed. PR #23 passed all five exact-head jobs and merged into #6; no token or API request was used.
+- Verified from GitHub's current plan documentation that private repositories need Pro/Team/Enterprise for branch protection/rulesets; a Free Organization does not remove this blocker. Updated the Runner trust-boundary document. Runner registration and local data access remain blocked pending an owner-approved plan or revised trust model.
 
 ## Operating constraints
 
@@ -130,8 +137,8 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. Post-#21 integration CI was green on #6 head `21c591223c9e7d61e6046a06f51522e979530f08`: both runs `41601942608` and `41601948914` passed all five required job types.
-2. PR #22 passed all five required job types on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in both PR and push runs and was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Both post-merge runs `41602459792` and `41602467771` passed all five required jobs on exact #6 head.
+1. PR #23 passed all five required job types on exact head `f400166fb184ee1d23ec3905a5d4f1c8a71f86e1` in run `41792758377` and merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`. Post-merge PR run `41793156231` passed all five required jobs on the exact integration head.
+2. PR #22's post-merge runs `41602459792` and `41602467771` both passed all five required jobs on the preceding integration head `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`.
 3. Keep PR #15 Draft and update this state/register after each material transition.
 4. Resolve the Runner trust boundary before any local data execution; do not register a Runner on an unprotected branch or arbitrary PR workflow.
 5. Once trusted local execution is available, compare the exact PR #14 runner/discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory, then run the integrated offline pipeline once against the designated corpus.
