@@ -243,9 +243,11 @@ def _run_one(
                 ) else "probe_failed",
                 requests_attempted=len(slugs),
                 results=results,
-                note=("At most one candle request is attempted per invocation; the provider quota is "
-                      "account-wide (1 request/minute, 100 successful requests/day). The local guard "
-                      "is process-memory only."),
+                note=("At most one candle request is attempted per invocation; provider docs publish "
+                      "3 requests/minute and 300 requests/day per account (429 rejections do not "
+                      "consume the daily quota). MarketSage applies a stricter local cap of "
+                      "1 request/minute and 100 successful requests/day; the local guard is "
+                      "process-memory only and cannot enforce account-wide usage."),
             )
         elif source_id == "us.fred.alfred":
             with FredAlfredClient(timeout=15.0) as client:
@@ -302,7 +304,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--tsetmc-query", action="append",
                         help="Exact TSETMC instrument-name search query; may be repeated, maximum 20.")
     parser.add_argument("--tindex-slug", action="append",
-                        help="Single Tindex candle slug per run; current free tier allows one request/minute.")
+                        help="Single Tindex candle slug per run; the local conservative cap is one request/minute.")
     return parser.parse_args(argv)
 
 
