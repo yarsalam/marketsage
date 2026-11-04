@@ -4,11 +4,11 @@ This document tracks integration status and acceptance gates for the currently i
 
 ## Tindex public API (free-tier)
 
-The Tindex connector is opt-in and read-only. It uses the documented HTTPS origin `https://tindex.app` and a Bearer token from environment variables. The local client enforces the conservative free-tier ceiling of 1 request/minute and 100 successful requests/day with a process-memory guard; this guard is not persistent and cannot account for other processes or hosts using the same account. Provider-side quota remains authoritative. The official developer page documents indicator categories including currency, precious metals, crypto, stock/energy indices, housing, automotive and macro-economy; this category list does not prove that every series is exposed to the current account or has usable historical coverage. Do not request undocumented routes or bypass unavailable endpoints through scraping. HTTP 410 remains disabled, and 401/403/410/429 are not retried.
+The Tindex connector is opt-in and read-only. It uses the documented HTTPS origin `https://tindex.app` and a Bearer token from environment variables. The official developer page (English and Persian, rechecked 2026-11-04) publishes 3 requests/minute and 300 requests/day per account, with one active token; HTTP 429 rejections do not count toward the daily quota. MarketSage deliberately enforces a stricter local ceiling of 1 request/minute and 100 successful requests/day. This process-memory guard is not persistent and cannot account for other processes or hosts using the same account; provider-side account quota remains authoritative. The official developer page documents indicator categories including currency, precious metals, crypto, stock/energy indices, housing, automotive and macro-economy; this category list does not prove that every series is exposed to the current account or has usable historical coverage. Do not request undocumented routes or bypass unavailable endpoints through scraping. HTTP 410 remains disabled, and 401/403/410/429 are not retried.
 
 A real authenticated request to `/api/public/currency-rates` previously returned HTTP 200 with `success` (boolean) and `data` (list); observed records contained `key` (string), `name` (string), `rate` (integer or float), and `decimals` (integer). `tindex_normalizer.py` validates these types and preserves `rate` as Decimal. The current public Tindex docs now state that currency-rate `rate` values are expressed in Toman per quoted unit, and that since 2026-07-20 values in Markets & Indicators are returned in Toman. However, until the user's currently enabled account payload and a second lawful reference are reconciled, the normalized `unit` must remain unknown and `eligible_for_scoring=False`. Official/free-market meaning, history completeness, licensing, and model-training permission remain unapproved.
 
-**Current public-docs quota update (2026-10-20):** Free tier documents 1 request/minute and 100 successful requests/day, with one active token. This supersedes the earlier 3/minute and 300/day values recorded in older project notes. Cache responses and avoid repeated live probes. The local process-memory guard cannot enforce account-wide quotas across machines or processes.
+**Quota recheck (2026-11-04):** The official English and Persian developer pages now both publish 3 requests/minute and 300 requests/day per account, with one active token; HTTP 429 rejections do not count toward the daily quota. This supersedes the 2026-10-20 documentation snapshot that listed 1/100. MarketSage deliberately retains a stricter local cap of 1 request/minute and 100 successful requests/day until a separate bounded account-level verification is approved. The process-memory guard cannot enforce the account-wide quota across machines or processes. Repeated fair-use violations can still lead to account-level 403 disablement, so do not raise the local cap based only on the published quota.
 
 Focused test command from `user/analysis-engine`:
 
@@ -138,7 +138,7 @@ else
 fi
 ```
 
-The Tindex probe makes one request to the documented USD indicator-history endpoint; respect the current provider docs' conservative 1 request/minute and 100 successful requests/day limits.
+The Tindex probe makes one request to the documented USD indicator-history endpoint; respect the provider's published account limit of 3 requests/minute and 300 requests/day; the MarketSage client applies the stricter local cap of 1 request/minute and 100 successful requests/day.
 
 ### External providers — VPN ON
 
