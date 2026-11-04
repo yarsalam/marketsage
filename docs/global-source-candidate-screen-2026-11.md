@@ -1,9 +1,9 @@
 # MarketSage — Global Official Source Candidate Screen
 
-**Review date:** 2026-11-03  
-**Scope:** official, machine-readable candidates for global macro, FX, rates, energy and issuer events  
+**Review date:** 2026-11-04  
+**Scope:** official candidates for global macro, FX, rates, energy, commodity benchmarks and issuer events  
 **Evidence mode:** official documentation review only; no API probes, no local data access, no credentials used  
-**Decision:** five candidates added to the catalog/registry as research-only. None is approved for production scoring.
+**Decision:** six candidates added to the catalog/registry as research-only. None is approved for production scoring.
 
 This screen separates four questions: (1) is a documented machine-readable access path available, (2) what history and temporal metadata exist, (3) what reuse/attribution constraints are documented, and (4) whether the series represents a tradable price or only macro/event context. Public or free access is not a general redistribution license.
 
@@ -16,6 +16,7 @@ This screen separates four questions: (1) is a documented machine-readable acces
 | 3 | EIA API v2 | Oil/energy regime variables: petroleum, natural gas, electricity, production, inventories and trade | Free API v2; registration/API key required. Series vary across hourly, weekly, monthly and annual frequency. API v2 supports date, frequency and facet filters; bulk downloads do not require a key. | API use is subject to EIA Terms of Service. EIA government information is generally public domain with acknowledgment, but third-party contributed/licensed material may remain protected. Release calendar, revisions and series units must be audited. Energy statistics are not necessarily tradable oil-price series. | Strong macro/energy candidate after secure key setup and one-series contract audit. |
 | 4 | SEC EDGAR submissions and XBRL APIs | US issuer filings, fundamentals and corporate-event context | Public `data.sec.gov` submissions/XBRL APIs require no API key. EDGAR public indexes extend to 1994Q3; company submissions include at least one year or 1,000 recent filings, with additional history files. APIs update through the day. | Fair Access: at most 10 requests/second per user across machines; declare a descriptive User-Agent and avoid unclassified bots. Acceptance time and public availability are distinct; SEC guidance says documents often appear 1–3 minutes after acceptance, with no guarantee. Post-acceptance corrections/deletions can alter later indexes. | High-value issuer-event candidate, but not a market-price feed. Verify field mapping, amendments, XBRL contexts/units and replay semantics. |
 | 5 | IMF Data API (SDMX 2.1/3.0) | International macro, balance-of-payments and monetary statistics | IMF documents SDMX 2.1 and 3.0 APIs. The public API page directs users to a Swagger explorer that requires a beta portal account. | The account requirement for API exploration does not establish anonymous endpoint access or the exact authentication/quota contract. Dataflow history, revision/vintage, release time, reuse rights and country/series definitions remain unresolved. | Medium-priority discovery candidate. Resolve API access and one dataflow contract before any probe or adapter. |
+| 6 | World Bank Commodity Markets Pink Sheet | Monthly global commodity regime context for gold, silver, crude oil, natural gas and other benchmarks | Official Commodity Markets page lists monthly and annual XLS workbooks; the reviewed page displayed an October 2026 monthly workbook and a 2026-11-03 next-update date. The workbook itself was not downloaded/parsed; exact series coverage and units remain unverified. | Monthly observation month is not publication/availability time; series have distinct units/benchmarks; historical workbook revisions and per-series third-party rights must be audited. World Bank dataset terms default to CC BY 4.0 for World Bank-produced open data but allow exceptions. | Useful monthly macro context only, not a daily tradable-price feed. Keep candidate-only until workbook metadata, vintages, units, missing periods and per-series rights pass. |
 
 ## Source-specific acceptance contracts
 
@@ -90,11 +91,30 @@ Required before use:
 4. Review dataset-specific reuse conditions and preserve the original metadata.
 5. Start with one dataflow and a short period; no broad catalog crawl.
 
+### World Bank Commodity Markets Pink Sheet
+
+Official references:
+- [Commodity Markets / Pink Sheet](https://www.worldbank.org/en/research/commodity-markets)
+- [World Bank Terms of Use for Datasets](https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets)
+- [World Bank Data Access and Licensing](https://datacatalog.worldbank.org/public-licenses)
+
+The official page lists separate monthly and annual XLS workbooks. On 2026-11-04 the page displayed an October 2026 monthly workbook and a next-update date of 2026-11-03, but no newer workbook link was visible in the retrieved page. The XLSX itself could not be parsed or downloaded in this review; exact observation end date, series count, units, coverage by commodity, missing-value tokens and workbook revision details are therefore not certified.
+
+Required before use:
+1. Discover the current workbook link from the official landing page; record retrieval time, release label, URL, file hash and workbook version rather than hardcoding an old document URL.
+2. Parse per-series source/description metadata, benchmark definition, currency, unit and quotation basis. Do not infer a unit from a ticker or generic commodity map.
+3. Keep nominal price, real price, price index and annual average as distinct data kinds.
+4. Store observation month separately from first-publication/availability time. A monthly label is not proof that the value was available at month-end.
+5. Preserve immutable workbook vintages and diff historical revisions; the current file alone may not support point-in-time replay.
+6. Audit each series' start/end month, missing observations, discontinuations and methodology changes.
+7. Verify per-series rights and upstream attribution. World Bank dataset terms say CC BY 4.0 is the default for World Bank-produced open datasets, but third-party components may carry different licenses.
+8. Use only for low-frequency global commodity context. Keep it separate from daily EIA spot statistics, futures, ETF prices and local Iran gold/FX series; do not splice benchmarks.
+
 ## Integration and operating decision
 
-- The catalog and source registry now include these five official-source candidates. All are `candidate_requires_validation`, `used_by_research_engine=false`, `approved_for_production=false`, and excluded from default live probes.
+- The catalog and source registry now include these six official-source candidates. All are `candidate_requires_validation`, `used_by_research_engine=false`, `approved_for_production=false`, and excluded from default live probes.
 - No adapters, schedules, live probes or credentials were added in this review.
 - Before any foreign live-source request, the operator must be reminded to turn VPN ON. This screen used official documentation pages only and did not contact data APIs.
-- Candidate value is complementary, not interchangeable: ECB/Treasury provide reference rates, EIA/IMF provide macro context, and SEC provides issuer events/fundamentals. None fills the missing Iranian daily tradable-price history.
+- Candidate value is complementary, not interchangeable: ECB/Treasury provide reference rates, EIA/IMF provide macro context, the Pink Sheet provides monthly commodity benchmarks, and SEC provides issuer events/fundamentals. None fills the missing Iranian daily tradable-price history.
 - A candidate can advance only after a bounded source-contract test, rights review, unit/time/history audit and independent reconciliation. A green parser or CI run cannot approve it.
 - Investment ranking and source scoring remain fail-closed.
