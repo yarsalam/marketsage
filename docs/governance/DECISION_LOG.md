@@ -106,3 +106,25 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 **Capital-risk impact:**  
 **Implementation PR/commit:**  
 **Supersedes:** (if any)
+
+
+## 2026-11-05 — Local Runner activated and staged TSETMC corpus validated
+
+**Decision authority:** Owner-approved manual-only compensating-control model (Issue #25, 2026-11-04); routine host hardening and bounded research execution delegated under the project constitution.  
+**Status:** Implemented for the Runner activation and first offline validator only.
+
+**Evidence**
+- Registered the repository-level Runner marketsage-local-01 for yarsalam/marketsage, with the custom labels marketsage-local and marketsage-research.
+- Installed and enabled actions.runner.yarsalam-marketsage.marketsage-local-01.service under the unprivileged marketsage-runner account.
+- Retained ProtectHome=true, ProtectSystem=strict, PrivateTmp=true, NoNewPrivileges=true, kernel/module/control-group protections, read-only staged data and restricted write paths.
+- Removed only RestrictSUIDSGID after an observed GNU tar 1.35 Function not implemented checkout failure. A nested tar extraction test passed inside a hardened systemd sandbox before restarting the Runner.
+- The first manual local validator run [41906518123](https://github.com/yarsalam/marketsage/actions/runs/41906518123), attempt 2, completed successfully. It verified all 8,801 staged source SHA-256 entries and 1,268,527,673 source bytes; inventoried 2,493 instrument-universe rows; made zero provider/network requests; and did not modify the dataset.
+- The validator retained eligible_for_scoring=false and approved_for_backtest=false.
+
+**Decision effect**
+- Issue #25's Runner installation/registration and first-validator acceptance criteria are complete.
+- A separate, reviewed manual workflow is being prepared for the PR #14 integrated offline TSETMC candidate pipeline. Its pipeline code is pinned to integration commit 819f8b4028469cb0d498098fec88545a18ebacc6; PR #6 itself remains open and must not be merged into main without separate owner approval.
+- The integrated pipeline run, source rights, raw/adjusted semantics, corporate-action completeness, independent reconciliation, point-in-time validity, Stage 4 attribution and investment strategy acceptance remain pending.
+- No source approval, backtest approval, investment ranking/scoring, production deployment, broker access, portfolio allocation or real-money trading is authorized by this decision.
+
+**Capital-risk impact:** None. This is an engineering/data-integrity milestone, not an investment decision.
