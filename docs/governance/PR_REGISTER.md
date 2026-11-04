@@ -132,8 +132,14 @@ Merge dependent PRs sequentially after all required jobs pass on the exact curre
 | [#29](https://github.com/yarsalam/marketsage/pull/29) | `feat/tindex-free-data-connector` (integration PR #6) | Exact-head run `41848702070` passed all five required jobs on `3ec83742614bfc1ea283144c15b0063c8ecb51b6`; merged at `fb64e773387f3eb7270d0dd65d8e885c1f26ba0d`. | Merged into #6; post-merge PR run `41849790150` and push run `41849780257` were still running when recorded. |
 
 - PR #14 was already merged into #6; no additional merge was necessary.
-- Current integration head after PR #29 is `fb64e773387f3eb7270d0dd65d8e885c1f26ba0d`. Confirm both post-merge runs before declaring the integration head green.
+- Current integration head after PR #29 is `fb64e773387f3eb7270d0dd65d8e885c1f26ba0d`. Post-merge PR run `41849790150` and push run `41849780257` both passed all five required job types on this exact head.
 - PR #29 adds the World Bank Pink Sheet as a monthly/annual commodity benchmark candidate only. The workbook was not downloaded or parsed; per-series units, benchmark/source lineage, coverage, revisions and first-availability time remain open gates. No source is approved for research-engine use or scoring.
 - PR #6 remains open and must not be merged to `main` without explicit owner authorization. PR #8 remains parked after the GitHub-hosted TSETMC timeout.
 - PR #15 remains Draft; this register and the governance documents are on `governance/execution-constitution-v1`, not `main`.
 - Local Runner activation remains blocked by owner-side installation/registration and final host checks; see [Issue #25](https://github.com/yarsalam/marketsage/issues/25). Latest terminal evidence: full archive/extracted files are under `/home/nima/actions-runner`, while the dedicated `/opt/actions-runner/marketsage` directory contains only a partial archive. No Runner process/service is active and the exposed token must not be reused.
+
+
+### Main/integration divergence — 2026-11-04
+
+- Live compare: main 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767; integration fb64e773387f3eb7270d0dd65d8e885c1f26ba0d; integration is 399 commits ahead / 2 behind. The main-only commits are PR #27's manual-only offline validator workflow and associated change. No branch update was attempted. Review the exact diff and conflicts before syncing.
+- PR #29 is merged into #6 and both post-merge runs passed all five jobs. PR #6 remains open; do not merge it to main without explicit owner approval.
