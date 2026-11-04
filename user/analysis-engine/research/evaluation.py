@@ -69,11 +69,89 @@ def _net_equal_weight_buy_hold_returns(
 
 
 def _metric_summary(returns: pd.Series, config: BacktestConfig) -> dict:
+    """Return conventional metrics plus explicitly defined downside/tail measures."""
+    r = returns.dropna().astype(float)
     summary = summarize_returns(
-        returns, config.annualization_periods, config.risk_free_rate_annual
+        r, config.annualization_periods, config.risk_free_rate_annual
     )
-    summary["periods"] = int(returns.dropna().shape[0])
+    summary["periods"] = int(r.shape[0])
+    summary["sortino"] = None
+    summary["annualized_downside_deviation"] = None
+    summary["historical_var_95_monthly_return"] = None
+    summary["historical_expected_shortfall_95_monthly_return"] = None
+    summary["historical_tail_observations"] = 0
+    summary["tail_measure_method"] = "empirical monthly 5th-percentile return; small-sample unstable"
+    if r.empty:
+        return summary
+
+    periodic_rf = (1 + config.risk_free_rate_annual) ** (1 / config.annualization_periods) - 1
+    excess = r - periodic_rf
+    downside = excess.clip(upper=0.0)
+    downside_deviation = float(
+        math.sqrt(float((downside ** 2).mean())) * math.sqrt(config.annualization_periods)
+    )
+    annualized_mean_excess = float(excess.mean() * config.annualization_periods)
+    summary["annualized_downside_deviation"] = downside_deviation
+    if downside_deviation > 0:
+        summary["sortino"] = annualized_mean_excess / downside_deviation
+
+    var_return = float(r.quantile(0.05))
+    tail = r[r <= var_return]
+    summary["historical_var_95_monthly_return"] = var_return
+    summary["historical_expected_shortfall_95_monthly_return"] = float(tail.mean())
+    summary["historical_tail_observations"] = int(tail.shape[0])
     return summary
+
+
+def _portfolio_diagnostics(monthly: pd.DataFrame, input_asset_count: int) -> dict:
+    """Summarize realized portfolio mechanics; cost sums are not compounded P&L drag."""
+    if monthly.empty:
+        return {
+            "rebalance_periods": 0,
+            "average_monthly_l1_turnover": None,
+            "total_l1_turnover": 0.0,
+            "sum_transaction_cost_fractions": 0.0,
+            "sum_slippage_cost_fractions": 0.0,
+            "sum_total_cost_fractions": 0.0,
+            "average_monthly_selected_asset_count": None,
+            "unique_selected_asset_count": 0,
+            "input_universe_asset_count": int(input_asset_count),
+            "unique_selected_asset_coverage_fraction": None,
+            "average_invested_exposure": None,
+            "average_cash_fraction": None,
+            "selected_asset_frequency": {},
+        }
+
+    frequencies: dict[str, int] = {}
+    selected_counts = []
+    for value in monthly["selected_assets"].astype(str):
+        selected = [item for item in value.split(",") if item]
+        selected_counts.append(len(selected))
+        for symbol in selected:
+            frequencies[symbol] = frequencies.get(symbol, 0) + 1
+
+    unique_selected = len(frequencies)
+    return {
+        "rebalance_periods": int(len(monthly)),
+        "average_monthly_l1_turnover": float(monthly["turnover"].mean()),
+        "total_l1_turnover": float(monthly["turnover"].sum()),
+        "max_monthly_l1_turnover": float(monthly["turnover"].max()),
+        "sum_transaction_cost_fractions": float(monthly["transaction_cost"].sum()),
+        "sum_slippage_cost_fractions": float(monthly["slippage_cost"].sum()),
+        "sum_total_cost_fractions": float(monthly["total_cost"].sum()),
+        "average_monthly_selected_asset_count": float(sum(selected_counts) / len(selected_counts)),
+        "unique_selected_asset_count": int(unique_selected),
+        "input_universe_asset_count": int(input_asset_count),
+        "unique_selected_asset_coverage_fraction": (
+            float(unique_selected / input_asset_count) if input_asset_count else None
+        ),
+        "average_invested_exposure": 1.0,
+        "average_cash_fraction": 0.0,
+        "selected_asset_frequency": dict(sorted(frequencies.items())),
+        "turnover_convention": "L1 gross traded weight (buys plus sells)",
+        "cost_sum_note": "Sum of per-period cost fractions; not compounded portfolio return drag.",
+        "exposure_note": "The current long-only strategy is fully invested each rebalance; no cash sleeve is modeled.",
+    }
 
 
 def evaluate_monthly_strategies(
@@ -131,6 +209,9 @@ def evaluate_monthly_strategies(
         }
         for name, series in returns_by_name.items():
             fold["metrics"][name] = _metric_summary(series.loc[dates], cfg)
+        fold["momentum_strategy_portfolio_diagnostics"] = _portfolio_diagnostics(
+            strategy["monthly"].loc[dates], prices.shape[1]
+        )
         folds.append(fold)
 
     full_metrics = {name: _metric_summary(series, cfg) for name, series in returns_by_name.items()}
@@ -222,6 +303,9 @@ def evaluate_monthly_strategies(
         },
         "full_period_metrics": full_metrics,
         "locked_holdout_metrics": holdout_metrics,
+        "momentum_strategy_portfolio_diagnostics": _portfolio_diagnostics(
+            strategy["monthly"], prices.shape[1]
+        ),
         "walkforward_folds": folds,
         "cost_sensitivity": cost_sensitivity,
         "six_month_forward_label_inventory": label_rows,
