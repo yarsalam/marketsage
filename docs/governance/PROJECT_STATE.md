@@ -153,7 +153,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 ## Next actions
 
-1. Owner decision: either obtain private-repository branch protection/rulesets with a supported plan, or explicitly approve a revised Runner trust model and its residual risk. Until then, do not register or activate a Runner.
+1. Owner decision tracked in [Issue #25](https://github.com/yarsalam/marketsage/issues/25): either obtain private-repository branch protection/rulesets with a supported plan, or explicitly approve a revised Runner trust model and its residual risk. Until then, do not register or activate a Runner.
 2. After the trust boundary and host/data permissions are verified, run the integrated PR #14 offline TSETMC pipeline once against the designated local corpus. Compare its exact discovery scope with the earlier 47-instrument diagnostic and 1,220-history inventory; do not repeat the older diagnostic blindly.
 3. Review existing corporate-action/date-gap queues against official evidence; do not regenerate candidate histories or silently repair gaps.
 4. Attribute the 2023-10 to 2024-03 Stage 4 outlier using the same pinned dataset hash and code/config provenance; do not inspect the locked holdout for tuning.
