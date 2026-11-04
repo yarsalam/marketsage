@@ -91,11 +91,12 @@ The staged directory contains raw provider responses, normalized histories, repo
 
 The dataset is not source-approved or approved for backtesting. Current acceptance evidence reports zero instruments automatically approved for backtesting; investment scoring remains disabled. The 79 adjusted research-only candidate outputs and the older reconciliation candidate outputs were excluded.
 
-First permitted workload after workflow review and activation:
-- verify the staged dataset checksum manifest;
-- run the offline TSETMC integrated acceptance/reconciliation inspection without network access and without modifying inputs;
-- produce a unique output directory with sanitized summaries only;
-- report quarantine/unknown states without automatically repairing or approving instruments.
+First permitted workload after host activation and owner review is only the PR #27 offline dataset validator:
+- verify the staged dataset inventory and all 8,801 source-file hashes;
+- write the sanitized validator report under `/srv/marketsage/output` without network access or input modification;
+- keep `eligible_for_scoring=false` and `approved_for_backtest=false`.
+
+This first workflow does not run the full PR #14 integrated TSETMC acceptance/reconciliation pipeline. That pipeline requires a separate, explicitly reviewed manual workflow after the validator report and host dependencies are checked.
 
 Do not inspect a holdout set, tune strategy parameters, calculate/enable investment scores, or infer source/legal approval from a successful parser or runner job.
 
