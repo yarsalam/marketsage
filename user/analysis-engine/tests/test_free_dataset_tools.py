@@ -89,7 +89,7 @@ def test_missing_csv_is_reported_instead_of_crashing(tmp_path: Path):
 
 
 
-def test_tindex_discovery_report_states_the_strict_account_quota(monkeypatch):
+def test_tindex_discovery_report_distinguishes_provider_quota_from_local_cap(monkeypatch):
     calls = []
 
     class FakeTindexClient:
@@ -122,6 +122,8 @@ def test_tindex_discovery_report_states_the_strict_account_quota(monkeypatch):
 
     assert calls == [("GOLD-18K", "3m", "daily")]
     assert record["requests_attempted"] == 1
+    assert "3 requests/minute" in record["note"]
+    assert "300 requests/day per account" in record["note"]
     assert "1 request/minute" in record["note"]
     assert "100 successful requests/day" in record["note"]
     assert "account-wide" in record["note"]
