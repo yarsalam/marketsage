@@ -44,7 +44,8 @@ main
        ├─ #21 Tindex quota wording correction           [merged]
        ├─ #22 official global source candidates         [merged]
        ├─ #23 Tindex quota evidence reconciliation     [merged]
-       └─ #24 Binance HTTP 451 probe hard block          [merged]
+       ├─ #24 Binance HTTP 451 probe hard block          [merged]
+       └─ #28 Iran official macro/bond candidate screen   [merged]
 
 #8  research/iran-free-data-smoke                    [open; parked]
 #15 governance/execution-constitution-v1              [open; Draft]
@@ -53,7 +54,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `e19d65840d9112362209a23ea53c7fcf608c0720`; post-#24 PR run `41796506276` passed all five required jobs | Open; do not merge to main |
+| #6 | Head `21552b719513d72f7fc10eff1efa11651c3d8530`; PR run `41847126900` / push run `41847115366` in progress after PR #28 | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
