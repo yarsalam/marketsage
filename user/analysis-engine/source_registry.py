@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 
-REGISTRY_VERSION = "1.1.2"
+REGISTRY_VERSION = "1.1.3"
 
 
 @dataclass(frozen=True)
@@ -110,6 +110,30 @@ SOURCES: tuple[SourceDefinition, ...] = (
         notes=("Public no-key API adapter for bounded annual series. These are macro "
                "observations, not daily prices; release-time and revision semantics remain "
                "unverified and every row remains ineligible for scoring."),
+    ),
+    SourceDefinition(
+        source_id="global.world_bank_commodity_prices",
+        market_scope="global",
+        asset_family="monthly_commodity_benchmarks",
+        provider="World Bank Commodity Markets Pink Sheet",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("monthly_commodity_price_candidate", "monthly_commodity_index_candidate",
+                    "annual_commodity_average_candidate"),
+        timestamp_quality="monthly/annual observation period available; exact workbook publication time, first-seen time and revision/vintage replay are not yet verified",
+        required_checks=("series_identity_and_benchmark_definition", "unit_currency_and_quantity",
+                         "nominal_real_and_index_classification", "monthly_release_and_availability_time",
+                         "immutable_workbook_vintages_and_revision_diff", "per_series_upstream_source_and_license",
+                         "history_coverage_and_missing_months", "discontinuation_and_methodology_changes",
+                         "monthly_benchmark_vs_daily_spot_or_futures", "independent_reconciliation",
+                         "attribution_and_change_notice"),
+        notes=("World Bank Commodity Markets lists monthly and annual Pink Sheet XLS workbooks. "
+               "The reviewed page displayed an October 2026 monthly workbook and a 2026-11-03 next-update "
+               "date, but the workbook itself was not downloaded or parsed. Units, coverage, missing values "
+               "and per-series upstream rights remain unverified. World Bank dataset terms describe CC BY 4.0 "
+               "as the default for World Bank-produced open datasets, while third-party components may carry "
+               "different terms. Monthly benchmark observations are macro context, not daily executable prices."),
     ),
     SourceDefinition(
         source_id="global.binance_spot_public",
