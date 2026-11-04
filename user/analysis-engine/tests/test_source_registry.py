@@ -50,3 +50,24 @@ def test_new_official_global_candidates_are_registered_but_remain_fail_closed():
         assert source.used_by_research_engine is False
         assert source.approved_for_production is False
         assert source_scoring_gate(source_id)["eligible_for_production_scoring"] is False
+
+def test_iran_cbi_macro_and_bond_auction_candidates_remain_fail_closed():
+    catalog = source_catalog()
+    entries = {item["source_id"]: item for item in catalog["sources"]}
+    expected = {
+        "iran.official_macro",
+        "iran.cbi.bond_auction_results",
+    }
+    assert expected <= set(entries)
+    macro = entries["iran.official_macro"]
+    bond = entries["iran.cbi.bond_auction_results"]
+    assert "official_transfer_fx_candidate" in macro["data_kinds"]
+    assert "weekly_policy_rate_candidate" in macro["data_kinds"]
+    assert "government_bond_auction_result_candidate" in bond["data_kinds"]
+    for source_id in expected:
+        source = next(source for source in SOURCES if source.source_id == source_id)
+        assert source.status == "candidate_requires_validation"
+        assert source.used_by_research_engine is False
+        assert source.approved_for_production is False
+        assert source_scoring_gate(source_id)["eligible_for_production_scoring"] is False
+

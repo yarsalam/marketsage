@@ -1,5 +1,5 @@
 {
-  "catalog_version": "1.1.1",
+  "catalog_version": "1.1.2",
   "last_reviewed": "2026-11-04",
   "policy": {
     "prefer_no_subscription": true,
@@ -188,20 +188,48 @@
     },
     {
       "source_id": "iran.official_macro",
-      "label": "Central Bank of Iran and Statistical Center of Iran",
+      "label": "CBI official macro, TSD, transfer FX and policy-rate portals; SCI candidate",
       "free_access_class": "public_portal_candidate",
-      "authentication": "No stable accepted machine-readable API registered yet",
-      "probe_mode": "manual catalog/format discovery before automating collection",
+      "authentication": "Public HTML/PDF pages observed without an account; no stable accepted API contract registered",
+      "probe_mode": "documentation-only review; no automated API request, account probe or dataset download",
       "data_families": [
-        "inflation",
-        "monetary aggregates",
-        "rates",
-        "national accounts"
+        "annual macroeconomic time series (CBI TSD)",
+        "official currency-transfer rates (not free-market FX)",
+        "weekly interbank and policy rates",
+        "inflation and price indices",
+        "national accounts and monetary aggregates"
       ],
-      "history_limit": "Not established",
+      "history_limit": "CBI describes >1,000 annual TSD variables from 1338 onward in HTML/Excel; policy rates are weekly; official FX has a dated archive but complete depth is unverified; exact series coverage and revision history remain unverified",
       "limitations": [
-        "Release date, revision policy, units and machine-readable coverage need inspection",
-        "PDF publication date must not be inferred from retrieval time"
+        "CBI TSD is described as annual HTML/Excel, not a documented REST/SDMX API; the linked viewer timed out in the documentation-review environment and no series-level endpoint contract was verified",
+        "CBI transfer FX is calculated from previous-business-day transactions in the currency-transfer hall; it is not free-market cash/bazaar FX",
+        "Jalali observation dates, Rial quote basis and currency denomination multipliers (for example JPY100/IQD100/KRW1000) require endpoint-level validation; do not silently divide by ten or infer a common unit",
+        "Policy-rate rows are weekly macro observations in percent, not bond prices or executable yields; first-publication time and revisions are unknown",
+        "CBI government Islamic-securities auction archive is PDF-oriented primary-market evidence, not a secondary-market bond-price or total-return series",
+        "CBI page states that material and moral rights belong to CBI; no blanket automated collection, redistribution or commercial/model-use license was established",
+        "SCI and national open-data catalog machine-readable contracts, per-resource licenses, release/vintage timestamps and persistent history were not verified",
+        "No source in this entry is approved for investment scoring or production"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.cbi.bond_auction_results",
+      "label": "CBI government Islamic-securities auction result archive",
+      "free_access_class": "public_portal_candidate",
+      "authentication": "No account observed for public listing/PDF pages; stable API not documented",
+      "probe_mode": "documentation-only; no automated PDF crawl or download",
+      "data_families": [
+        "government Islamic-securities primary-market auction results"
+      ],
+      "history_limit": "Dated PDF archive is visible, including weekly 1405 entries; complete historical depth and machine-readable history are not established",
+      "limitations": [
+        "Primary-market auction results are not secondary-market bond prices or total-return histories",
+        "Auction yield, coupon, current yield and yield-to-maturity are distinct measures and must not be conflated",
+        "Instrument identity, maturity, settlement date, cash-flow schedule, accepted price/yield and correction history need structured extraction and reconciliation",
+        "Publication timestamp is not established by the Jalali archive date alone",
+        "CBI page states that material and moral rights belong to CBI; reuse, automated collection and commercial/model-use permission remain unresolved",
+        "No adapter, default probe, research-engine use or scoring eligibility is approved"
       ],
       "default_live_probe": false,
       "production_approved": false

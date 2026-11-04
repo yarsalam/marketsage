@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 
-REGISTRY_VERSION = "1.1.1"
+REGISTRY_VERSION = "1.1.2"
 
 
 @dataclass(frozen=True)
@@ -146,16 +146,47 @@ SOURCES: tuple[SourceDefinition, ...] = (
     SourceDefinition(
         source_id="iran.official_macro",
         market_scope="iran",
-        asset_family="macro_inflation_rates",
+        asset_family="macro_inflation_policy_rates_official_fx",
         provider="Central Bank of Iran and Statistical Center of Iran",
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("macro_observation", "release_document"),
-        timestamp_quality="release timestamps and revision history not yet verified",
+        data_kinds=("annual_macro_observation_candidate", "official_transfer_fx_candidate",
+                    "weekly_policy_rate_candidate", "price_index_candidate",
+                    "release_document"),
+        timestamp_quality="annual/weekly/daily observation dates may be available; exact first-publication and revision/vintage timestamps are not established",
         required_checks=("publication_time", "revision_history", "units_and_definitions",
-                         "machine_readable_history"),
-        notes="Official sources are candidates; release-time availability must be audited.",
+                         "machine_readable_history", "jalali_calendar_and_conversion",
+                         "official_vs_free_market_fx", "quote_unit_and_denomination_multiplier",
+                         "series_frequency_and_release_lag", "rights_and_redistribution"),
+        notes=("CBI documents more than 1,000 annual TSD variables from 1338 onward in HTML/Excel, "
+               "plus official transfer FX and weekly policy-rate pages. The transfer rate is based on "
+               "the previous business day's currency-transfer hall transactions and is not free-market "
+               "cash FX. Jalali dates, Rial quote basis and per-currency denomination multipliers need "
+               "endpoint-level validation. The linked TSD viewer did not respond in the documentation "
+               "review environment; no stable API or reuse license was verified. SCI remains a portal "
+               "candidate. No source is wired or approved for scoring."),
+    ),
+    SourceDefinition(
+        source_id="iran.cbi.bond_auction_results",
+        market_scope="iran",
+        asset_family="government_islamic_securities_primary_auctions",
+        provider="Central Bank of Iran government Islamic-securities auction archive",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("government_bond_auction_result_candidate",),
+        timestamp_quality="Jalali archive/auction date available; exact publication time and correction/vintage timestamps are not verified",
+        required_checks=("instrument_identity", "auction_vs_secondary_market",
+                         "maturity_and_cashflow_schedule", "yield_definition",
+                         "settlement_date", "auction_price_and_amount",
+                         "publication_time", "revision_history",
+                         "pdf_extraction_and_reconciliation", "rights_and_redistribution"),
+        notes=("CBI publishes dated PDF results for government Islamic-securities auctions. "
+               "These are primary-market auction records, not continuous secondary-market prices "
+               "or total-return histories. Do not conflate auction yield, coupon, current yield, "
+               "yield-to-maturity, fund NAV and exchange price. Instrument, maturity, settlement, "
+               "cash-flow, publication and reuse semantics remain unverified."),
     ),
     SourceDefinition(
         source_id="iran.tindex.public_api",
