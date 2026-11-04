@@ -5,22 +5,23 @@
 **Default branch:** `main`  
 **Main HEAD:** `07f2e968257ef868a5efbab36f379ee487658577`  
 **Integration PR:** #6, `main` ← `feat/tindex-free-data-connector`  
-**Integration HEAD:** `a2e19c156f226241a34658d32d25e93173c99a5d`  
-**Post-#23 integration CI:** PR run `41793156231` passed all five required job types on exact head `a2e19c156f226241a34658d32d25e93173c99a5d`; PR #23's exact-head run `41792758377` passed all five jobs before merge.  
+**Integration HEAD:** `e19d65840d9112362209a23ea53c7fcf608c0720`  
+**Post-#24 integration CI:** PR run `41796506276` passed all five required job types on exact head `e19d65840d9112362209a23ea53c7fcf608c0720`; PR #24's exact-head run `41796133083` passed all five jobs before merge.  
 **Current posture:** engineering integration is consolidated, but no data source has passed full acceptance and no representative investment strategy has passed empirical validation.
 
 ## Executive status
 
 - PR #1 application baseline is on `main`; no production deployment occurred.
-- PRs #7, #9, #13, #14, #16, #17 and #18 are merged into PR #6 in dependency order.
+- PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23 and #24 are merged into PR #6 in dependency order.
 - PR #6 remains open and **must not be merged into `main` without explicit owner approval**.
 - PR #19 source-evidence refresh is merged into #6 at `2fea1c2e8f73fe3b7768f4f2e0d3da36ce27248b`; its exact-head run `41598599936` and post-merge #6 run `41598989190` passed all five required job types.
 - PR #20 TSETMC identity crosswalk passed all five required job types on exact head `c58cde2c87c698ec4a33a58ff2d3caeeecd70569` (run `41600402263`) and was merged into #6 at `4191dd3715173265193163e30281ab555b9d12fb`. Both post-merge runs `41601055518` (push) and `41601064135` (pull_request) subsequently passed all five job types.
 - PR #21 corrected stale Tindex quota wording and added a mocked regression test. All five required exact-head job types passed on `7c52b11a6cc3e41fb214114d95b2d4df70f28fa9` (run `41601260850`); it was merged into #6 at `21c591223c9e7d61e6046a06f51522e979530f08`.
 - PR #22 added five official global source candidates (ECB, US Treasury, EIA, SEC EDGAR and IMF) with rights/time/history caveats and fail-closed registry tests. All five required job types passed on exact head `6eff5daf8c2b86a96015992d3f9d3f17beacab82` in PR run `41602083315` and push run `41602045431`; it was merged into #6 at `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f`. Both post-merge runs `41602459792` and `41602467771` passed all five job types.
 - PR #23 reconciled the current Tindex quota evidence: official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, while the MarketSage client retains its stricter local 1/minute and 100-success/day cap. Its exact-head run `41792758377` passed all five jobs; it merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-merge PR run `41793156231` passed all five jobs.
+- PR #24 removes Binance Spot from default probes and hard-blocks explicit discovery requests after owner-reported Iran-network HTTP 451; the runner returns `blocked_owner_reported_http_451` with `requests_attempted=0`. No network request or alternate route was used. Exact-head run `41796133083` passed all five required jobs; PR #24 merged into #6 at `e19d65840d9112362209a23ea53c7fcf608c0720`; post-merge run `41796506276` passed all five jobs.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
-- PR #15 governance remains Draft; its documents are updated through PR #23 and now record the private-repository branch-protection plan blocker, but the PR is not merged.
+- PR #15 governance remains Draft; its documents are updated through PR #24 and record the private-repository branch-protection plan blocker and owner-reported host preparation, but the PR is not merged.
 - The governance documents referenced in this state file currently exist on PR #15's `governance/execution-constitution-v1` branch; PR #15 is still Draft and these files are not present on the default `main` branch. They are therefore a working continuity record, not yet an adopted default-branch policy.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
 
@@ -40,7 +41,8 @@ main
        ├─ #20 TSETMC identity crosswalk                 [merged]
        ├─ #21 Tindex quota wording correction           [merged]
        ├─ #22 official global source candidates         [merged]
-       └─ #23 Tindex quota evidence reconciliation     [merged]
+       ├─ #23 Tindex quota evidence reconciliation     [merged]
+       └─ #24 Binance HTTP 451 probe hard block          [merged]
 
 #8  research/iran-free-data-smoke                    [open; parked]
 #15 governance/execution-constitution-v1              [open; Draft]
@@ -49,7 +51,7 @@ main
 | PR | Exact result | State |
 |---|---|---|
 | #1 | Application baseline merged to `main`; no deployment | Merged |
-| #6 | Head `a2e19c156f226241a34658d32d25e93173c99a5d`; post-#23 PR run `41793156231` passed all five required jobs | Open; do not merge to main |
+| #6 | Head `e19d65840d9112362209a23ea53c7fcf608c0720`; post-#24 PR run `41796506276` passed all five required jobs | Open; do not merge to main |
 | #7 | Tindex/FRED corrections and strict 1/minute + 100/day guard | Merged into #6 |
 | #8 | GitHub-hosted TSETMC live request timed out to `cdn.tsetmc.com` | Open; parked |
 | #9 | Iranian market dashboard and read-only research endpoints | Merged into #6 |
@@ -64,6 +66,7 @@ main
 | #21 | Exact-head run `41601260850` passed all five required job types; merge `21c591223c9e7d61e6046a06f51522e979530f08` | Merged into #6 |
 | #22 | PR run `41602083315` and push run `41602045431` passed all five required job types; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` | Merged into #6 |
 | #23 | Exact-head run `41792758377` passed all five required jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d`; post-merge PR run `41793156231` passed all five jobs | Merged into #6 |
+| #24 | Exact-head PR run `41796133083` and post-merge PR run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` | Merged into #6 |
 
 ## Source and dataset evidence
 
@@ -90,7 +93,7 @@ This section distinguishes committed documentation and previously shared sanitiz
 ### Global candidates
 
 - **World Bank Indicators:** prior export reports 26 annual Iran CPI rows for 2000–2025; the non-null value count was not reported. Annual observation year is not release/availability time; revisions and series definitions must be preserved. It is macro context, not daily market pricing.
-- **Binance Spot:** owner-reported Iran-network attempts returned HTTP 451 for BTCUSDT/ETHUSDT/SOLUSDT. Keep the route blocked; do not seek alternate hosts to bypass it. A separate small foreign sample is not multi-year coverage or rights acceptance.
+- **Binance Spot:** owner-reported Iran-network attempts returned HTTP 451 for BTCUSDT/ETHUSDT/SOLUSDT. PR #24 removes it from default probes and hard-blocks explicit discovery selection with zero requests; do not seek alternate hosts or retry without a changed access/legal basis. A separate small foreign sample is not multi-year coverage or rights acceptance.
 - **Yahoo Finance:** existing proxy captures may support exploratory research only. Reuse existing captures; do not redownload without a changed acceptance question. Terms, adjustments, symbol/currency mapping, survivorship and point-in-time limitations remain open. US ETFs are not a representative Iran universe.
 - **FRED/ALFRED:** API key/access was previously unavailable. Observation period and day-level vintage are not exact intraday release time; do not repeat the same probe until secure access/network changes.
 - **GDELT:** prior HTTP 429 remains in cooldown. `seendate` is first-seen/index time, not publisher publication time. No validated Persian/English sentiment/event benchmark exists.
@@ -127,7 +130,8 @@ This section distinguishes committed documentation and previously shared sanitiz
 
 - Reviewed the live repository, PR graph and governance documents.
 - Confirmed PR #14 is already merged into #6 and the post-#18 #6 CI run passed all five required job types.
-- Revalidated PR #14 live metadata: it is merged into #6 at `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; exact-head run `41401668921` passed all five required jobs on head `4bd179263f55b90854d00f1ea3b1287da0393b03`. No second merge was needed. The current #6 head remains `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-#23 run `41793156231` passed all five required jobs.
+- Revalidated PR #14 live metadata: it is merged into #6 at `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; exact-head run `41401668921` passed all five required jobs on head `4bd179263f55b90854d00f1ea3b1287da0393b03`. No second merge was needed. The current #6 head is now `e19d65840d9112362209a23ea53c7fcf608c0720`; post-#24 run `41796506276` passed all five required jobs.
+- PR #24 was opened after static review found the discovery script still default-probed Binance despite the owner-reported HTTP 451 block. The fix excludes it from defaults and hard-blocks explicit selection with zero requests; exact-head and post-merge CI each passed all five jobs.
 - Opened and merged PR #19 after all five exact-head CI job types passed. It refreshes the source catalog and evidence-led candidate triage, recording Nerkhsanj anomalies/quarantine, previous TSETMC whole-corpus evidence/scope mismatch, and Tindex Rial/Toman/account-scope constraints. No provider probe or local raw-data access occurred.
 - Verified the source registry had 18 entries before the new global-source screen; PR #22 expands it to 22 registered entries, while the catalog grows from 13 to 18. The five new catalog entries are not default-probed, not wired into research and remain unapproved.
 - Reviewed the Stage 4 protocol, empirical review and backtest code. No new empirical run was attempted because the permissioned local input is unavailable and the known extreme fold requires attribution, not a repeated blind run.

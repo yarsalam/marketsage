@@ -3,16 +3,16 @@
 **Snapshot date:** 2026-11-04  
 **Repository:** `yarsalam/marketsage` (**Private**)  
 **Integration target:** PR #6 branch `feat/tindex-free-data-connector`
-**Current integration HEAD:** `a2e19c156f226241a34658d32d25e93173c99a5d`
-**Post-#23 CI:** PR run `41793156231` passed all five required job types on exact head `a2e19c156f226241a34658d32d25e93173c99a5d`; PR #23 exact-head run `41792758377` passed all five jobs before merge.
+**Current integration HEAD:** `e19d65840d9112362209a23ea53c7fcf608c0720`
+**Post-#24 CI:** PR run `41796506276` passed all five required job types on exact head `e19d65840d9112362209a23ea53c7fcf608c0720`; PR #24 exact-head run `41796133083` passed all five jobs before merge.
 
 ## Open PRs
 
 | PR | Base ← head | Current head / CI | State and handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `a2e19c156f226241a34658d32d25e93173c99a5d`; post-#23 PR run `41793156231` passed all five required jobs | Open; do not merge to `main` without explicit owner approval. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `e19d65840d9112362209a23ea53c7fcf608c0720`; post-#24 PR run `41796506276` passed all five required jobs | Open; do not merge to `main` without explicit owner approval. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Live TSETMC request timed out from GitHub-hosted runner | Open; parked. Do not repeat the same network request from that environment. |
-| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed through PR #23 and Runner plan blocker clarified; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
+| [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Governance docs refreshed through PR #24, including Runner host prep and Stage 4 static audit; PR remains Draft | Open; Draft; no merge/adoption transition made in this execution. |
 
 
 ## Merged PRs relevant to the integration path
@@ -32,6 +32,7 @@
 | [#21](https://github.com/yarsalam/marketsage/pull/21) | #6 feature branch | Tindex quota-report consistency correction; all five exact-head jobs passed; merge `21c591223c9e7d61e6046a06f51522e979530f08` |
 | [#22](https://github.com/yarsalam/marketsage/pull/22) | #6 feature branch | Five official global source candidates; all five required exact-head jobs passed in PR and push runs; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` |
 | [#23](https://github.com/yarsalam/marketsage/pull/23) | #6 feature branch | Reconciled Tindex's published 3/minute + 300/day account quota with the unchanged stricter local 1/minute + 100-success/day guard; exact-head run `41792758377` passed all five jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d` |
+| [#24](https://github.com/yarsalam/marketsage/pull/24) | #6 feature branch | Removed the owner-reported HTTP 451 Binance route from default probes and hard-blocked explicit discovery selection with zero requests; exact-head run `41796133083` and post-merge run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` |
 
 ## Current integration graph
 
@@ -49,7 +50,8 @@ main
        ├─ #20 [merged]
        ├─ #21 [merged]
        ├─ #22 [merged]
-       └─ #23 [merged]
+       ├─ #23 [merged]
+       └─ #24 [merged]
 
 #8  [open; parked network diagnostic]
 #15 [open; Draft governance]
@@ -66,9 +68,10 @@ main
 - Nerkhsanj owner-reported audit: 182 adjacent changes >=20%, 48 >=100%, concentrated in IQD/silver/Tether; IQD gap up to 373 days and silver/Tether/Bitcoin up to 84 days. IQD/silver/Tether remain excluded; Bitcoin remains a coverage warning.
 - Tindex unit families must remain separate: the official English and Persian developer pages rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, with one active token; HTTP 429 rejections do not consume the daily quota. MarketSage keeps the stricter local 1 request/minute and 100-success/day cap. The 100-day history cap and distinct Rial/Toman endpoint families still do not support a bulk 1,644-symbol six-month history crawl; configured-account access, units and rights remain unverified.
 - Stage 4 still has no accepted representative, permissioned, point-in-time out-of-sample result. The previously recorded 240.89% six-month fold requires attribution; do not tune against the locked holdout.
+- Binance Spot is now hard-blocked in the discovery runner after owner-reported Iran-network HTTP 451; default probes exclude it and explicit selection returns zero requests. No alternate host is used.
 - Static Stage 4 review (2026-11-04): the backtest uses prior-month signals, next-month returns, L1 turnover costs and pre-holdout folds/locked holdout with equal-weight and cash baselines; six-month labels are inventory-only. The evaluator's complete monthly panel does not prove source rights, survivorship control, corporate-action correctness, point-in-time availability or executable liquidity. The existing fold-attribution script is ready but awaits the same pinned local dataset/config; it was not run.
-- No Runner is registered; branch protection/rulesets cannot be configured through the connected GitHub integration in the current account. GitHub's current plan docs say private-repository protection requires Pro/Team/Enterprise; a Free Organization alone does not satisfy the gate.
-- PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`. PR #21, #22 and #23 are merged; PR #23 exact-head run `41792758377` and post-merge PR run `41793156231` passed all five required jobs.
+- No Runner is registered. The owner has created only the dedicated OS account and `/opt/actions-runner/marketsage` directory; no package, registration token, data mount or self-hosted workflow is in place. Branch protection/rulesets cannot be configured through the connected GitHub integration in the current account. GitHub's current plan docs say private-repository protection requires Pro/Team/Enterprise; a Free Organization alone does not satisfy the gate.
+- PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`. PR #21, #22, #23 and #24 are merged; PR #24 exact-head run `41796133083` and post-merge PR run `41796506276` passed all five required jobs.
 
 ## Local Runner activation gate
 
