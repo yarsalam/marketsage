@@ -184,3 +184,9 @@ This section distinguishes committed documentation and previously shared sanitiz
 - PR #6 remains open. Do not merge it to `main` without explicit owner authorization. PR #8 remains parked after the prior GitHub-hosted TSETMC timeout; do not repeat the same request from that environment.
 - Owner action remains tracked in Issue [#25](https://github.com/yarsalam/marketsage/issues/25). Latest terminal output reconfirms the complete 228,071,396-byte v2.338.2 archive and extracted files under `/home/nima/actions-runner`, but the extracted tree's correspondence to that archive is unverified; `/opt/actions-runner/marketsage` has only a 9,719,808-byte partial archive. No Runner process/service is active and no Runner is registered/online. Verify the archive SHA-256, freshly extract into the dedicated path as `marketsage-runner`, exclude personal `.env`, `.path`, and `_diag`, then complete isolation checks before using a fresh locally entered token. The token previously pasted into chat must never be reused.
 - No production deployment, source approval, investment ranking/scoring, portfolio allocation, broker access, or real-money trade is authorized. Stage 4 still lacks a representative, permissioned, point-in-time out-of-sample result that establishes net risk-adjusted edge against baselines after costs and drawdown.
+
+
+### Main/integration divergence after PR #29 — 2026-11-04
+
+- Live compare reports main at 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767 and integration PR #6 at fb64e773387f3eb7270d0dd65d8e885c1f26ba0d; the integration branch is 399 commits ahead and 2 commits behind main. The two main-only commits are the separate PR #27 manual-only offline validator workflow and its associated change. No automatic synchronization was attempted; assess the exact diff/conflicts before any future update.
+- Both post-#29 integration CI runs passed all five required jobs. PR #6 remains open and unmerged to main.
