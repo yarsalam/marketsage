@@ -2,6 +2,7 @@
 
 **Snapshot date:** 2026-11-04  
 **Repository:** `yarsalam/marketsage` (**Private**)  
+**Default branch HEAD:** `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`  
 **Integration target:** PR #6 branch `feat/tindex-free-data-connector`
 **Current integration HEAD:** `e19d65840d9112362209a23ea53c7fcf608c0720`
 **Post-#24 CI:** PR run `41796506276` passed all five required job types on exact head `e19d65840d9112362209a23ea53c7fcf608c0720`; PR #24 exact-head run `41796133083` passed all five jobs before merge.
@@ -79,30 +80,42 @@ main
 - Owner approved the manual-only compensating-control model on 2026-11-04; this does not equal protected-branch enforcement. Runner remains unregistered/offline pending actual workflow inventory/review and final activation checks.
 - PR #8 remains parked after GitHub-hosted TSETMC ConnectTimeout. PR #6 remains open and unmerged to `main`. PR #21, #22, #23 and #24 are merged; PR #24 exact-head run `41796133083` and post-merge PR run `41796506276` passed all five required jobs.
 
+## Merged to main outside the integration PR
+
+| PR | Target | Result |
+|---|---|---|
+| [#27](https://github.com/yarsalam/marketsage/pull/27) | `main` | Manual-only offline TSETMC dataset validator workflow; merged at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`. All five required CI jobs passed on exact PR head `c60edd0f16244ab12e6602b9247e4174567f6081` in run `41833221157`. It does not register/start a Runner or execute the full PR #14 pipeline. |
+
 ## Local Runner activation gate
 
-The owner selected the manual-only compensating-control model in Issue #25 on 2026-11-04. The decision and accepted residual risk are recorded in `docs/governance/DECISION_LOG.md` and `docs/governance/LOCAL_RUNNER_TRUST_BOUNDARY.md`. This does not provide or claim GitHub private branch protection/ruleset enforcement.
+The owner selected the manual-only compensating-control model in Issue [#25](https://github.com/yarsalam/marketsage/issues/25) on 2026-11-04. This is not equivalent to GitHub private branch protection/ruleset enforcement; live branch metadata reports `main.protected=false`.
 
-### Owner-host preparation and test evidence — 2026-11-04
+### GitHub workflow inventory and review — 2026-11-04
+
+- On `main`, `.github/workflows/ci.yml` runs all jobs on `ubuntu-latest`; no existing general CI job targets self-hosted.
+- The PR #8 TSETMC smoke workflow on the integration branch also uses `ubuntu-latest`; it remains parked after the GitHub-hosted ConnectTimeout. Do not repeat the same network request from that environment.
+- PR #27 was statically reviewed and merged to `main` at `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`. Its workflow has only `workflow_dispatch`, default-branch/owner/explicit-confirmation gates, exact custom labels `marketsage-local,marketsage-research`, `contents: read`, full-SHA-pinned checkout, no secrets, provider probes or artifact upload, and a bounded standard-library validator. All five required jobs passed on exact PR head in run `41833221157`.
+- PR #27 validates the staged dataset inventory and 8,801 SHA-256 entries; it does not yet execute the full PR #14 integrated TSETMC acceptance pipeline. That is a later, separately reviewed workload.
+- The owner must review the exact current `main` SHA and workflow before the first dispatch. Merge of PR #27 does not register/start the Runner and does not authorize dispatch.
+
+### Owner-host evidence — corrected from latest terminal output (2026-11-04)
 
 - Account: `marketsage-runner`, UID 110/GID 119, home `/var/lib/marketsage-runner`, shell `nologin`; member only of its own group and not in `sudo`, `docker`, `lxd` or `adm`.
-- Runner version 2.338.2 is installed under `/opt/actions-runner/marketsage`. No `.runner`, `.credentials` or `.credentials_rsaparams` markers, active Runner process, or installed/loaded service were found. It is not registered or online.
-- Any registration token previously pasted into chat is compromised and must never be reused. A fresh token must be entered locally only, after the workflow gate is satisfied.
-- Dataset staged at `/srv/marketsage/data/tsetmc_history_20261022`: 8,801 source files plus `SHA256SUMS` and `STAGING_README.txt`, 8,803 files total. Every source file hash was verified; adjusted research-only candidates were excluded and source files were not modified.
-- Dataset group is `marketsage-runner`; files are `0440`, directories `2750`. Runner read/hash/JSON/CSV checks passed on representative raw, normalized, reports, pipeline metadata, discovery, reconciliation and acceptance files. Writes to the dataset were denied. Separate `/srv/marketsage/output` write/create/delete test passed.
-- The general `/home/nima` tree is not traversable by the Runner account. No access to browser, SSH, credentials, Docker or personal project files has been granted.
-- These results are owner-supplied terminal outputs; they verify tested filesystem permissions, not workflow safety, network egress policy, kernel security or arbitrary-code containment.
-- Local Runner remains unregistered/offline. No workflow has been changed to `self-hosted`.
+- Latest terminal output shows the full 228,071,396-byte v2.338.2 archive in `/home/nima/actions-runner`, with extracted files also present there. The extracted `config.sh`/`run.sh` timestamps are 2026-10-26, so their version/correspondence to the newer archive is not verified.
+- `/opt/actions-runner/marketsage` currently contains only a 9,719,808-byte partial archive; extracted `config.sh` and `run.sh` are absent. The designated Runner installation is therefore incomplete. The personal directory also contains `.env`, `.path` and `_diag`; do not copy those into the dedicated Runner installation.
+- No Runner process or installed/loaded Runner service was found in the latest terminal output. The Runner is not registered or online. The registration token previously pasted into chat must never be reused.
+- Dataset staged at `/srv/marketsage/data/tsetmc_history_20261022`: 8,801 source files plus `SHA256SUMS` and `STAGING_README.txt`, 8,803 files total. Prior owner-reported checks verified all source hashes, read access and denied dataset writes; separate output-directory writes passed.
+- These are owner-supplied terminal results, not an independent penetration test. They do not prove workflow safety, network-egress containment, kernel security or protection against arbitrary workflow code.
 
-### Remaining gates
+### Remaining owner gates
 
-1. Inventory and inspect the exact current workflow files and every trigger, runner target, permission, action SHA, checkout ref and secret reference.
-2. Add a separate manual-only `workflow_dispatch` workflow; keep all normal CI on GitHub-hosted runners.
-3. Review exact workflow content and commit before each dispatch; use read-only token permission, no secrets, fixed trusted ref/SHA validation, serialization and sanitized output only.
-4. Verify workspace cleanup, service isolation and emergency disable/unregister instructions.
-5. Perform a final no-credentials/no-process host check, then repository-scope registration with a fresh locally entered token.
+1. Verify the full local archive SHA-256 against the published digest and freshly extract it under `/opt/actions-runner/marketsage` as `marketsage-runner`; do not copy personal environment files or old diagnostics.
+2. Apply service/workspace isolation, dedicated `_work`, cleanup and emergency disable/unregister procedure.
+3. Run the final no-credentials/no-process host audit; register a repository-scoped Runner with a fresh locally entered token and custom labels `marketsage-local,marketsage-research`.
+4. Owner reviews the exact current `main` workflow/commit and manually confirms the bounded offline dataset validator.
+5. Review its sanitized result, then add/review a separate manual workflow for the full PR #14 offline pipeline. Do not conflate the validator with that pipeline.
 
-No local job, data scoring, backtest admission, production deployment, broker access or trading is authorized by this setup.
+No local job, source approval, backtest admission, investment scoring, production deployment, broker access or trading is authorized by this setup.
 
 ## Execution policy
 
