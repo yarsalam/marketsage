@@ -5,13 +5,13 @@
 **Default branch HEAD:** `7e669749d2615bc0f2a9d6f557bb99f8e7bd0767`  
 **Integration target:** PR #6 branch `feat/tindex-free-data-connector`
 **Current integration HEAD:** `21552b719513d72f7fc10eff1efa11651c3d8530`
-**Post-#28 CI:** PR run `41847126900` and push run `41847115366` are in progress on exact integration head `21552b719513d72f7fc10eff1efa11651c3d8530`; the exact PR #28 head passed all five required jobs in run `41846337902`.
+**Post-#28 CI:** PR run `41847126900` and push run `41847115366` both passed all five required jobs on exact integration head `21552b719513d72f7fc10eff1efa11651c3d8530`; the exact PR #28 head also passed all five jobs in run `41846337902`.
 
 ## Open PRs
 
 | PR | Base ← head | Current head / CI | State and handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `21552b719513d72f7fc10eff1efa11651c3d8530`; PR run `41847126900` / push run `41847115366` in progress after PR #28 | Open; do not merge to `main` without explicit owner approval. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | `main` ← `feat/tindex-free-data-connector` | `21552b719513d72f7fc10eff1efa11651c3d8530`; PR run `41847126900` and push run `41847115366` passed all five jobs after PR #28 | Open; do not merge to `main` without explicit owner approval. |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | old `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | Live TSETMC request timed out from GitHub-hosted runner | Open; parked. Do not repeat the same network request from that environment. |
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | `main` ← `governance/execution-constitution-v1` | Owner-approved manual-only Runner exception, PR #27 workflow merged, latest host package-location correction and owner action documented | Open; Draft; adoption pending. |
 
@@ -40,7 +40,7 @@
 | [#22](https://github.com/yarsalam/marketsage/pull/22) | #6 feature branch | Five official global source candidates; all five required exact-head jobs passed in PR and push runs; merge `b3fd6af1b40a3d9693feade7f9ad820bd3cfa69f` |
 | [#23](https://github.com/yarsalam/marketsage/pull/23) | #6 feature branch | Reconciled Tindex's published 3/minute + 300/day account quota with the unchanged stricter local 1/minute + 100-success/day guard; exact-head run `41792758377` passed all five jobs; merge `a2e19c156f226241a34658d32d25e93173c99a5d` |
 | [#24](https://github.com/yarsalam/marketsage/pull/24) | #6 feature branch | Removed the owner-reported HTTP 451 Binance route from default probes and hard-blocked explicit discovery selection with zero requests; exact-head run `41796133083` and post-merge run `41796506276` passed all five required jobs; merge `e19d65840d9112362209a23ea53c7fcf608c0720` |
-| [#28](https://github.com/yarsalam/marketsage/pull/28) | #6 feature branch | CBI official macro/transfer-FX/weekly policy-rate and government bond-auction candidate screen; exact-head run `41846337902` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530`; post-merge CI in progress |
+| [#28](https://github.com/yarsalam/marketsage/pull/28) | #6 feature branch | CBI official macro/transfer-FX/weekly policy-rate and government bond-auction candidate screen; exact-head run `41846337902` and post-merge PR/push runs `41847126900` / `41847115366` passed all five jobs; merge `21552b719513d72f7fc10eff1efa11651c3d8530` |
 
 ## Current integration graph
 
