@@ -143,3 +143,15 @@ Merge dependent PRs sequentially after all required jobs pass on the exact curre
 
 - Live compare: main 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767; integration fb64e773387f3eb7270d0dd65d8e885c1f26ba0d; integration is 399 commits ahead / 2 behind. The main-only commits are PR #27's manual-only offline validator workflow and associated change. No branch update was attempted. Review the exact diff and conflicts before syncing.
 - PR #29 is merged into #6 and both post-merge runs passed all five jobs. PR #6 remains open; do not merge it to main without explicit owner approval.
+
+
+## Stage 4 diagnostics PR — 2026-11-04
+
+| PR | Target | Exact result | Current status |
+|---|---|---|---|
+| [#30](https://github.com/yarsalam/marketsage/pull/30) | integration PR #6 | Exact-head run 41850746372 passed all five required jobs on fb22c350cd1f2dc23dfcd1d1bea7cf1d6e20fad8; merged at 819f8b4028469cb0d498098fec88545a18ebacc6. | Merged; post-merge PR run 41851276790 and push run 41851269421 were still in progress when recorded. |
+
+- PR #30 adds downside/tail-risk and portfolio-mechanics diagnostics without changing the strategy, asset universe, split dates or holdout use. No local empirical run was performed.
+- Current integration head: 819f8b4028469cb0d498098fec88545a18ebacc6. Both post-merge runs must pass before the head is declared green.
+- Integration is 405 commits ahead and 2 behind main (main 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767). No sync was attempted.
+- PR #6 remains open and must not be merged to main without explicit owner authorization.
