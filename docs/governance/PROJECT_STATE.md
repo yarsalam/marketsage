@@ -195,6 +195,12 @@ This section distinguishes committed documentation and previously shared sanitiz
 ## Stage 4 protocol implementation update — 2026-11-04
 
 - PR #30 added predeclared Sortino/downside-deviation and empirical monthly 5th-percentile/expected-shortfall reporting, plus L1 turnover, transaction/slippage/total cost-fraction sums, rebalance count, selected-asset frequency/coverage, and fully-invested/cash-exposure diagnostics for full period, locked holdout and each walk-forward fold. Small-sample tail estimates are explicitly caveated; cost-fraction sums are not compounded P&L drag.
-- PR #30 exact-head run 41850746372 passed all five required job types on fb22c350cd1f2dc23dfcd1d1bea7cf1d6e20fad8 and was merged into PR #6 at 819f8b4028469cb0d498098fec88545a18ebacc6. Post-merge PR run 41851276790 and push run 41851269421 were in progress at the time of this note; do not treat the new integration head as green until both complete successfully.
+- PR #30 exact-head run 41850746372 passed all five required job types on fb22c350cd1f2dc23dfcd1d1bea7cf1d6e20fad8 and was merged into PR #6 at 819f8b4028469cb0d498098fec88545a18ebacc6. Post-merge PR run 41851276790 and push run 41851269421 both completed successfully on that exact integration head; all five required job types passed in each.
 - This change does not alter strategy parameters, universe, split dates or holdout use. No local dataset was read and no new empirical result was generated. Stage 4 remains unaccepted; no representative permissioned point-in-time result or outlier-fold attribution has been produced.
 - Current integration head is 819f8b4028469cb0d498098fec88545a18ebacc6. Live compare with main 7e669749d2615bc0f2a9d6f557bb99f8e7bd0767 reports integration 405 commits ahead and 2 behind; no synchronization was attempted.
+
+
+### Post-#30 CI final verification — 2026-11-04
+
+- Both post-merge runs 41851276790 (pull_request) and 41851269421 (push) completed successfully on integration head 819f8b4028469cb0d498098fec88545a18ebacc6; each passed analysis, user-frontend, user-backend, admin-workspace and production-images.
+- PR #6 remains open; no merge to main was performed or authorized. PR #15 remains Draft and its governance files remain on governance/execution-constitution-v1, not main.
