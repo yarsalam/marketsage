@@ -3,9 +3,8 @@
 
 This script never changes source approval, saves provider raw payloads, prints
 quotes, or puts credentials in a report. Live probes are small and opt-in by
-source. Binance remains explicitly supported but is excluded from default probes
-because the owner reported HTTP 451 from the Iran network; do not retry the same
-route or seek alternate hosts without a changed access/legal basis.
+source. Binance is hard-blocked after the owner reported HTTP 451 from the Iran
+network; do not retry the same route or seek alternate hosts.
 """
 from __future__ import annotations
 
@@ -25,7 +24,6 @@ REPO_DIR = Path(__file__).resolve().parents[3]
 if str(ENGINE_DIR) not in sys.path:
     sys.path.insert(0, str(ENGINE_DIR))
 
-from binance_public_provider import BinancePublicClient, BinancePublicError
 from codal_provider import CodalClient
 from fred_alfred_provider import FredAlfredClient, FredProviderError
 from gdelt_news_provider import GdeltDocClient, GdeltError
@@ -147,6 +145,14 @@ def _run_one(
         "eligible_for_scoring": False,
         "raw_payload_saved": False,
     }
+    if source_id == "global.binance_spot_public":
+        record.update(
+            status="blocked_owner_reported_http_451",
+            requests_attempted=0,
+            note="Owner-reported Iran-network HTTP 451; no request sent and no alternate route attempted.",
+        )
+        record["completed_at_utc"] = datetime.now(timezone.utc).isoformat()
+        return record
     try:
         if source_id == "iran.tsetmc":
             queries = tsetmc_queries or ["فولاد"]
@@ -179,23 +185,6 @@ def _run_one(
             )
             if export_dir is not None:
                 target = export_dir / "world_bank_IRN_FP.CPI.TOTL.ZG_candidate.csv"
-                record["candidate_export_rows"] = _write_csv(target, rows)
-                record["candidate_export_path"] = str(target)
-        elif source_id == "global.binance_spot_public":
-            with BinancePublicClient(timeout=10.0) as client:
-                rows = client.klines("BTCUSDT", interval="1d", limit=5)
-            dates = [row["observation_time_utc"] for row in rows]
-            record.update(
-                status="reachable_schema_validated_candidate",
-                instrument_key="BTCUSDT",
-                interval="1d",
-                row_count=len(rows),
-                first_observation_time_utc=min(dates, default=None),
-                last_observation_time_utc=max(dates, default=None),
-                quote_asset_inferred=False,
-            )
-            if export_dir is not None:
-                target = export_dir / "binance_BTCUSDT_1d_candidate.csv"
                 record["candidate_export_rows"] = _write_csv(target, rows)
                 record["candidate_export_path"] = str(target)
         elif source_id == "iran.tindex.public_api":
@@ -281,9 +270,6 @@ def _run_one(
             record["safe_error_detail"] = str(exc)
             record["error_detail_redacted"] = False
         if source_id == "us.fred.alfred" and isinstance(exc, FredProviderError):
-            record["safe_error_detail"] = str(exc)
-            record["error_detail_redacted"] = False
-        if source_id == "global.binance_spot_public" and isinstance(exc, BinancePublicError):
             record["safe_error_detail"] = str(exc)
             record["error_detail_redacted"] = False
         if source_id == "global.world_bank_indicators" and isinstance(exc, WorldBankError):
