@@ -151,3 +151,10 @@ After producing the report, run the structural validator:
 ```
 
 The validator fails if the report does not explicitly keep ranking/source scoring disabled, the holdout is marked as used for tuning, walk-forward folds overlap the holdout, required baselines or cost scenarios are absent, or the dataset hash is malformed. This is a structural guardrail, not proof that source data are accurate, licensed, point-in-time correct, or economically tradable. It does not assess whether strategy metrics are good.
+
+
+### Implemented portfolio and downside-risk diagnostics
+
+The evaluation runner also reports, for the full period and each chronological fold, L1 gross traded-weight turnover (buys plus sells), summed transaction/slippage/total cost fractions, rebalance count, selected-asset frequency and coverage relative to the input universe, and the modelled invested/cash exposure. Cost-fraction sums are not compounded return drag; the current momentum rule is fully invested and has no cash sleeve.
+
+For each return series it reports Sortino using annualized mean excess return divided by annualized downside deviation relative to the configured periodic risk-free rate, plus the empirical monthly 5th-percentile return and mean return at/below that threshold (historical 95% VaR/expected-shortfall convention). These empirical tail estimates are descriptive and unstable in small samples, especially a 12-month holdout; they are not parametric forecasts or a substitute for a larger independent sample. The strategy remains exploratory and ranking/scoring remain disabled.
