@@ -123,3 +123,17 @@ No local job, source approval, backtest admission, investment scoring, productio
 ## Execution policy
 
 Merge dependent PRs sequentially after all required jobs pass on the exact current head. Independent source screening, evidence review and methodology work may proceed in parallel. A blocked network smoke does not freeze unrelated work. Update this register and `PROJECT_STATE.md` after each material transition. CI green is not source acceptance, strategy validation or deployment authorization.
+
+
+## Latest integration update — 2026-11-04
+
+| PR | Target | Exact result | Current status |
+|---|---|---|---|
+| [#29](https://github.com/yarsalam/marketsage/pull/29) | `feat/tindex-free-data-connector` (integration PR #6) | Exact-head run `41848702070` passed all five required jobs on `3ec83742614bfc1ea283144c15b0063c8ecb51b6`; merged at `fb64e773387f3eb7270d0dd65d8e885c1f26ba0d`. | Merged into #6; post-merge PR run `41849790150` and push run `41849780257` were still running when recorded. |
+
+- PR #14 was already merged into #6; no additional merge was necessary.
+- Current integration head after PR #29 is `fb64e773387f3eb7270d0dd65d8e885c1f26ba0d`. Confirm both post-merge runs before declaring the integration head green.
+- PR #29 adds the World Bank Pink Sheet as a monthly/annual commodity benchmark candidate only. The workbook was not downloaded or parsed; per-series units, benchmark/source lineage, coverage, revisions and first-availability time remain open gates. No source is approved for research-engine use or scoring.
+- PR #6 remains open and must not be merged to `main` without explicit owner authorization. PR #8 remains parked after the GitHub-hosted TSETMC timeout.
+- PR #15 remains Draft; this register and the governance documents are on `governance/execution-constitution-v1`, not `main`.
+- Local Runner activation remains blocked by owner-side installation/registration and final host checks; see [Issue #25](https://github.com/yarsalam/marketsage/issues/25). Latest terminal evidence: full archive/extracted files are under `/home/nima/actions-runner`, while the dedicated `/opt/actions-runner/marketsage` directory contains only a partial archive. No Runner process/service is active and the exposed token must not be reused.
