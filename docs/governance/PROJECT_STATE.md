@@ -107,6 +107,13 @@ This section distinguishes committed documentation and previously shared sanitiz
 - Cost assumptions in the exploratory report were 10 bps transaction cost + 25 bps slippage, with 25/50 bps higher-cost stress; slippage is an assumption, not measured execution. Annual risk-free rate was 0%.
 - No permissioned, representative, point-in-time, net-of-realistic-cost out-of-sample strategy result has been accepted. No calibrated probability or validated AI prediction model exists.
 
+### Static code review — 2026-11-04
+
+- `research/backtest.py` validates a complete, finite, positive monthly price panel with unique, consecutive calendar months; momentum/volatility signals use data through the prior month-end and the following month's return is applied afterward. Transaction costs and slippage are charged on L1 gross traded-weight turnover (buys plus sells), including initial allocation.
+- `research/evaluation.py` keeps a final holdout separate from pre-holdout chronological six-month folds and compares net momentum with monthly-rebalanced equal weight, equal-weight buy-and-hold and zero-return cash, plus predeclared higher-cost stress. Six-month forward labels are reported as inventory only, not as model predictions.
+- The validation is structural, not provenance validation: the evaluator accepts a caller-supplied monthly CSV. Its complete-panel requirement does not resolve universe survivorship, source rights, corporate actions, point-in-time availability, currency comparability or executable liquidity. Those remain upstream acceptance gates.
+- `scripts/analyze_stage4_fold.py` is available to attribute the 2023-10 to 2024-03 anomaly by selected assets/monthly returns and reconcile gross contributions. It has not been run because the exact permissioned local input is unavailable here; run it only against the same pinned dataset hash/configuration used for the recorded result.
+
 ## Local execution and Runner blocker
 
 - No trusted local Runner is registered. The owner's local raw corpus and Stage 4 monthly input are not available to this execution.
