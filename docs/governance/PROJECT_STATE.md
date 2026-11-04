@@ -21,6 +21,7 @@
 - PR #23 reconciled the current Tindex quota evidence: official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account, while the MarketSage client retains its stricter local 1/minute and 100-success/day cap. Its exact-head run `41792758377` passed all five jobs; it merged into #6 at `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-merge PR run `41793156231` passed all five jobs.
 - PR #8 remains parked after the GitHub-hosted TSETMC live request timed out. Do not repeat that request from the same environment.
 - PR #15 governance remains Draft; its documents are updated through PR #23 and now record the private-repository branch-protection plan blocker, but the PR is not merged.
+- The governance documents referenced in this state file currently exist on PR #15's `governance/execution-constitution-v1` branch; PR #15 is still Draft and these files are not present on the default `main` branch. They are therefore a working continuity record, not yet an adopted default-branch policy.
 - No production deployment, source approval, investment ranking/scoring activation, portfolio allocation or real-money trade occurred.
 
 ## Verified integration graph
@@ -109,14 +110,17 @@ This section distinguishes committed documentation and previously shared sanitiz
 ## Local execution and Runner blocker
 
 - No trusted local Runner is registered. The owner's local raw corpus and Stage 4 monthly input are not available to this execution.
-- The connected GitHub integration cannot configure or verify private repository rulesets/branch protection in the current account. GitHub's current plan docs say private-repository branch protection/rulesets require Pro, Team or Enterprise; moving to a Free Organization alone does not resolve this. All inspected branches remain unprotected.
-- The Runner trust boundary is documented in `LOCAL_RUNNER_TRUST_BOUNDARY.md`. Before activation, either private-repository branch protection or an explicitly approved revised trust model, a dedicated unprivileged OS account, restricted read/write data directories, repository-scoped ephemeral Runner and a separate trusted `workflow_dispatch` workflow are required.
+- Owner-side host preparation reported on 2026-11-04: Ubuntu 26.04.1 LTS x86_64; dedicated `marketsage-runner` account created (UID 110/GID 119, only its own group, no `sudo` group); `/opt/actions-runner/marketsage` created as owner/group `marketsage-runner`, mode `0750`. The supplied shell output found no prior `config.sh`/`run.sh` or `$HOME/actions-runner*` installation. This is owner-reported host output, not an independent remote host audit.
+- The Runner package has not been installed, configured or registered; no Runner is online, no research data directories have been exposed, and no workflow has been changed to use `self-hosted`. Account creation alone does not satisfy the trust boundary.
+- The connected GitHub integration cannot configure or verify private repository rulesets/branch protection in the current account. GitHub's current plan docs say private-repository branch protection/rulesets require Pro, Team or Enterprise; moving to a Free Organization alone does not resolve this. The protection state therefore remains unverified through this connection.
+- The Runner trust boundary is documented in `LOCAL_RUNNER_TRUST_BOUNDARY.md`. Before registration/activation, either private-repository branch protection must be available and verified, or the owner must explicitly approve a revised trust model with its residual risk. Restricted read/write data directories, repository-scoped Runner and a separate trusted `workflow_dispatch` workflow are also required.
 - Until those controls are verified, local TSETMC acceptance, local event/gap-ledger review and empirical Stage 4 execution remain **BLOCKED**. No local audit is claimed.
 
 ## Independent work completed in this execution — 2026-11-04
 
 - Reviewed the live repository, PR graph and governance documents.
 - Confirmed PR #14 is already merged into #6 and the post-#18 #6 CI run passed all five required job types.
+- Revalidated PR #14 live metadata: it is merged into #6 at `f267c49efcbf72e7ddc17099ff93f38ade269a7b`; exact-head run `41401668921` passed all five required jobs on head `4bd179263f55b90854d00f1ea3b1287da0393b03`. No second merge was needed. The current #6 head remains `a2e19c156f226241a34658d32d25e93173c99a5d`, and post-#23 run `41793156231` passed all five required jobs.
 - Opened and merged PR #19 after all five exact-head CI job types passed. It refreshes the source catalog and evidence-led candidate triage, recording Nerkhsanj anomalies/quarantine, previous TSETMC whole-corpus evidence/scope mismatch, and Tindex Rial/Toman/account-scope constraints. No provider probe or local raw-data access occurred.
 - Verified the source registry had 18 entries before the new global-source screen; PR #22 expands it to 22 registered entries, while the catalog grows from 13 to 18. The five new catalog entries are not default-probed, not wired into research and remain unapproved.
 - Reviewed the Stage 4 protocol, empirical review and backtest code. No new empirical run was attempted because the permissioned local input is unavailable and the known extreme fold requires attribution, not a repeated blind run.
