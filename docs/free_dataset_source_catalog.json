@@ -71,7 +71,7 @@
       "label": "Binance Spot public klines",
       "free_access_class": "public_market_data_no_key",
       "authentication": "none for public market-data endpoint",
-      "probe_mode": "up to five daily BTCUSDT candles",
+      "probe_mode": "hard-blocked after owner-reported Iran-network HTTP 451; no live request is sent",
       "data_families": [
         "venue-specific crypto OHLCV"
       ],
