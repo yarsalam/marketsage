@@ -196,7 +196,7 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #39 separates `DISCOVERY_IDENTITY_CONFLICT` and `DISCOVERY_AMBIGUOUS_HISTORY` from actual input/parser failures.
 - Identity conflicts and ambiguous history selection explicitly prevent identity acceptance and receive distinct remediation-queue stages.
 - The regression test checks that an identity conflict remains quarantined and scoring/backtest flags remain false.
-- PR #39 targets the integration branch only; its exact-head CI must pass before merge. The main local workflow's pinned integration SHA must be updated in a separate PR before the corrected pipeline can be dispatched.
+- PR #39 merged into the integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after all five required job types passed in run `42050542208`. The main local workflow pin is updated by PR #41; owner review of the exact merged workflow and pinned commit is still required before any future dispatch.
 
 **Decision effect**
 - Do not rerun the unchanged corpus or weaken thresholds.
@@ -205,3 +205,13 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open and must not be merged to main without separate explicit owner approval.
 
 **Capital-risk impact:** None. No source acceptance, strategy backtest, scoring, production, broker or trading authorization changes.
+
+## 2026-11-05 — TSETMC official REST-service path and World Bank Pink Sheet release refresh
+
+**Authority:** Documentation-only source screening; no live provider requests or source approvals.
+
+- A Tasnim report dated 1404/10/06 (2025-12-27), quoting TSETMC, reports a new REST web service and links to `https://api.tsetmc.com/docs/`. The documentation endpoint was inaccessible in this review. Authentication, subscription/pricing, rate limits, history, units, adjustment semantics, publication timing and commercial rights remain unknown. Existing reverse-engineered CDN endpoints must not be assumed equivalent. PR #44 records this as a contract-discovery candidate only.
+- The World Bank's November 2026 Pink Sheet PDF is dated 2026-11-03 and reports monthly averages through October 2026. It exposes selected units/benchmarks and revision notes, lists third-party sources, and carries an "Official Use Only" footer. The XLSX workbook remains unparsed; per-series rights and historical vintages are unresolved. PR #43 records this as monthly macro context only.
+- Neither candidate is enabled for automated collection, research-engine use, scoring or commercial redistribution by these documentation changes.
+
+**Capital-risk impact:** None. Existing fail-closed source and scoring gates remain unchanged.
