@@ -10,7 +10,7 @@ The laptop Runner is limited to reviewed, owner-dispatched research workflows. O
 
 Allowed local workloads:
 1. the manual staged-dataset checksum/inventory validator on main;
-2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, which checks out the pinned integration commit `819f8b4028469cb0d498098fec88545a18ebacc6` and runs the offline TSETMC candidate-acceptance pipeline after explicit owner dispatch.
+2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, which historically pinned integration commit `819f8b4028469cb0d498098fec88545a18ebacc6`. This PR updates the pin to corrected pipeline commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` (v1.1.1); the workflow remains manual-only and is not dispatched by this change.
 
 Disallowed:
 - fork/PR/issue/comment/schedule/push/workflow-run/repository-dispatch triggers;
@@ -96,9 +96,9 @@ The workflow remains manual-only on `main`, owner-gated, requires explicit boole
 - 0 input-file read errors; 0 provider/network requests; raw inputs unchanged.
 - 32 output-manifest files hash-verified; no artifacts uploaded.
 - All candidates remain blocked on rights, identity evidence, price/volume semantics, independent reconciliation and corporate-action completeness.
-- The run's `identity_conflict_count=7` corresponds to history-row `insCode`/ISIN conflicts with sibling search/crosswalk metadata. Pipeline v1.1.0 also labeled those seven as `INPUT_OR_PARSER_ERROR`, despite `input_file_read_errors=0`. [PR #39](https://github.com/yarsalam/marketsage/pull/39) corrects this classification and keeps identity conflicts fail-closed; it is an open nested PR targeting the integration branch, not yet merged.
+- The run's `identity_conflict_count=7` corresponds to history-row `insCode`/ISIN conflicts with sibling search/crosswalk metadata. Pipeline v1.1.0 also labeled those seven as `INPUT_OR_PARSER_ERROR`, despite `input_file_read_errors=0`. [PR #39](https://github.com/yarsalam/marketsage/pull/39) merged the v1.1.1 classification correction into the integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c`; the seven mappings remain unresolved.
 
-Do not repeat the unchanged corpus. Before any future dispatch, the owner must review the exact current workflow source and pinned pipeline commit. After PR #39 merges into the integration branch, a separate main-branch PR must update the workflow's pinned SHA; only then can a new evidence-backed/corrected dataset run be considered.
+Do not repeat the unchanged corpus. Before any future dispatch, the owner must review the exact current workflow source and pinned pipeline commit. PR #41 updates the main workflow's pinned SHA to `1dc6894c0823f6ffe77d27fd866576f5115a042c`. The owner must review the exact merged workflow and pin before any future dispatch; no dispatch is part of this PR.
 
 The external evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40). No raw rows, candidate CSVs, local paths or private output files may be uploaded. No source approval, scoring, ranking, backtest approval, production deployment, broker access, trading or capital allocation is authorized.
 
@@ -126,7 +126,10 @@ If any local job behaves unexpectedly:
 
 - [Issue #25 — local Runner activation (completed)](https://github.com/yarsalam/marketsage/issues/25)
 - [Issue #40 — TSETMC rights, identity and reconciliation evidence](https://github.com/yarsalam/marketsage/issues/40)
-- [PR #39 — discovery identity-conflict classification correction](https://github.com/yarsalam/marketsage/pull/39)
+- [PR #39 — discovery identity-conflict classification correction (merged to integration)](https://github.com/yarsalam/marketsage/pull/39)
+- [PR #41 — governance sync and corrected workflow pin](https://github.com/yarsalam/marketsage/pull/41)
+- [PR #43 — World Bank Pink Sheet release/rights refresh](https://github.com/yarsalam/marketsage/pull/43)
+- [PR #44 — TSETMC official REST-service candidate screen](https://github.com/yarsalam/marketsage/pull/44)
 - [Project state](PROJECT_STATE.md)
 - [Decision log](DECISION_LOG.md)
 - [Project execution constitution](PROJECT_EXECUTION_CONSTITUTION.md)
