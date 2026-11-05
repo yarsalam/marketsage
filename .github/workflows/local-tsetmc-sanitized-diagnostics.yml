@@ -1,0 +1,38 @@
+name: MarketSage sanitized TSETMC input diagnostics
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_private_local_diagnostics:
+        description: "Confirm read-only aggregate diagnostics of existing private TSETMC output; no source data upload"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketsage-local-research-runner
+  cancel-in-progress: false
+
+jobs:
+  sanitized-local-diagnostics:
+    if: github.ref == 'refs/heads/main' && github.actor == 'yarsalam' && inputs.confirm_private_local_diagnostics == true
+    runs-on: [self-hosted, linux, x64, marketsage-local, marketsage-research]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout the exact manually selected workflow commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          clean: true
+
+      - name: Run read-only sanitized diagnostics
+        run: |
+          python3 user/analysis-engine/scripts/diagnose_tsetmc_input_errors.py
+
+# Deliberately no push, pull_request, schedule, repository_dispatch, secrets,
+# provider/network access, dependency installation, artifact upload, raw data
+# output, scoring, backtest, production deployment, broker access, or trading.
