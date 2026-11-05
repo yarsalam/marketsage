@@ -145,7 +145,6 @@ jobs:
           python3 - <<'PY'
           import json
           import os
-          import sys
           import urllib.request
 
           needs = json.loads(os.environ["NEEDS_JSON"])
@@ -162,11 +161,11 @@ jobs:
               f'{os.environ["RUN_ID"]}'
           )
           body = (
-              "### Automated CI failure notice\\n\\n"
-              f'Workflow: `{os.environ["WORKFLOW_NAME"]}`\\n'
+              "### Automated CI failure notice\n\n"
+              f'Workflow: `{os.environ["WORKFLOW_NAME"]}`\n'
               f'Run: [#{os.environ["RUN_NUMBER"]}]({run_url}) '
-              f'(attempt {os.environ["RUN_ATTEMPT"]})\\n'
-              f'Failed jobs: {", ".join(failures)}\\n\\n'
+              f'(attempt {os.environ["RUN_ATTEMPT"]})\n'
+              f'Failed jobs: {", ".join(failures)}\n\n'
               "This notice contains job names only; it does not attach logs, "
               "artifacts, raw market data, prices, credentials, or local paths. "
               "Inspect the linked run and redact sensitive material before sharing."
