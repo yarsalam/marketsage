@@ -116,6 +116,17 @@ jobs:
       - name: Build all production images
         run: docker compose --env-file .env.production -f docker-compose.production.yml build
 
+  ci-infra-tests:
+    name: Test CI automation helpers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test sanitized failure notice helper
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+
   notify-failure:
     name: Post sanitized failure notice
     needs:
@@ -124,12 +135,17 @@ jobs:
       - user-frontend
       - admin-workspace
       - production-images
+      - ci-infra-tests
     if: ${{ always() && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      contents: read
       issues: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Post job-level status to infrastructure issue
         env:
           GH_TOKEN: ${{ github.token }}
@@ -137,58 +153,6 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
-          WORKFLOW_NAME: ${{ github.workflow }}
-          REPOSITORY: ${{ github.repository }}
           SERVER_URL: ${{ github.server_url }}
           API_URL: ${{ github.api_url }}
-        run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import urllib.request
-
-          needs = json.loads(os.environ["NEEDS_JSON"])
-          failures = sorted(
-              name for name, result in needs.items()
-              if result.get("result") == "failure"
-          )
-          if not failures:
-              raise SystemExit(0)
-
-          run_url = (
-              f'{os.environ["SERVER_URL"]}/'
-              f'{os.environ["REPOSITORY"]}/actions/runs/'
-              f'{os.environ["RUN_ID"]}'
-          )
-          body = (
-              "### Automated CI failure notice\n\n"
-              f'Workflow: `{os.environ["WORKFLOW_NAME"]}`\n'
-              f'Run: [#{os.environ["RUN_NUMBER"]}]({run_url}) '
-              f'(attempt {os.environ["RUN_ATTEMPT"]})\n'
-              f'Failed jobs: {", ".join(failures)}\n\n'
-              "This notice contains job names only; it does not attach logs, "
-              "artifacts, raw market data, prices, credentials, or local paths. "
-              "Inspect the linked run and redact sensitive material before sharing."
-          )
-          payload = json.dumps({"body": body}).encode("utf-8")
-          request = urllib.request.Request(
-              f'{os.environ["API_URL"]}/repos/'
-              f'{os.environ["REPOSITORY"]}/issues/49/comments',
-              data=payload,
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "Authorization": f'Bearer {os.environ["GH_TOKEN"]}',
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "Content-Type": "application/json",
-              },
-              method="POST",
-          )
-          try:
-              with urllib.request.urlopen(request, timeout=20) as response:
-                  if response.status not in (200, 201):
-                      raise SystemExit(1)
-          except Exception:
-              print("Sanitized failure notice could not be delivered.")
-              raise SystemExit(1) from None
-          print("Sanitized failure notice posted to infrastructure issue.")
-          PY
+        run: python3 .github/scripts/post_ci_failure_notice.py
