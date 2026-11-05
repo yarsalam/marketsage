@@ -15,6 +15,7 @@
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync plus update the manual local workflow pin to corrected TSETMC pipeline v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. The previous head passed five jobs in run 42051140989; this amended head requires fresh exact-head CI. No dispatch is performed. |
 | [#38](https://github.com/yarsalam/marketsage/pull/38) | target not surfaced in issue metadata | Read-only sanitized diagnostics for existing local TSETMC output inventories; manual-only, no provider requests or artifact uploads | Open. Exact-head CI not verified in this run; do not dispatch the local workflow without owner review. |
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and correction of the manual local workflow's immutable pipeline pin to v1.1.1 `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Run 42055777260 passed all five jobs on the preceding head; this new state-sync update requires fresh exact-head CI. No dispatch is performed. |
+| [#48](https://github.com/yarsalam/marketsage/pull/48) | feat/tindex-free-data-connector (PR #6 integration branch) | Stage 4 exact code/worktree provenance and report/input hash sidecar; validator fails closed on missing/dirty provenance | Open. Exact-head CI run 42058368153 is in progress; no data or source approval is included. |
 
 
 
@@ -71,13 +72,14 @@ main
 
 PR #39 merged into PR #6's integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after five required job types passed in run `42050542208`. The first local candidate run (41914919555) used the previous v1.1.0 pipeline; the corrected v1.1.1 implementation changes classification only. PR #41 updates main's manual workflow pin to the corrected commit and requires owner review before a future dispatch.
 
-PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen) and PR #46 (FIPIRAN/IFB/Investats candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #38 (sanitized local diagnostics) and PR #41 (this governance/pin update) remain open. PR #6 remains open, 413 commits ahead and 9 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
+PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen) and PR #46 (FIPIRAN/IFB/Investats candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #48 (Stage 4 run-manifest provenance), PR #38 (sanitized local diagnostics) and PR #41 (this governance/pin update) remain open. PR #6 remains open, 413 commits ahead and 9 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
 
 ## Release and capital-risk guardrails
 
 - No data source currently passes the complete acceptance gate for investment scoring.
 - Stage 4 remains exploratory; the 2023-10-31 through 2024-03-31 fold reporting +240.89% requires asset-level attribution from the exact original input dataset.
 - The exact-hash attribution of that +240.89% fold requires the owner's local original CSV; the action, command, hash and acceptance criteria are tracked in [Issue #47](https://github.com/yarsalam/marketsage/issues/47). Do not reconstruct or substitute the dataset.
+- PR #48 is intended to add the missing exact-code/worktree and report/input hash manifest; until its exact-head CI passes and it merges, the historical Stage 4 report remains without a sidecar manifest.
 - Do not inspect or tune against the locked final holdout.
 - The local run 41914919555 completed candidate-only using pipeline v1.1.0: 47 quarantined, 0 research-eligible, 0 input-file read errors and 7 discovery identity conflicts. PR #39 merged the v1.1.1 classification correction into integration; the historical run itself is unchanged and no candidates were promoted.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
