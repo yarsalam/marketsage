@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import platform
 from datetime import datetime, timezone
@@ -49,6 +48,8 @@ def main() -> int:
         parser.error("write the report outside the repository so the captured code revision stays reproducible")
     if manifest_output == repository_root or repository_root in manifest_output.parents:
         parser.error("write the run manifest outside the repository")
+    if output == source or manifest_output in {source, output}:
+        parser.error("input, report and manifest paths must be three distinct files")
     if not source.is_file():
         parser.error(f"input CSV does not exist: {source}")
     try:
