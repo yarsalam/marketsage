@@ -76,6 +76,7 @@ PR #43 (World Bank Pink Sheet refresh) and PR #45 (TSETMC official REST-service 
 
 - No data source currently passes the complete acceptance gate for investment scoring.
 - Stage 4 remains exploratory; the 2023-10-31 through 2024-03-31 fold reporting +240.89% requires asset-level attribution from the exact original input dataset.
+- The exact-hash attribution of that +240.89% fold requires the owner's local original CSV; the action, command, hash and acceptance criteria are tracked in [Issue #47](https://github.com/yarsalam/marketsage/issues/47). Do not reconstruct or substitute the dataset.
 - Do not inspect or tune against the locked final holdout.
 - The local run 41914919555 completed candidate-only using pipeline v1.1.0: 47 quarantined, 0 research-eligible, 0 input-file read errors and 7 discovery identity conflicts. PR #39 merged the v1.1.1 classification correction into integration; the historical run itself is unchanged and no candidates were promoted.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
