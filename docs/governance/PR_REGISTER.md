@@ -10,11 +10,12 @@
 
 | PR | Target | Scope / current state | Handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Diverged integration branch, 412 commits ahead / 9 behind main at latest comparison; offline pipeline execution pin is v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync plus update the manual local workflow pin to corrected TSETMC pipeline v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. The previous head passed five jobs in run 42051140989; this amended head requires fresh exact-head CI. No dispatch is performed. |
-| [#43](https://github.com/yarsalam/marketsage/pull/43) | feat/tindex-free-data-connector (PR #6 integration branch) | Refresh World Bank Pink Sheet release, units, revision and rights evidence | Open. Exact-head CI run 42051901501 was in progress at last inspection; merge only after all five jobs pass. |
-| [#44](https://github.com/yarsalam/marketsage/pull/44) | feat/tindex-free-data-connector (PR #6 integration branch) | Record TSETMC official REST-service documentation path as a candidate; do not assume rights/auth/history | Open. Await exact-head five-job CI. |
+| [#38](https://github.com/yarsalam/marketsage/pull/38) | target not surfaced in issue metadata | Read-only sanitized diagnostics for existing local TSETMC output inventories; manual-only, no provider requests or artifact uploads | Open. Exact-head CI not verified in this run; do not dispatch the local workflow without owner review. |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and correction of the manual local workflow's immutable pipeline pin to v1.1.1 `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Run 42051140989 passed on the previous head only; this updated head requires fresh exact-head five-job CI. No dispatch is performed. |
+| [#45](https://github.com/yarsalam/marketsage/pull/45) | feat/tindex-free-data-connector (PR #6 integration branch) | TSETMC official REST-service candidate screen; preserves the already merged November Pink Sheet release/rights record | Open. CI run 42055449340 is in progress after the catalog correction; merge only after all five required job types pass. |
 
 
 
@@ -38,7 +39,7 @@
 
 PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29, #30 and #39 are merged into the integration branch in dependency order. Exact-head and post-merge CI results are recorded in their PRs. They do not constitute data-source approval or strategy acceptance.
 
-- [#14](https://github.com/yarsalam/marketsage/pull/14) — integrated offline TSETMC candidate-acceptance pipeline; code is pinned for local execution at 819f8b4028469cb0d498098fec88545a18ebacc6.
+- [#14](https://github.com/yarsalam/marketsage/pull/14) — integrated offline TSETMC candidate-acceptance pipeline; original implementation was pinned at 819f8b4028469cb0d498098fec88545a18ebacc6; PR #39's classification correction at `1dc6894c0823f6ffe77d27fd866576f5115a042c` is the current v1.1.1 execution pin proposed by PR #41.
 - [#20](https://github.com/yarsalam/marketsage/pull/20) — v2 TSETMC identity crosswalk and ambiguity quarantine.
 - [#22](https://github.com/yarsalam/marketsage/pull/22) — official global source candidates (ECB, Treasury, EIA, SEC, IMF).
 - [#23](https://github.com/yarsalam/marketsage/pull/23) — Tindex quota evidence reconciliation while retaining the stricter local guard.
@@ -47,6 +48,7 @@ PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29, #30
 - [#29](https://github.com/yarsalam/marketsage/pull/29) — World Bank Pink Sheet benchmark candidate.
 - [#30](https://github.com/yarsalam/marketsage/pull/30) — Stage 4 downside/tail-risk and portfolio-mechanics diagnostics.
 - [#39](https://github.com/yarsalam/marketsage/pull/39) — TSETMC discovery identity-conflict classification fix; merged at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after all five required job types passed in run `42050542208`.
+- [#43](https://github.com/yarsalam/marketsage/pull/43) — World Bank Pink Sheet November 2026 PDF release/units/revision/rights refresh; merged into integration after all five required job types passed in run `42051901501`.
 
 ## Closed / superseded
 
@@ -55,6 +57,7 @@ PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29, #30
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | Closed as superseded; its divergent branch was not merged. Its five governance documents were adopted through clean PR #31. |
 | [#26](https://github.com/yarsalam/marketsage/pull/26) | Closed as duplicate/superseded documentation branch. |
 | [#42](https://github.com/yarsalam/marketsage/pull/42) | Closed as stale-base duplicate; the same World Bank source refresh was reapplied to the updated integration head in PR #43. |
+| [#44](https://github.com/yarsalam/marketsage/pull/44) | Closed as stale-base TSETMC REST candidate PR; the same changes were reapplied on the updated integration head in PR #45. |
 
 ## Current integration graph
 
@@ -66,7 +69,7 @@ main
 
 PR #39 merged into PR #6's integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after five required job types passed in run `42050542208`. The first local candidate run (41914919555) used the previous v1.1.0 pipeline; the corrected v1.1.1 implementation changes classification only. PR #41 updates main's manual workflow pin to the corrected commit and requires owner review before a future dispatch.
 
-PR #43 (World Bank Pink Sheet refresh) and PR #44 (TSETMC official REST-service screen) are open against the integration branch. PR #42 is closed as superseded by #43. PR #6 remains open, 408 commits ahead and 9 behind main at the last comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
+PR #43 (World Bank Pink Sheet refresh) is merged into the integration branch; PR #44 is closed as superseded by #45. PR #45 (TSETMC official REST-service candidate screen) remains open against the integration branch, with exact-head CI running after a catalog correction. PR #38 (sanitized local diagnostics) and PR #41 (this governance/pin update) are also open. PR #6 remains open, 412 commits ahead and 9 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
 
 ## Release and capital-risk guardrails
 
