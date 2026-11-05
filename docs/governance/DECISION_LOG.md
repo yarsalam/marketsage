@@ -244,3 +244,15 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - No local workflow dispatch, source acceptance, backtest approval, scoring/ranking, production deployment, broker access, trading or capital allocation is authorized by these changes.
 
 **Capital-risk impact:** None.
+
+## 2026-11-05 — Screen Iran property and automobile data candidates
+
+**Authority:** Constitution Rule 2 (broad, evidence-led candidate screening).  
+**Status:** Documentation-only PR #51 is open; no provider probe or source approval.
+
+- CBI's reviewed urban CPI PDF (Tir 1405, observations through Khordad 1405, base 1400=100) is household inflation context, not a property asset-price or rental-yield series. CBI's Economic Time Series Database is annual macro/construction context, not a verified monthly property transaction feed.
+- CBI Tehran housing transaction reports ran monthly through Mordad 1403; the CBI/IBENA status statement dated 1404-09-12 says reporting stopped after the registry transition and access to replacement systems remained unavailable. Treat the series as historical-only with a structural coverage break.
+- CODAL disclosures for Iran Khodro, Pars Khodro and Saipa provide company-level production/sales fundamentals. Sales amounts, quantities and manufacturer price fields are not a market-wide executed new/used-car transaction-price index.
+- No current representative transaction-price source for Iranian property or used vehicles passed the history, point-in-time, unit, independent-reconciliation and rights gates. The asset universe remains open; no proxy is silently promoted to an investable price.
+
+**Capital-risk impact:** None. All source and scoring gates remain fail-closed.
