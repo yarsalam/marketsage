@@ -88,7 +88,7 @@ Attempt 1 failed during tar extraction. The service compatibility change and a s
 
 Workflow `.github/workflows/local-tsetmc-integrated-acceptance.yml` was added by PR #32 and amended by PR #34, merged to `main` at `554fe2200ccb3a523442b0e241e81a748becfa44`. PR #34 exact head `dcf32f46b524daf3ac63e9937962cd02948ca2f8` passed all five CI jobs in run `41913385729`; the analysis suite reported 109 passed and 7 warnings.
 
-The workflow remains manual-only on `main`, owner-gated, requires explicit boolean confirmation, checks out the exact manually selected workflow commit plus immutable integration pipeline commit `819f8b4028469cb0d498098fec88545a18ebacc6`, and uses the repository-scoped Runner labels. It reads only the staged raw subtree and explicit v2 crosswalk, applies the memory/disk and bounded-batch checks, keeps detailed outputs local, prints sanitized aggregates only, and does not upload artifacts, make provider requests, alter inputs or enable scoring/backtesting.
+After PR #41 merges, the workflow remains manual-only on `main`, owner-gated, requires explicit boolean confirmation, checks out the exact manually selected workflow commit plus immutable integration pipeline commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` (v1.1.1), and uses the repository-scoped Runner labels. It reads only the staged raw subtree and explicit v2 crosswalk, applies the memory/disk and bounded-batch checks, keeps detailed outputs local, prints sanitized aggregates only, and does not upload artifacts, make provider requests, alter inputs or enable scoring/backtesting.
 
 **First completed integrated run:** [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555), 2026-11-05.
 - Two batches: 32 and 15 candidates; 95 unique input files; 7,554 history rows.
@@ -128,8 +128,10 @@ If any local job behaves unexpectedly:
 - [Issue #40 — TSETMC rights, identity and reconciliation evidence](https://github.com/yarsalam/marketsage/issues/40)
 - [PR #39 — discovery identity-conflict classification correction (merged to integration)](https://github.com/yarsalam/marketsage/pull/39)
 - [PR #41 — governance sync and corrected workflow pin](https://github.com/yarsalam/marketsage/pull/41)
-- [PR #43 — World Bank Pink Sheet release/rights refresh](https://github.com/yarsalam/marketsage/pull/43)
-- [PR #44 — TSETMC official REST-service candidate screen](https://github.com/yarsalam/marketsage/pull/44)
+- [PR #43 — World Bank Pink Sheet release/rights refresh (merged into integration)](https://github.com/yarsalam/marketsage/pull/43)
+- [PR #44 — TSETMC official REST-service candidate screen (closed as stale-base/superseded)](https://github.com/yarsalam/marketsage/pull/44)
+- [PR #45 — TSETMC official REST-service candidate screen on updated integration head](https://github.com/yarsalam/marketsage/pull/45)
+- [PR #38 — sanitized local TSETMC diagnostics (open; no dispatch)](https://github.com/yarsalam/marketsage/pull/38)
 - [Project state](PROJECT_STATE.md)
 - [Decision log](DECISION_LOG.md)
 - [Project execution constitution](PROJECT_EXECUTION_CONSTITUTION.md)
