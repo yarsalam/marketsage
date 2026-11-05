@@ -1,6 +1,6 @@
 {
   "catalog_version": "1.1.3",
-  "last_reviewed": "2026-11-04",
+  "last_reviewed": "2026-11-05",
   "policy": {
     "prefer_no_subscription": true,
     "free_access_is_not_a_reuse_license": true,
@@ -12,19 +12,22 @@
   "sources": [
     {
       "source_id": "iran.tsetmc",
-      "label": "TSETMC instrument search and daily history",
+      "label": "TSETMC instrument search/daily history plus newly announced official REST-service candidate",
       "free_access_class": "public_candidate",
-      "authentication": "none observed for current candidate endpoints",
+      "authentication": "None observed for the current public candidate endpoints; authentication or subscription requirements for the newly announced official REST service are unknown",
       "probe_mode": "one bounded exact instrument search by default",
       "data_families": [
         "Iranian equities",
         "listed funds"
       ],
-      "history_limit": "Endpoint returns candidate daily history; actual coverage must be measured per instrument",
+      "history_limit": "Current candidate endpoints return daily history; actual coverage must be measured per instrument. The official REST-service documentation path was announced on 2025-12-27 but could not be inspected; its endpoint history and pagination contract remain unknown.",
       "limitations": [
         "Reverse-engineered endpoints can change or block non-Iranian IPs",
         "Rial/Toman convention and adjusted history must be verified",
-        "Automated collection and commercial rights are not approved"
+        "Automated collection and commercial rights are not approved",
+        "TSETMC announced a new REST web service and linked https://api.tsetmc.com/docs/ on 2025-12-27; the documentation host was inaccessible in this review, so the official contract remains unverified.",
+        "Do not assume the new official REST service is identical to the repository's reverse-engineered cdn.tsetmc.com endpoints; keep the adapters and their evidence separate until exact hosts, endpoints and schemas are compared.",
+        "The announcement does not establish whether access is public, account-based or paid, nor request limits, historical depth, price-adjustment semantics or commercial/model-use rights. Obtain and review the actual service terms before persistent or derived use."
       ],
       "default_live_probe": true,
       "production_approved": false
