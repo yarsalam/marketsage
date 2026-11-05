@@ -220,12 +220,13 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 ## 2026-11-05 — Refresh source-screen PR status after integration rebase
 
 **Authority:** Routine documentation and evidence maintenance under the project execution constitution.  
-**Status:** PR #43 merged into integration; PR #44 closed as stale-base; PR #45 is the current TSETMC REST candidate PR.
+**Status:** PR #43 and PR #45 merged into integration; PR #44 closed as stale-base; PR #46 is the current Iran fund/fixed-income candidate PR.
 
 - PR #43's World Bank Pink Sheet update passed all five required CI job types in run `42051901501` and is present in the current integration catalog. The November 2026 PDF is dated 2026-11-03 and reports monthly averages through October. The landing page still labels the XLS workbook October 2026 and shows an older latest-prices card; the PDF/workbook release-label mismatch is retained as unresolved rather than inferred away.
 - PR #45's first patch accidentally regressed the catalog to the older October-only release record. The PR branch was corrected in commit `516e03cb4add2158a9f225e910a121d244f85962` to preserve the November PDF date, selected units, revision notes, third-party-source caveat and "Official Use Only" marking while keeping the TSETMC REST candidate separate from reverse-engineered CDN endpoints.
-- The current PR #45 CI run `42055449340` is in progress after that correction. Do not merge until all five required job types pass on the current head.
-- PR #44 is closed as a stale-base duplicate; PR #45 reapplies the same TSETMC candidate screen on the updated integration branch. The official REST documentation host remains inaccessible in this review, so authentication, pricing, limits, history, units, timestamp semantics and rights remain unknown.
+- The corrected PR #45 head passed all five required job types in run `42055449340` and merged into the integration branch at `cbe585efe26ee129370b39e6bd983e709aecf55c`.
+- PR #44 is closed as a stale-base duplicate; PR #45 merged the TSETMC candidate screen on the updated integration branch. The official REST documentation host remains inaccessible in this review, so authentication, pricing, limits, history, units, timestamp semantics and rights remain unknown.
+- PR #46 adds FIPIRAN, IFB and Investats candidate-only screening. Its five-job CI is pending; no probe or procurement is authorized.
 - Issue #40 remains the durable owner-action record for local review of the seven identity conflicts, intended-Iran-network documentation review, rights, and independent price/volume reconciliation.
 
 **Capital-risk impact:** None. No provider probe, source approval, backtest approval, scoring, ranking, production deployment, broker access or trading was performed.
