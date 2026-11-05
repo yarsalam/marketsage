@@ -1,0 +1,1025 @@
+{
+  "catalog_version": "1.1.4",
+  "last_reviewed": "2026-11-05",
+  "policy": {
+    "prefer_no_subscription": true,
+    "free_access_is_not_a_reuse_license": true,
+    "all_new_sources_eligible_for_scoring": false,
+    "vendor_provided_streamdata_is_not_classified_as_free": true,
+    "missing_values_are_never_forward_filled": true,
+    "raw_vendor_files_must_not_be_committed": true
+  },
+  "sources": [
+    {
+      "source_id": "iran.tsetmc",
+      "label": "TSETMC instrument search/daily history plus newly announced official REST-service candidate",
+      "free_access_class": "public_candidate",
+      "authentication": "None observed for the current public candidate endpoints; authentication or subscription requirements for the newly announced official REST service are unknown",
+      "probe_mode": "one bounded exact instrument search by default",
+      "data_families": [
+        "Iranian equities",
+        "listed funds"
+      ],
+      "history_limit": "Current candidate endpoints return daily history; actual coverage must be measured per instrument. The official REST-service documentation path was announced on 2025-12-27 but could not be inspected; its endpoint history and pagination contract remain unknown.",
+      "limitations": [
+        "Reverse-engineered endpoints can change or block non-Iranian IPs",
+        "Rial/Toman convention and adjusted history must be verified",
+        "Automated collection and commercial rights are not approved",
+        "TSETMC announced a new REST web service and linked https://api.tsetmc.com/docs/ on 2025-12-27; the documentation host was inaccessible in this review, so the official contract remains unverified.",
+        "Do not assume the new official REST service is identical to the repository's reverse-engineered cdn.tsetmc.com endpoints; keep the adapters and their evidence separate until exact hosts, endpoints and schemas are compared.",
+        "The announcement does not establish whether access is public, account-based or paid, nor request limits, historical depth, price-adjustment semantics or commercial/model-use rights. Obtain and review the actual service terms before persistent or derived use."
+      ],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.codal",
+      "label": "CODAL company disclosures",
+      "free_access_class": "public_candidate",
+      "authentication": "none observed for current search endpoint",
+      "probe_mode": "one small page of disclosure search",
+      "data_families": [
+        "issuer filings",
+        "corporate events"
+      ],
+      "history_limit": "Search response only; publication and amendment history require validation",
+      "limitations": [
+        "Retrieval timestamp is not publication time",
+        "Filing corrections and amendments need linkage",
+        "Use terms and automated access need review"
+      ],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.world_bank_indicators",
+      "label": "World Bank Indicators API",
+      "free_access_class": "public_api_no_key",
+      "authentication": "none required by current official API documentation",
+      "probe_mode": "Iran annual CPI inflation indicator, bounded to selected years",
+      "data_families": [
+        "annual macroeconomic indicators"
+      ],
+      "history_limit": "Indicator-specific; API supports long annual histories but data may be missing or revised",
+      "limitations": [
+        "Annual observation year is not publication time",
+        "Not a substitute for daily prices",
+        "Indicator definitions and licensing/redistribution conditions still need review"
+      ],
+      "default_live_probe": true,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.world_bank_commodity_prices",
+      "label": "World Bank Commodity Markets Pink Sheet (monthly/annual commodity prices and indices)",
+      "free_access_class": "public_dataset_candidate",
+      "authentication": "No API key observed for public XLS workbook links; no stable REST/SDMX API contract established",
+      "probe_mode": "documentation-only; discover the current workbook link from the official Commodity Markets page; no automated fetch",
+      "data_families": [
+        "monthly nominal commodity prices",
+        "monthly commodity price indices",
+        "annual commodity prices and indices",
+        "global energy and precious-metals benchmarks"
+      ],
+      "history_limit": "The World Bank Data Blog dated 2026-11-04 links the November 2026 Pink Sheet PDF dated 2026-11-03, which reports monthly averages through October 2026. The Commodity Markets landing page still labels the monthly XLS as October 2026 and its latest-prices card still shows 2026-10-02 with next update 2026-11-03; the PDF/workbook release-label mismatch is unresolved. Exact XLSX coverage and first-availability time per series remain unparsed.",
+      "limitations": [
+        "Monthly/annual benchmark data are not daily executable spot/futures prices or ETF returns",
+        "Observation month is not publication/availability time; preserve the PDF publication date and any later workbook availability separately",
+        "Each commodity has its own benchmark, currency, unit and quotation basis; parse the workbook's series metadata and preserve units exactly",
+        "Keep nominal prices, real prices, price indices and annual averages as separate data kinds",
+        "Historical workbooks may revise earlier observations; immutable vintages and revision diffs are required for point-in-time replay",
+        "The November 2026 PDF confirms selected units and benchmark definitions: Brent USD/barrel, gold and silver USD/troy ounce, copper USD/metric ton; gold is a spot average of daily rates, silver is the London afternoon fixing, and crude-oil average equally weights Brent, Dubai and WTI",
+        "The November PDF lists third-party upstream sources and carries an 'Official Use Only' footer; the general CC BY 4.0 default does not automatically clear third-party components or that marking; obtain per-series rights clarification before commercial redistribution",
+        "The XLSX workbook itself was not downloaded or parsed; exact historical coverage, workbook schema, missing-value tokens, discontinuations and full revision vintages remain unknown",
+        "No adapter, automated workbook fetch, default probe, research-engine use or scoring eligibility is approved",
+        "World Bank dataset summary terms provide a CC BY 4.0 default where dataset/indicator metadata permits; preserve attribution, indicate changes, and review third-party components separately"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.binance_spot_public",
+      "label": "Binance Spot public klines",
+      "free_access_class": "public_market_data_no_key",
+      "authentication": "none for public market-data endpoint",
+      "probe_mode": "hard-blocked after owner-reported Iran-network HTTP 451; no live request is sent",
+      "data_families": [
+        "venue-specific crypto OHLCV"
+      ],
+      "history_limit": "Public kline endpoint supports pagination; completeness must be audited over the requested window",
+      "limitations": [
+        "BTCUSDT is venue/pair-specific and is not the same as USD spot",
+        "Owner-reported Iran-network requests returned HTTP 451; do not repeat the same route or seek alternate hosts without a changed access/legal basis",
+        "Network/geographic access may vary",
+        "Usage terms, storage, derived outputs and commercial display rights require review"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.tindex.public_api",
+      "label": "Tindex free-tier public API",
+      "free_access_class": "free_tier_account_scoped",
+      "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
+      "probe_mode": "one currency-rate request per invocation; provider docs publish 3 requests/minute and 300 requests/day/account; local cap is 1/minute and 100 successful/day",
+      "data_families": [
+        "currency snapshots",
+        "documented indicators"
+      ],
+      "history_limit": "Indicator history/candles are capped at the latest 100 days; not sufficient alone for six-month strategy tests",
+      "limitations": [
+        "Account-level endpoint access is not established by public docs and can differ by token",
+        "Current docs describe currency rate in Toman per quoted unit and say Markets & Indicators values are in Toman since 2026-07-20; reconcile against a sanitized account payload and independent reference before setting a confirmed unit",
+        "Provider docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account; HTTP 429 rejections do not consume the daily quota. MarketSage local guard deliberately caps at 1 request/minute and 100 successful requests/day but is process-local, not account-wide",
+        "Commercial/high-volume use, durable storage, derived display and redistribution rights require review",
+        "Never infer official/free-market market semantics from the name alone",
+        "A previously shared review of the public developer documentation described a TSE stock screener with 1,644 active instruments and stock-history endpoints capped at 100 days; actual configured-account access remains unverified, so do not schedule a bulk crawl under the 300-requests/day account quota (only successful requests count).",
+        "The same documentation review distinguished TSE stock-price endpoints in Rial from other Markets & Indicators values in Toman since 2026-07-20. Keep these endpoint families separate; do not combine or convert units without exact endpoint-level payload and independent-reference reconciliation."
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.tindex.candles",
+      "label": "Tindex indicator candle history",
+      "free_access_class": "free_tier_account_scoped",
+      "authentication": "TINDEX_API_BASE_URL and TINDEX_API_TOKEN in environment only",
+      "probe_mode": "one explicit slug per run; provider docs publish 3 requests/minute and 300 requests/day/account; local cap is 1/minute",
+      "data_families": [
+        "indicator OHLC series"
+      ],
+      "history_limit": "At most the latest 100 days on the documented endpoint",
+      "limitations": [
+        "Slugs and category access must be verified against the specific account; do not bypass 410/403",
+        "One active token/account; provider docs publish 3 requests/minute and 300 requests/day/account; MarketSage local cap remains 1 request/minute and 100 successful requests/day",
+        "Only a recent 100-day window is documented, so not enough alone for six-month evaluation",
+        "Toman semantics are documented since 2026-07-20 for Markets & Indicators, but series units need reconciliation before confirmation",
+        "All outputs are research candidates only; rights and independent reconciliation remain open"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "us.fred.alfred",
+      "label": "FRED/ALFRED observations and vintages",
+      "free_access_class": "free_api_key",
+      "authentication": "FRED_API_KEY in environment only",
+      "probe_mode": "three FEDFUNDS observations",
+      "data_families": [
+        "US macro",
+        "rates",
+        "historical vintages"
+      ],
+      "history_limit": "Series-specific and API paginated",
+      "limitations": [
+        "Observation period is not release time",
+        "Vintage dates are day-level not exact intraday release timestamps",
+        "Series definition and terms need review"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.gdelt_doc_api",
+      "label": "GDELT DOC article discovery",
+      "free_access_class": "public_api_candidate",
+      "authentication": "none observed",
+      "probe_mode": "explicit opt-in, one tiny request only",
+      "data_families": [
+        "news discovery metadata"
+      ],
+      "history_limit": "Provider search-window and query dependent",
+      "limitations": [
+        "Previous probe returned HTTP 429; deliberately excluded from default run",
+        "First-seen/index time is not verified publisher publication time",
+        "Article discovery is not truth verification or sentiment validation"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "global.yahoo_finance.yfinance",
+      "label": "Yahoo Finance via yfinance",
+      "free_access_class": "public_site_access_unofficial_client",
+      "authentication": "usually none for current research path",
+      "probe_mode": "existing research pipeline, not contacted by new discovery pack",
+      "data_families": [
+        "global ETF proxies",
+        "listed assets",
+        "crypto proxies"
+      ],
+      "history_limit": "Symbol and endpoint dependent",
+      "limitations": [
+        "Not an official guaranteed API contract",
+        "Terms, redistribution and automated usage must be reviewed",
+        "Global ETFs are research proxies, not guaranteed Iran-tradable assets"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.official_macro",
+      "label": "CBI official macro, TSD, transfer FX and policy-rate portals; SCI candidate",
+      "free_access_class": "public_portal_candidate",
+      "authentication": "Public HTML/PDF pages observed without an account; no stable accepted API contract registered",
+      "probe_mode": "documentation-only review; no automated API request, account probe or dataset download",
+      "data_families": [
+        "annual macroeconomic time series (CBI TSD)",
+        "official currency-transfer rates (not free-market FX)",
+        "weekly interbank and policy rates",
+        "inflation and price indices",
+        "national accounts and monetary aggregates"
+      ],
+      "history_limit": "CBI describes >1,000 annual TSD variables from 1338 onward in HTML/Excel; policy rates are weekly; official FX has a dated archive but complete depth is unverified; exact series coverage and revision history remain unverified",
+      "limitations": [
+        "CBI TSD is described as annual HTML/Excel, not a documented REST/SDMX API; the linked viewer timed out in the documentation-review environment and no series-level endpoint contract was verified",
+        "CBI transfer FX is calculated from previous-business-day transactions in the currency-transfer hall; it is not free-market cash/bazaar FX",
+        "Jalali observation dates, Rial quote basis and currency denomination multipliers (for example JPY100/IQD100/KRW1000) require endpoint-level validation; do not silently divide by ten or infer a common unit",
+        "Policy-rate rows are weekly macro observations in percent, not bond prices or executable yields; first-publication time and revisions are unknown",
+        "CBI government Islamic-securities auction archive is PDF-oriented primary-market evidence, not a secondary-market bond-price or total-return series",
+        "CBI page states that material and moral rights belong to CBI; no blanket automated collection, redistribution or commercial/model-use license was established",
+        "SCI and national open-data catalog machine-readable contracts, per-resource licenses, release/vintage timestamps and persistent history were not verified",
+        "No source in this entry is approved for investment scoring or production"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.cbi.bond_auction_results",
+      "label": "CBI government Islamic-securities auction result archive",
+      "free_access_class": "public_portal_candidate",
+      "authentication": "No account observed for public listing/PDF pages; stable API not documented",
+      "probe_mode": "documentation-only; no automated PDF crawl or download",
+      "data_families": [
+        "government Islamic-securities primary-market auction results"
+      ],
+      "history_limit": "Dated PDF archive is visible, including weekly 1405 entries; complete historical depth and machine-readable history are not established",
+      "limitations": [
+        "Primary-market auction results are not secondary-market bond prices or total-return histories",
+        "Auction yield, coupon, current yield and yield-to-maturity are distinct measures and must not be conflated",
+        "Instrument identity, maturity, settlement date, cash-flow schedule, accepted price/yield and correction history need structured extraction and reconciliation",
+        "Publication timestamp is not established by the Jalali archive date alone",
+        "CBI page states that material and moral rights belong to CBI; reuse, automated collection and commercial/model-use permission remain unresolved",
+        "No adapter, default probe, research-engine use or scoring eligibility is approved"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.gold_fx",
+      "label": "TGJU gold, coin and free-market FX pages",
+      "free_access_class": "not_yet_approved_candidate",
+      "authentication": "Unknown/endpoint contract not verified",
+      "probe_mode": "no automated scraper; legal/access review first",
+      "data_families": [
+        "18K gold",
+        "individual coin types",
+        "free-market FX"
+      ],
+      "history_limit": "Not established",
+      "limitations": [
+        "Public webpage access is not permission for automated scraping",
+        "Keep official and free-market FX series separate",
+        "Rial/Toman, timestamps and correction behavior need reconciliation"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "vendor.streamdata_export",
+      "label": "Seller-provided StreamData CSV exports",
+      "free_access_class": "vendor_supplied_not_free",
+      "authentication": "Vendor contract/account dependent",
+      "probe_mode": "local files only; never auto-download or classify as free",
+      "data_families": [
+        "AYAR fund",
+        "BTCUSDT",
+        "18K gold",
+        "free-market USD"
+      ],
+      "history_limit": "Supplied capture is approximately six months",
+      "limitations": [
+        "Rights and fees are not assumed",
+        "Do not commit raw files",
+        "Resolve the AYAR OHLC anomaly and unit/time semantics"
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.nerkhsanj.rates_archive",
+      "label": "Nerkhsanj public JSON rates/archive (publisher-announced candidate)",
+      "free_access_class": "public_api_candidate",
+      "authentication": "Publisher announcement says no API key; one owner-run live HTTPS request completed and parsed the candidate schema.",
+      "probe_mode": "one bounded request to a published JSON archive after VPN-on reminder; no per-record /calc loops",
+      "data_families": [
+        "free-market FX",
+        "gold",
+        "coins",
+        "selected crypto/local-price candidates"
+      ],
+      "history_limit": "Owner-run capture on 2026-10-22 parsed 91,245 rows across 28 candidate series. Owner-reported 2026-10-23 audit flagged material scale anomalies and gaps, including an IQD maximum gap of 373 days; per-series completeness remains unaccepted.",
+      "limitations": [
+        "Third-party/community-operated candidate; source ownership, upstream data lineage, reliability and terms require verification",
+        "Publisher announcement asks for Nerkhsanj attribution/link; confirm conditions and permitted commercial/data use before reuse",
+        "The ingestion parser uses an observed response and round-trip Jalali/Gregorian calendar checks; successful date parsing does not verify units, series semantics, completeness, or economic accuracy.",
+        "Market series, key names, update frequency, historical gaps and corrections must be inventoried from the actual API, not inferred from the announcement",
+        "The initial metadata-only probe parsed 28 candidate series (91,245 reported pairs) but did not validate Jalali calendar dates; a later ingestion round-trip-validated accepted rows and wrote normalized candidate files locally, not to Git. Neither step established units, source lineage, rights, or independent reconciliation.",
+        "Owner-reported local audit dated 2026-10-23 flagged 182 adjacent changes >=20%, including 48 >=100%, concentrated in IQD, silver and Tether. Keep IQD, silver and Tether excluded from feature generation; retain Bitcoin as a coverage warning.",
+        "Owner-reported gaps include 373 days for IQD and up to 84 days for silver, Tether and Bitcoin. Do not rescale, delete rows or forward-fill to make these series appear continuous.",
+        "These are sanitized owner-reported findings only; this execution did not access or independently re-audit the local raw archive."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "latest_probe_evidence": {
+        "reported_date": "2026-10-22",
+        "probe_type": "single bounded metadata-only HTTPS request",
+        "outcome": "probe_completed",
+        "schema_status": "candidate_schema_parsed",
+        "series_count": 28,
+        "raw_payload_saved": false,
+        "raw_values_emitted": false,
+        "production_approved": false,
+        "eligible_for_scoring": false,
+        "not_yet_established": [
+          "exact series-key meanings",
+          "per-series missing-date/session coverage and corrections",
+          "actual Jalali calendar validity",
+          "Toman versus other unit semantics against an independent source",
+          "upstream data lineage and source accuracy",
+          "attribution and commercial reuse rights"
+        ],
+        "reported_total_pair_rows": 91245,
+        "reported_duplicate_dates_total": 0,
+        "reported_invalid_numeric_rates_total": 0,
+        "date_bound_semantics": "lexical Jalali YYYY/MM/DD strings; no calendar round-trip validation in probe",
+        "per_series_inventory": [
+          {
+            "series_key": "dollar",
+            "reported_rows": 3983,
+            "first_jalali": "1390/09/05",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "euro",
+            "reported_rows": 3751,
+            "first_jalali": "1391/04/08",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "yuan",
+            "reported_rows": 3206,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "gold",
+            "reported_rows": 3535,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "coin",
+            "reported_rows": 4321,
+            "first_jalali": "1389/01/15",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "aed",
+            "reported_rows": 3681,
+            "first_jalali": "1391/06/11",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "lira",
+            "reported_rows": 3181,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "pound",
+            "reported_rows": 3746,
+            "first_jalali": "1391/06/11",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "tether",
+            "reported_rows": 2038,
+            "first_jalali": "1399/08/22",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "bitcoin",
+            "reported_rows": 2031,
+            "first_jalali": "1399/08/22",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "gold24",
+            "reported_rows": 3394,
+            "first_jalali": "1393/02/12",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "bahar",
+            "reported_rows": 3516,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "half",
+            "reported_rows": 3458,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "quarter",
+            "reported_rows": 3443,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "gram",
+            "reported_rows": 3379,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "cad",
+            "reported_rows": 3243,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "aud",
+            "reported_rows": 3240,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "chf",
+            "reported_rows": 3231,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "sar",
+            "reported_rows": 3250,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "qar",
+            "reported_rows": 3248,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "kwd",
+            "reported_rows": 3235,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "omr",
+            "reported_rows": 3238,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "iqd",
+            "reported_rows": 2848,
+            "first_jalali": "1393/05/01",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "afn",
+            "reported_rows": 3297,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "rub",
+            "reported_rows": 3266,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "inr",
+            "reported_rows": 3252,
+            "first_jalali": "1393/04/30",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "mesghal",
+            "reported_rows": 3537,
+            "first_jalali": "1392/04/31",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          },
+          {
+            "series_key": "silver",
+            "reported_rows": 1697,
+            "first_jalali": "1399/08/10",
+            "last_jalali": "1405/07/29",
+            "unit_verified": false,
+            "semantic_mapping_verified": false
+          }
+        ],
+        "actual_jalali_calendar_validity": "not tested by metadata probe"
+      },
+      "latest_ingestion_evidence": {
+        "reported_date": "2026-10-22",
+        "run_id": "run_20261022T202100508487Z",
+        "ingestion_version": "1.0.0",
+        "outcome": "COMPLETED_CANDIDATE_ONLY",
+        "series_count": 28,
+        "source_rows": 91245,
+        "normalized_rows": 91245,
+        "quarantined_pairs": 0,
+        "duplicate_date_series_count": 0,
+        "conflicting_duplicate_date_series_count": 0,
+        "source_payload_sha256": "0498c8a91ea9b080367c1447660f3bf6c555f3d6f20da462634473afd70ee50e",
+        "raw_payload_saved": false,
+        "jalali_calendar_validation": "round_trip_checked",
+        "value_unit": "UNKNOWN_UNVERIFIED",
+        "value_semantics": "DAILY_PROVIDER_VALUE_NOT_VALIDATED_AS_CLOSE",
+        "source_terms_reviewed": false,
+        "upstream_lineage_verified": false,
+        "unit_semantics_verified": false,
+        "source_approved": false,
+        "eligible_for_scoring": false,
+        "adjusted_returns_approved": false,
+        "backtest_approved": false,
+        "not_yet_established": [
+          "exact meaning and identity of every provider series key",
+          "Toman versus Rial and exact quote convention",
+          "whether daily values represent a close or another daily reference value",
+          "per-series trading calendar, missing dates, stale/repeated values and return outliers",
+          "source lineage, reliability and historical corrections",
+          "independent reconciliation against a separately reviewed reference",
+          "attribution, collection, storage, commercial and model-use rights"
+        ]
+      },
+      "latest_quality_audit_evidence": {
+        "reported_date": "2026-10-23",
+        "run_id": "run_20261023T074318140271Z",
+        "source_payload_sha256": "0498c8a91ea9b080367c1447660f3bf6c555f3d6f20da462634473afd70ee50e",
+        "audit_status": "COMPLETED_CANDIDATE_AUDIT",
+        "series_count": 28,
+        "normalized_rows": 91245,
+        "invalid_iso_date_rows": 0,
+        "invalid_or_nonpositive_numeric_value_rows": 0,
+        "jalali_gregorian_mismatch_rows": 0,
+        "duplicate_date_excess_rows": 0,
+        "conflicting_duplicate_dates": 0,
+        "observation_change_pairs_abs_pct_ge_20": 182,
+        "observation_change_pairs_abs_pct_ge_50": 117,
+        "observation_change_pairs_abs_pct_ge_100": 48,
+        "change_metric_note": "Absolute change between adjacent unique, non-conflicting observed dates; adjacent observations may span multiple calendar days.",
+        "large_changes_are_accepted": false,
+        "source_approved": false,
+        "eligible_for_scoring": false,
+        "adjusted_returns_approved": false,
+        "backtest_approved": false,
+        "next_review": [
+          "inspect per-series outlier counts and largest-change dates from the local quality_audit.json",
+          "reconcile representative observations against an independently reviewed source",
+          "verify units, quote conventions, series meaning, stale values and provider corrections",
+          "review attribution, data retention and model/commercial usage rights"
+        ],
+        "per_series_outlier_triage": {
+          "reported_date": "2026-10-23",
+          "iqd": {
+            "abs_change_ge_20_pct": 158,
+            "abs_change_ge_50_pct": 109,
+            "abs_change_ge_100_pct": 44,
+            "maximum_calendar_gap_days": 373,
+            "largest_reported_change_dates": [
+              {
+                "date": "2017-12-30",
+                "abs_change_pct": "102930.3030"
+              },
+              {
+                "date": "2016-02-14",
+                "abs_change_pct": "85292.8571"
+              },
+              {
+                "date": "2017-04-02",
+                "abs_change_pct": "58190.3226"
+              }
+            ],
+            "disposition": "QUARANTINE_FROM_FEATURES_PENDING_REVIEW"
+          },
+          "silver": {
+            "abs_change_ge_20_pct": 11,
+            "abs_change_ge_50_pct": 6,
+            "abs_change_ge_100_pct": 3,
+            "maximum_calendar_gap_days": 84,
+            "largest_reported_change_dates": [
+              {
+                "date": "2021-08-30",
+                "abs_change_pct": "2493.9024"
+              },
+              {
+                "date": "2021-08-11",
+                "abs_change_pct": "2387.5000"
+              },
+              {
+                "date": "2022-09-30",
+                "abs_change_pct": "893.9634"
+              }
+            ],
+            "disposition": "QUARANTINE_FROM_FEATURES_PENDING_REVIEW"
+          },
+          "tether": {
+            "abs_change_ge_20_pct": 2,
+            "abs_change_ge_50_pct": 2,
+            "abs_change_ge_100_pct": 1,
+            "maximum_calendar_gap_days": 84,
+            "largest_reported_change_dates": [
+              {
+                "date": "2021-07-01",
+                "abs_change_pct": "2536200.0000"
+              },
+              {
+                "date": "2021-06-30",
+                "abs_change_pct": "99.9960"
+              },
+              {
+                "date": "2025-06-12",
+                "abs_change_pct": "10.9105"
+              }
+            ],
+            "disposition": "QUARANTINE_FROM_FEATURES_PENDING_REVIEW"
+          },
+          "bitcoin": {
+            "abs_change_ge_20_pct": 0,
+            "maximum_calendar_gap_days": 84,
+            "disposition": "COVERAGE_REVIEW_REQUIRED"
+          },
+          "interpretation": "Adjacent observed-date change flags; intervals may span many calendar days. These are not proof of invalid observations but block acceptance pending unit/scale, key meaning, gap and independent-reference reconciliation."
+        },
+        "manual_transition_review": {
+          "reported_date": "2026-10-23",
+          "review_scope": "Owner inspected local adjacent observations; only derived diagnostics/dates recorded in this repository, not raw price rows.",
+          "iqd": {
+            "transitions": [
+              {
+                "date": "2016-02-14",
+                "calendar_gap_days": 1,
+                "adjacent_value_scale_ratio_approx": 854
+              },
+              {
+                "date": "2017-04-02",
+                "calendar_gap_days": 4,
+                "adjacent_value_scale_ratio_approx": 583
+              },
+              {
+                "date": "2017-12-30",
+                "calendar_gap_days": 3,
+                "adjacent_value_scale_ratio_approx": 1030
+              }
+            ],
+            "assessment": "PROBABLE_SCALE_OR_SCHEMA_DISCONTINUITY",
+            "disposition": "EXCLUDE_FROM_FEATURE_GENERATION_PENDING_RECONCILIATION"
+          },
+          "silver": {
+            "transitions": [
+              {
+                "date": "2021-08-11",
+                "calendar_gap_days": 1,
+                "adjacent_value_scale_ratio_approx": 24.9
+              },
+              {
+                "date": "2021-08-30",
+                "calendar_gap_days": 1,
+                "adjacent_value_scale_ratio_approx": 26
+              },
+              {
+                "date": "2022-09-30",
+                "calendar_gap_days": 1,
+                "adjacent_value_scale_ratio_approx": 9.9
+              }
+            ],
+            "assessment": "POSSIBLE_UNIT_OR_SCHEMA_CHANGE",
+            "disposition": "EXCLUDE_FROM_FEATURE_GENERATION_PENDING_RECONCILIATION"
+          },
+          "tether": {
+            "transitions": [
+              {
+                "date": "2021-06-30",
+                "calendar_gap_days": 1,
+                "assessment": "isolated drop to sentinel-like value"
+              },
+              {
+                "date": "2021-07-01",
+                "calendar_gap_days": 1,
+                "assessment": "rapid return to prior scale; reported abs change exceeds 100 percent"
+              }
+            ],
+            "assessment": "STRONGLY_SUSPICIOUS_ISOLATED_OBSERVATION_OR_SCHEMA_SCALE_INCONSISTENCY",
+            "disposition": "EXCLUDE_FROM_FEATURE_GENERATION_PENDING_RECONCILIATION"
+          },
+          "raw_values_committed_to_git": false,
+          "automatic_correction_applied": false,
+          "forward_fill_applied": false,
+          "adjusted_returns_approved": false,
+          "source_approved": false,
+          "eligible_for_scoring": false,
+          "backtest_approved": false,
+          "required_before_reconsideration": [
+            "Verify exact key meaning, quote convention and unit",
+            "Inspect provider release/change history for the affected periods",
+            "Compare the dates and adjacent observations against an independently reviewed reference",
+            "Document a deterministic policy for suspicious values without silently overwriting the source"
+          ]
+        }
+      }
+    },
+    {
+      "source_id": "global.sec_edgar",
+      "label": "SEC EDGAR submissions and XBRL company-facts APIs",
+      "free_access_class": "public_api_no_key",
+      "authentication": "Official data.sec.gov submissions and XBRL APIs require no API key; automated clients must declare a descriptive User-Agent.",
+      "probe_mode": "No probe in this review; after VPN-on reminder, one exact issuer/CIK history request only.",
+      "data_families": [
+        "US issuer filings",
+        "XBRL company facts",
+        "corporate disclosures and events"
+      ],
+      "history_limit": "EDGAR public filing indexes extend to 1994Q3; company submissions JSON contains at least one year or 1,000 recent filings (whichever is greater), with older filing-history files where applicable.",
+      "limitations": [
+        "Filing acceptance time and public-document availability are different; SEC guidance says filings are often available 1–3 minutes after EDGAR acceptance, with no guarantee.",
+        "Post-acceptance corrections/deletions can alter later indexes; preserve accession numbers and correction history rather than assuming a static index.",
+        "Fair Access is at most 10 requests/second per user across machines; declare a descriptive User-Agent and do not use unclassified bots.",
+        "Public access is not a blanket license for every downstream reuse; review source-specific reuse terms.",
+        "This is issuer-disclosure/fundamental data, not market-price history; XBRL context, units, periods and amendments need mapping."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+        "https://www.sec.gov/about/developer-resources",
+        "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+        "https://www.sec.gov/about/webmaster-frequently-asked-questions"
+      ]
+    },
+    {
+      "source_id": "global.ecb_data_portal",
+      "label": "ECB Data Portal SDMX API",
+      "free_access_class": "public_sdmx_api_candidate",
+      "authentication": "Public HTTPS SDMX REST API; current public documentation does not describe an API-key requirement, but confirm access behavior before a bounded request.",
+      "probe_mode": "First discover one exact dataflow/series; then one short daily reference-FX or yield-curve range only after VPN-on reminder.",
+      "data_families": [
+        "daily reference exchange rates",
+        "yield curves and interest-rate statistics",
+        "global/euro-area macroeconomic statistics"
+      ],
+      "history_limit": "Dataset-specific. ECB documentation lists daily reference exchange-rate history since 1999; API supports start/end periods, updatedAfter deltas and includeHistory for prior data versions.",
+      "limitations": [
+        "ESCB public statistics may be reused free of charge with source attribution and without modifying the statistics/metadata; third-party data are excluded absent permission.",
+        "Revisions, updates and discontinued series must be preserved; current production values alone are not point-in-time history.",
+        "Reference FX is not an executable bid/ask quote; euro-centered series and currency direction must be explicit.",
+        "Observation period is not necessarily the public release/availability timestamp.",
+        "No local-market price series for Iran is supplied."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://data.ecb.europa.eu/help/api/data",
+        "https://data.ecb.europa.eu/help/api/overview",
+        "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html"
+      ]
+    },
+    {
+      "source_id": "global.us_treasury_yield_curve",
+      "label": "US Treasury daily interest-rate XML feeds",
+      "free_access_class": "public_xml_feed_candidate",
+      "authentication": "Official public XML feed guide shows HTTPS GET and no API key parameter; verify availability with one bounded request.",
+      "probe_mode": "One exact yield-curve type and one calendar-year range after VPN-on reminder; do not crawl all history.",
+      "data_families": [
+        "daily Treasury par yield curve",
+        "daily Treasury bill rates",
+        "daily real-yield and long-term rate series"
+      ],
+      "history_limit": "Official guide lists daily par yields from 1990, bill rates from 2002, long-term rates from 2000 and real-yield series from 2003; default response is 300 rows and all-history retrieval is paginated from page=0.",
+      "limitations": [
+        "Par yields and bill rates are rate observations, not bond prices or total-return indexes.",
+        "Maturity labels, day-count conventions, curve construction and rate units need explicit mapping.",
+        "Observation date is available; exact publication/availability timestamp and correction-vintage behavior need review.",
+        "Feed schema can evolve; Treasury published new XML elements for 2025 maturity additions.",
+        "Reuse/redistribution terms were not fully resolved in this screen; do not infer blanket permission."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://home.treasury.gov/treasury-daily-interest-rate-xml-feed",
+        "https://home.treasury.gov/developer-notice-xml-changes",
+        "https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rate-xml-files"
+      ]
+    },
+    {
+      "source_id": "global.eia_energy_api",
+      "label": "US Energy Information Administration API v2",
+      "free_access_class": "public_api_key_required",
+      "authentication": "Free API key registration is required for API v2; official documentation says bulk downloads do not require a key.",
+      "probe_mode": "No probe in this review; after VPN-on reminder and key setup, request one exact series/frequency/date range.",
+      "data_families": [
+        "crude-oil and petroleum prices/inventories",
+        "natural-gas and electricity data",
+        "international energy production/trade/consumption"
+      ],
+      "history_limit": "Series- and dataset-specific, spanning hourly, weekly, monthly and annual frequencies; API v2 supports date/frequency and facet filters. Coverage must be checked per series.",
+      "limitations": [
+        "API access is subject to the EIA API Terms of Service; API data are free and use must follow the Copyrights and Reuse policy.",
+        "EIA government data are generally public domain with acknowledgment, but third-party contributed/licensed materials may remain protected.",
+        "Observation period and release/publication time are different; revisions and release calendars need series-level handling.",
+        "Energy statistics and spot/futures market prices are different instruments; do not treat inventory or production as an executable oil-price series.",
+        "API key is a credential and must remain outside Git and reports."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://www.eia.gov/opendata/documentation.php",
+        "https://www.eia.gov/opendata/terms-of-service.php",
+        "https://www.eia.gov/about/copyrights_reuse.php"
+      ]
+    },
+    {
+      "source_id": "global.imf_sdmx_api",
+      "label": "IMF Data API (SDMX 2.1 and 3.0)",
+      "free_access_class": "public_sdmx_api_access_unverified",
+      "authentication": "IMF documentation advertises SDMX 2.1/3.0 APIs; API explorer/Swagger requires a beta portal account. Exact data-endpoint authentication and quotas remain unverified.",
+      "probe_mode": "No probe in this review; first identify one dataflow and its access requirements, then make one bounded series query after VPN-on reminder.",
+      "data_families": [
+        "international macroeconomic indicators",
+        "balance of payments and external-sector data",
+        "country-level monetary and financial statistics"
+      ],
+      "history_limit": "Dataflow- and series-specific; SDMX APIs expose dataset structures, but historical depth and revision/vintage availability must be verified per dataflow.",
+      "limitations": [
+        "A beta portal account is required to explore the documented Swagger interface; do not assume this proves API-key or public anonymous access.",
+        "Series definitions, country coverage, frequency, units and release calendars vary by dataflow.",
+        "Observation period is not release/availability time; point-in-time vintage support must be demonstrated for each selected dataset.",
+        "Reuse and redistribution terms were not resolved in this screen.",
+        "This is macro context, not a substitute for daily tradable asset prices."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "official_documentation": [
+        "https://data.imf.org/en/Resource-Pages/IMF-API"
+      ]
+    },
+    {
+      "source_id": "iran.fipiran.fund_nav",
+      "label": "FIPIRAN public fund NAV/AUM/flows candidate",
+      "free_access_class": "public_site_unofficial_api_candidate",
+      "authentication": "An unofficial read-only wrapper reports no API key or account for public-page JSON; the official access contract and authentication policy are unverified.",
+      "probe_mode": "documentation-only; no site JSON/API request; Iran-network access must be reviewed before any owner-run probe",
+      "data_families": [
+        "Iranian mutual fund and ETF NAV",
+        "fund size/AUM",
+        "unit flows and investor mix",
+        "fund type, manager and fund metadata"
+      ],
+      "history_limit": "An unofficial wrapper reports about 500 funds and up to 60 evenly spaced history points; complete daily history and per-fund coverage are not established.",
+      "limitations": [
+        "The wrapper explicitly says it is unofficial and not affiliated with FIPIRAN; its MIT code license does not license the underlying fund data.",
+        "The wrapper reports that fipiran.ir responds only to Iranian network lines; this was not independently tested and no live request was made.",
+        "Reported units are NAV Rial per unit, fund size billion Toman, and returns percent per period (not annualized); validate each field and scale separately.",
+        "The reported history tool returns up to 60 evenly spaced points, not a complete daily tape; do not infer daily volatility, drawdown, liquidity or continuous six-month coverage.",
+        "Stable fund identity, registration/group IDs and mapping to TSETMC instruments require verification.",
+        "NAV, issuance/redemption price, exchange-traded price, AUM, unit count, subscriptions/redemptions and total return are distinct fields.",
+        "Observation date is not first-publication time; release timestamps, corrections, historical vintages and missing-date behavior are unknown.",
+        "Distribution, fee, capital-change and fund termination treatment require validation before total-return use.",
+        "Automated collection, storage, attribution, internal model use, commercial use and redistribution rights are unknown.",
+        "No adapter, default probe, research-engine use or scoring eligibility is approved."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "eligible_for_scoring": false,
+      "discovery_references": [
+        "https://fipiran.ir/",
+        "https://github.com/sepehr071/fipiran-mcp"
+      ]
+    },
+    {
+      "source_id": "iran.ifb.secondary_fixed_income",
+      "label": "Iran Fara Bourse secondary fixed-income public-site candidate",
+      "free_access_class": "public_site_unofficial_api_candidate",
+      "authentication": "An unofficial read-only wrapper reports no API key/account for public pages and web service; the official service contract and authentication policy are unverified.",
+      "probe_mode": "documentation-only; no site JSON/API request; Iran-network access must be reviewed before any owner-run probe",
+      "data_families": [
+        "Treasury bills (akhza), sukuk and bonds",
+        "secondary-market prices and YTM",
+        "coupon schedules, issuer, guarantor and maturity",
+        "daily price history, quotes, order books and yield curves"
+      ],
+      "history_limit": "An unofficial wrapper describes daily price/YTM history but does not publish exact coverage depth or completeness per instrument.",
+      "limitations": [
+        "The wrapper explicitly says it is unofficial and not affiliated with Iran Fara Bourse; its MIT code license does not license IFB data.",
+        "The wrapper reports that ifb.ir responds only from Iranian networks; this was not independently tested and no live request was made.",
+        "Reported price unit is Rial, YTM is percent per year and dates are Jalali; quote scale, clean/dirty price, accrued interest and settlement convention remain unverified.",
+        "The wrapper says YTM is computed by IFB from the last trade; validate the formula, day-count, compounding, coupon cash flows, maturity and settlement before use.",
+        "Daily history depth, missing dates, stale prices, suspensions, turnover, bid/ask spread, order-book depth, first-publication time and correction history are unknown.",
+        "Coupon rate, current yield, YTM, auction yield and realized holding-period return must remain separate measures.",
+        "Stable instrument identity, board/market, issuer/guarantor, default/call events and point-in-time eligibility require verification.",
+        "Automated collection, storage, attribution, internal model use, commercial use and redistribution rights are unknown.",
+        "No adapter, default probe, research-engine use or scoring eligibility is approved."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "eligible_for_scoring": false,
+      "discovery_references": [
+        "https://www.ifb.ir/",
+        "https://github.com/sepehr071/ifb-mcp"
+      ]
+    },
+    {
+      "source_id": "vendor.investats_financial_api",
+      "label": "Investats Iranian financial data/API (commercial vendor candidate)",
+      "free_access_class": "vendor_quote_required_not_free",
+      "authentication": "Commercial account/API access is advertised; exact authentication, pricing and rate limits are not public in the reviewed material.",
+      "probe_mode": "documentation-only; no account, quote request, API request or dataset download; procurement requires owner approval",
+      "data_families": [
+        "Iranian equities and ETFs",
+        "fund AUM/NAV and flows",
+        "OHLCV and market history",
+        "gold, FX and other advertised financial datasets"
+      ],
+      "history_limit": "Vendor material self-reports an AUM dataset with 899314 rows for 298 funds from 2008-08-11 to 2026-09-08 (daily), and an OHLCV dataset with 3107029 rows for 5218 symbols from 1979-12-25 to 2026-09-14; these are aggregate vendor claims, not verified per-series coverage.",
+      "limitations": [
+        "This is a commercial vendor, not a free/open source; no price quote, contract, account or purchase was obtained.",
+        "Aggregate row counts and date ranges do not prove continuous history for each fund or instrument; require a per-series coverage/missing-date matrix.",
+        "AUM/NAV fields are not automatically exchange prices or total-return series; exact fields, units, quote basis and distribution treatment require samples.",
+        "Historical corrections, backfills, first-publication timestamps, point-in-time vintages and source lineage are unverified.",
+        "Require contractual permission for storage, internal research/model use, derived metrics, display, redistribution, retention after termination and deletion.",
+        "Require API schema, authentication, quotas, SLA, uptime, support, change notice and incident handling.",
+        "Independently reconcile representative data against reviewed sources before any research use.",
+        "No adapter, account, download, purchase or scoring eligibility is approved."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "eligible_for_scoring": false,
+      "discovery_references": [
+        "https://investats.net/",
+        "https://investats.net/blog/investment-funds-api-nav-performance-mtum8rn2",
+        "https://investats.net/blog/iranian-stock-api-providers-comparison-mu29k9ls"
+      ]
+    }
+  ]
+}

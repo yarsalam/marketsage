@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import logging
 import os
@@ -18,12 +19,58 @@ from research.backtest import BacktestConfig, run_monthly_momentum_backtest, sum
 from iran_market_data import provider_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
-from fastapi import FastAPI, HTTPException, Query
+from research_pipeline import build_research_snapshot
+from fastapi import FastAPI, Header, HTTPException, Query
+from iran_live_data import (
+    get_iran_data_status,
+    get_iran_opportunities,
+    get_latest_currency_rates,
+    refresh_tindex_currency_rates,
+)
 from pydantic import BaseModel, Field
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("marketsage.analysis")
 app = FastAPI(title="MarketSage Analysis API", version="0.3.0")
+
+_iran_auto_refresh_stop = threading.Event()
+_iran_auto_refresh_thread: threading.Thread | None = None
+
+
+def _iran_auto_refresh_loop() -> None:
+    # Keep the schedule conservative: no more than one request per hour.
+    interval = max(3600, int(os.getenv("IRAN_DATA_REFRESH_INTERVAL_SECONDS", "3600")))
+    while not _iran_auto_refresh_stop.wait(interval):
+        try:
+            refresh_tindex_currency_rates()
+            logger.info("Scheduled Iranian source refresh completed")
+        except Exception as exc:
+            logger.warning("Scheduled Iranian source refresh failed: %s", type(exc).__name__)
+
+
+@app.on_event("startup")
+def start_iran_auto_refresh() -> None:
+    global _iran_auto_refresh_thread
+    if os.getenv("IRAN_DATA_AUTO_REFRESH_ENABLED", "false").strip().lower() != "true":
+        return
+    if not get_iran_data_status()["configured"]:
+        logger.warning("Iran auto-refresh requested but Tindex credentials are not configured")
+        return
+    _iran_auto_refresh_stop.clear()
+    _iran_auto_refresh_thread = threading.Thread(
+        target=_iran_auto_refresh_loop,
+        name="marketsage-iran-refresh",
+        daemon=True,
+    )
+    _iran_auto_refresh_thread.start()
+    logger.info("Iran auto-refresh enabled with an interval of at least one hour")
+
+
+@app.on_event("shutdown")
+def stop_iran_auto_refresh() -> None:
+    _iran_auto_refresh_stop.set()
+    if _iran_auto_refresh_thread and _iran_auto_refresh_thread.is_alive():
+        _iran_auto_refresh_thread.join(timeout=2)
 
 TICKERS = {
     "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana",
@@ -33,11 +80,41 @@ TICKERS = {
     "XLF": "US Financials ETF", "XLE": "US Energy ETF",
 }
 CACHE_TTL = max(60, int(os.getenv("PRICE_CACHE_TTL_SECONDS", "900")))
+# Stale fallback is bounded: a provider outage must not keep an old portfolio usable forever.
+MAX_STALE_CACHE_AGE_SECONDS = max(0, int(os.getenv("MAX_STALE_CACHE_AGE_SECONDS", "86400")))
 DATA_SNAPSHOT_DIR = Path(os.getenv("DATA_SNAPSHOT_DIR", "/data/snapshots"))
 _cache_lock = threading.Lock()
 _cache_frame: pd.DataFrame | None = None
 _cache_time = 0.0
-_cache_metadata: dict = {"loaded": False, "stale": False}
+_cache_metadata: dict = {"loaded": False, "available": False, "stale": False}
+
+
+class ResearchArticleRequest(BaseModel):
+    source_id: str | None = None
+    url: str = Field(min_length=1, max_length=2048)
+    title: str = Field(min_length=1, max_length=2000)
+    first_seen_date: str
+
+
+class ResearchObservationRequest(BaseModel):
+    date: str
+    close: float
+
+
+class ResearchMarketSeriesRequest(BaseModel):
+    symbol: str = Field(min_length=1, max_length=100)
+    source_id: str | None = None
+    unit: str | None = None
+    currency: str | None = None
+    unit_confirmed: bool = False
+    currency_confirmed: bool = False
+    observations: list[ResearchObservationRequest] = Field(default_factory=list, max_length=5000)
+
+
+class ResearchSnapshotRequest(BaseModel):
+    as_of_date: str
+    articles: list[ResearchArticleRequest] = Field(default_factory=list, max_length=500)
+    market_series: list[ResearchMarketSeriesRequest] = Field(default_factory=list, max_length=100)
 
 
 class AllocationItem(BaseModel):
@@ -203,13 +280,34 @@ def get_prices() -> pd.DataFrame:
     try:
         frame = download_prices()
     except Exception as exc:
-        logger.exception("Market data refresh failed")
+        # Never log provider exception text or response bodies; they can contain URLs or secrets.
+        logger.error("Market data refresh failed; error_type=%s", type(exc).__name__)
         with _cache_lock:
             if _cache_frame is not None and not _cache_frame.empty:
-                _cache_metadata = {**_cache_metadata, "stale": True, "last_refresh_error": type(exc).__name__}
-                logger.warning("Returning stale cached prices after refresh failure")
-                return _cache_frame.copy()
-        raise HTTPException(status_code=503, detail="Market data unavailable; no decision generated.") from exc
+                stale_age = max(0.0, time.monotonic() - _cache_time)
+                _cache_metadata = {
+                    **_cache_metadata,
+                    "available": stale_age <= MAX_STALE_CACHE_AGE_SECONDS,
+                    "stale": True,
+                    "last_refresh_error": type(exc).__name__,
+                    "last_refresh_failed_at": datetime.now(timezone.utc).isoformat(),
+                    "stale_age_seconds": int(stale_age),
+                }
+                if stale_age <= MAX_STALE_CACHE_AGE_SECONDS:
+                    logger.warning(
+                        "Serving stale cached prices within configured age limit; stale_age_seconds=%d",
+                        int(stale_age),
+                    )
+                    return _cache_frame.copy()
+                _cache_metadata = {
+                    **_cache_metadata,
+                    "available": False,
+                    "unavailable_reason": "stale_cache_exceeded_max_age",
+                }
+        raise HTTPException(
+            status_code=503,
+            detail="Market data unavailable or cached data exceeded the maximum stale age; no decision generated.",
+        ) from exc
 
     retrieved_at = datetime.now(timezone.utc)
     snapshot = None
@@ -220,7 +318,8 @@ def get_prices() -> pd.DataFrame:
     with _cache_lock:
         _cache_frame, _cache_time = frame, time.monotonic()
         _cache_metadata = {
-            "loaded": True, "stale": False, "source": "Yahoo Finance via yfinance",
+            "loaded": True, "available": True, "stale": False, "stale_age_seconds": 0,
+            "source": "Yahoo Finance via yfinance",
             "retrieved_at": retrieved_at.isoformat(),
             "data_as_of": pd.Timestamp(frame.dropna(how="all").index.max()).date().isoformat(),
             "row_count": int(len(frame)),
@@ -279,14 +378,73 @@ def calculate_scores(monthly_prices: pd.DataFrame) -> pd.Series:
             + 0.25 * (1 - scale(volatility))).replace([np.inf, -np.inf], np.nan).dropna().sort_values(ascending=False)
 
 
+@app.post("/research/snapshot")
+def research_snapshot(payload: ResearchSnapshotRequest) -> dict:
+    """Create a bounded fixture/provided-data snapshot; never enables investment scoring."""
+    try:
+        articles = [item.model_dump(exclude_none=True) for item in payload.articles]
+        # Approval is an internal review decision, not a caller-controlled input.
+        market_series = [
+            {**item.model_dump(exclude_none=True), "source_approved": False}
+            for item in payload.market_series
+        ]
+        return build_research_snapshot(
+            as_of_date=payload.as_of_date,
+            articles=articles,
+            market_series=market_series,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "service": "analysis-engine"}
+    """Liveness only: the process can answer HTTP requests."""
+    return {"status": "ok", "service": "analysis-engine", "check": "liveness"}
 
 
 @app.get("/ready")
 def ready() -> dict:
-    return {"status": "ready", "service": "analysis-engine"}
+    """Readiness for the research-only API; no external providers are contacted."""
+    try:
+        registry = source_catalog()
+        sources = registry.get("sources")
+        summary = registry.get("summary")
+        if not isinstance(sources, list) or not sources or not isinstance(summary, dict):
+            raise ValueError("source_registry_empty_or_invalid")
+        registered_count = int(summary.get("total_sources", -1))
+        approved_count = sum(
+            1 for item in sources
+            if isinstance(item, dict) and item.get("approved_for_production") is True
+        )
+        reported_approved_count = int(summary.get("production_approved", -1))
+        if registered_count != len(sources) or reported_approved_count != approved_count:
+            raise ValueError("source_registry_summary_mismatch")
+        if not callable(build_research_snapshot):
+            raise ValueError("research_snapshot_pipeline_unavailable")
+    except Exception as exc:
+        # Emit only the exception class: never return internal provider details.
+        logger.warning("Readiness check failed (%s)", type(exc).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "reason": "critical_local_dependency_unavailable",
+            },
+        ) from exc
+
+    return {
+        "status": "ready",
+        "service": "analysis-engine",
+        "readiness_scope": "research_only",
+        "checks": {
+            "source_registry": "ready",
+            "research_snapshot_pipeline": "ready",
+        },
+        "registered_source_count": registered_count,
+        "production_approved_source_count": approved_count,
+        "investment_ranking_enabled": False,
+    }
 
 
 @app.get("/markets")
@@ -309,6 +467,42 @@ def sources() -> dict:
 def iran_market_providers() -> dict:
     """Report provider readiness without presenting unverified data as live."""
     return provider_catalog()
+
+
+@app.get("/iran/data-status")
+def iran_data_status() -> dict:
+    """Report Tindex connection and persisted Iranian-market data coverage."""
+    return get_iran_data_status()
+
+
+@app.get("/iran/currency-rates")
+def iran_currency_rates() -> dict:
+    """Return the latest persisted Tindex rates; never triggers provider requests."""
+    return get_latest_currency_rates()
+
+
+@app.get("/iran/opportunities")
+def iran_opportunities() -> dict:
+    """Return only production-eligible Iranian opportunities; fail closed otherwise."""
+    return get_iran_opportunities()
+
+
+@app.post("/iran/refresh")
+def refresh_iran_data(x_iran_refresh_token: str | None = Header(default=None)) -> dict:
+    """Manually fetch one Tindex endpoint; requires a server-side refresh token."""
+    expected_token = os.getenv("IRAN_REFRESH_TOKEN", "").strip()
+    if not expected_token:
+        raise HTTPException(status_code=503, detail="Iran data refresh is disabled until IRAN_REFRESH_TOKEN is configured.")
+    if not x_iran_refresh_token or not hmac.compare_digest(x_iran_refresh_token, expected_token):
+        raise HTTPException(status_code=403, detail="Iran data refresh authorization failed.")
+    try:
+        return refresh_tindex_currency_rates()
+    except Exception as exc:
+        logger.warning("Iran source refresh failed: %s", type(exc).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Tindex refresh failed ({type(exc).__name__}). Check server-side configuration and provider access.",
+        ) from None
 
 
 @app.get("/data-status")

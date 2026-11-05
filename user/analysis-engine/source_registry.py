@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 
-REGISTRY_VERSION = "1.0.0"
+REGISTRY_VERSION = "1.1.3"
 
 
 @dataclass(frozen=True)
@@ -62,58 +62,215 @@ SOURCES: tuple[SourceDefinition, ...] = (
         market_scope="iran",
         asset_family="equities_and_funds",
         provider="TSETMC candidate endpoints",
-        status="candidate_requires_validation",
+        status="adapter_implemented_not_scheduled",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("daily_ohlcv", "adjusted_price", "fund_quote"),
+        data_kinds=("daily_ohlcv_candidate", "daily_ohlcv_adjusted_candidate",
+                    "adjusted_price_candidate", "fund_quote_candidate"),
         timestamp_quality="not_verified",
         required_checks=("actual_host_connectivity", "terms_and_access_permission",
                          "symbol_identity", "adjusted_history", "suspensions",
                          "historical_depth", "unit_and_currency"),
-        notes="Candidate only; no Iranian equity or fund feed is enabled for scoring.",
+        notes=("Raw and provider-adjusted history are stored as separate candidate series. "
+               "The legacy chart mapping is empirical, coverage can be incomplete, price units "
+               "and terms remain unverified, and scoring stays disabled."),
+    ),
+    SourceDefinition(
+        source_id="vendor.streamdata_export",
+        market_scope="iran_and_global",
+        asset_family="seller_supplied_gold_fund_crypto_gold_fx_csv",
+        provider="Seller-provided StreamData CSV export (provider identity pending confirmation)",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("ohlcv_vendor_csv_candidate",),
+        timestamp_quality="observation date available; source clock, timezone and publication time unknown",
+        required_checks=("seller_identity_and_contract", "redistribution_and_derived_data_rights",
+                         "instrument_identity_and_venue", "unit_currency_and_quote_convention",
+                         "timezone_and_candle_boundary", "raw_vs_adjusted_status",
+                         "historical_reconciliation_and_missing_sessions",
+                         "corrections_and_versioning_policy", "ohlc_quality_anomalies"),
+        notes=("Local-only CSV exports identified as Ayar gold fund, BTCUSDT, 18K gold and free-market USD. "
+               "Values are preserved without assuming price units, currencies or adjustment state. "
+               "Do not commit vendor data files to this public repository; candidate scoring remains disabled."),
+    ),
+    SourceDefinition(
+        source_id="global.world_bank_indicators",
+        market_scope="global_and_iran",
+        asset_family="annual_macro_indicators",
+        provider="World Bank Indicators API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("annual_macro_observation_candidate",),
+        timestamp_quality="observation year known; exact publication timestamp unavailable",
+        required_checks=("indicator_identity_and_definition", "historical_coverage",
+                         "data_revisions_and_vintages", "country_and_unit_semantics",
+                         "api_terms_and_reuse_rights", "point_in_time_release_availability"),
+        notes=("Public no-key API adapter for bounded annual series. These are macro "
+               "observations, not daily prices; release-time and revision semantics remain "
+               "unverified and every row remains ineligible for scoring."),
+    ),
+    SourceDefinition(
+        source_id="global.world_bank_commodity_prices",
+        market_scope="global",
+        asset_family="monthly_commodity_benchmarks",
+        provider="World Bank Commodity Markets Pink Sheet",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("monthly_commodity_price_candidate", "monthly_commodity_index_candidate",
+                    "annual_commodity_average_candidate"),
+        timestamp_quality="monthly/annual observation period available; exact workbook publication time, first-seen time and revision/vintage replay are not yet verified",
+        required_checks=("series_identity_and_benchmark_definition", "unit_currency_and_quantity",
+                         "nominal_real_and_index_classification", "monthly_release_and_availability_time",
+                         "immutable_workbook_vintages_and_revision_diff", "per_series_upstream_source_and_license",
+                         "history_coverage_and_missing_months", "discontinuation_and_methodology_changes",
+                         "monthly_benchmark_vs_daily_spot_or_futures", "independent_reconciliation",
+                         "attribution_and_change_notice"),
+        notes=("World Bank Commodity Markets lists monthly and annual Pink Sheet XLS workbooks. "
+               "The reviewed page displayed an October 2026 monthly workbook and a 2026-11-03 next-update "
+               "date, but the workbook itself was not downloaded or parsed. Units, coverage, missing values "
+               "and per-series upstream rights remain unverified. World Bank dataset terms describe CC BY 4.0 "
+               "as the default for World Bank-produced open datasets, while third-party components may carry "
+               "different terms. Monthly benchmark observations are macro context, not daily executable prices."),
+    ),
+    SourceDefinition(
+        source_id="global.binance_spot_public",
+        market_scope="global_crypto_venue_specific",
+        asset_family="crypto_spot_ohlcv",
+        provider="Binance Spot public market-data API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("venue_specific_spot_ohlcv_candidate",),
+        timestamp_quality="candle open/close UTC times; publication timestamp unavailable",
+        required_checks=("instrument_pair_and_venue_identity", "history_completeness_and_pagination",
+                         "timezone_and_candle_boundary", "ohlcv_and_volume_reconciliation",
+                         "terms_and_geographic_access", "rate_limit_and_failure_backoff",
+                         "partial_candle_policy"),
+        notes=("Unauthenticated public kline adapter. Pair and venue stay explicit; quote "
+               "currency is not inferred from the symbol text. Terms, geography, historical "
+               "completeness, and market-data semantics require acceptance."),
     ),
     SourceDefinition(
         source_id="iran.codal",
         market_scope="iran",
         asset_family="company_filings_and_corporate_events",
         provider="CODAL",
-        status="candidate_requires_validation",
+        status="adapter_implemented_not_scheduled",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("issuer_disclosure", "corporate_event"),
+        data_kinds=("issuer_disclosure_candidate", "corporate_event_candidate"),
         timestamp_quality="publication/update semantics need validation",
         required_checks=("publication_timestamp", "amendment_linkage",
                          "parser_fixtures", "historical_coverage"),
-        notes="Use original disclosure and its publication time; do not infer event time from crawl time.",
+        notes="Read-only search client returns provider payload unchanged; publication/amendment schema and exact timing require fixture validation before event use.",
     ),
     SourceDefinition(
         source_id="iran.official_macro",
         market_scope="iran",
-        asset_family="macro_inflation_rates",
+        asset_family="macro_inflation_policy_rates_official_fx",
         provider="Central Bank of Iran and Statistical Center of Iran",
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("macro_observation", "release_document"),
-        timestamp_quality="release timestamps and revision history not yet verified",
+        data_kinds=("annual_macro_observation_candidate", "official_transfer_fx_candidate",
+                    "weekly_policy_rate_candidate", "price_index_candidate",
+                    "release_document"),
+        timestamp_quality="annual/weekly/daily observation dates may be available; exact first-publication and revision/vintage timestamps are not established",
         required_checks=("publication_time", "revision_history", "units_and_definitions",
-                         "machine_readable_history"),
-        notes="Official sources are candidates; release-time availability must be audited.",
+                         "machine_readable_history", "jalali_calendar_and_conversion",
+                         "official_vs_free_market_fx", "quote_unit_and_denomination_multiplier",
+                         "series_frequency_and_release_lag", "rights_and_redistribution"),
+        notes=("CBI documents more than 1,000 annual TSD variables from 1338 onward in HTML/Excel, "
+               "plus official transfer FX and weekly policy-rate pages. The transfer rate is based on "
+               "the previous business day's currency-transfer hall transactions and is not free-market "
+               "cash FX. Jalali dates, Rial quote basis and per-currency denomination multipliers need "
+               "endpoint-level validation. The linked TSD viewer did not respond in the documentation "
+               "review environment; no stable API or reuse license was verified. SCI remains a portal "
+               "candidate. No source is wired or approved for scoring."),
+    ),
+    SourceDefinition(
+        source_id="iran.cbi.bond_auction_results",
+        market_scope="iran",
+        asset_family="government_islamic_securities_primary_auctions",
+        provider="Central Bank of Iran government Islamic-securities auction archive",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("government_bond_auction_result_candidate",),
+        timestamp_quality="Jalali archive/auction date available; exact publication time and correction/vintage timestamps are not verified",
+        required_checks=("instrument_identity", "auction_vs_secondary_market",
+                         "maturity_and_cashflow_schedule", "yield_definition",
+                         "settlement_date", "auction_price_and_amount",
+                         "publication_time", "revision_history",
+                         "pdf_extraction_and_reconciliation", "rights_and_redistribution"),
+        notes=("CBI publishes dated PDF results for government Islamic-securities auctions. "
+               "These are primary-market auction records, not continuous secondary-market prices "
+               "or total-return histories. Do not conflate auction yield, coupon, current yield, "
+               "yield-to-maturity, fund NAV and exchange price. Instrument, maturity, settlement, "
+               "cash-flow, publication and reuse semantics remain unverified."),
+    ),
+    SourceDefinition(
+        source_id="iran.tindex.public_api",
+        market_scope="iran_and_global",
+        asset_family="currency_precious_metals_crypto",
+        provider="Tindex developer API (vendor-provided account; current enabled endpoints only)",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("currency_rate", "indicator_candle_candidate",
+                    "precious_metal_quote", "crypto_indicator"),
+        timestamp_quality="provider observation dates available for candles; publication timestamp and account access remain unverified",
+        required_checks=("terms_and_commercial_rights", "automated_collection_permission",
+                         "payload_schema_and_units", "historical_depth", "publication_and_retrieval_times",
+                         "revisions_and_missing_intervals", "independent_reconciliation"),
+        notes=("Access is through a vendor-provided account; official docs rechecked 2026-11-04 publish 3 requests/minute and 300 requests/day per account (429 rejections do not consume the daily quota), with "
+               "one active token. MarketSage keeps a stricter local cap of 1 request/minute and 100 successful requests/day. The public docs describe currency rate "
+               "as Toman per unit and state Markets & Indicators values have been in Toman since 2026-07-20; retain "
+               "normalized units as unconfirmed until a sanitized account payload reconciles independently. The documented "
+               "candle-history window is at most 100 days and requires delta-date decoding; 403/410/429 must remain "
+               "fail-closed. Only fetched, schema-validated rows are candidates, never scoring-ready."),
+    ),
+    SourceDefinition(
+        source_id="iran.nerkhsanj.rates_archive",
+        market_scope="iran",
+        asset_family="free_fx_gold_coins_selected_crypto",
+        provider="Nerkhsanj public JSON rates/archive (publisher-announced candidate; not yet verified)",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("daily_rates_candidate", "gold_quote_candidate", "coin_quote_candidate"),
+        timestamp_quality="owner-run ingestion round-trip-validated Jalali observation dates; exact observation-time and publication/update semantics remain unknown",
+        required_checks=("live_schema_fixture", "publisher_identity_and_upstream_lineage",
+                         "terms_attribution_and_commercial_rights", "series_key_identity",
+                         "toman_unit_and_jalali_conversion", "daily_history_coverage_and_gaps",
+                         "independent_reconciliation", "corrections_and_retrieval_time"),
+        notes=("One owner-run bounded archive request on 2026-10-22 parsed 28 candidate keys and 91,245 pairs; the "
+               "2026-10-23 local audit reported no invalid dates, non-positive values or duplicate-date conflicts, but "
+               "flagged 182 adjacent changes >=20% and 48 >=100%, concentrated in IQD, silver and Tether, plus long "
+               "gaps including 373 days for IQD and up to 84 days for silver, Tether and Bitcoin. These are owner-reported "
+               "summaries, not independent validation; the raw response was not retained as a reusable fixture. This "
+               "remains candidate-only: key/series identity, units, quote convention, daily-value semantics, source and "
+               "upstream lineage, attribution, commercial/model-use rights, calendar, corrections, completeness and "
+               "independent reconciliation are unverified. Keep IQD, silver and Tether out of features; do not rescale, "
+               "delete or forward-fill records. Never poll /calc per record or enable this source for scoring."),
     ),
     SourceDefinition(
         source_id="iran.gold_fx",
         market_scope="iran",
         asset_family="gold_coins_and_fx",
-        provider=None,
-        status="provider_not_selected",
+        provider="TGJU public pages (candidate; public API and collection rights not verified)",
+        status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("gold_gram", "coin_quote", "fx_quote"),
+        data_kinds=("gold_gram_candidate", "coin_quote_candidate", "free_fx_quote_candidate"),
         timestamp_quality="not_available",
         required_checks=("two_provider_reconciliation", "legal_use_rights",
                          "free_market_vs_official_rate", "rial_toman_units",
                          "historical_depth", "timestamp_and_corrections"),
-        notes="No source selected. Gold types and official/free-market FX must remain separate series.",
+        notes="TGJU is a discovery candidate, not an enabled crawler: verify terms, automated collection permission, selectors, units, market convention, timestamps, and historical coverage first. Keep each gold/coin type and free/official FX as separate series.",
     ),
     SourceDefinition(
         source_id="iran.fixed_income",
@@ -144,18 +301,114 @@ SOURCES: tuple[SourceDefinition, ...] = (
         notes="Keep each venue and quote currency distinct; do not merge local and USD prices blindly.",
     ),
     SourceDefinition(
-        source_id="global.sec_edgar",
+        source_id="global.ecb_data_portal",
         market_scope="global",
-        asset_family="company_filings",
-        provider="SEC EDGAR",
+        asset_family="fx_rates_yields_macro",
+        provider="European Central Bank Data Portal SDMX API",
         status="candidate_requires_validation",
         used_by_research_engine=False,
         approved_for_production=False,
-        data_kinds=("filing", "company_facts"),
-        timestamp_quality="acceptance timestamp available but field mapping needs audit",
-        required_checks=("filing_acceptance_time", "amendments", "point_in_time_field_mapping",
-                         "request_policy"),
-        notes="Candidate source for US issuer fundamentals and disclosures.",
+        data_kinds=("daily_reference_fx_candidate", "yield_curve_candidate",
+                    "macro_observation_vintage_candidate"),
+        timestamp_quality="observation periods and update/history metadata are available; exact release/availability time needs series-level validation",
+        required_checks=("series_key_and_definition", "currency_direction_and_units",
+                         "reference_rate_vs_executable_quote", "updated_after_and_historical_versions",
+                         "release_availability_time", "reuse_attribution_and_third_party_rights",
+                         "revision_and_discontinuation_policy"),
+        notes=("Public SDMX REST candidate for daily reference FX, yield curves and macro statistics. "
+               "ECB documentation describes updatedAfter and includeHistory; the ESCB reuse policy "
+               "allows public statistics to be reused with attribution and without modification, "
+               "but excludes third-party data without permission. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.us_treasury_yield_curve",
+        market_scope="global",
+        asset_family="sovereign_yields_and_rates",
+        provider="US Department of the Treasury daily interest-rate XML feeds",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("daily_par_yield_candidate", "daily_bill_rate_candidate",
+                    "daily_real_yield_candidate"),
+        timestamp_quality="daily observation date available; exact publication/availability timestamp and correction vintage need validation",
+        required_checks=("curve_type_and_maturity_mapping", "yield_definition_and_units",
+                         "calendar_and_missing_dates", "publication_availability_time",
+                         "xml_schema_drift_and_pagination", "reuse_terms_and_attribution"),
+        notes=("Official XML feeds list daily par yields from 1990 and bill/real-yield series with "
+               "different start dates; default responses contain 300 rows and all-history access "
+               "is paginated. Rates are not bond prices or total-return indexes. No live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.eia_energy_api",
+        market_scope="global",
+        asset_family="energy_oil_gas_electricity",
+        provider="US Energy Information Administration API v2",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("energy_price_candidate", "inventory_production_demand_candidate",
+                    "international_energy_statistic_candidate"),
+        timestamp_quality="series observation period and frequency are available; release calendar, publication time and revisions need series-level validation",
+        required_checks=("api_key_and_terms_of_service", "series_identity_and_frequency",
+                         "units_and_geography", "release_calendar_and_vintage",
+                         "third_party_materials_and_reuse", "history_completeness",
+                         "energy_statistic_vs_tradable_price"),
+        notes=("Free API v2 requires a registered API key; bulk downloads do not require a key. "
+               "EIA states its government information is generally public domain with acknowledgment, "
+               "but third-party contributed/licensed materials may be protected. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.imf_sdmx_api",
+        market_scope="global",
+        asset_family="international_macro_and_external_sector",
+        provider="International Monetary Fund SDMX 2.1/3.0 Data APIs",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("macro_observation_candidate", "balance_of_payments_candidate",
+                    "monetary_statistics_candidate"),
+        timestamp_quality="dataset-specific observation period; release/availability and vintage semantics not yet verified",
+        required_checks=("dataflow_and_series_definition", "authentication_and_quota",
+                         "country_frequency_and_unit_mapping", "release_calendar_and_vintage",
+                         "history_and_revision_behavior", "reuse_rights"),
+        notes=("IMF documentation advertises SDMX 2.1 and 3.0 APIs; its Swagger explorer requires "
+               "a beta portal account. Actual API authentication, quota, dataflow history and reuse "
+               "conditions remain unverified. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.sec_edgar",
+        market_scope="global",
+        asset_family="company_filings_and_fundamentals",
+        provider="SEC EDGAR submissions and XBRL company-facts APIs",
+        status="candidate_requires_validation",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("filing_candidate", "xbrl_company_fact_candidate"),
+        timestamp_quality="filing acceptance date/time can be recovered from EDGAR metadata; public-document availability can lag and post-acceptance corrections exist",
+        required_checks=("issuer_cik_and_form_identity", "acceptance_vs_public_availability_time",
+                         "amendments_and_post_acceptance_corrections", "xbrl_context_units_and_periods",
+                         "fair_access_10_requests_per_second", "declared_user_agent",
+                         "reuse_terms_and_attribution", "point_in_time_field_mapping"),
+        notes=("Public data.sec.gov submissions and XBRL APIs require no API key; EDGAR indexes extend "
+               "to 1994Q3. SEC Fair Access limits a user to 10 requests/second across machines and "
+               "requires a descriptive User-Agent. Filings may appear 1-3 minutes after acceptance, "
+               "and corrections/deletions can change later indexes. This is issuer-event/fundamental "
+               "data, not market-price history. No adapter or live probe is enabled."),
+    ),
+    SourceDefinition(
+        source_id="global.gdelt_doc_api",
+        market_scope="global_and_iran",
+        asset_family="news_discovery",
+        provider="GDELT DOC 2.0 API",
+        status="adapter_implemented_not_scheduled",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("article_metadata",),
+        timestamp_quality="GDELT seendate is first-seen/index time; publisher publication time unavailable",
+        required_checks=("query_coverage_by_language_and_country", "deduplication_precision",
+                         "publisher_terms", "source_outage_and_rate_limits",
+                         "published_time_reconciliation", "labeled_news_recall"),
+        notes="Read-only article discovery adapter with mocked tests. Titles are not full article text; sentiment, political event extraction and market scoring remain unset.",
     ),
     SourceDefinition(
         source_id="global.gdelt_news_discovery",
@@ -170,6 +423,21 @@ SOURCES: tuple[SourceDefinition, ...] = (
         required_checks=("original_source_verification", "publication_and_update_times",
                          "duplicates_and_corrections", "language_coverage", "licensing"),
         notes="Never treat a discovery/index result alone as verified event truth.",
+    ),
+    SourceDefinition(
+        source_id="marketsage.headline_lexicon_baseline",
+        market_scope="iran_and_global",
+        asset_family="headline_sentiment_and_event_candidates",
+        provider="MarketSage transparent Persian/English keyword baseline",
+        status="prototype_only_not_validated",
+        used_by_research_engine=False,
+        approved_for_production=False,
+        data_kinds=("headline_sentiment_candidate", "political_event_category_candidate"),
+        timestamp_quality="inherited from source; not improved by classifier",
+        required_checks=("representative_persian_english_labelled_corpus", "inter_annotator_agreement",
+                         "out_of_sample_precision_recall", "negation_and_context", "domain_drift",
+                         "false_positive_review", "point_in_time_replay"),
+        notes="Auditable lexical baseline for smoke tests only. It emits word evidence and abstains on unknown sentiment; not a validated ML model and never affects investment scoring.",
     ),
     SourceDefinition(
         source_id="sentiment.provider_tbd",

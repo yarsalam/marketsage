@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ResearchSnapshot } from "@/components/ResearchSnapshot";
 
 type TabId = "momentum" | "regime" | "news" | "risk" | "portfolio" | "backtest" | "macro" | "analyst" | "settings";
 type Allocation = { asset: string; ticker: string; weight: number; capital_allocated: number };
@@ -128,7 +129,7 @@ export function ResearchTab({ activeTab, onNavigate }: { activeTab: TabId; onNav
 
 export const MomentumMonitor = (props: { onNavigate: (tab: string) => void }) => <ResearchTab activeTab="momentum" {...props} />;
 export const MarketRegime = (props: { onNavigate: (tab: string) => void }) => <ResearchTab activeTab="regime" {...props} />;
-export const NewsIntelligence = (props: { onNavigate: (tab: string) => void }) => <ResearchTab activeTab="news" {...props} />;
+export const NewsIntelligence = (_props: { onNavigate: (tab: string) => void }) => <ResearchSnapshot />;
 export const RiskCenter = (props: { onNavigate: (tab: string) => void }) => <ResearchTab activeTab="risk" {...props} />;
 export const PortfolioAllocator = (props: { onNavigate: (tab: string) => void }) => <ResearchTab activeTab="portfolio" {...props} />;
 export const BacktestingLab = (props: { onNavigate: (tab: string) => void }) => <ResearchTab activeTab="backtest" {...props} />;

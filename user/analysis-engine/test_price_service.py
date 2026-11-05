@@ -100,7 +100,7 @@ def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates()
     assert entries["global.yahoo_finance.yfinance"]["used_by_research_engine"] is True
     assert entries["global.yahoo_finance.yfinance"]["approved_for_production"] is False
     assert entries["iran.tsetmc"]["approved_for_production"] is False
-    assert entries["iran.gold_fx"]["status"] == "provider_not_selected"
+    assert entries["iran.gold_fx"]["status"] == "candidate_requires_validation"
     assert entries["crypto.exchange_specific"]["approved_for_production"] is False
 
 
@@ -214,3 +214,123 @@ def test_backtest_endpoint_rejects_negative_slippage_before_fetch(monkeypatch):
     )
     response = client.get("/backtest?slippage_bps=-1")
     assert response.status_code == 422
+
+
+def test_research_snapshot_api_returns_descriptive_metrics_and_keeps_ranking_disabled():
+    response = client.post(
+        "/research/snapshot",
+        json={
+            "as_of_date": "2026-10-17",
+            "articles": [{
+                "source_id": "fixture.news",
+                "url": "https://example.test/article",
+                "title": "Central bank announces growth agreement",
+                "first_seen_date": "2026-10-16",
+            }],
+            "market_series": [{
+                "symbol": "DEMO",
+                "source_id": "fixture.market",
+                "unit": "USD per unit",
+                "currency": "USD",
+                "unit_confirmed": True,
+                "currency_confirmed": True,
+                "observations": [
+                    {"date": "2026-10-15", "close": 100},
+                    {"date": "2026-10-16", "close": 110},
+                    {"date": "2026-10-17", "close": 105},
+                    {"date": "2026-10-18", "close": 1000},
+                ],
+            }],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["pipeline_version"] == "research_snapshot_v1"
+    assert payload["news"]["articles_analyzed"] == 1
+    assert payload["markets"][0]["metrics"]["last_observation_date"] == "2026-10-17"
+    assert payload["markets"][0]["metrics"]["total_return"] == pytest.approx(0.05)
+    assert payload["markets"][0]["eligible_for_scoring"] is False
+    assert "source_not_approved" in payload["markets"][0]["exclusion_reasons"]
+    assert payload["investment_ranking"] is None
+    assert payload["investment_ranking_status"] == "disabled_until_source_and_model_acceptance"
+
+
+def test_research_snapshot_api_rejects_invalid_dates_and_values():
+    bad_date = client.post(
+        "/research/snapshot",
+        json={"as_of_date": "17-10-2026", "articles": [], "market_series": []},
+    )
+    assert bad_date.status_code == 422
+
+    bad_close = client.post(
+        "/research/snapshot",
+        json={
+            "as_of_date": "2026-10-17",
+            "articles": [],
+            "market_series": [{
+                "symbol": "DEMO",
+                "observations": [{"date": "2026-10-17", "close": -1}],
+            }],
+        },
+    )
+    assert bad_close.status_code == 422
+
+
+def test_stale_cache_fallback_is_bounded_and_logs_only_error_type(monkeypatch, caplog):
+    prices = provider_frame()
+    monkeypatch.setattr(price_service, "_cache_frame", prices)
+    monkeypatch.setattr(price_service, "CACHE_TTL", 5)
+    monkeypatch.setattr(price_service, "_cache_time", price_service.time.monotonic() - 10)
+    monkeypatch.setattr(
+        price_service,
+        "_cache_metadata",
+        {"loaded": True, "available": True, "stale": False, "source": "fixture"},
+    )
+    monkeypatch.setattr(price_service, "MAX_STALE_CACHE_AGE_SECONDS", 60)
+    monkeypatch.setattr(
+        price_service,
+        "download_prices",
+        lambda: (_ for _ in ()).throw(RuntimeError("provider body token=DO_NOT_LOG")),
+    )
+
+    returned = price_service.get_prices()
+    status = client.get("/data-status")
+
+    assert returned.equals(prices)
+    assert status.status_code == 200
+    payload = status.json()
+    assert payload["stale"] is True
+    assert payload["available"] is True
+    assert payload["last_refresh_error"] == "RuntimeError"
+    assert payload["stale_age_seconds"] >= 10
+    assert "DO_NOT_LOG" not in caplog.text
+    assert "provider body" not in caplog.text
+
+
+def test_expired_stale_cache_fails_closed_with_503(monkeypatch):
+    prices = provider_frame()
+    monkeypatch.setattr(price_service, "_cache_frame", prices)
+    monkeypatch.setattr(price_service, "CACHE_TTL", 5)
+    monkeypatch.setattr(price_service, "_cache_time", price_service.time.monotonic() - 61)
+    monkeypatch.setattr(
+        price_service,
+        "_cache_metadata",
+        {"loaded": True, "available": True, "stale": False, "source": "fixture"},
+    )
+    monkeypatch.setattr(price_service, "MAX_STALE_CACHE_AGE_SECONDS", 60)
+    monkeypatch.setattr(
+        price_service,
+        "download_prices",
+        lambda: (_ for _ in ()).throw(TimeoutError("provider timed out")),
+    )
+
+    response = client.get("/decision")
+
+    assert response.status_code == 503
+    assert "maximum stale age" in response.json()["detail"]
+    payload = client.get("/data-status").json()
+    assert payload["stale"] is True
+    assert payload["available"] is False
+    assert payload["unavailable_reason"] == "stale_cache_exceeded_max_age"
+    assert payload["last_refresh_error"] == "TimeoutError"

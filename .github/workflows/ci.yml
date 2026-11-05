@@ -2,9 +2,8 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**", "ci/**"]
+    branches: [main, "deploy/**", "research/**", "ci/**", "feat/**", "feature/**", "fix/**", "governance/**"]
   pull_request:
-    branches: [main, "deploy/**"]
 
 permissions:
   contents: read
@@ -14,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validate free dataset acceptance scripts/catalog
+        working-directory: user/analysis-engine
+        run: |
+          bash -n scripts/run_free_dataset_acceptance_pack.sh
+          python -m json.tool ../../docs/free_dataset_source_catalog.json >/dev/null
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -97,5 +101,17 @@ jobs:
         run: |
           cp .env.production.example .env.production
           docker compose --env-file .env.production -f docker-compose.production.yml config -q
+      - name: Validate staging Compose overlay
+        run: |
+          cp .env.staging.example .env.staging
+          docker compose --env-file .env.staging -f docker-compose.production.yml -f docker-compose.staging.yml config -q
+      - name: Validate staging Caddyfile syntax
+        run: |
+          docker run --rm \
+            -e STAGING_DOMAIN=staging.example.com \
+            -e STAGING_BASIC_AUTH_USER=ci-user \
+            -e 'STAGING_BASIC_AUTH_HASH=$2a$14$Zkx19XLiW6VYouLHR5NmfOFU0z2GTNmpkT/5qqR7hx4IjWJPDhjvG' \
+            -v "$PWD/deploy/staging/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            caddy:2.11.7-alpine caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
       - name: Build all production images
         run: docker compose --env-file .env.production -f docker-compose.production.yml build

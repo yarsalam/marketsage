@@ -1,4 +1,4 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException, UnprocessableEntityException } from '@nestjs/common';
 import axios from 'axios';
 
 @Injectable()
@@ -33,7 +33,53 @@ export class MarketsService {
     return this.getAnalysis(`/backtest?top_n=${encodeURIComponent(topN)}&transaction_cost_bps=${encodeURIComponent(transactionCostBps)}`);
   }
 
+  getIranDataStatus() {
+    return this.getAnalysis('/iran/data-status');
+  }
+
+  getIranCurrencyRates() {
+    return this.getAnalysis('/iran/currency-rates');
+  }
+
+  getIranOpportunities() {
+    return this.getAnalysis('/iran/opportunities');
+  }
+
+  async refreshIranData(refreshToken: string) {
+    try {
+      const { data } = await axios.post(this.baseUrl + '/iran/refresh', {}, {
+        timeout: 45_000,
+        headers: { Accept: 'application/json', 'X-Iran-Refresh-Token': refreshToken },
+      });
+      return data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        throw new ServiceUnavailableException('Iranian data refresh authorization failed.');
+      }
+      throw new ServiceUnavailableException(
+        'Iranian market-data refresh failed. Check source configuration and provider access.',
+      );
+    }
+  }
+
   getDataStatus() {
     return this.getAnalysis('/data-status');
+  }
+
+  async getResearchSnapshot(payload: Record<string, unknown>) {
+    try {
+      const { data } = await axios.post(`${this.baseUrl}/research/snapshot`, payload, {
+        timeout: 45_000,
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      });
+      return data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 422) {
+        throw new UnprocessableEntityException('Research snapshot input failed validation.');
+      }
+      throw new ServiceUnavailableException(
+        'Research snapshot is temporarily unavailable.',
+      );
+    }
   }
 }

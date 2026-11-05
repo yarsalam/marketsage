@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { MarketsService } from './markets.service';
 
 @Controller('api/markets')
@@ -31,8 +31,33 @@ export class MarketsController {
     return this.marketsService.getBacktest(String(topNValue), String(costValue));
   }
 
+  @Get('iran/data-status')
+  getIranDataStatus() {
+    return this.marketsService.getIranDataStatus();
+  }
+
+  @Get('iran/currency-rates')
+  getIranCurrencyRates() {
+    return this.marketsService.getIranCurrencyRates();
+  }
+
+  @Get('iran/opportunities')
+  getIranOpportunities() {
+    return this.marketsService.getIranOpportunities();
+  }
+
+  @Post('iran/refresh')
+  refreshIranData(@Headers('x-iran-refresh-token') refreshToken?: string) {
+    return this.marketsService.refreshIranData(refreshToken ?? '');
+  }
+
   @Get('data-status')
   getDataStatus() {
     return this.marketsService.getDataStatus();
+  }
+
+  @Post('research-snapshot')
+  getResearchSnapshot(@Body() payload: Record<string, unknown>) {
+    return this.marketsService.getResearchSnapshot(payload);
   }
 }

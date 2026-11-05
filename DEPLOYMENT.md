@@ -79,7 +79,40 @@ Validate proxy config and HTTPS before opening public access. Domain names and c
 
 Never run `docker compose down -v` on a server unless deleting every attached named volume is intentional.
 
-## 7. Explicit launch blockers
+## 7. Stale-data fallback policy
+
+The analysis service allows a previously successful in-memory price cache to be served after a provider refresh failure only while its age is at most `MAX_STALE_CACHE_AGE_SECONDS` (default: 86,400 seconds / 24 hours). Set this value in the protected `.env.production` file; use `0` to disable stale fallback. When the cache exceeds the limit, price-dependent endpoints return HTTP 503 and must not produce a decision.
+
+Check `GET /data-status` during an incident. A stale cache is reported with `stale=true`, its age, and a sanitized error type. Provider exception text and raw response bodies should not be copied into logs or incident reports. This in-memory fallback policy does not make the cached provider data validated or suitable for investment ranking.
+
+Before a staging release, run the automated stale-cache regression tests from `user/analysis-engine`:
+
+```bash
+.venv/bin/python -m pytest -q test_price_service.py
+```
+
+Do not simulate provider failure against a production account or alter production cache age just to force a test.
+
+## 8. Iranian market-data dashboard and Tindex refresh
+
+The user-facing app now has an Iranian market-data landing tab. The Tindex pipeline is opt-in and manual:
+- Configure `TINDEX_API_BASE_URL` and `TINDEX_API_TOKEN` in the protected server-side `.env.production`; do not commit either value.
+- Set `IRAN_REFRESH_TOKEN` to a long random secret in `.env.production`. The same secret authorizes manual refresh requests; the dashboard asks for it per request and does not persist it in browser storage.
+- Keep `TINDEX_PUBLIC_DISPLAY_ENABLED=false` unless the vendor agreement explicitly allows public display/redistribution. Turning it on exposes persisted provider rates through the public site/API.
+- Keep `IRAN_DATA_AUTO_REFRESH_ENABLED=false` unless the vendor agreement permits automated collection. When enabled, the collector requests the Tindex currency-rate endpoint at startup only after the configured interval elapses, then at intervals of at least one hour. The default is disabled.
+- Rebuild and restart after setting these variables:
+  ```bash
+  docker compose --env-file .env.production -f docker-compose.production.yml config
+  docker compose --env-file .env.production -f docker-compose.production.yml build analysis-engine user-backend user-frontend
+  docker compose --env-file .env.production -f docker-compose.production.yml up -d
+  ```
+- Check `GET /api/markets/iran/data-status`, `GET /api/markets/iran/currency-rates`, and `GET /api/markets/iran/opportunities`.
+- From the Iranian market-data dashboard, enter the refresh secret and request a refresh. This makes one Tindex currency-rates request; the API enforces a 60-second local cooldown and does not automatically retry failures. Respect the provider's account quota.
+- Raw payloads, SHA-256 checksum, retrieval timestamp, normalized rows, and sanitized refresh status persist in `/data/iran-market.sqlite3` on the existing `market_data` volume.
+
+When `TINDEX_PUBLIC_DISPLAY_ENABLED=true`, displayed provider rates are explicitly raw values: unit, market definition, and source publication timestamp are not inferred. Public display is disabled by default. The opportunity endpoint intentionally returns no ranks until an appropriate set of comparable, approved historical series passes the source acceptance gates. Do not describe the Tindex integration as commercial-license approved solely because the token works.
+
+## 9. Explicit launch blockers
 
 - The admin UI source is tracked, but the admin NestJS server is only a starter skeleton and is not included in production Compose. Do not expose it as a functioning admin service.
 - Admin authentication, authorization, audit logging, persistence and actual admin operations remain unimplemented/unverified.
