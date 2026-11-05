@@ -1,5 +1,7 @@
 import json
+import re
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from post_ci_failure_notice import build_comment, failed_job_names, post_comment
@@ -72,6 +74,23 @@ class FailureNoticeTests(unittest.TestCase):
         self.assertTrue(request.full_url.endswith("/repos/yarsalam/marketsage/issues/49/comments"))
         self.assertEqual(json.loads(request.data.decode())["body"], "sanitized only")
         self.assertNotIn("test-token", request.data.decode())
+
+    def test_workflow_actions_are_pinned_to_full_commit_shas(self):
+        root = Path(__file__).resolve().parents[2]
+        workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        refs = re.findall(r"^\\s*uses:\\s+[^@\\s]+@([0-9a-fA-F]+)", workflow, re.MULTILINE)
+        self.assertTrue(refs, "expected at least one external action")
+        self.assertTrue(
+            all(re.fullmatch(r"[0-9a-fA-F]{40}", ref) for ref in refs),
+            "all action references must be immutable 40-character SHAs",
+        )
+
+    def test_dependabot_has_bounded_weekly_actions_updates(self):
+        root = Path(__file__).resolve().parents[2]
+        config = (root / ".github" / "dependabot.yml").read_text(encoding="utf-8")
+        self.assertIn("package-ecosystem: github-actions", config)
+        self.assertIn("interval: weekly", config)
+        self.assertIn("open-pull-requests-limit: 5", config)
 
 
 if __name__ == "__main__":
