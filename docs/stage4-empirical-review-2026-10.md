@@ -5,6 +5,8 @@
 **Input report:** `/tmp/marketsage-stage4-evaluation.json` (local artifact; do not commit the raw report or dataset).  
 **Dataset SHA-256:** `1e71d898b18b4a6db74aba4826c86a4982efad934ee30aa82ff354883f01d878`
 
+**Reproducibility limitation (2026-11-05):** This historical report predates the exact-code/run-manifest enhancement. The input SHA-256 is recorded, but the original report has no captured Git commit/worktree state or sidecar report hash. Do not describe the old artifact as fully reproducible until the exact same input is rerun with the updated runner and its matching `.manifest.json` sidecar is preserved. The original hash remains the only acceptable input for reproducing the recorded metrics; do not substitute another CSV or use the locked holdout for tuning.
+
 ## Dataset and protocol
 
 - 78 monthly rows from 2020-04-30 through 2026-09-30, covering 11 assets.
