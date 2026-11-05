@@ -10,7 +10,8 @@ The laptop Runner is limited to reviewed, owner-dispatched research workflows. O
 
 Allowed local workloads:
 1. the manual staged-dataset checksum/inventory validator on main;
-2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, which historically pinned integration commit `819f8b4028469cb0d498098fec88545a18ebacc6`. This PR updates the pin to corrected pipeline commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` (v1.1.1); the workflow remains manual-only and is not dispatched by this change.
+2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, with its immutable pipeline pin updated by this PR to corrected v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c`; it remains manual-only and is not dispatched by this change.
+3. `.github/workflows/local-tsetmc-sanitized-diagnostics.yml`, merged in PR #38 at `07e641670ceab22496ef976a584934464570fd9a` after all five required CI jobs passed in run `42031417400`. It reads only existing local `run_manifest.json` and `input_inventory.csv` files under the private output directory, verifies inventory hashes, and emits aggregate reason/input-kind counts. It does not write inputs, make provider requests, expose raw rows/paths/identifiers, or upload artifacts; owner review is still required before manual dispatch.
 
 Disallowed:
 - fork/PR/issue/comment/schedule/push/workflow-run/repository-dispatch triggers;
@@ -132,7 +133,7 @@ If any local job behaves unexpectedly:
 - [PR #44 — TSETMC official REST-service candidate screen (closed as stale-base/superseded)](https://github.com/yarsalam/marketsage/pull/44)
 - [PR #45 — TSETMC official REST-service candidate screen (merged into integration)](https://github.com/yarsalam/marketsage/pull/45)
 - [PR #46 — FIPIRAN/IFB/Investats candidate-only source screen](https://github.com/yarsalam/marketsage/pull/46)
-- [PR #38 — sanitized local TSETMC diagnostics (open; no dispatch)](https://github.com/yarsalam/marketsage/pull/38)
+- [PR #38 — sanitized local TSETMC diagnostics (merged to main; manual dispatch not yet authorized)](https://github.com/yarsalam/marketsage/pull/38)
 - [Project state](PROJECT_STATE.md)
 - [Decision log](DECISION_LOG.md)
 - [Project execution constitution](PROJECT_EXECUTION_CONSTITUTION.md)
