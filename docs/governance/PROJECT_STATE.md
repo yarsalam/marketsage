@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-11-05  
 **Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
+**Main HEAD at last inspection:** 3d4e2a97da70ae5564a5252048fcb2e2971bd6e5 (before this state-sync PR)  
 **Integration PR:** #6, feat/tindex-free-data-connector  
 **Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
 **Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
@@ -11,8 +11,10 @@
 
 - PR #6 remains open and **must not be merged to main without explicit owner approval**. Its current integration code is used by the new local workflow only through the immutable commit SHA above.
 - PR #8 remains parked after the GitHub-hosted TSETMC connection timeout. Do not repeat the same request from the same environment.
-- PR #27 (manual-only staged-dataset validator), PR #31 (clean governance adoption), PR #32 (manual integrated TSETMC workflow) and PR #34 (memory-bounded local analysis) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
+- PR #27 (manual-only staged-dataset validator), PR #31 (governance adoption), PR #32 (manual integrated TSETMC workflow), PR #34 (memory-bounded local analysis), PR #35 (governance sync), PR #36 (candidate-run record) and PR #37 (TSETMC remediation plan) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
 - PRs #7, #9, #13, #14, #16–#24, and #28–#30 are integrated into PR #6 in dependency order. Their CI results do not approve data sources or the strategy.
+- PR #6's integration branch is 405 commits ahead and 9 behind main at the last comparison; it is diverged and remains unmerged. PR #39 is an open nested PR targeting that integration branch, correcting TSETMC discovery-identity classification; its exact-head CI has not yet been verified. Do not merge PR #6 to main.
+- Owner evidence blocker: [Issue #40](https://github.com/yarsalam/marketsage/issues/40) tracks TSETMC rights, seven identity conflicts, units/semantics and independent reconciliation evidence.
 - The governance constitution is adopted on main via PR #31. Main branch protection is not enabled; the local Runner uses the owner-approved manual-only compensating-control model. This is not equivalent to branch protection/rulesets.
 
 ## Local Runner and first dataset gate
@@ -40,18 +42,30 @@ Attempt 1 failed while extracting actions/checkout; the host compatibility fix w
 
 **Interpretation:** this gate establishes staged-corpus inventory/checksum integrity only. It does not establish usage rights, correct raw/adjusted-price semantics, corporate-action correctness, independent price reconciliation, point-in-time availability, source acceptance or backtest eligibility.
 
-## Next data task
+## Integrated TSETMC candidate run and next data task
 
-PR #32 is merged to main at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`. It adds a separate manual-only workflow for the PR #14 integrated offline TSETMC candidate-acceptance pipeline. It:
-- checks out this workflow's exact manually selected main commit;
-- checks out the integration implementation at the fixed SHA 819f8b4028469cb0d498098fec88545a18ebacc6;
-- requires the owner confirmation input and the repository-scoped Runner labels;
-- checks the staged dataset is readable and non-writable, checks the v2 identity crosswalk, bounds discovery size, requires at least 4 GiB effective available RAM (host and cgroup-aware) and 8 GiB free output disk, and refuses symlinks/out-of-dataset inputs;
-- divides the discovered candidates into bounded batches of at most 32 instruments and 32 MiB of unique selected input files per batch; it rechecks RAM/disk before every batch and keeps each batch's detailed outputs local;
-- makes no provider/network requests, changes no input file, and keeps row-level candidate outputs and local absolute paths on the laptop under the private output directory;
-- prints only sanitized counts and fail-closed status flags to GitHub logs; no artifacts are uploaded.
+PR #32 is merged to main at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`. PR #34's memory-bounded correction is merged at `554fe2200ccb3a523442b0e241e81a748becfa44`. The manual-only workflow checks out the exact owner-selected main commit and the fixed integration implementation commit `819f8b4028469cb0d498098fec88545a18ebacc6`; it runs only after an owner-reviewed manual dispatch.
 
-The first integrated dispatch, run [41912248800](https://github.com/yarsalam/marketsage/actions/runs/41912248800), reached the local Runner and checked out both exact commits successfully, but stopped before candidate analysis with `insufficient_available_memory`: the original static 16 GiB gate was higher than the laptop's available memory. No candidate batch ran; the staged dataset remained read-only and the workflow made no provider requests. PR #34 adds bounded memory-aware batches and reports the measured host/cgroup memory and free disk. PR #34 merged to `main` at `554fe2200ccb3a523442b0e241e81a748becfa44` after all five exact-head CI jobs passed in run [41913385729](https://github.com/yarsalam/marketsage/actions/runs/41913385729); the analysis suite reported 109 passed and 7 warnings. A post-merge `main` push CI run is being checked separately. The owner must now manually dispatch again with `confirm_integrated_acceptance=true`. It prints aggregate decision/quarantine reason counts and price-semantics/identity counts only; detailed CSVs and row-level data remain local.
+**Latest local candidate run:** [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555), manually dispatched on main on 2026-11-05. It completed successfully in two bounded batches (32 and 15 candidates), with 95 unique input files and 7,554 history rows. It made zero provider/network requests, did not overwrite the staged inputs, verified 32 local output-manifest files, uploaded no artifacts and kept row-level outputs private.
+
+Sanitized result:
+- 47 candidates discovered; 47 quarantined; 0 research-eligible.
+- 0 research-feature rows; 0 six-month forward-label rows; no backtest run or approval.
+- 0 input-file read errors.
+- 7 discovery identity conflicts between history-row `insCode`/ISIN values and sibling search/crosswalk metadata.
+- 47 candidates still lack verified usage rights, identity evidence, price/volume semantics, independent reconciliation and corporate-action completeness.
+- 47 lack an adjusted-chart candidate; 35 also fall below the six-month history threshold.
+- All scoring, ranking, backtest and capital-risk flags remain false.
+
+**Classification correction:** pipeline v1.1.0 reported `INPUT_OR_PARSER_ERROR: 7`, but the same run's preflight reported `identity_conflict_count=7` and `input_file_read_errors=0`. The code appends the discovery identity conflict to a generic error list, causing a misleading reason label. [PR #39](https://github.com/yarsalam/marketsage/pull/39) separates discovery identity conflicts and ambiguous history selection from actual input/parser errors, explicitly blocks identity acceptance on conflicts, and adds a regression test. It is open against the integration branch; do not treat the correction as merged until its exact-head CI passes.
+
+**Next actions**
+1. Complete the exact-head five-job CI for PR #39 and, if green, merge it only into the PR #6 integration branch. PR #6 itself remains open.
+2. Prepare a separate main-branch PR to update the local workflow's pinned integration SHA after PR #39 merges. The owner must review the exact workflow and pinned source commit before any future manual dispatch, as required by the trust boundary.
+3. Resolve the external evidence blockers in [Issue #40](https://github.com/yarsalam/marketsage/issues/40): locally review the seven identity conflicts against an authoritative instrument master; provide applicable TSETMC rights/retention terms; identify a lawful independent price/volume reference; attest units, raw/adjusted semantics and corporate-action completeness.
+4. Do not rerun the unchanged corpus. Reprocess only after a separately versioned, evidence-backed input correction or new immutable dataset version, with hashes preserved.
+5. Obtain a permissioned and representative history before any locked walk-forward strategy evaluation. Attribute the Stage 4 extreme fold only from the exact original monthly CSV/hash/config; do not tune on the final holdout.
+6. Keep source scoring, investment ranking, calibrated probabilities, production release, broker access and trading disabled until all data and empirical gates pass. Any real-money allocation or trade still requires separate explicit owner approval.
 
 ## Data-source acceptance
 
