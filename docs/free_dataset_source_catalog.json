@@ -81,17 +81,18 @@
         "annual commodity prices and indices",
         "global energy and precious-metals benchmarks"
       ],
-      "history_limit": "Official page lists monthly and annual XLS workbooks; on 2026-11-04 it displayed an October 2026 monthly workbook, latest-prices-published date 2026-10-02 and next-update date 2026-11-03. Exact observation end date, first-availability time and coverage per series are not independently parsed.",
+      "history_limit": "The World Bank Data Blog dated 2026-11-04 links the November 2026 Pink Sheet PDF dated 2026-11-03, which reports monthly averages through October 2026. The Commodity Markets landing page still labels the monthly XLS as October 2026 and its latest-prices card still shows 2026-10-02 with next update 2026-11-03; the PDF/workbook release-label mismatch is unresolved. Exact XLSX coverage and first-availability time per series remain unparsed.",
       "limitations": [
         "Monthly/annual benchmark data are not daily executable spot/futures prices or ETF returns",
-        "Observation month is not publication/availability time; release label alone does not establish when a value became knowable",
+        "Observation month is not publication/availability time; preserve the PDF publication date and any later workbook availability separately",
         "Each commodity has its own benchmark, currency, unit and quotation basis; parse the workbook's series metadata and preserve units exactly",
         "Keep nominal prices, real prices, price indices and annual averages as separate data kinds",
         "Historical workbooks may revise earlier observations; immutable vintages and revision diffs are required for point-in-time replay",
-        "The workbook itself was not downloaded or parsed in this review; exact coverage, missing-value tokens, discontinuations and per-series units remain unverified",
-        "The official page displayed an October 2026 workbook and a 2026-11-03 next-update date; check the landing page for a newer file before any future collection",
+        "The November 2026 PDF confirms selected units and benchmark definitions: Brent USD/barrel, gold and silver USD/troy ounce, copper USD/metric ton; gold is a spot average of daily rates, silver is the London afternoon fixing, and crude-oil average equally weights Brent, Dubai and WTI",
+        "The November PDF lists third-party upstream sources and carries an 'Official Use Only' footer; the general CC BY 4.0 default does not automatically clear third-party components or that marking; obtain per-series rights clarification before commercial redistribution",
+        "The XLSX workbook itself was not downloaded or parsed; exact historical coverage, workbook schema, missing-value tokens, discontinuations and full revision vintages remain unknown",
         "No adapter, automated workbook fetch, default probe, research-engine use or scoring eligibility is approved",
-        "World Bank dataset summary terms allow CC BY 4.0 reuse unless dataset/indicator metadata says otherwise; third-party components may carry separate terms. Preserve World Bank/data-provider attribution, indicate changes, link terms when facilitating access and do not imply endorsement."
+        "World Bank dataset summary terms provide a CC BY 4.0 default where dataset/indicator metadata permits; preserve attribution, indicate changes, and review third-party components separately"
       ],
       "default_live_probe": false,
       "production_approved": false
