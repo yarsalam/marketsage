@@ -1020,6 +1020,73 @@
         "https://investats.net/blog/investment-funds-api-nav-performance-mtum8rn2",
         "https://investats.net/blog/iranian-stock-api-providers-comparison-mu29k9ls"
       ]
+    },
+    {
+      "source_id": "iran.cbi.urban_cpi_monthly",
+      "label": "CBI urban consumer-price index summary (monthly group-level PDF)",
+      "free_access_class": "public_official_pdf_candidate",
+      "authentication": "Official public PDF observed without an account; no stable machine-readable API contract established",
+      "probe_mode": "documentation-only; no automated PDF crawl or download",
+      "data_families": [
+        "monthly urban consumer-price index",
+        "monthly price changes by consumption group, including housing, water, electricity, gas and other fuels"
+      ],
+      "history_limit": "The reviewed official PDF is dated Tir 1405, reports through Khordad 1405, and uses base year 1400=100. Complete historical file continuity, first-publication timestamps and revisions are not established.",
+      "limitations": [
+        "This is household consumption CPI, not residential property transaction prices, capital appreciation, or rental yield.",
+        "The reviewed issue is four months behind the current 1405-08 review date; do not treat its last observation as current.",
+        "The PDF is a summary publication; stable series identifiers, machine-readable history, revision/vintage policy and exact first-availability timestamps are not verified.",
+        "CBI's site footer states that all material and moral rights belong to CBI; no blanket automated collection, commercial/model-use or redistribution license was established.",
+        "No adapter, default live probe, research-engine use, scoring or production approval."
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.cbi.tehran_housing_transactions",
+      "label": "CBI Tehran housing transaction reports (historical archive; current feed interrupted)",
+      "free_access_class": "historical_official_report_candidate",
+      "authentication": "Historical public reports are referenced on the CBI site; no current raw transaction feed or supported API is established",
+      "probe_mode": "documentation-only; no automated archive crawl or transaction-data request",
+      "data_families": [
+        "monthly Tehran apartment transaction counts",
+        "average transaction price per square metre",
+        "transaction distribution by Tehran district and building age"
+      ],
+      "history_limit": "CBI states that monthly reports ran from Farvardin 1396 through Mordad 1403. The bank reported loss of access to the previous raw-transaction registry from the second half of Shahrivar 1403; a 1404-09-12 status statement said access to the replacement Self-Writer/Kateb systems was still unavailable.",
+      "limitations": [
+        "Coverage is Tehran only and aggregated; it is not a national property-price series or property-level transaction tape.",
+        "No current monthly observations after Mordad 1403 were verified; the reporting break is structural, not an ordinary missing-data gap.",
+        "The 1404-09-12 status is documented by a secondary article quoting IBENA/CBI; no machine-readable CBI API or restoration notice was verified in this screen.",
+        "Report release dates, corrections, methodology changes, sample counts, neighborhood definitions and property-mix effects need per-report validation.",
+        "CBI site material rights belong to CBI; reuse, automated collection and commercial/model-use rights remain unresolved.",
+        "Historical-only context candidate; no adapter, default probe, backtest price input, scoring or production approval."
+      ],
+      "default_live_probe": false,
+      "production_approved": false
+    },
+    {
+      "source_id": "iran.codal.automaker_operations",
+      "label": "CODAL listed-automaker operating disclosures",
+      "free_access_class": "public_issuer_disclosure_candidate",
+      "authentication": "Public disclosure search is observed for the generic CODAL candidate; a dedicated supported API contract for this subfamily is not established",
+      "probe_mode": "documentation-only; no automated issuer search or filing crawl",
+      "data_families": [
+        "production and sales units by listed automaker and product category (filing frequency varies)",
+        "reported sales amounts and manufacturer-reported price fields where present in original filings"
+      ],
+      "history_limit": "A JETRO review published 2025-08-13 compiles annual CODAL disclosures for Iran Khodro, Pars Khodro and Saipa for Iranian years 1399-1403. Per-issuer monthly filing continuity, product-level field coverage and amendment history have not been measured.",
+      "limitations": [
+        "Issuer filings describe manufacturer operations and primary sales, not a market-wide new/used vehicle transaction-price index.",
+        "Sales amount divided by sales units is not a valid vehicle price index without consistent model/trim mix, tax, discount, contract, delivery and revenue-recognition treatment.",
+        "Jalali reporting periods, Rial/Toman scale, quantity units, publication versus retrieval timestamps, corrections and per-product semantics must be validated from each original filing.",
+        "Public filing availability does not establish unrestricted automated collection, retention, redistribution or commercial/model-use rights.",
+        "The JETRO table is a secondary compilation citing CODAL, not a substitute for the original filing.",
+        "No adapter, default live probe, price-series substitution, research-engine use, scoring or production approval.",
+        "Monthly frequency and per-issuer continuity must be measured from original CODAL filings; do not infer them from third-party aggregators."
+      ],
+      "default_live_probe": false,
+      "production_approved": false
     }
   ]
 }
