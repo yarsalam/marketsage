@@ -25,7 +25,7 @@ The workflow uses GitHub-hosted `ubuntu-latest` runners for cloud-native tests a
 
 The concurrency group is keyed by pull-request number when available, otherwise by Git ref. A newer run for the same PR/ref cancels its superseded run. Separate PRs remain independent. A cancelled run is not evidence of a test failure; inspect the newest run for that PR/ref.
 
-The workflow currently requests only `contents: read`. It does not require repository secrets and must not print credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
+The validation jobs retain only `contents: read` and do not require repository secrets. A separate failure-notification job receives only `issues: write` so it can add a sanitized comment to Issue #49; it reports workflow/run identifiers and failed job names only. It does not read logs or artifacts, write repository contents, or expose credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
 
 ## Manual-only local workflows
 
@@ -34,6 +34,9 @@ The TSETMC integrated acceptance and sanitized diagnostics workflows are deliber
 Do not use the local runner for untrusted PR code. Any future server runner must be a separately managed, least-privilege environment with restricted network access, isolated workspaces, bounded concurrency, health monitoring, safe patching, and a documented recovery path. Keep private input data off GitHub and out of artifacts.
 
 ## Daily operations and failure recovery
+
+On a failed CI run, the notification job attempts to add a sanitized comment to Issue #49. A missing comment means notification delivery may have failed; the Actions run remains the source of truth. GitHub Mobile push delivery still depends on the user's notification settings and is not guaranteed by this workflow.
+
 
 1. Open the Actions tab and select **MarketSage CI**.
 2. For each PR, inspect the newest run for its exact head commit. Do not infer current success from an older run.
