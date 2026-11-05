@@ -22,6 +22,8 @@ The workflow uses GitHub-hosted `ubuntu-latest` runners for cloud-native tests a
 | user-frontend | 30 minutes |
 | admin-workspace | 30 minutes |
 | production-images | 40 minutes |
+| ci-infra-tests | 5 minutes |
+| notify-failure | 5 minutes |
 
 The concurrency group is keyed by pull-request number when available, otherwise by Git ref. A newer run for the same PR/ref cancels its superseded run. Separate PRs remain independent. A cancelled run is not evidence of a test failure; inspect the newest run for that PR/ref.
 
