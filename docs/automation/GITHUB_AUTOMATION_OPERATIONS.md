@@ -25,7 +25,7 @@ The workflow uses GitHub-hosted `ubuntu-latest` runners for cloud-native tests a
 
 The concurrency group is keyed by pull-request number when available, otherwise by Git ref. A newer run for the same PR/ref cancels its superseded run. Separate PRs remain independent. A cancelled run is not evidence of a test failure; inspect the newest run for that PR/ref.
 
-The validation jobs retain only `contents: read` and do not require repository secrets. A separate failure-notification job receives only `issues: write` so it can add a sanitized comment to Issue #49; it reports workflow/run identifiers and failed job names only. It does not read logs or artifacts, write repository contents, or expose credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
+The build/test jobs and the CI-helper unit-test job use only `contents: read` and do not require repository secrets. A separate failure-notification job uses `contents: read` to check out the small reporter script and `issues: write` to add a sanitized comment to Issue #49; it reports the run link and failed job names only. It does not read logs or artifacts, write repository contents, or expose credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
 
 ## Manual-only local workflows
 
