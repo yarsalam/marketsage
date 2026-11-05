@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 SOURCE_ID = "iran.tsetmc"
 DEFAULT_MIN_HISTORY = 252
 DEFAULT_MIN_COVERAGE = 0.95
@@ -853,7 +853,14 @@ def run_pipeline(
         symbol = str(item.get("symbol", "") or "").strip()
         isin = str(item.get("isin", "") or "").strip()
         identity_fields = bool(code.isdigit() and 10 <= len(code) <= 22 and symbol and re.fullmatch(r"[A-Za-z0-9]{12}", isin) and code not in duplicate_codes)
-        identity_ok = identity_fields and evidence_reference_ok(item.get("identity_match_evidence_ref"), base)
+        discovery_ambiguous_history = bool(item.get("_discovery_ambiguous_history"))
+        discovery_identity_conflict = bool(item.get("_discovery_identity_conflict"))
+        identity_ok = (
+            identity_fields
+            and not discovery_ambiguous_history
+            and not discovery_identity_conflict
+            and evidence_reference_ok(item.get("identity_match_evidence_ref"), base)
+        )
         paths = {k: (Path(str(item.get(k, "")).strip()).expanduser() if str(item.get(k, "")).strip() else None)
                  for k in ("daily_history_path", "adjusted_chart_path", "adjustment_events_path", "share_change_events_path")}
         for k, path in paths.items():
@@ -879,10 +886,6 @@ def run_pipeline(
                 inventory.append({"instrument_code": code, "symbol": symbol,
                                   "input_kind": "identity_crosswalk", "path": str(crosswalk_input),
                                   "sha256": "", "status": "error", "error": str(exc)})
-        if item.get("_discovery_ambiguous_history"):
-            errors.append("discovery:multiple_equal_priority_history_files_for_instrument")
-        if item.get("_discovery_identity_conflict"):
-            errors.append("discovery:insCode_conflicts_with_sibling_search_metadata")
         for alternative in item.get("_alternative_history_paths", []):
             alt_path = Path(str(alternative)).expanduser()
             try:
@@ -1110,6 +1113,10 @@ def run_pipeline(
             reasons.append("INSTRUMENT_IDENTITY_FIELDS_INCOMPLETE_OR_DUPLICATE")
         elif not identity_ok:
             reasons.append("INSTRUMENT_IDENTITY_EVIDENCE_REFERENCE_MISSING")
+        if discovery_ambiguous_history:
+            reasons.append("DISCOVERY_AMBIGUOUS_HISTORY")
+        if discovery_identity_conflict:
+            reasons.append("DISCOVERY_IDENTITY_CONFLICT")
         if errors:
             reasons.append("INPUT_OR_PARSER_ERROR")
         if bad_history:
@@ -1143,7 +1150,7 @@ def run_pipeline(
 
         if errors or bad_history or bad_adjusted_history:
             status = "needs_reprocessing"
-        elif ratio_bad or event_bad or not identity_ok or long_gap_bad:
+        elif discovery_ambiguous_history or discovery_identity_conflict or ratio_bad or event_bad or not identity_ok or long_gap_bad:
             status = "quarantine_needs_independent_evidence"
         elif low_coverage:
             status = "needs_reprocessing"
@@ -1197,11 +1204,28 @@ def run_pipeline(
                 "required_action": "Resolve reason codes using reviewed evidence; do not retry unless input hash or evidence changes.",
                 "resolution_status": "open",
             })
-            stage = "history_quality_or_input" if errors or bad_history else "adjusted_history_quality" if bad_adjusted_history else "history_gap_reconciliation" if long_gap_bad else "adjustment_factor_audit" if ratio_bad else "adjusted_history_coverage" if low_coverage else "event_reconciliation" if event_bad else "source_evidence"
+            stage = (
+                "history_quality_or_input" if errors or bad_history
+                else "history_source_selection" if discovery_ambiguous_history
+                else "identity_reconciliation" if discovery_identity_conflict
+                else "adjusted_history_quality" if bad_adjusted_history
+                else "history_gap_reconciliation" if long_gap_bad
+                else "adjustment_factor_audit" if ratio_bad
+                else "adjusted_history_coverage" if low_coverage
+                else "event_reconciliation" if event_bad
+                else "source_evidence"
+            )
+            required_action = (
+                "Reconcile history-row insCode/ISIN against the v2 crosswalk and an authoritative instrument master; do not infer or auto-select identity."
+                if discovery_identity_conflict
+                else "Review equal-priority history files, preserve both hashes, and select one only with documented provenance."
+                if discovery_ambiguous_history
+                else "Resolve reason codes; no automatic retry loop."
+            )
             queue_out.append({
                 "instrument_code": code, "symbol": symbol, "stage": stage,
                 "reason_code": reason_text,
-                "required_action": "Resolve reason codes; no automatic retry loop.",
+                "required_action": required_action,
                 "attempt_count": 0, "last_attempt_at": "", "next_retry_after": "",
                 "input_hash": hashlib.sha256(hash_json.encode()).hexdigest(),
                 "pipeline_version": VERSION, "resolution_status": "pending_evidence_or_reprocessing",
