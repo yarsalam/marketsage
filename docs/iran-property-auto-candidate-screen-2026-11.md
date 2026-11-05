@@ -48,15 +48,15 @@ Direct retrieval timed out in this review environment. No series-level workbook,
 
 ## 2. Automobile and vehicle market
 
-### 2.1 CODAL listed-automaker disclosures — issuer fundamentals, not market prices
+### 2.1 CODAL automaker disclosures — issuer fundamentals, not market prices
 
 Source portal: [CODAL](https://www.codal.ir).
 
-A JETRO report dated 2025-08-13 compiles original CODAL disclosures for Iran Khodro, Pars Khodro and Saipa for Iranian year 1403. It reports production units, sales units and sales amounts; selected product tables also expose manufacturer-reported price/amount fields. The report notes that the local industry association had not published 2024 industry-wide production/sales statistics, while CODAL filings supplied company-level disclosures.
+A JETRO report dated 2025-08-13 compiles annual CODAL disclosures for Iran Khodro, Pars Khodro and Saipa for Iranian years 1399-1403. It reports production units, sales units and sales amounts; selected product tables also expose manufacturer-reported price/amount fields. The report notes that the local industry association had not published 2024 industry-wide production/sales statistics, while CODAL filings supplied company-level disclosures. This review did not measure monthly filing continuity or per-issuer history, so frequency must be verified from original filings.
 
 Reference: [JETRO — Iran vehicle production and major-company disclosures, 2025-08-13](https://www.jetro.go.jp/biz/areareports/2025/12940875b2aa9f23.html).
 
-**Use boundary:** CODAL can support listed-automaker operating fundamentals and supply context. It does not by itself provide a representative market-wide transaction-price index for new or used vehicles. Sales amount divided by units is not a valid vehicle price index unless product/trim mix, taxes, discounts, delivery timing, contract terms and revenue recognition are reconciled. Production volume is not an investment return.
+**Use boundary:** CODAL can support listed-automaker operating fundamentals and supply context when original filing frequency and coverage are verified. It does not by itself provide a representative market-wide transaction-price index for new or used vehicles. Sales amount divided by units is not a valid vehicle price index unless product/trim mix, taxes, discounts, delivery timing, contract terms and revenue recognition are reconciled. Production volume is not an investment return.
 
 The generic CODAL candidate remains unapproved for automated collection. This screen does not run a CODAL query, download filings, or change the default probe policy.
 
