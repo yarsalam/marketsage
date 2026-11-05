@@ -228,5 +228,6 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #44 is closed as a stale-base duplicate; PR #45 merged the TSETMC candidate screen on the updated integration branch. The official REST documentation host remains inaccessible in this review, so authentication, pricing, limits, history, units, timestamp semantics and rights remain unknown.
 - PR #46 adds FIPIRAN, IFB and Investats candidate-only screening. Its five-job CI is pending; no probe or procurement is authorized.
 - Issue #40 remains the durable owner-action record for local review of the seven identity conflicts, intended-Iran-network documentation review, rights, and independent price/volume reconciliation.
+- [Issue #47](https://github.com/yarsalam/marketsage/issues/47) separately records the owner's exact-hash local attribution of the unexplained +240.89% Stage 4 fold; the original monthly CSV is not present in GitHub and must not be replaced with another dataset.
 
 **Capital-risk impact:** None. No provider probe, source approval, backtest approval, scoring, ranking, production deployment, broker access or trading was performed.
