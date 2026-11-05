@@ -6,8 +6,9 @@ This is a diagnostic only: it does not tune parameters, approve sources, or enab
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
+import platform
+from datetime import datetime, timezone
 from pathlib import Path
 import sys
 
@@ -17,14 +18,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+from research.provenance import capture_git_provenance, sha256_file
 
 
 def analyze_fold(
@@ -141,8 +135,16 @@ def main() -> int:
     args = parser.parse_args()
     source = Path(args.input).expanduser().resolve()
     output = Path(args.output).expanduser().resolve()
+    repository_root = Path(__file__).resolve().parents[3]
+    if output == repository_root or repository_root in output.parents:
+        parser.error("write the attribution report outside the repository")
     if not source.is_file():
         parser.error(f"input CSV does not exist: {source}")
+    try:
+        git_metadata = capture_git_provenance(repository_root)
+    except RuntimeError as exc:
+        parser.error(str(exc))
+    run_started_at = datetime.now(timezone.utc).isoformat()
     prices = pd.read_csv(source, index_col=0, parse_dates=True)
     config = BacktestConfig(
         top_n=args.top_n,
@@ -158,13 +160,27 @@ def main() -> int:
         "bytes": source.stat().st_size,
         "format": "CSV",
     }
+    report["run_metadata"] = {
+        **git_metadata,
+        "started_at_utc": run_started_at,
+        "python_version": platform.python_version(),
+        "pandas_version": pd.__version__,
+        "numpy_version": np.__version__,
+        "randomness": "deterministic_no_rng",
+        "source_manifest_sha256": None,
+        "source_manifest_status": "not_supplied",
+    }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
+    report_sha256 = sha256_file(output)
     print(json.dumps({
         "status": "completed_exploratory_fold_attribution",
         "purpose": report["purpose"],
         "ranking_approved": False,
         "dataset_sha256": report["dataset"]["sha256"],
+        "code_commit": git_metadata["code_commit"],
+        "git_worktree_clean": git_metadata["git_worktree_clean"],
+        "report_sha256": report_sha256,
         "actual_start": report["actual_start"],
         "actual_end": report["actual_end"],
         "periods": report["periods"],
