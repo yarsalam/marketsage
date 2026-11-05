@@ -138,6 +138,8 @@ def main() -> int:
     repository_root = Path(__file__).resolve().parents[3]
     if output == repository_root or repository_root in output.parents:
         parser.error("write the attribution report outside the repository")
+    if output == source:
+        parser.error("input and attribution report must be different files")
     if not source.is_file():
         parser.error(f"input CSV does not exist: {source}")
     try:
