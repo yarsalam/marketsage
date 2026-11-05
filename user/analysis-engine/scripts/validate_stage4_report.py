@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Validate structural and fail-closed invariants in a Stage 4 evaluation report."""
+"""Validate structural and fail-closed invariants in a Stage 4 report and sidecar manifest."""
 from __future__ import annotations
 
 import argparse
 import json
 import re
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from research.provenance import sha256_file
 
 
 def validate_report(report: dict) -> list[str]:
@@ -22,6 +26,21 @@ def validate_report(report: dict) -> list[str]:
         errors.append("dataset metadata is missing")
     elif not re.fullmatch(r"[0-9a-f]{64}", str(dataset.get("sha256", ""))):
         errors.append("dataset.sha256 must be a 64-character lowercase SHA-256 digest")
+
+    run_metadata = report.get("run_metadata")
+    if not isinstance(run_metadata, dict):
+        errors.append("run_metadata is missing; exact code/environment provenance is required")
+    else:
+        if not re.fullmatch(r"[0-9a-f]{40}", str(run_metadata.get("code_commit", ""))):
+            errors.append("run_metadata.code_commit must be a full lowercase Git commit SHA")
+        if run_metadata.get("git_worktree_clean") is not True:
+            errors.append("run_metadata.git_worktree_clean must be true for reproducible evaluation")
+        if not re.fullmatch(r"[0-9a-f]{64}", str(run_metadata.get("git_status_sha256", ""))):
+            errors.append("run_metadata.git_status_sha256 must be a 64-character lowercase SHA-256 digest")
+        if run_metadata.get("git_status_entry_count") != 0:
+            errors.append("run_metadata.git_status_entry_count must be zero")
+        if run_metadata.get("randomness") != "deterministic_no_rng":
+            errors.append("run_metadata.randomness must state deterministic_no_rng")
 
     try:
         rows = int(report["data_rows"])
@@ -96,9 +115,48 @@ def validate_report(report: dict) -> list[str]:
     return errors
 
 
+def validate_manifest(report: dict, manifest: dict, report_path: Path) -> list[str]:
+    """Verify the sidecar binds the report, input dataset, code and configuration."""
+    errors: list[str] = []
+    if not isinstance(manifest, dict):
+        return ["run manifest must be a JSON object"]
+    if manifest.get("schema_version") != 1:
+        errors.append("manifest.schema_version must be 1")
+    try:
+        actual_report_sha = sha256_file(report_path)
+        actual_report_bytes = report_path.stat().st_size
+    except OSError as exc:
+        return [f"cannot hash report artifact: {exc}"]
+    if manifest.get("report_sha256") != actual_report_sha:
+        errors.append("manifest.report_sha256 does not match the report artifact")
+    if manifest.get("report_bytes") != actual_report_bytes:
+        errors.append("manifest.report_bytes does not match the report artifact")
+    dataset = report.get("dataset") if isinstance(report, dict) else None
+    run_metadata = report.get("run_metadata") if isinstance(report, dict) else None
+    if not isinstance(dataset, dict) or manifest.get("input_sha256") != dataset.get("sha256"):
+        errors.append("manifest.input_sha256 does not match report.dataset.sha256")
+    if not isinstance(run_metadata, dict):
+        errors.append("report.run_metadata is required to validate the manifest")
+    else:
+        if manifest.get("code_commit") != run_metadata.get("code_commit"):
+            errors.append("manifest.code_commit does not match report.run_metadata.code_commit")
+        if manifest.get("git_worktree_clean") is not True or run_metadata.get("git_worktree_clean") is not True:
+            errors.append("manifest and report must both record a clean Git worktree")
+        if manifest.get("git_status_sha256") != run_metadata.get("git_status_sha256"):
+            errors.append("manifest.git_status_sha256 does not match report.run_metadata")
+    if manifest.get("strategy_config") != report.get("strategy_config"):
+        errors.append("manifest.strategy_config does not match the report")
+    if manifest.get("evaluation_design") != report.get("evaluation_design"):
+        errors.append("manifest.evaluation_design does not match the report")
+    if manifest.get("source_manifest_status") != "not_supplied":
+        errors.append("manifest.source_manifest_status must disclose that no source manifest was supplied")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", help="Path to run_stage4_evaluation.py JSON output")
+    parser.add_argument("--manifest", help="sidecar manifest path; defaults to REPORT.manifest.json")
     args = parser.parse_args()
     path = Path(args.report).expanduser().resolve()
     if not path.is_file():
@@ -110,13 +168,33 @@ def main() -> int:
     if not isinstance(report, dict):
         parser.error("report root must be a JSON object")
 
+    manifest_path = (
+        Path(args.manifest).expanduser().resolve()
+        if args.manifest else Path(str(path) + ".manifest.json")
+    )
     errors = validate_report(report)
+    if not manifest_path.is_file():
+        errors.append(f"run manifest does not exist: {manifest_path}")
+        manifest_sha256 = None
+    else:
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"cannot read run manifest JSON: {exc}")
+            manifest_sha256 = None
+        else:
+            errors.extend(validate_manifest(report, manifest, path))
+            manifest_sha256 = sha256_file(manifest_path)
+
     result = {
         "status": "failed" if errors else "passed",
         "purpose": report.get("purpose"),
         "ranking_approved": report.get("ranking_approved"),
         "source_scoring_approved": report.get("source_scoring_approved"),
         "dataset_sha256": report.get("dataset", {}).get("sha256") if isinstance(report.get("dataset"), dict) else None,
+        "code_commit": report.get("run_metadata", {}).get("code_commit") if isinstance(report.get("run_metadata"), dict) else None,
+        "manifest": str(manifest_path),
+        "manifest_sha256": manifest_sha256,
         "errors": errors,
     }
     print(json.dumps(result, indent=2, ensure_ascii=False))
