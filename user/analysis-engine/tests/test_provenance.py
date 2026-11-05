@@ -1,7 +1,5 @@
 import hashlib
 import subprocess
-from pathlib import Path
-
 import pytest
 
 from research.provenance import capture_git_provenance
