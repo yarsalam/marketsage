@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-11-05  
 **Repository:** yarsalam/marketsage (Private)  
-**Main HEAD at last inspection:** 3d4e2a97da70ae5564a5252048fcb2e2971bd6e5 (before this state-sync PR)  
+**Main HEAD at last inspection:** 07e641670ceab22496ef976a584934464570fd9a (after PR #38 merged)  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code commit:** 1dc6894c0823f6ffe77d27fd866576f5115a042c (pipeline v1.1.1; current branch head may advance with docs-only PRs)
 
@@ -10,12 +10,11 @@
 
 | PR | Target | Scope / current state | Handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Diverged integration branch, 412 commits ahead / 9 behind main at latest comparison; offline pipeline execution pin is v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Keep open. **Do not merge to main without explicit owner approval.** |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Diverged integration branch, 414 commits ahead / 10 behind main at latest comparison; offline pipeline execution pin is v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
-| [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync plus update the manual local workflow pin to corrected TSETMC pipeline v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. The previous head passed five jobs in run 42051140989; this amended head requires fresh exact-head CI. No dispatch is performed. |
-| [#38](https://github.com/yarsalam/marketsage/pull/38) | target not surfaced in issue metadata | Read-only sanitized diagnostics for existing local TSETMC output inventories; manual-only, no provider requests or artifact uploads | Open. Exact-head CI not verified in this run; do not dispatch the local workflow without owner review. |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and corrected manual workflow pin to TSETMC pipeline v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Current head `3a90a8aca2bb7a49e3bc42cd0e6b8d11d1caf905` passed all five required jobs in run `42058474876`; this state/register correction creates a new head and requires fresh exact-head CI. No dispatch is performed. |
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and correction of the manual local workflow's immutable pipeline pin to v1.1.1 `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Run 42055777260 passed all five jobs on the preceding head; this new state-sync update requires fresh exact-head CI. No dispatch is performed. |
-| [#48](https://github.com/yarsalam/marketsage/pull/48) | feat/tindex-free-data-connector (PR #6 integration branch) | Stage 4 exact code/worktree provenance and report/input hash sidecar; validator fails closed on missing/dirty provenance | Open. Exact-head CI run 42058368153 is in progress; no data or source approval is included. |
+| [#48](https://github.com/yarsalam/marketsage/pull/48) | feat/tindex-free-data-connector (PR #6 integration branch) | Stage 4 exact code/worktree provenance and report/input hash sidecar; validator fails closed on missing/dirty provenance | Open. Initial run `42058606524` exposed only a test-message assertion mismatch; test-only correction commit `3235284d51371ec3c56b9f48d2d0f831fae88187` is under exact-head CI run `42060466294`. No data or source approval is included. |
 
 
 
@@ -32,9 +31,7 @@
 | [#35](https://github.com/yarsalam/marketsage/pull/35) | Governance sync after the memory-bounded Runner correction; merged to main. |
 | [#36](https://github.com/yarsalam/marketsage/pull/36) | Sanitized record of local run 41914919555; merged to main. |
 | [#37](https://github.com/yarsalam/marketsage/pull/37) | TSETMC evidence-remediation plan; merged to main. |
-| [#35](https://github.com/yarsalam/marketsage/pull/35) | Governance sync after the memory-bounded Runner correction; merged to main. |
-| [#36](https://github.com/yarsalam/marketsage/pull/36) | Sanitized record of local run 41914919555; merged to main. |
-| [#37](https://github.com/yarsalam/marketsage/pull/37) | TSETMC evidence-remediation plan; merged to main. |
+| [#38](https://github.com/yarsalam/marketsage/pull/38) | Sanitized read-only local TSETMC input-inventory diagnostics; merged at `07e641670ceab22496ef976a584934464570fd9a` after all five required CI job types passed in run `42031417400`. Manual-only; not dispatched. |
 
 ## Merged into integration PR #6
 
@@ -69,17 +66,18 @@ main
 - #31 merged: governance adoption
 - #32 merged: integrated local TSETMC candidate workflow
 - #34 merged: memory-bounded/cgroup-aware candidate batches
+- #38 merged: read-only aggregate diagnostics of existing local TSETMC input inventories; manual-only and not dispatched
 
 PR #39 merged into PR #6's integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after five required job types passed in run `42050542208`. The first local candidate run (41914919555) used the previous v1.1.0 pipeline; the corrected v1.1.1 implementation changes classification only. PR #41 updates main's manual workflow pin to the corrected commit and requires owner review before a future dispatch.
 
-PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen) and PR #46 (FIPIRAN/IFB/Investats candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #48 (Stage 4 run-manifest provenance), PR #38 (sanitized local diagnostics) and PR #41 (this governance/pin update) remain open. PR #6 remains open, 413 commits ahead and 9 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
+PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen) and PR #46 (FIPIRAN/IFB/Investats candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #48 (Stage 4 run-manifest provenance) and PR #41 (this governance/pin update) remain open; PR #38 is merged to main. PR #6 remains open, 414 commits ahead and 10 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
 
 ## Release and capital-risk guardrails
 
 - No data source currently passes the complete acceptance gate for investment scoring.
 - Stage 4 remains exploratory; the 2023-10-31 through 2024-03-31 fold reporting +240.89% requires asset-level attribution from the exact original input dataset.
 - The exact-hash attribution of that +240.89% fold requires the owner's local original CSV; the action, command, hash and acceptance criteria are tracked in [Issue #47](https://github.com/yarsalam/marketsage/issues/47). Do not reconstruct or substitute the dataset.
-- PR #48 is intended to add the missing exact-code/worktree and report/input hash manifest; until its exact-head CI passes and it merges, the historical Stage 4 report remains without a sidecar manifest.
+- PR #48 adds the missing exact-code/worktree and report/input hash manifest. Its initial exact-head CI exposed a test-message assertion mismatch; a test-only correction is under run `42060466294`. Until that exact-head CI passes and the PR merges, the historical Stage 4 report remains without a sidecar manifest.
 - Do not inspect or tune against the locked final holdout.
 - The local run 41914919555 completed candidate-only using pipeline v1.1.0: 47 quarantined, 0 research-eligible, 0 input-file read errors and 7 discovery identity conflicts. PR #39 merged the v1.1.1 classification correction into integration; the historical run itself is unchanged and no candidates were promoted.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
