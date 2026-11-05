@@ -229,5 +229,6 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #46 added FIPIRAN, IFB and Investats candidate-only screening; all five required job types passed in run `42056363087`, and the PR merged into integration at `0857a48ad9db6c5dab13ae0eca95354639d47324`. No probe or procurement is authorized.
 - Issue #40 remains the durable owner-action record for local review of the seven identity conflicts, intended-Iran-network documentation review, rights, and independent price/volume reconciliation.
 - [Issue #47](https://github.com/yarsalam/marketsage/issues/47) separately records the owner's exact-hash local attribution of the unexplained +240.89% Stage 4 fold; the original monthly CSV is not present in GitHub and must not be replaced with another dataset.
+- PR #48 adds exact Git commit/worktree metadata and a sidecar manifest binding the report to the input CSV and configuration. Its exact-head CI is pending; it does not supply source provenance or release timestamps.
 
 **Capital-risk impact:** None. No provider probe, source approval, backtest approval, scoring, ranking, production deployment, broker access or trading was performed.
