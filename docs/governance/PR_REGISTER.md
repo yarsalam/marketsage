@@ -4,17 +4,17 @@
 **Repository:** yarsalam/marketsage (Private)  
 **Main HEAD at last inspection:** 07e641670ceab22496ef976a584934464570fd9a (after PR #38 merged)  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
-**Pinned integration code commit:** 1dc6894c0823f6ffe77d27fd866576f5115a042c (pipeline v1.1.1; current branch head may advance with docs-only PRs)
+**Pinned TSETMC pipeline implementation:** 1dc6894c0823f6ffe77d27fd866576f5115a042c (v1.1.1)  
+**Integration branch HEAD:** 1d90726c593b0818982407c309ff13301798f5b3 (PR #48 merged; post-merge CI run 42061367000 in progress)
 
 ## Open PRs
 
 | PR | Target | Scope / current state | Handling |
 |---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Diverged integration branch, 414 commits ahead / 10 behind main at latest comparison; offline pipeline execution pin is v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Keep open. **Do not merge to main without explicit owner approval.** |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Diverged integration branch, 415 commits ahead / 10 behind main at latest comparison; offline pipeline execution pin is v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and corrected manual workflow pin to TSETMC pipeline v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Exact-head CI must pass before merge; this PR does not dispatch the local workflow. |
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and correction of the manual local workflow's immutable pipeline pin to v1.1.1 `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Run 42055777260 passed all five jobs on the preceding head; this new state-sync update requires fresh exact-head CI. No dispatch is performed. |
-| [#48](https://github.com/yarsalam/marketsage/pull/48) | feat/tindex-free-data-connector (PR #6 integration branch) | Stage 4 exact code/worktree provenance and report/input hash sidecar; validator fails closed on missing/dirty provenance | Open. Corrected exact head `3235284d51371ec3c56b9f48d2d0f831fae88187` passed all five required CI job types in run `42060466294`; integration merge is not yet confirmed. No data or source approval is included. |
 
 
 
@@ -46,6 +46,7 @@ PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29, #30
 - [#29](https://github.com/yarsalam/marketsage/pull/29) — World Bank Pink Sheet benchmark candidate.
 - [#30](https://github.com/yarsalam/marketsage/pull/30) — Stage 4 downside/tail-risk and portfolio-mechanics diagnostics.
 - [#39](https://github.com/yarsalam/marketsage/pull/39) — TSETMC discovery identity-conflict classification fix; merged at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after all five required job types passed in run `42050542208`.
+- [#48](https://github.com/yarsalam/marketsage/pull/48) — Stage 4 exact Git/worktree provenance and report/input hash sidecar; merged at `1d90726c593b0818982407c309ff13301798f5b3` after corrected exact-head CI passed all five required job types in run `42060466294`; post-merge CI run `42061367000` is in progress. Source provenance remains unverified.
 - [#43](https://github.com/yarsalam/marketsage/pull/43) — World Bank Pink Sheet November 2026 PDF release/units/revision/rights refresh; merged into integration after all five required job types passed in run `42051901501`.
 - [#45](https://github.com/yarsalam/marketsage/pull/45) — TSETMC official REST-service candidate screen, with the November Pink Sheet record preserved; merged at `cbe585efe26ee129370b39e6bd983e709aecf55c` after all five required job types passed in run `42055449340`.
 - [#46](https://github.com/yarsalam/marketsage/pull/46) — FIPIRAN fund NAV, IFB secondary fixed-income and commercial Investats candidate screen; merged at `0857a48ad9db6c5dab13ae0eca95354639d47324` after all five required job types passed in run `42056363087`.
@@ -70,14 +71,14 @@ main
 
 PR #39 merged into PR #6's integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after five required job types passed in run `42050542208`. The first local candidate run (41914919555) used the previous v1.1.0 pipeline; the corrected v1.1.1 implementation changes classification only. PR #41 updates main's manual workflow pin to the corrected commit and requires owner review before a future dispatch.
 
-PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen) and PR #46 (FIPIRAN/IFB/Investats candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #48 (Stage 4 run-manifest provenance) and PR #41 (this governance/pin update) remain open; PR #38 is merged to main. PR #6 remains open, 414 commits ahead and 10 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
+PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen), PR #46 (FIPIRAN/IFB/Investats candidate screen) and PR #48 (Stage 4 run-manifest provenance) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #41 (this governance/pin update) remains open; PR #38 is merged to main. PR #6 remains open, 414 commits ahead and 10 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
 
 ## Release and capital-risk guardrails
 
 - No data source currently passes the complete acceptance gate for investment scoring.
 - Stage 4 remains exploratory; the 2023-10-31 through 2024-03-31 fold reporting +240.89% requires asset-level attribution from the exact original input dataset.
 - The exact-hash attribution of that +240.89% fold requires the owner's local original CSV; the action, command, hash and acceptance criteria are tracked in [Issue #47](https://github.com/yarsalam/marketsage/issues/47). Do not reconstruct or substitute the dataset.
-- PR #48 adds the missing exact-code/worktree and report/input hash manifest. Its corrected exact-head CI passed all five required job types in run `42060466294`; the integration merge is not yet confirmed. The historical Stage 4 report remains without a sidecar manifest until the enhancement is merged and the exact original dataset is rerun.
+- PR #48 is merged into integration at `1d90726c593b0818982407c309ff13301798f5b3`; the corrected exact-head CI passed all five required job types in run `42060466294`. The historical Stage 4 report still requires a new run using the exact original CSV and matching hash; no replacement dataset is acceptable.
 - Do not inspect or tune against the locked final holdout.
 - The local run 41914919555 completed candidate-only using pipeline v1.1.0: 47 quarantined, 0 research-eligible, 0 input-file read errors and 7 discovery identity conflicts. PR #39 merged the v1.1.1 classification correction into integration; the historical run itself is unchanged and no candidates were promoted.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
