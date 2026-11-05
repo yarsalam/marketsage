@@ -451,3 +451,30 @@ def test_discovery_flags_row_isin_conflict_with_authoritative_crosswalk(tmp_path
     assert items[0]["instrument_code"] == "1234567890123"
     assert items[0]["isin"] == "IRTEST000002"
     assert items[0]["_discovery_identity_conflict"] is True
+
+    before = (folder / "history_archive.json").read_bytes()
+    summary = run_pipeline(
+        items,
+        manifest_path=None,
+        output_root=tmp_path / "out",
+        min_history=2,
+        min_coverage=0.0,
+        discovered=True,
+    )
+    out = Path(summary["output_dir"])
+    with (out / "instrument_decisions.csv").open(encoding="utf-8", newline="") as handle:
+        decision = next(csv.DictReader(handle))
+    reasons = set(decision["decision_reason_codes"].split(";"))
+    assert "DISCOVERY_IDENTITY_CONFLICT" in reasons
+    assert "INPUT_OR_PARSER_ERROR" not in reasons
+    assert decision["identity_verified"] == "False"
+    assert decision["eligible_for_research"] == "False"
+    assert summary["research_eligible_count"] == 0
+    assert summary["flags"]["eligible_for_scoring"] is False
+    assert summary["flags"]["eligible_for_backtest"] is False
+
+    with (out / "reprocessing_queue.csv").open(encoding="utf-8", newline="") as handle:
+        queue = next(csv.DictReader(handle))
+    assert queue["stage"] == "identity_reconciliation"
+    assert "authoritative instrument master" in queue["required_action"]
+    assert (folder / "history_archive.json").read_bytes() == before
