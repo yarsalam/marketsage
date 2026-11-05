@@ -179,3 +179,29 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
+
+## 2026-11-05 — Interpret the first integrated TSETMC candidate run as identity/evidence failure, not parser success
+
+**Authority:** Routine engineering evidence review within the existing owner-approved research scope.  
+**Status:** Candidate-only run completed; source remains unapproved. [Issue #40](https://github.com/yarsalam/marketsage/issues/40) tracks the external evidence required.
+
+**Observed run**
+- Manual local workflow [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555) completed in two bounded batches.
+- 47 candidates were discovered and all 47 remained quarantined; 0 research-eligible, 0 feature rows and 0 six-month forward-label rows.
+- The run reported `input_file_read_errors=0`, but its discovery preflight reported `identity_conflict_count=7`.
+- Pipeline v1.1.0 added `discovery:insCode_conflicts_with_sibling_search_metadata` to a generic error list and consequently emitted `INPUT_OR_PARSER_ERROR: 7`. This was a reason-code classification defect, not evidence of seven unreadable files.
+- No provider requests were made, no raw input was modified and no candidate-level output was uploaded.
+
+**Engineering correction**
+- PR #39 separates `DISCOVERY_IDENTITY_CONFLICT` and `DISCOVERY_AMBIGUOUS_HISTORY` from actual input/parser failures.
+- Identity conflicts and ambiguous history selection explicitly prevent identity acceptance and receive distinct remediation-queue stages.
+- The regression test checks that an identity conflict remains quarantined and scoring/backtest flags remain false.
+- PR #39 targets the integration branch only; its exact-head CI must pass before merge. The main local workflow's pinned integration SHA must be updated in a separate PR before the corrected pipeline can be dispatched.
+
+**Decision effect**
+- Do not rerun the unchanged corpus or weaken thresholds.
+- All 47 candidates remain excluded until rights, authoritative identity, units/semantics, independent reconciliation and corporate-action evidence are supplied and reviewed.
+- Continue independent screening of permissioned Iranian and global sources.
+- PR #6 remains open and must not be merged to main without separate explicit owner approval.
+
+**Capital-risk impact:** None. No source acceptance, strategy backtest, scoring, production, broker or trading authorization changes.
