@@ -45,9 +45,9 @@ Do not random-split time-series observations. After the data inventory determine
 3. Use rolling or expanding walk-forward folds whose training windows always precede each test window. The forward-label overlap must be purged/embargoed where it can leak across boundaries.
 4. Publish exact date boundaries, observations per split, asset coverage and exclusions before looking at the results.
 5. If the sample is too short for meaningful six-month labels, report **insufficient history** instead of shortening the horizon after seeing results.
-6. Keep a run manifest: dataset hashes, data cut-off, source versions, code commit, config, feature/label definitions, cost assumptions, random seeds, and output artifact hashes.
+6. Keep a run manifest: dataset hashes, data cut-off, source versions, code commit, config, feature/label definitions, cost assumptions, random seeds, and output artifact hashes. The current runner records the exact Git commit/worktree state and environment in the report, and writes a sidecar manifest binding the input SHA-256, report SHA-256, code commit, configuration and evaluation design. Because no source manifest is currently supplied, the report explicitly records source provenance/release timing as unverified; this is not a source-acceptance pass.
 
-No universal percentage split is prescribed before the data audit. The exact split must be justified by the available history and fixed before comparative metrics are reviewed.
+No universal percentage split is prescribed before the data audit. The exact split must be justified by the available history and fixed before comparative metrics are reviewed. The current evaluator keeps parameters fixed and slices one causally generated return stream into chronological pre-holdout windows; these are descriptive fixed-strategy evaluation windows, not independently retrained model folds. If parameters or a predictive model are later trained/tuned, use nested chronological train/validation windows and purge/embargo overlapping six-month labels before opening the locked holdout.
 
 ## 4. Baselines and execution assumptions
 
@@ -118,6 +118,10 @@ The repository now includes:
 
 - `research/evaluation.py`: full-period comparison of the fixed momentum strategy, a zero-return cash reference, an all-asset equal-weight buy-and-hold reference (initial costs only), and an all-asset equal-weight monthly-rebalanced reference (same configured cost basis).
 - `scripts/run_stage4_evaluation.py`: command-line runner that writes a JSON report with the input CSV SHA-256, sample dates, strategy configuration, full-period metrics, a final locked holdout, pre-holdout chronological folds, and a six-month forward-label inventory.
+- `research/provenance.py`: records the exact 40-character Git commit, clean/dirty worktree state, a hash/count of status entries without exposing local file names, and SHA-256 helpers.
+- The evaluation report records UTC run time and Python/pandas/NumPy versions. A local `OUTPUT.manifest.json` sidecar binds the report SHA-256/byte count to the input SHA-256, code commit, worktree state, configuration and evaluation design. Both files must be preserved together.
+- The runner requires report and manifest outputs outside the repository. The structural validator requires a clean worktree and a matching sidecar; an uncommitted code tree or missing/mismatched manifest fails validation.
+- The manifest explicitly says `source_manifest_status=not_supplied` until a source manifest is provided. It does not establish publisher rights, first-availability timestamps, point-in-time vintages or source validity.
 - `tests/test_research_evaluation.py`: deterministic fixture tests for holdout boundaries, fold boundaries, baseline presence, and label-inventory scope.
 - The backtest summary now reports transaction-cost, slippage, and total-cost fractions separately. The backward-compatible `sum_of_period_cost_fractions` key now means the sum of all charged cost fractions.
 - Sharpe uses a configurable annual risk-free assumption (`risk_free_rate_annual`, default 0.0) and records that assumption in the output.
@@ -150,7 +154,7 @@ After producing the report, run the structural validator:
 .venv/bin/python -m pytest -q tests/test_stage4_report_validator.py
 ```
 
-The validator fails if the report does not explicitly keep ranking/source scoring disabled, the holdout is marked as used for tuning, walk-forward folds overlap the holdout, required baselines or cost scenarios are absent, or the dataset hash is malformed. This is a structural guardrail, not proof that source data are accurate, licensed, point-in-time correct, or economically tradable. It does not assess whether strategy metrics are good.
+The validator fails if the report does not explicitly keep ranking/source scoring disabled, the holdout is marked as used for tuning, chronological evaluation windows overlap the holdout, required baselines or cost scenarios are absent, the dataset hash is malformed, the code commit/worktree provenance is missing or dirty, or the sidecar report/input hashes and configuration do not match. The fold-attribution diagnostic also records code commit, worktree state, input hash and report hash. These are structural reproducibility guardrails, not proof that source data are accurate, licensed, point-in-time correct, or economically tradable. They do not assess whether strategy metrics are good.
 
 
 ### Implemented portfolio and downside-risk diagnostics
