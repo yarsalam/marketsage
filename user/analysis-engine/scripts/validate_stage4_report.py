@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -37,10 +38,19 @@ def validate_report(report: dict) -> list[str]:
             errors.append("run_metadata.git_worktree_clean must be true for reproducible evaluation")
         if not re.fullmatch(r"[0-9a-f]{64}", str(run_metadata.get("git_status_sha256", ""))):
             errors.append("run_metadata.git_status_sha256 must be a 64-character lowercase SHA-256 digest")
-        if run_metadata.get("git_status_entry_count") != 0:
-            errors.append("run_metadata.git_status_entry_count must be zero")
+        if type(run_metadata.get("git_status_entry_count")) is not int or run_metadata.get("git_status_entry_count") != 0:
+            errors.append("run_metadata.git_status_entry_count must be integer zero")
+        if run_metadata.get("git_worktree_clean") is True and run_metadata.get("git_status_sha256") != hashlib.sha256(b"").hexdigest():
+            errors.append("a clean worktree must have the SHA-256 digest of an empty Git status")
         if run_metadata.get("randomness") != "deterministic_no_rng":
             errors.append("run_metadata.randomness must state deterministic_no_rng")
+        if run_metadata.get("source_manifest_status") != "not_supplied":
+            errors.append("run_metadata.source_manifest_status must disclose that no source manifest was supplied")
+        if run_metadata.get("availability_timestamp_status") != "not_verified_by_evaluation_runner":
+            errors.append("run_metadata must disclose that source availability timestamps are not verified")
+        for field in ("started_at_utc", "python_version", "pandas_version", "numpy_version"):
+            if not isinstance(run_metadata.get(field), str) or not run_metadata[field]:
+                errors.append(f"run_metadata.{field} must be a non-empty string")
 
     try:
         rows = int(report["data_rows"])
@@ -144,6 +154,12 @@ def validate_manifest(report: dict, manifest: dict, report_path: Path) -> list[s
             errors.append("manifest and report must both record a clean Git worktree")
         if manifest.get("git_status_sha256") != run_metadata.get("git_status_sha256"):
             errors.append("manifest.git_status_sha256 does not match report.run_metadata")
+        if manifest.get("git_status_entry_count") != run_metadata.get("git_status_entry_count"):
+            errors.append("manifest.git_status_entry_count does not match report.run_metadata")
+        if manifest.get("randomness") != run_metadata.get("randomness"):
+            errors.append("manifest.randomness does not match report.run_metadata")
+        if manifest.get("source_manifest_status") != run_metadata.get("source_manifest_status"):
+            errors.append("manifest.source_manifest_status does not match report.run_metadata")
     if manifest.get("strategy_config") != report.get("strategy_config"):
         errors.append("manifest.strategy_config does not match the report")
     if manifest.get("evaluation_design") != report.get("evaluation_design"):
