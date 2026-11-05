@@ -1,5 +1,5 @@
 {
-  "catalog_version": "1.1.3",
+  "catalog_version": "1.1.4",
   "last_reviewed": "2026-11-05",
   "policy": {
     "prefer_no_subscription": true,
@@ -922,6 +922,103 @@
       "production_approved": false,
       "official_documentation": [
         "https://data.imf.org/en/Resource-Pages/IMF-API"
+      ]
+    },
+    {
+      "source_id": "iran.fipiran.fund_nav",
+      "label": "FIPIRAN public fund NAV/AUM/flows candidate",
+      "free_access_class": "public_site_unofficial_api_candidate",
+      "authentication": "An unofficial read-only wrapper reports no API key or account for public-page JSON; the official access contract and authentication policy are unverified.",
+      "probe_mode": "documentation-only; no site JSON/API request; Iran-network access must be reviewed before any owner-run probe",
+      "data_families": [
+        "Iranian mutual fund and ETF NAV",
+        "fund size/AUM",
+        "unit flows and investor mix",
+        "fund type, manager and fund metadata"
+      ],
+      "history_limit": "An unofficial wrapper reports about 500 funds and up to 60 evenly spaced history points; complete daily history and per-fund coverage are not established.",
+      "limitations": [
+        "The wrapper explicitly says it is unofficial and not affiliated with FIPIRAN; its MIT code license does not license the underlying fund data.",
+        "The wrapper reports that fipiran.ir responds only to Iranian network lines; this was not independently tested and no live request was made.",
+        "Reported units are NAV Rial per unit, fund size billion Toman, and returns percent per period (not annualized); validate each field and scale separately.",
+        "The reported history tool returns up to 60 evenly spaced points, not a complete daily tape; do not infer daily volatility, drawdown, liquidity or continuous six-month coverage.",
+        "Stable fund identity, registration/group IDs and mapping to TSETMC instruments require verification.",
+        "NAV, issuance/redemption price, exchange-traded price, AUM, unit count, subscriptions/redemptions and total return are distinct fields.",
+        "Observation date is not first-publication time; release timestamps, corrections, historical vintages and missing-date behavior are unknown.",
+        "Distribution, fee, capital-change and fund termination treatment require validation before total-return use.",
+        "Automated collection, storage, attribution, internal model use, commercial use and redistribution rights are unknown.",
+        "No adapter, default probe, research-engine use or scoring eligibility is approved."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "eligible_for_scoring": false,
+      "discovery_references": [
+        "https://fipiran.ir/",
+        "https://github.com/sepehr071/fipiran-mcp"
+      ]
+    },
+    {
+      "source_id": "iran.ifb.secondary_fixed_income",
+      "label": "Iran Fara Bourse secondary fixed-income public-site candidate",
+      "free_access_class": "public_site_unofficial_api_candidate",
+      "authentication": "An unofficial read-only wrapper reports no API key/account for public pages and web service; the official service contract and authentication policy are unverified.",
+      "probe_mode": "documentation-only; no site JSON/API request; Iran-network access must be reviewed before any owner-run probe",
+      "data_families": [
+        "Treasury bills (akhza), sukuk and bonds",
+        "secondary-market prices and YTM",
+        "coupon schedules, issuer, guarantor and maturity",
+        "daily price history, quotes, order books and yield curves"
+      ],
+      "history_limit": "An unofficial wrapper describes daily price/YTM history but does not publish exact coverage depth or completeness per instrument.",
+      "limitations": [
+        "The wrapper explicitly says it is unofficial and not affiliated with Iran Fara Bourse; its MIT code license does not license IFB data.",
+        "The wrapper reports that ifb.ir responds only from Iranian networks; this was not independently tested and no live request was made.",
+        "Reported price unit is Rial, YTM is percent per year and dates are Jalali; quote scale, clean/dirty price, accrued interest and settlement convention remain unverified.",
+        "The wrapper says YTM is computed by IFB from the last trade; validate the formula, day-count, compounding, coupon cash flows, maturity and settlement before use.",
+        "Daily history depth, missing dates, stale prices, suspensions, turnover, bid/ask spread, order-book depth, first-publication time and correction history are unknown.",
+        "Coupon rate, current yield, YTM, auction yield and realized holding-period return must remain separate measures.",
+        "Stable instrument identity, board/market, issuer/guarantor, default/call events and point-in-time eligibility require verification.",
+        "Automated collection, storage, attribution, internal model use, commercial use and redistribution rights are unknown.",
+        "No adapter, default probe, research-engine use or scoring eligibility is approved."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "eligible_for_scoring": false,
+      "discovery_references": [
+        "https://www.ifb.ir/",
+        "https://github.com/sepehr071/ifb-mcp"
+      ]
+    },
+    {
+      "source_id": "vendor.investats_financial_api",
+      "label": "Investats Iranian financial data/API (commercial vendor candidate)",
+      "free_access_class": "vendor_quote_required_not_free",
+      "authentication": "Commercial account/API access is advertised; exact authentication, pricing and rate limits are not public in the reviewed material.",
+      "probe_mode": "documentation-only; no account, quote request, API request or dataset download; procurement requires owner approval",
+      "data_families": [
+        "Iranian equities and ETFs",
+        "fund AUM/NAV and flows",
+        "OHLCV and market history",
+        "gold, FX and other advertised financial datasets"
+      ],
+      "history_limit": "Vendor material self-reports an AUM dataset with 899314 rows for 298 funds from 2008-08-11 to 2026-09-08 (daily), and an OHLCV dataset with 3107029 rows for 5218 symbols from 1979-12-25 to 2026-09-14; these are aggregate vendor claims, not verified per-series coverage.",
+      "limitations": [
+        "This is a commercial vendor, not a free/open source; no price quote, contract, account or purchase was obtained.",
+        "Aggregate row counts and date ranges do not prove continuous history for each fund or instrument; require a per-series coverage/missing-date matrix.",
+        "AUM/NAV fields are not automatically exchange prices or total-return series; exact fields, units, quote basis and distribution treatment require samples.",
+        "Historical corrections, backfills, first-publication timestamps, point-in-time vintages and source lineage are unverified.",
+        "Require contractual permission for storage, internal research/model use, derived metrics, display, redistribution, retention after termination and deletion.",
+        "Require API schema, authentication, quotas, SLA, uptime, support, change notice and incident handling.",
+        "Independently reconcile representative data against reviewed sources before any research use.",
+        "No adapter, account, download, purchase or scoring eligibility is approved."
+      ],
+      "default_live_probe": false,
+      "production_approved": false,
+      "eligible_for_scoring": false,
+      "discovery_references": [
+        "https://investats.net/",
+        "https://investats.net/blog/investment-funds-api-nav-performance-mtum8rn2",
+        "https://investats.net/blog/iranian-stock-api-providers-comparison-mu29k9ls"
       ]
     }
   ]
