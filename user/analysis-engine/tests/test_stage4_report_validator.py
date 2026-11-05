@@ -90,7 +90,7 @@ def test_validator_rejects_missing_or_dirty_code_provenance():
     report["run_metadata"]["git_status_entry_count"] = 2
     errors = validate_report(report)
     assert any("git_worktree_clean must be true" in error for error in errors)
-    assert any("git_status_entry_count must be zero" in error for error in errors)
+    assert any("git_status_entry_count must be integer zero" in error for error in errors)
 
 
 def test_manifest_binds_report_input_code_and_configuration(tmp_path):
