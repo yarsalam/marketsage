@@ -236,10 +236,10 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 ## 2026-11-05 — Add sanitized local diagnostics and exact Stage 4 run provenance
 
 **Authority:** Routine engineering execution within the adopted research-only and least-privilege controls.  
-**Status:** PR #38 is merged to main; PR #48's corrected exact head passed CI and its integration merge is pending confirmation.
+**Status:** PR #38 is merged to main; PR #48 is merged to integration.
 
 - PR #38 merged at `07e641670ceab22496ef976a584934464570fd9a` after all five required job types passed in run `42031417400`. Its manual-only diagnostic reads existing local input inventories, verifies their recorded hashes, and emits only aggregate categories. It has not been dispatched.
-- PR #48's corrected exact head `3235284d51371ec3c56b9f48d2d0f831fae88187` passed all five required job types in run `42060466294`. It records exact Git commit/worktree state and binds the report to its input hash, configuration and evaluation design with a sidecar manifest.
+- PR #48's corrected exact head `3235284d51371ec3c56b9f48d2d0f831fae88187` passed all five required job types in run `42060466294` and merged to the integration branch at `1d90726c593b0818982407c309ff13301798f5b3`. Post-merge CI run `42061367000` is being checked. It records exact Git commit/worktree state and binds the report to its input hash, configuration and evaluation design with a sidecar manifest.
 - The provenance enhancement does not supply source rights, publisher identity, first-availability timestamps, point-in-time vintages, or proof of economic validity. The manifest remains explicit that no source manifest was supplied.
 - No local workflow dispatch, source acceptance, backtest approval, scoring/ranking, production deployment, broker access, trading or capital allocation is authorized by these changes.
 
