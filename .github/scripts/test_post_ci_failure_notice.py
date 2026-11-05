@@ -78,7 +78,7 @@ class FailureNoticeTests(unittest.TestCase):
     def test_workflow_actions_are_pinned_to_full_commit_shas(self):
         root = Path(__file__).resolve().parents[2]
         workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-        refs = re.findall(r"^\s*uses:\s+[^@\s]+@([0-9a-fA-F]+)", workflow, re.MULTILINE)
+        refs = re.findall(r"^\s*(?:-\s*)?uses:\s+[^@\s]+@([0-9a-fA-F]+)", workflow, re.MULTILINE)
         self.assertTrue(refs, "expected at least one external action")
         self.assertTrue(
             all(re.fullmatch(r"[0-9a-fA-F]{40}", ref) for ref in refs),
