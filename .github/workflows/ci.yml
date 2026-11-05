@@ -5,6 +5,11 @@ on:
     branches: [main, "deploy/**", "research/**", "ci/**"]
   pull_request:
     branches: [main, "deploy/**"]
+  # GitHub scheduled workflows run from the default branch after this PR is merged.
+  # A daily full validation provides a bounded unattended health signal.
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
