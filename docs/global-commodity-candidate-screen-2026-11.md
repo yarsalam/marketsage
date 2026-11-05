@@ -1,12 +1,12 @@
-# Global commodity candidate screen — World Bank Pink Sheet — 2026-11-04
+# Global commodity candidate screen — World Bank Pink Sheet — 2026-11-05
 
 **Status:** documentation-only candidate review. No adapter, automated download, default probe, research-engine use or scoring eligibility is added.  
 **Scope:** monthly global commodity prices and indices for energy, precious metals and other commodity families.  
-**Network boundary:** official public documentation only; no workbook download or provider API request was made.
+**Network boundary:** official public documentation only; the November PDF was inspected, but the monthly XLSX workbook was not downloaded and no provider API request was made.
 
 ## Executive disposition
 
-The World Bank Commodity Markets page lists a Pink Sheet data section with separate monthly and annual XLS workbooks. On 2026-11-04, the page displayed an **October 2026** monthly-price workbook link and a next-update date of **2026-11-03**; no newer monthly workbook link was visible in the page snapshot reviewed. The actual workbook could not be parsed in this review, so its exact observation end date, series count, per-series units, coverage start and missing-value conventions are not certified here.
+The World Bank Commodity Markets page now lists a **November 2026** monthly-price XLS workbook and November PDF. The official PDF is dated **2026-11-03**, contains monthly averages through **October 2026**, and the landing page reports latest prices published on 2026-11-03 with the next update due 2026-12-02. Thus the release label is one month later than the latest observation month. The XLSX workbook itself remains unparsed, so its full history, exact series count, row layout and missing-value conventions are not certified.
 
 This is a useful candidate for **monthly global commodity regime context** (for example, gold, silver, crude oil and natural gas benchmarks), not a daily trading-price feed and not a substitute for an executable spot/futures series.
 
@@ -18,8 +18,8 @@ This is a useful candidate for **monthly global commodity regime context** (for 
   - annual prices (XLS);
   - monthly commodity-price report PDFs.
 - The monthly workbook link is discovered from the official landing page. Its document URL contains a versioned/hash-like path; do not hardcode an old file URL as a permanent endpoint.
-- The page snapshot reviewed on 2026-11-04 labels the monthly workbook "October 2026", shows "Latest Commodity Prices Published (10/02/2026)", and shows "Next update: November 3, 2026". It did not expose a newer workbook link in the retrieved page. These are page/release labels, not proof of the observation end date or the exact first-availability time; do not infer that October observations were available on October 31 from the workbook label.
-- The XLSX link could not be parsed by the documentation-review tool, and a direct download was not completed. The workbook's exact row/column layout, units row, source/description metadata, coverage by series and missing-value tokens remain unverified.
+- The page snapshot reviewed on 2026-11-05 labels the XLS workbook "November 2026", shows "Latest Commodity Prices Published (11/03/2026)", and shows "Next update: December 2, 2026". The linked November PDF is itself dated November 3 and its monthly columns run through October 2026. Record at least the observation month (October), document/release date (November 3), and first-seen retrieval time separately. Do not backdate October values to October 31.
+- The monthly XLSX link could not be parsed by the documentation-review tool and a direct download attempt failed. The separate official November PDF was parsed. It documents monthly average units/benchmarks including Brent crude in USD/barrel, gold and silver in USD/troy ounce, copper in USD/metric ton, and European natural gas in USD/MMBtu. Its descriptions specify, for example, gold as a spot average of daily rates, silver as the London afternoon fixing, and the crude-oil average as an equally weighted average of Brent, Dubai and WTI. The XLSX workbook's full row/column layout, historical coverage by series, missing-value tokens and exact revision history remain unverified.
 - No documented stable REST/SDMX API for the Pink Sheet workbook was established in this review. Treat it as a periodically published workbook until a documented machine-readable contract is verified.
 
 ## Rights and attribution
@@ -30,9 +30,9 @@ Official references:
 - World Bank Dataset Terms: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
 - World Bank Data Access and Licensing: https://datacatalog.worldbank.org/public-licenses
 
-The World Bank Commodity Markets page links to the World Bank's dataset summary terms and licensing pages. Those terms state that data may be copied, adapted, distributed and used commercially under CC BY 4.0 unless the dataset/indicator metadata says otherwise. They require attribution (generally “The World Bank: Dataset name: Data source (if known)”), linking to the terms when facilitating access, and prohibit implying World Bank endorsement. The licensing page explicitly describes exceptions: third-party datasets or components may use other licenses or require separate permission. Preserve source metadata and verify every series before commercial/model use.
+The World Bank Data summary terms state that World Bank Data Catalog datasets are generally available for commercial and non-commercial reuse under CC BY 4.0 unless dataset/indicator metadata says otherwise. They require attribution to the World Bank and data providers, prohibit implying endorsement, and explicitly exclude third-party material unless the originator permits reuse. The November PDF's source list names third parties including Bloomberg Finance L.P., S&P Global, FAO, USDA and market/industry organizations; its footer also carries an "Official Use Only" marking. That marking is not by itself a complete license determination, but it is a material clearance flag.
 
-Therefore, do not infer that every commodity row in the Pink Sheet is covered by one blanket license. Before use, inspect the workbook's per-series source/description metadata and preserve attribution. The data-specific dataset terms linked from the Commodity Markets page govern the relevant dataset; general website content terms are not a substitute for that check.
+Therefore, the generic CC BY default is not sufficient to clear the full Pink Sheet for commercial redistribution. Before any commercial or model use, inspect the workbook's per-series source/description metadata, obtain any required originator permission, clarify the PDF's "Official Use Only" marking with the World Bank where relevant, and preserve the required attribution. Do not commit or redistribute the workbook while this remains unresolved.
 
 ## Required series-level contract
 
@@ -58,4 +58,4 @@ Before any workbook is downloaded into a collection pipeline:
 
 ## Review record
 
-Reviewed 2026-11-04 from the official World Bank Commodity Markets page and World Bank dataset licensing pages. The page listed an October 2026 monthly workbook and a 2026-11-03 next-update date. The workbook itself was not downloaded or parsed, no API key was used, and no foreign provider live-data request or laptop network request was made.
+Reviewed 2026-11-05 from the official World Bank Commodity Markets page, November 2026 Pink Sheet PDF dated 2026-11-03, and World Bank dataset terms. The PDF confirms monthly observations through October 2026 and selected benchmark units; the XLSX workbook was not downloaded or parsed. No API key or provider API was used. The source remains candidate-only pending workbook-level history, per-series rights and point-in-time vintage checks.
