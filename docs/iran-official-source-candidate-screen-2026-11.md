@@ -1,4 +1,4 @@
-# Iran official source candidate screen — 2026-11-04
+# Iran official source candidate screen — 2026-11-05
 
 **Status:** documentation-only candidate review. No source is approved for production scoring, research-engine use, or backtest admission by this screen.  
 **Scope:** Central Bank of Iran (CBI), Statistical Center of Iran (SCI), national open-data catalog, and official Iranian exchange candidates.  
@@ -6,14 +6,15 @@
 
 ## Executive disposition
 
-The CBI public website exposes several useful official macro and policy-statistics families. The strongest newly verified candidates are:
+The CBI public website exposes several useful official macro and policy-statistics families. A separate TSETMC announcement also points to a newly documented REST web-service path, but its contract and rights could not yet be verified. The strongest current candidates are:
 
 1. CBI Economic Time Series Database (TSD): more than 1,000 annual variables from 1338 onward, exposed through HTML and Excel according to the CBI's own description.
 2. CBI official exchange-rate page: daily currency-transfer rates calculated from the previous business day's transactions in the currency-transfer hall. This is **not** the Iranian free-market cash USD rate.
 3. CBI policy-rate page: weekly interbank, repo-floor, standing lending and deposit rates, with Jalali observation dates and percentage units.
 4. CBI government Islamic-securities auction archive: dated PDF auction-result documents. These are primary-market auction records, not secondary-market bond prices or total-return histories.
+5. TSETMC official REST web-service documentation path: announced in December 2025, but the documentation endpoint was inaccessible in this review and no authentication, pricing, history, rights or rate-limit contract is established.
 
-All four remain candidates. The reviewed pages do not establish a stable public API contract, exact publication timestamps, full revision/vintage semantics, or permission for automated commercial/model use. The CBI footer states that the site's material and moral rights belong to the CBI; no blanket reuse license was identified in this review.
+All five remain candidates. The reviewed pages do not establish a stable public API contract, exact publication timestamps, full revision/vintage semantics, or permission for automated commercial/model use. The CBI footer states that the site's material and moral rights belong to the CBI; no blanket reuse license was identified in this review.
 
 ## 1. Central Bank of Iran
 
@@ -65,7 +66,20 @@ The CBI's Islamic-securities section links to a dated archive of government Isla
 
 **Disposition:** add as a separate `iran.cbi.bond_auction_results` candidate for primary-market context only. It does not close the fixed-income secondary-market price/history gap.
 
-## 2. Other Iranian official portals and exchanges
+## 2. TSETMC official REST service — new contract-discovery candidate
+
+A Tasnim report dated 1404/10/06 (2025-12-27), quoting TSETMC, says that a new REST API web service was released alongside the older SOAP service. The report says both services would remain supported until further notice, while future development would be provided through REST, and links to the service documentation at `https://api.tsetmc.com/docs/`.
+
+- Secondary report quoting TSETMC: https://www.tasnimnews.ir/fa/news/1404/10/06/3481080/نسخه-جدید-وب-سرویس-tsetmc-منتشر-شد
+- Documentation URL cited by the announcement: https://api.tsetmc.com/docs/
+- The documentation host/path was inaccessible to this review environment. This is not evidence that the service is unavailable from the owner's intended Iran network; no provider request, account login or credential attempt was made.
+- The exact API host/base path, OpenAPI contract, authentication, subscription/pricing, request limits, endpoint families, historical depth, units, price-adjustment semantics, observation/availability timestamps, corrections and commercial/model-use terms remain unknown.
+- Do not assume this newly announced service is the same as the reverse-engineered public CDN endpoints currently used by the repository's TSETMC adapter. Do not silently relabel the existing adapter as an official API client.
+- The announcement and documentation link do not themselves grant collection, retention, redistribution or commercial rights. Obtain the service terms and any required agreement before any persistent or derived use.
+
+**Disposition:** prioritize a documentation/contract review from the intended Iran network before any new live probe. If the official REST contract and rights are verified, compare it against the current reverse-engineered adapter for identity, history, units, adjustments and release semantics. No adapter switch, probe, source approval or scoring eligibility is added by this screen.
+
+## 3. Other Iranian official portals and exchanges
 
 The following official destinations were identified for follow-up, but no machine-readable series contract was verified in this screen:
 
@@ -79,7 +93,7 @@ The following official destinations were identified for follow-up, but no machin
 
 A timeout in this review environment is an evidence limitation, not proof of provider outage or absence of data. Do not convert it into a claim that an official portal has no data.
 
-## 3. Fixed-income gap remains open
+## 4. Fixed-income gap remains open
 
 The CBI auction archive improves primary-market context but does not provide an accepted investable fixed-income series. A usable fixed-income instrument record still needs, at minimum:
 
@@ -95,7 +109,7 @@ The CBI auction archive improves primary-market context but does not provide an 
 
 Until these are established, fixed income remains unavailable/not-rankable. A weekly auction result or policy rate must not be presented as a tradable bond return.
 
-## 4. Cross-source acceptance gates
+## 5. Cross-source acceptance gates
 
 For every candidate above, require:
 
@@ -110,14 +124,16 @@ For every candidate above, require:
 
 No new source is wired into the research engine or default probe runner by this screen. All source and scoring gates remain fail-closed.
 
-## 5. Review record
+## 6. Review record
 
-Reviewed on 2026-11-04 from public documentation pages:
+Reviewed on 2026-11-05 from public documentation pages and a secondary report quoting TSETMC:
 
 - CBI homepage and statistics directory: https://www.cbi.ir/
 - CBI TSD description: https://www.cbi.ir/page/4275.aspx
 - CBI official exchange rates: https://www.cbi.ir/exrates/rates_fa.aspx
 - CBI policy rates: https://www.cbi.ir/PolicyRates/policyrates_fa.aspx
 - CBI government Islamic-securities auction archive: https://www.cbi.ir/category/21038.aspx
+- Tasnim report quoting TSETMC's REST-service announcement (2025-12-27): https://www.tasnimnews.ir/fa/news/1404/10/06/3481080/نسخه-جدید-وب-سرویس-tsetmc-منتشر-شد
+- TSETMC service documentation path cited by the announcement: https://api.tsetmc.com/docs/
 
-No API key, account token, provider API, laptop network, VPN route, dataset download or raw local file was used. The project's rule to remind the owner to enable VPN before any future foreign live-source request remains unchanged.
+No API key, account token, provider API, laptop network, VPN route, dataset download or raw local file was used. The TSETMC documentation endpoint could not be inspected here; its authentication, commercial terms and service contract remain unknown. The project's rule to remind the owner to enable VPN before any future foreign live-source request remains unchanged.
