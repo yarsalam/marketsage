@@ -15,7 +15,7 @@
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync plus update the manual local workflow pin to corrected TSETMC pipeline v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. The previous head passed five jobs in run 42051140989; this amended head requires fresh exact-head CI. No dispatch is performed. |
 | [#38](https://github.com/yarsalam/marketsage/pull/38) | target not surfaced in issue metadata | Read-only sanitized diagnostics for existing local TSETMC output inventories; manual-only, no provider requests or artifact uploads | Open. Exact-head CI not verified in this run; do not dispatch the local workflow without owner review. |
 | [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/state sync and correction of the manual local workflow's immutable pipeline pin to v1.1.1 `1dc6894c0823f6ffe77d27fd866576f5115a042c` | Open. Run 42055777260 passed all five jobs on the preceding head; this new state-sync update requires fresh exact-head CI. No dispatch is performed. |
-| [#46](https://github.com/yarsalam/marketsage/pull/46) | feat/tindex-free-data-connector (PR #6 integration branch) | Candidate-only screen for FIPIRAN fund NAV, IFB secondary fixed income and commercial Investats data | Open. CI run 42056363087 is in progress; merge only after all five required job types pass. |
+
 
 
 
@@ -50,6 +50,7 @@ PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29, #30
 - [#39](https://github.com/yarsalam/marketsage/pull/39) — TSETMC discovery identity-conflict classification fix; merged at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after all five required job types passed in run `42050542208`.
 - [#43](https://github.com/yarsalam/marketsage/pull/43) — World Bank Pink Sheet November 2026 PDF release/units/revision/rights refresh; merged into integration after all five required job types passed in run `42051901501`.
 - [#45](https://github.com/yarsalam/marketsage/pull/45) — TSETMC official REST-service candidate screen, with the November Pink Sheet record preserved; merged at `cbe585efe26ee129370b39e6bd983e709aecf55c` after all five required job types passed in run `42055449340`.
+- [#46](https://github.com/yarsalam/marketsage/pull/46) — FIPIRAN fund NAV, IFB secondary fixed-income and commercial Investats candidate screen; merged at `0857a48ad9db6c5dab13ae0eca95354639d47324` after all five required job types passed in run `42056363087`.
 
 ## Closed / superseded
 
@@ -70,7 +71,7 @@ main
 
 PR #39 merged into PR #6's integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after five required job types passed in run `42050542208`. The first local candidate run (41914919555) used the previous v1.1.0 pipeline; the corrected v1.1.1 implementation changes classification only. PR #41 updates main's manual workflow pin to the corrected commit and requires owner review before a future dispatch.
 
-PR #43 (World Bank Pink Sheet refresh) and PR #45 (TSETMC official REST-service candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #46 (FIPIRAN/IFB/Investats candidate screen) remains open with exact-head CI running. PR #38 (sanitized local diagnostics) and PR #41 (this governance/pin update) are also open. PR #6 remains open, 413 commits ahead and 9 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
+PR #43 (World Bank Pink Sheet refresh), PR #45 (TSETMC official REST-service candidate screen) and PR #46 (FIPIRAN/IFB/Investats candidate screen) are merged into the integration branch. PR #44 is closed as superseded by #45. PR #38 (sanitized local diagnostics) and PR #41 (this governance/pin update) remain open. PR #6 remains open, 413 commits ahead and 9 behind main at the latest comparison, and must not be merged to main without explicit owner approval. PR #8 remains parked. The latest local candidate run completed, but 47/47 candidates remain quarantined. Owner evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
 
 ## Release and capital-risk guardrails
 
