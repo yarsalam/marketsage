@@ -95,6 +95,10 @@ The existing Stage 4 report is exploratory, not accepted predictive validation. 
 
 The matching monthly-price CSV and its exact hash/configuration are not currently part of the staged TSETMC dataset. Do not reconstruct or substitute a different dataset and call the attribution reproducible. The locked holdout must remain untouched.
 
+## Stage 4 exact-dataset attribution blocker
+
+The 2023-10-31 through 2024-03-31 fold remains unexplained at approximately +240.89%. The exact monthly-price CSV used by the report is a local artifact and is not present in GitHub. The repository's `analyze_stage4_fold.py` diagnostic must be run against that exact file and its SHA-256 must match `1e71d898b18b4a6db74aba4826c86a4982efad934ee30aa82ff354883f01d878` before interpreting attribution. The owner action, exact command and acceptance criteria are recorded in [Issue #47](https://github.com/yarsalam/marketsage/issues/47). Do not substitute a different dataset, upload raw prices, or tune against the locked holdout. Stage 4 remains exploratory until the extreme fold is attributed and the source/point-in-time/cost gates are resolved.
+
 ## Current decision and next actions
 
 1. Owner manually dispatches the updated `.github/workflows/local-tsetmc-integrated-acceptance.yml` on `main` with `confirm_integrated_acceptance=true` and reviews the sanitized counts, decision statuses, quarantine reasons and reprocessing queue.
