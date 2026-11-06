@@ -76,3 +76,11 @@ Provider-specific features are optional. The coordinator must not assume a vendo
 A temporary isolated harness using the same schema and validator logic passed 10 checks. This was not a run from a repository checkout and was not a GitHub Actions run. The repository tests still need to be executed from a clean checkout when an authorized non-billed execution environment is available.
 
 Not implemented yet: persistent task storage, transactional outbox, provider adapters, leases/heartbeats/fencing, dispatch reconciliation, fake-provider lifecycle tests, monitoring or recovery. This contract and validator do not establish 24/7 readiness.
+
+## In-memory lifecycle proof fixture (not production infrastructure)
+
+- `infra/control_plane/lifecycle.py` supplies a deterministic fake provider and a single-process coordinator fixture.
+- `infra/control_plane/test_lifecycle.py` covers duplicate submission, idempotency-key/input conflicts, ambiguous submit-response reconciliation, terminal provider state, duplicate logical-task delivery, exclusive active claims, fencing-token recovery, stale-result rejection, and terminal test-failure handling.
+- The fixture deliberately uses memory only. It has no durable queue, database, process recovery, distributed locking, provider network calls, or production suitability.
+- A simulated lost response is reconciled by idempotency key before any subsequent submit. The fixture does not claim to prove behavior against a real provider.
+- These tests have been added to the repository but have **not** been executed from a clean checkout or CI. They must be run in an authorized zero-cost environment before this step is accepted.
