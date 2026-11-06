@@ -136,3 +136,11 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 - Added a regression test proving the original task remains addressable and a duplicate delivery with the same idempotency key still maps to the original logical task.
 - Exact branch head for the code/test/contract change: `e19ddd8ac9367e841415122945189dd72a46521b`. The exact lifecycle source and tests passed **10/10** in a temporary isolated harness (exit 0); this is not a clean checkout or CI result.
 - No durable storage was implemented. The manifest dependency/bootstrap and clean-checkout test gates remain open; do not proceed to the transactional outbox until those tests pass in an authorized zero-cost clean checkout.
+
+
+### Fenced terminal-failure publication correction — 2026-11-06
+
+- The in-memory coordinator's `mark_failed` now requires the active lease and checks owner plus fencing token. An expired worker cannot mark the task failed after a replacement worker reclaims it.
+- Added a regression covering stale worker A versus current worker B; stale failure publication is rejected, and the current lease can still publish a terminal test failure.
+- Exact lifecycle source/tests at `0ad3e7323a7e20779017a47854f33c1b21c6321d` passed **11/11** in a temporary isolated harness (exit code 0). This is not clean-checkout or CI evidence.
+- Durable storage, transactional outbox and real provider adapters remain blocked until the manifest/lifecycle tests pass from a clean checkout under the zero-cost policy.
