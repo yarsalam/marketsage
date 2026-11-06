@@ -66,3 +66,13 @@ Provider-specific features are optional. The coordinator must not assume a vendo
 4. Local fake provider adapter for deterministic contract tests.
 5. Only then implement real provider adapters, starting with a local isolated runner.
 6. External providers remain disabled until account, jurisdiction, quota and zero-billing eligibility are verified.
+## Initial implementation status
+
+- `schemas/infra-task-v1.schema.json`: strict Draft 2020-12 schema; unknown fields are rejected. Current policy fixes cost at zero, secrets and network access off, and production/merge/deploy/investment actions off.
+- `infra/control_plane/manifest.py`: validates the schema, requires timezone-aware timestamps and a deadline after request time, derives a stable SHA-256 idempotency key from provider/repository/commit/task-version/input digest, and reports only sanitized validation paths/rule names.
+- `infra/control_plane/test_manifest.py`: tests valid manifests, commit-bound idempotency, cost/network/secret denial, unknown fields, invalid commit SHA, deadline ordering, identity mismatch and safe multi-error reporting.
+- `requirements-infra.txt`: isolates the JSON Schema validation dependency from the MarketSage analysis-engine dependencies.
+
+A temporary isolated harness using the same schema and validator logic passed 10 checks. This was not a run from a repository checkout and was not a GitHub Actions run. The repository tests still need to be executed from a clean checkout when an authorized non-billed execution environment is available.
+
+Not implemented yet: persistent task storage, transactional outbox, provider adapters, leases/heartbeats/fencing, dispatch reconciliation, fake-provider lifecycle tests, monitoring or recovery. This contract and validator do not establish 24/7 readiness.
