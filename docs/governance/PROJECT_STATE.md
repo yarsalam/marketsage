@@ -128,3 +128,11 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 - PR #50 exact head `9098f110f615d46adbfa49f37e644000b832feb0` has not produced a valid test result. Run [42176190919](https://github.com/yarsalam/marketsage/actions/runs/42176190919), attempt 2, shows all five hosted test/build jobs and the failure reporter ended before step 1 with runner ID 0 and zero steps; production-images was skipped. This is runner allocation/capacity evidence, not a code-level test result.
 - The failure reporter cannot report a pool-wide outage because it shares the same hosted runner pool. Do not dispatch/rerun hosted Actions until the owner completes [Issue #53](https://github.com/yarsalam/marketsage/issues/53); keep the zero-dollar spend boundary unchanged.
 - PR #14 is already merged into integration PR #6. PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked; its GitHub-hosted TSETMC timeout must not be repeated from the same environment.
+
+
+### In-memory lifecycle fixture correction — 2026-11-06
+
+- Fixed an identity-index consistency defect: `InMemoryCoordinator.enqueue` now rejects reuse of an existing `task_id` with a different idempotency key/input instead of overwriting the task-by-ID index.
+- Added a regression test proving the original task remains addressable and a duplicate delivery with the same idempotency key still maps to the original logical task.
+- Exact branch head for the code/test/contract change: `e19ddd8ac9367e841415122945189dd72a46521b`. The exact lifecycle source and tests passed **10/10** in a temporary isolated harness (exit 0); this is not a clean checkout or CI result.
+- No durable storage was implemented. The manifest dependency/bootstrap and clean-checkout test gates remain open; do not proceed to the transactional outbox until those tests pass in an authorized zero-cost clean checkout.
