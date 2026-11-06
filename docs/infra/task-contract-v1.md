@@ -35,7 +35,7 @@ The manifest is immutable input, not a mutable run status. The coordinator store
 - Persist dispatch intent before calling a provider (transactional outbox).
 - A lease has an owner, expiry, heartbeat and monotonically increasing fencing token.
 - Reconcile an uncertain provider response before failover; do not dispatch a second copy merely because the first response timed out.
-- A worker may publish results only while its fencing token is current.
+- A worker may publish success or terminal failure only while its fencing token is current; stale workers must not overwrite the current lease holder's result or failure state.
 - Retry only capacity/provider/worker-loss failures. A code or test failure remains failed and is never hidden by provider shopping.
 - Keep attempt history and sanitized failure classification for audit.
 
@@ -91,3 +91,8 @@ Not implemented yet: persistent task storage, transactional outbox, provider ada
 - The in-memory coordinator now rejects reuse of an existing `task_id` for a different idempotency key/input identity instead of overwriting the task-by-ID index while leaving the task-by-key index stale.
 - A regression test verifies the original task remains addressable and a duplicate delivery with the same idempotency key still resolves to the original logical task.
 - This is a single-process fixture correction only. It does not add durable storage or prove restart/distributed recovery; the clean-checkout test gate remains open.
+
+
+### Fenced failure publication regression — 2026-11-06
+
+The in-memory lifecycle fixture now requires the active `Lease` (owner plus fencing token) to publish a terminal test/code failure. A stale worker whose lease expired cannot mark a task failed after a replacement worker has claimed it. This mirrors the existing stale-success publication guard. The fixture remains in-memory only; no durable recovery claim is made.
