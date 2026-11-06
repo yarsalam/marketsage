@@ -60,7 +60,7 @@ def validate_manifest(manifest: Mapping[str, Any]) -> None:
         raise ManifestValidationError(["$: expected object"])
 
     validator = Draft202012Validator(load_schema(), format_checker=FormatChecker())
-    errors = sorted(validator.iter_errors(dict(manifest)), key=lambda error: (list(error.absolute_path), error.validator or ""))
+    errors = sorted(validator.iter_errors(dict(manifest)), key=lambda error: (tuple(str(part) for part in error.absolute_path), error.validator or ""))
     if errors:
         issues: list[str] = []
         for error in errors:
