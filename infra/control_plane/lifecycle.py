@@ -127,6 +127,14 @@ class InMemoryCoordinator:
                 if existing.input_digest != input_digest:
                     raise IdempotencyConflict("idempotency key/input mismatch")
                 return existing
+            task_id_owner = self._tasks_by_id.get(task_id)
+            if task_id_owner is not None:
+                if (
+                    task_id_owner.idempotency_key != idempotency_key
+                    or task_id_owner.input_digest != input_digest
+                ):
+                    raise IdempotencyConflict("task id reused for different identity")
+                return task_id_owner
             task = _Task(task_id, idempotency_key, input_digest)
             self._tasks_by_key[idempotency_key] = task
             self._tasks_by_id[task_id] = task
