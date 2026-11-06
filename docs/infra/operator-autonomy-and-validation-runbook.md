@@ -96,3 +96,8 @@ The PR #50 failure-notification job shares the same GitHub Actions runner pool a
 ### Probe request bound — 2026-11-06
 
 The probe rejects non-HTTPS initial URLs and user-info URLs, rejects HTTPS-to-HTTP redirects, and permits at most one HTTPS redirect per package page. It makes 12 initial package-page GETs and at most 24 total GETs including redirects, with a 12-second timeout per request. The nine offline probe tests passed in an isolated temporary harness only; the owner-network probe remains pending Issue #52.
+
+
+## 8. GitHub Actions quota handoff
+
+[Issue #53](https://github.com/yarsalam/marketsage/issues/53) tracks the account-only check required before another hosted run. The latest exact-head attempt and its single bounded retry failed before any job step started (runner ID 0, zero steps). This is not a code-level test result and does not prove billing as the cause. The owner must inspect included-minute balance/reset and account/repository Actions restrictions while leaving the USD 0 spending cap unchanged. Until that evidence is returned, do not dispatch or rerun hosted Actions. Continue zero-cost repository-side work only.
