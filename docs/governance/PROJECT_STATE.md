@@ -1,9 +1,10 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-05  
+**Snapshot date:** 2026-11-06  
 **Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
+**Main HEAD:** 07e641670ceab22496ef976a584934464570fd9a  
 **Integration PR:** #6, feat/tindex-free-data-connector  
+**Current integration HEAD:** 1d90726c593b0818982407c309ff13301798f5b3  
 **Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
 **Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
 
@@ -85,3 +86,22 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 6. Keep source scoring, investment ranking, calibrated probabilities, production release, broker access and trading disabled until all relevant data and empirical gates pass. Any real-money allocation or trade still requires the owner's separate explicit approval.
 
 **Investment-stage status: NOT READY.** A successful Runner job, parser, dataset hash audit, or integration CI run is not an investment approval.
+
+
+## Infrastructure-first execution status — 2026-11-06 (supersedes ordinary next-data work until Issue #49 is accepted)
+
+**Priority:** [Issue #49](https://github.com/yarsalam/marketsage/issues/49) is the active first priority. Ordinary product, source-screening, dataset, backtest and investment-analysis work is paused. Only work directly required to design, implement, secure and prove provider-independent execution may proceed.
+
+- Default branch `main`: `07e641670ceab22496ef976a584934464570fd9a`.
+- Integration PR #6 current head: `1d90726c593b0818982407c309ff13301798f5b3`. PR #14 is already merged into #6; no repeat merge is required. PR #6 remains open and must not be merged to main without separate explicit owner approval.
+- PR #50 (cloud CI timeouts/concurrency/schedule/failure notice) remains open. Exact head `9098f110f615d46adbfa49f37e644000b832feb0`; run [42176190919](https://github.com/yarsalam/marketsage/actions/runs/42176190919) and its bounded rerun failed before job steps with hosted runner ID 0. No step logs were available. This is an allocation/account-capacity failure, not a demonstrated code-test failure. GitHub Actions usage/budget is explicitly blocked at USD 0; do not trigger more hosted runs until included quota is confirmed reset or separate owner authorization exists.
+- PR #41 is an open governance/workflow-pin synchronization PR; exact-head run [42063679856](https://github.com/yarsalam/marketsage/actions/runs/42063679856) passed all five required job types. It remains open for review; no local workflow was dispatched.
+- PR #51 is an open documentation-only data candidate screen; exact-head run [42062133299](https://github.com/yarsalam/marketsage/actions/runs/42062133299) passed all five job types. Ordinary data work remains paused under Issue #49; do not merge or extend it during the infrastructure-first phase.
+- PR #48 (Stage 4 provenance manifest) is merged into integration at `1d90726c593b0818982407c309ff13301798f5b3`. This does not mean the local original dataset was rerun or the unexplained fold was attributed.
+- Provider-neutral work is on `infra/provider-neutral-control-plane-2026-11`, 26 commits ahead of main at the start of this update. It contains the architecture, provider landscape, strict task manifest/schema, in-memory fake-provider/lifecycle fixtures, operating runbook and Python mirror probe. No provider is registered and no paid resource is active.
+- The latest owner-local validation attempt failed during dependency bootstrap before tests; the manifest and lifecycle test modules have not run from a clean checkout. The mirror probe is now HTTPS-downgrade-safe and has six offline regression tests; those passed only in an isolated temporary harness, not on the owner network or from a clean repository checkout.
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52) is the owner-action handoff for running the bounded mirror probe on the actual worker network. Until that evidence exists, no mirror is selected and no dependency constraints are changed.
+- Oracle signup returned an export/compliance denial. Do not bypass it by changing identity, address, location, VPN or using another person's account.
+- The laptop Runner is registered and isolated for reviewed manual local workloads, but it is not an always-on control plane and does not establish 24/7 readiness. No local workflow is dispatched by this update.
+
+**Current status:** infrastructure not ready; durable queue/outbox, real provider adapters, restart recovery, stale-run monitoring, independent backend failover and a clean end-to-end zero-cost canary remain unproven. Research scoring/ranking, backtest approval, production deployment and trading remain disabled.

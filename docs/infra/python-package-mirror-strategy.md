@@ -61,3 +61,12 @@ Until those checks pass, classify the blocker as package-mirror/bootstrap availa
 - Community catalog for Iranian mirrors: https://github.com/MiravaOrg/Mirava/blob/main/README.fa.md
 
 These references identify candidates; they are not uptime, completeness, security-audit or SLA guarantees.
+
+
+## Probe hardening and offline regression coverage — 2026-11-06
+
+The standard-library probe now uses a dedicated redirect handler that rejects any redirect whose target scheme is not HTTPS. Python's default HTTPS handler and certificate verification remain enabled. Each request is a bounded GET with a 12-second timeout and a maximum 2,048-byte response read; no credentials are sent and no distribution files are downloaded.
+
+Added `infra/control_plane/test_probe_package_mirrors.py` with six offline tests covering request method/headers/timeout/read bound, HTTPS-only redirects, HTTP status handling, sanitized transport errors, and aggregate non-200 exit behavior.
+
+The six tests passed in an isolated temporary standard-library harness against the implementation and test content in this execution. This is **not** a clean repository checkout test, not a run on the owner's network, and not evidence that any mirror is reachable or complete. The actual network probe and exact clean-checkout validation remain blocked on [Issue #52](https://github.com/yarsalam/marketsage/issues/52). No mirror has been selected and no dependency constraint has been changed.

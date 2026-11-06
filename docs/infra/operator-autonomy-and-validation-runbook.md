@@ -69,3 +69,16 @@ Minimum evidence before calling a runner usable:
 ## 5. Owner approval boundaries remain unchanged
 
 No private code transfer to an external provider, provider registration, billing activation, paid usage, plan upgrade, new VPS, production access, merge, deployment, ranking/scoring activation, or investment action is permitted without the relevant explicit approval. The production Yarsalam server and the owner's laptop are not assumed to be always-on MarketSage workers.
+
+
+## 6. Mirror-probe review — 2026-11-06
+
+The candidate mirror probe was reviewed and hardened before asking for a network run:
+- HTTPS-to-HTTP redirects are rejected; default certificate verification is retained.
+- Requests are GET-only, carry no credentials, read at most 2,048 bytes, and have a 12-second per-request timeout.
+- Transport exception text and response bodies are not emitted.
+- Six offline regression tests cover the request contract, redirect policy, status handling, redaction and exit behavior. They passed in an isolated temporary harness, but have not yet run from the owner's clean detached checkout.
+
+**Owner-only network gate:** [Issue #52](https://github.com/yarsalam/marketsage/issues/52) tracks running the probe on the actual worker network. No mirror can be selected from desk research or this assistant's network. After a successful mirror probe, verify compatible wheels and install the unchanged dependency set in a clean isolated environment; only then run the manifest/lifecycle tests. Do not start durable storage implementation before those existing tests pass from the clean checkout.
+
+GitHub Actions remains at a zero-dollar usage/budget stop. Do not dispatch or rerun hosted workflows until included quota is verified to have reset or the owner separately authorizes spend. No paid provider, Oracle workaround, production VPS worker or private-code export is authorized.
