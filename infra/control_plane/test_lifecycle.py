@@ -85,9 +85,25 @@ class CoordinatorLifecycleTests(unittest.TestCase):
         self.assertTrue(self.coordinator.publish_result(lease=new, result="fresh"))
 
     def test_test_failure_is_terminal_and_not_claimable_for_failover(self) -> None:
-        self.coordinator.mark_failed(task_id="task-1", failure_class="test_failure")
+        lease = self.coordinator.claim(task_id="task-1", owner="worker-a")
+        self.assertTrue(
+            self.coordinator.mark_failed(lease=lease, failure_class="test_failure")
+        )
         self.assertEqual(self.coordinator.get("task-1").state, "failed")
         self.assertIsNone(self.coordinator.claim(task_id="task-1", owner="other-provider"))
+
+    def test_stale_worker_cannot_publish_failure_after_lease_recovery(self) -> None:
+        old = self.coordinator.claim(task_id="task-1", owner="worker-a")
+        self.coordinator.recover_expired(task_id="task-1", current_owner="worker-a")
+        current = self.coordinator.claim(task_id="task-1", owner="worker-b")
+        self.assertFalse(
+            self.coordinator.mark_failed(lease=old, failure_class="test_failure")
+        )
+        self.assertEqual(self.coordinator.get("task-1").state, "leased")
+        self.assertTrue(
+            self.coordinator.mark_failed(lease=current, failure_class="test_failure")
+        )
+        self.assertEqual(self.coordinator.get("task-1").state, "failed")
 
 
 if __name__ == "__main__":
