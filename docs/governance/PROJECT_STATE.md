@@ -115,3 +115,8 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 
 
 - Mirror-probe bound was tightened: 12 initial package-page GETs, at most one HTTPS redirect per page (24 total GETs maximum), 12-second timeout per request. Nine offline regression tests passed in a temporary harness only; no actual mirror reachability is established.
+
+
+### Additional owner-action handoff — 2026-11-06
+
+- [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is the owner-only verification gate for GitHub Actions included-minute availability, reset date, repository/account enablement and the current USD 0 spending cap. It explicitly requests no spend increase, plan change or visibility change. Do not dispatch or rerun hosted workflows until the owner confirms that a zero-cost included allowance is available and authorizes one bounded exact-head validation attempt.
