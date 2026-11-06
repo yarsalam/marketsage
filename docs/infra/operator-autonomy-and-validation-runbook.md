@@ -101,3 +101,12 @@ The probe rejects non-HTTPS initial URLs and user-info URLs, rejects HTTPS-to-HT
 ## 8. GitHub Actions quota handoff
 
 [Issue #53](https://github.com/yarsalam/marketsage/issues/53) tracks the account-only check required before another hosted run. The latest exact-head attempt and its single bounded retry failed before any job step started (runner ID 0, zero steps). This is not a code-level test result and does not prove billing as the cause. The owner must inspect included-minute balance/reset and account/repository Actions restrictions while leaving the USD 0 spending cap unchanged. Until that evidence is returned, do not dispatch or rerun hosted Actions. Continue zero-cost repository-side work only.
+
+
+## 9. Task identity collision regression — 2026-11-06
+
+- The in-memory coordinator previously allowed a second logical task to reuse an existing `task_id` with a different idempotency key. That overwrote the task-by-ID index while the task-by-key index still referenced the original object.
+- The fixture now rejects this identity collision with `IdempotencyConflict`; the regression test also verifies that the original task remains addressable and duplicate delivery by the same idempotency key still returns the original logical task.
+- Exact branch head after the code/test/contract update: `e19ddd8ac9367e841415122945189dd72a46521b`.
+- Exact `lifecycle.py` and `test_lifecycle.py` were copied unchanged into a temporary isolated package layout and run with `python -m unittest infra.control_plane.test_lifecycle -v`: **10 tests passed, exit code 0**.
+- This was an isolated harness, not a clean repository checkout or GitHub Actions run. It does not clear the separate manifest dependency bootstrap gate, prove durable storage, or establish process restart/distributed recovery. Continue to hold durable coordinator implementation until the manifest/lifecycle batch passes from the exact clean checkout.
