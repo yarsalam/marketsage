@@ -10,8 +10,8 @@ Machine-readable schema: `schemas/infra-task-v1.schema.json`.
 
 ## Required identity
 
-- `task_id`: unique logical task ID (UUID).
-- `idempotency_key`: stable key for the logical work, derived from repository, immutable commit SHA, task definition version and normalized inputs. A duplicate webhook must resolve to the same logical task.
+- `task_id`: unique logical task ID (UUID). Reusing an existing task ID for a different idempotency key or input digest is a hard conflict; it must never overwrite the existing task index.
+- `idempotency_key`: stable key for the logical work, derived from repository, immutable commit SHA, task definition version and normalized inputs. A duplicate webhook must resolve to the same logical task even if the delivery carries a different provisional task ID.
 - `repository.commit_sha`: immutable 40-character Git commit SHA. Never dispatch against a moving branch name alone.
 - `task_definition.id` and `version`: allowlisted task profile, not an arbitrary command supplied by a webhook or untrusted PR.
 - `requested_at` and `deadline`: timestamps used for expiry and bounded execution.
@@ -84,3 +84,10 @@ Not implemented yet: persistent task storage, transactional outbox, provider ada
 - The fixture deliberately uses memory only. It has no durable queue, database, process recovery, distributed locking, provider network calls, or production suitability.
 - A simulated lost response is reconciled by idempotency key before any subsequent submit. The fixture does not claim to prove behavior against a real provider.
 - These tests have been added to the repository but have **not** been executed from a clean checkout or CI. They must be run in an authorized zero-cost environment before this step is accepted.
+
+
+### Lifecycle fixture regression — 2026-11-06
+
+- The in-memory coordinator now rejects reuse of an existing `task_id` for a different idempotency key/input identity instead of overwriting the task-by-ID index while leaving the task-by-key index stale.
+- A regression test verifies the original task remains addressable and a duplicate delivery with the same idempotency key still resolves to the original logical task.
+- This is a single-process fixture correction only. It does not add durable storage or prove restart/distributed recovery; the clean-checkout test gate remains open.
