@@ -60,6 +60,17 @@ class CoordinatorLifecycleTests(unittest.TestCase):
         )
         self.assertIs(duplicate, self.task)
 
+    def test_task_id_collision_does_not_overwrite_existing_task(self) -> None:
+        with self.assertRaises(IdempotencyConflict):
+            self.coordinator.enqueue(
+                task_id="task-1", idempotency_key="key-2", input_digest="b" * 64
+            )
+        self.assertIs(self.coordinator.get("task-1"), self.task)
+        duplicate = self.coordinator.enqueue(
+            task_id="task-2", idempotency_key="key-1", input_digest="a" * 64
+        )
+        self.assertIs(duplicate, self.task)
+
     def test_only_one_owner_can_claim_active_task(self) -> None:
         lease = self.coordinator.claim(task_id="task-1", owner="worker-a")
         self.assertIsNotNone(lease)
