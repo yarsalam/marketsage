@@ -172,14 +172,21 @@ class InMemoryCoordinator:
             task.state = "succeeded"
             return True
 
-    def mark_failed(self, *, task_id: str, failure_class: str) -> None:
-        """A task/test failure is terminal; it is not a provider failover signal."""
+    def mark_failed(self, *, lease: Lease, failure_class: str) -> bool:
+        """Publish a terminal failure only while the worker's fencing token is current."""
         if failure_class not in {"test_failure", "code_failure"}:
             raise ValueError("only terminal task failures are accepted here")
         with self._lock:
-            task = self._tasks_by_id[task_id]
+            task = self._tasks_by_id[lease.task_id]
+            if (
+                task.state != "leased"
+                or task.owner != lease.owner
+                or task.fencing_token != lease.fencing_token
+            ):
+                return False
             task.state = "failed"
             task.owner = None
+            return True
 
     def get(self, task_id: str) -> _Task:
         with self._lock:
