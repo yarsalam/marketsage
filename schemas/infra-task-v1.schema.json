@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/marketsage/infra-task-v1.schema.json",
+  "title": "MarketSage provider-neutral infrastructure task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "idempotency_key",
+    "queue",
+    "repository",
+    "task_definition",
+    "requested_at",
+    "deadline",
+    "policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "task_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._:-]+$"
+    },
+    "queue": {
+      "enum": [
+        "infra",
+        "ci-quality",
+        "security",
+        "docs",
+        "source-reliability",
+        "research-methods",
+        "release-readiness"
+      ]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "full_name",
+        "ref",
+        "commit_sha"
+      ],
+      "properties": {
+        "provider": {
+          "enum": [
+            "github",
+            "forgejo",
+            "gitea",
+            "gitee",
+            "gitflic",
+            "gitriver",
+            "local"
+          ]
+        },
+        "full_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "commit_sha": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        }
+      }
+    },
+    "task_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._/-]{1,100}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cost_ceiling_minor_units",
+        "repository_access",
+        "secrets_access",
+        "network_policy",
+        "production_access",
+        "merge_allowed",
+        "deploy_allowed",
+        "investment_actions_allowed",
+        "raw_market_data_allowed"
+      ],
+      "properties": {
+        "cost_ceiling_minor_units": {
+          "const": 0
+        },
+        "repository_access": {
+          "enum": [
+            "none",
+            "read-only"
+          ]
+        },
+        "secrets_access": {
+          "const": "none"
+        },
+        "network_policy": {
+          "enum": [
+            "none",
+            "explicit_allowlist"
+          ]
+        },
+        "production_access": {
+          "const": false
+        },
+        "merge_allowed": {
+          "const": false
+        },
+        "deploy_allowed": {
+          "const": false
+        },
+        "investment_actions_allowed": {
+          "const": false
+        },
+        "raw_market_data_allowed": {
+          "const": false
+        }
+      }
+    },
+    "retry_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "retry_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "provider_unavailable",
+              "quota_blocked",
+              "capacity_unavailable",
+              "worker_lost"
+            ]
+          }
+        }
+      }
+    },
+    "result_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowed_artifacts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "sanitized_summary",
+              "test_report",
+              "coverage_report"
+            ]
+          }
+        },
+        "raw_logs_allowed": {
+          "const": false
+        },
+        "secret_values_allowed": {
+          "const": false
+        },
+        "local_paths_allowed": {
+          "const": false
+        }
+      }
+    }
+  }
+}
