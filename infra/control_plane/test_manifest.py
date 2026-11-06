@@ -95,6 +95,11 @@ class TaskManifestTests(unittest.TestCase):
         with self.assertRaises(ManifestValidationError):
             validate_manifest(invalid)
 
+    def test_rejects_network_access(self) -> None:
+        invalid = {**self.manifest, "policy": {**self.manifest["policy"], "network_policy": "explicit_allowlist"}}
+        with self.assertRaises(ManifestValidationError):
+            validate_manifest(invalid)
+
     def test_rejects_deadline_before_request(self) -> None:
         invalid = {**self.manifest, "deadline": self.manifest["requested_at"]}
         with self.assertRaises(ManifestValidationError):
