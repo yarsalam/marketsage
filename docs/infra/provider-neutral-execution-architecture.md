@@ -55,22 +55,27 @@ Task states: queued -> leased -> dispatched -> running -> succeeded | failed | c
 
 | Provider | Hosted capacity | Self-hosted capacity | Current role |
 |---|---|---|---|
-| GitHub Actions | Included quota exhausted on this private repo; account Actions budget currently blocks usage | Self-hosted runner supported | Keep configured; do not dispatch hosted jobs until quota reset or owner-approved budget change |
-| CircleCI | Free plan currently advertises up to 6,000 build minutes on small Docker, 5 active users; credits depend on resource class | Supported; free plan advertises up to 5 concurrent self-hosted tasks | First hosted fallback candidate; verify private-repository eligibility and actual credit metering |
-| Buildkite | Free plan currently advertises up to 2,000 Linux vCPU minutes/month | Up to 10 concurrent self-hosted agents on Free plan | Secondary candidate; validate account free-plan transition and limits |
-| GitLab CI | Hosted shared-runner limits depend on current plan/namespace and must be verified in-account | Self-managed runners supported | Evaluate as alternate Forge and runner control plane |
-| Woodpecker CI | Not a free hosted capacity source by itself | Requires compute we control | Preferred lightweight self-hosted CI candidate |
-| Forgejo Actions | Not a free compute source by itself | Requires compute we control | Evaluate as independent Forge + Actions-compatible runner |
-| Jenkins | Not a free compute source by itself | Requires compute we control | Defer unless a concrete plugin/job need justifies it |
+| GitHub Actions | Included quota exhausted; current account budget blocks hosted execution | Self-hosted runner supported | Keep canonical workflows; no hosted dispatch until reset or separately approved budget |
+| CircleCI | Free credits exist, but login currently fails for the owner; no usable capacity verified | Self-hosted runner supported | Blocked pending official account access and quota verification |
+| Buildkite | Owner account is on a time-limited trial; no durable free entitlement verified | Self-hosted agents supported; trial/free terms must be confirmed | Do not create pipeline or trigger builds until trial terms and costs are verified |
+| Gitee Go | Official page advertises 200 build minutes/repository and 1,000/org/month | Not required for hosted usage; confirm agent options | Hosted candidate only for a disposable public test; likely needs Gitee-side repository mirror |
+| Alibaba Cloud DevOps Flow | 3,000 core-minutes/month and storage quotas, but region-based activation requires pay-as-you-go | Private build clusters possible, but require owner compute | Excluded under zero-cost policy; do not activate billing |
+| GitRiver Community | No hosted compute; Community edition is self-hosted | Integrated executor; vendor FAQ lists 2+ CPU/4+ GiB RAM minimum | New Russian self-hosted candidate; disposable local evaluation only |
+| GitFlic CE | SaaS free terms not yet verified from official sources | Free CE reported by third party | Research lead only; confirm official license, terms and CI syntax |
+| Forgejo + Woodpecker | No hosted compute included | Requires owner-controlled compute | Preferred mature self-hosted baseline; harden backend and agent isolation |
+| Gitea + Gitea Actions | No hosted compute included | Requires owner-controlled compute | Alternative self-hosted forge/runner stack |
+| GitLab CI | Hosted shared-runner limits and access must be verified in-account | Self-managed runners supported | Excluded for now due access restriction; no location or identity workarounds |
+| Jenkins | No hosted compute included | Requires owner-controlled compute | Defer unless a concrete plugin/job need justifies it |
 | Dagger | Not a hosted scheduler or quota pool | Runs wherever a compatible worker exists | Evaluate as portable task execution layer, not a CI provider |
 
 Provider pricing and quotas change. Treat public plan pages as leads, not proof of an account's actual entitlement. Recheck before activation and record the date, plan, resource class, concurrency and cost exposure. Never infer free capacity solely from account creation.
 
 ## 6. Compute strategy without Oracle
 
-- **No-cost hosted CI first:** use only confirmed free capacity on CircleCI/Buildkite/GitLab after validating the actual account and private-repository conditions.
-- **Self-hosted second:** evaluate a low-cost isolated VPS only after estimating monthly cost and obtaining explicit owner authorization. Do not install a CI worker on the yarsalam production VPS.
-- **Free cloud trials:** may be used only as temporary experiments if eligibility and terms permit; credits/trials are not treated as durable always-on capacity.
+- **No-cost hosted CI is optional, not foundational:** evaluate Gitee Go only with a public dummy repository and only after confirming eligibility, quota hard-stop, data location and terms. CircleCI login is currently blocked for the owner; Buildkite is a time-limited trial, not durable free capacity.
+- **Alibaba Cloud DevOps Flow is excluded for now:** its documented activation requires pay-as-you-go billing, which violates the current zero-cost constraint.
+- **Self-hosted first:** evaluate Forgejo + Woodpecker and GitRiver Community on an already available, non-production machine. Do not install a CI worker on the yarsalam production VPS. A self-hosted solution still consumes hardware, electricity, storage and maintenance.
+- **Free cloud trials:** are not treated as durable always-on capacity and must not be activated if they create billing exposure.
 - **Owner laptop:** may be an explicitly on-demand worker, never the always-on coordinator or sole execution path.
 - **No free compute available:** continue repository-only design, documentation, static analysis that can be run in the current authorized environment, and local work when the owner is available. Report that 24/7 execution is not yet proven rather than pretending.
 
