@@ -109,3 +109,12 @@ Do not mirror or upload the private MarketSage repository to Gitee, GitFlic, Git
 - Gitsi official terms, privacy and trust pages: https://www.gitsi.com/terms ; https://www.gitsi.com/privacy ; https://www.gitsi.com/trust
 - Woodpecker security boundaries and architecture: https://woodpecker-ci.org/docs/usage/security-boundaries ; https://woodpecker-ci.org/docs/administration/general
 - Forgejo Actions security guidance: https://forgejo.org/docs/latest/user/actions/security/
+## Existing GitHub workflow audit (read-only)
+
+Files inspected on the infrastructure branch:
+
+- `.github/workflows/ci.yml`: automatic `push` triggers for `main`, `deploy/**`, `research/**`, `ci/**`; automatic `pull_request` triggers targeting `main` and `deploy/**`. It uses hosted `ubuntu-latest`, installs dependencies, runs tests/builds and builds production images. No secrets are declared in the inspected workflow. Do not open a PR targeting `main` or `deploy/**` while hosted Actions remains blocked unless a controlled test is explicitly authorized; a PR event would request a run even though current Actions quota is exhausted.
+- `.github/workflows/local-tsetmc-integrated-acceptance.yml`, `.github/workflows/local-tsetmc-offline-acceptance.yml`, `.github/workflows/local-tsetmc-sanitized-diagnostics.yml`: manual `workflow_dispatch` only, explicit boolean confirmation, restricted to `main` and actor `yarsalam`, self-hosted labels, `contents: read`, no secrets, no artifact upload and no production action. The integrated workflow pins both checkout actions and the pipeline commit. These workflows are deliberately excluded from provider migration until infrastructure gates are proven.
+- The new branch name `infra/provider-neutral-control-plane-2026-11` is not included in the current `ci.yml` push branch filters, so ordinary pushes to this branch should not match that workflow. No workflow was dispatched and no PR was opened.
+
+Do not confuse a workflow definition with evidence of an execution. This audit is static only; no runner availability or workflow correctness is asserted.
