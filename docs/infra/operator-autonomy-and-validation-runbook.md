@@ -77,7 +77,7 @@ The candidate mirror probe was reviewed and hardened before asking for a network
 - HTTPS-to-HTTP redirects are rejected; default certificate verification is retained.
 - Requests are GET-only, carry no credentials, read at most 2,048 bytes, and have a 12-second per-request timeout.
 - Transport exception text and response bodies are not emitted.
-- Six offline regression tests cover the request contract, redirect policy, status handling, redaction and exit behavior. They passed in an isolated temporary harness, but have not yet run from the owner's clean detached checkout.
+- Nine offline regression tests cover the request contract, redirect policy, status handling, redaction and exit behavior. They passed in an isolated temporary harness, but have not yet run from the owner's clean detached checkout.
 
 **Owner-only network gate:** [Issue #52](https://github.com/yarsalam/marketsage/issues/52) tracks running the probe on the actual worker network. No mirror can be selected from desk research or this assistant's network. After a successful mirror probe, verify compatible wheels and install the unchanged dependency set in a clean isolated environment; only then run the manifest/lifecycle tests. Do not start durable storage implementation before those existing tests pass from the clean checkout.
 
@@ -91,3 +91,8 @@ The existing standard-library-only `infra/control_plane/lifecycle.py` and `test_
 The `test_manifest` module still depends on `jsonschema` and remains unexecuted from a clean checkout because dependency bootstrap failed before test discovery. The exact-network mirror probe remains the next owner gate in Issue #52. Do not proceed to durable storage implementation until the prescribed clean-checkout manifest/lifecycle test batch passes.
 
 The PR #50 failure-notification job shares the same GitHub Actions runner pool as the jobs it observes. Run [42176190919](https://github.com/yarsalam/marketsage/actions/runs/42176190919) shows that the notifier also failed before steps during runner allocation. Therefore an external observer on a genuinely independent execution path is required; an Actions job cannot prove or report the health of the Actions runner pool when that pool cannot start jobs.
+
+
+### Probe request bound — 2026-11-06
+
+The probe rejects non-HTTPS initial URLs and user-info URLs, rejects HTTPS-to-HTTP redirects, and permits at most one HTTPS redirect per package page. It makes 12 initial package-page GETs and at most 24 total GETs including redirects, with a 12-second timeout per request. The nine offline probe tests passed in an isolated temporary harness only; the owner-network probe remains pending Issue #52.

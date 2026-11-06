@@ -4,13 +4,14 @@ import io
 import unittest
 import urllib.error
 import urllib.request
+from contextlib import redirect_stdout
 from unittest.mock import Mock, patch
 
 from infra.control_plane import probe_package_mirrors as probe_module
 
 
 class ProbeTests(unittest.TestCase):
-    def test_probe_uses_get_tls_opener_timeout_and_small_read(self) -> None:
+    def test_probe_uses_get_timeout_and_small_read(self) -> None:
         response = Mock()
         response.status = 200
         response.__enter__ = Mock(return_value=response)
@@ -28,15 +29,32 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(error, "")
         self.assertGreaterEqual(elapsed, 0)
-        self.assertIsInstance(
-            build.call_args.args[0], probe_module.HTTPSOnlyRedirectHandler
-        )
+        handler = build.call_args.args[0]
+        self.assertIsInstance(handler, probe_module.HTTPSOnlyRedirectHandler)
+        self.assertEqual(handler.max_redirections, 1)
+        self.assertEqual(handler.max_repeats, 1)
         request, = opener.open.call_args.args
         self.assertEqual(request.get_method(), "GET")
         self.assertEqual(request.get_header("User-agent"), probe_module.USER_AGENT)
         self.assertEqual(request.get_header("Accept"), "text/html")
         self.assertEqual(opener.open.call_args.kwargs["timeout"], 12)
         response.read.assert_called_once_with(2048)
+
+    def test_probe_rejects_non_https_without_network(self) -> None:
+        with patch.object(probe_module.urllib.request, "build_opener") as build:
+            status, _, error = probe_module.probe("http://mirror.example/simple/pkg/")
+        self.assertIsNone(status)
+        self.assertEqual(error, "HTTPS_REQUIRED")
+        build.assert_not_called()
+
+    def test_probe_rejects_url_userinfo_without_network(self) -> None:
+        with patch.object(probe_module.urllib.request, "build_opener") as build:
+            status, _, error = probe_module.probe(
+                "https://user:password@mirror.example/simple/pkg/"
+            )
+        self.assertIsNone(status)
+        self.assertEqual(error, "HTTPS_REQUIRED")
+        build.assert_not_called()
 
     def test_http_error_returns_only_status(self) -> None:
         opener = Mock()
@@ -78,6 +96,14 @@ class ProbeTests(unittest.TestCase):
                 request, None, 302, "Found", {}, "http://mirror.example/pkg/"
             )
 
+    def test_redirect_handler_rejects_userinfo(self) -> None:
+        handler = probe_module.HTTPSOnlyRedirectHandler()
+        request = urllib.request.Request("https://mirror.example/pkg/")
+        with self.assertRaises(urllib.error.URLError):
+            handler.redirect_request(
+                request, None, 302, "Found", {}, "https://user:pass@cdn.example/pkg/"
+            )
+
     def test_redirect_handler_allows_https_redirect(self) -> None:
         handler = probe_module.HTTPSOnlyRedirectHandler()
         request = urllib.request.Request("https://mirror.example/pkg/")
@@ -87,7 +113,6 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(redirected.full_url, "https://cdn.example/pkg/")
 
     def test_main_reports_any_non_200_as_failure(self) -> None:
-        from contextlib import redirect_stdout
         output = io.StringIO()
         with patch.object(
             probe_module, "MIRRORS", (("test", "https://mirror.example/simple/"),)

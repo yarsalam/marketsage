@@ -67,6 +67,11 @@ These references identify candidates; they are not uptime, completeness, securit
 
 The standard-library probe now uses a dedicated redirect handler that rejects any redirect whose target scheme is not HTTPS. Python's default HTTPS handler and certificate verification remain enabled. Each request is a bounded GET with a 12-second timeout and a maximum 2,048-byte response read; no credentials are sent and no distribution files are downloaded.
 
-Added `infra/control_plane/test_probe_package_mirrors.py` with six offline tests covering request method/headers/timeout/read bound, HTTPS-only redirects, HTTP status handling, sanitized transport errors, and aggregate non-200 exit behavior.
+Added `infra/control_plane/test_probe_package_mirrors.py` with nine offline tests covering request method/headers/timeout/read bound, HTTPS-only redirects, HTTP status handling, sanitized transport errors, and aggregate non-200 exit behavior.
 
 The six tests passed in an isolated temporary standard-library harness against the implementation and test content in this execution. This is **not** a clean repository checkout test, not a run on the owner's network, and not evidence that any mirror is reachable or complete. The actual network probe and exact clean-checkout validation remain blocked on [Issue #52](https://github.com/yarsalam/marketsage/issues/52). No mirror has been selected and no dependency constraint has been changed.
+
+
+### Additional bound — 2026-11-06
+
+The probe now also rejects non-HTTPS initial URLs and URLs containing user information, and caps each package page at one HTTPS redirect. There are 12 initial package-page requests; with at most one redirect per page, the upper bound is 24 HTTP requests, each with a 12-second timeout. Nine offline tests cover these constraints. They have not been run from the owner's clean checkout.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Probe candidate Python Simple API mirrors without installing packages.
 
-Uses stdlib only, rejects HTTPS-to-HTTP redirect downgrades, sends no
+Uses stdlib only, requires HTTPS for initial URLs and redirects, sends no
 credentials, and prints HTTP status/latency/package-page visibility. It does
 not download distributions.
 """
@@ -20,25 +20,43 @@ MIRRORS = (
 )
 PACKAGES = ("jsonschema", "jsonschema-specifications", "rpds-py", "attrs")
 TIMEOUT_SECONDS = 12
-USER_AGENT = "MarketSage-Package-Mirror-Probe/1.1"
+USER_AGENT = "MarketSage-Package-Mirror-Probe/1.2"
 
 
 class HTTPSOnlyRedirectHandler(urllib.request.HTTPRedirectHandler):
-    """Reject redirects that would downgrade a request from HTTPS to HTTP."""
+    """Reject insecure redirects and cap each package page at one redirect."""
+
+    max_redirections = 1
+    max_repeats = 1
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        if urlsplit(newurl).scheme.lower() != "https":
-            raise urllib.error.URLError("non-https redirect blocked")
+        target = urlsplit(newurl)
+        if (
+            target.scheme.lower() != "https"
+            or not target.hostname
+            or target.username is not None
+            or target.password is not None
+        ):
+            raise urllib.error.URLError("unsafe redirect blocked")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def probe(url: str) -> tuple[int | None, float, str]:
+    started = time.monotonic()
+    target = urlsplit(url)
+    if (
+        target.scheme.lower() != "https"
+        or not target.hostname
+        or target.username is not None
+        or target.password is not None
+    ):
+        return None, time.monotonic() - started, "HTTPS_REQUIRED"
+
     request = urllib.request.Request(
         url,
         headers={"User-Agent": USER_AGENT, "Accept": "text/html"},
         method="GET",
     )
-    started = time.monotonic()
     opener = urllib.request.build_opener(HTTPSOnlyRedirectHandler())
     try:
         # urllib's default HTTPSHandler retains certificate verification.
@@ -54,7 +72,7 @@ def probe(url: str) -> tuple[int | None, float, str]:
 def main() -> int:
     failures = 0
     print(
-        "TLS verification: enabled; HTTPS redirects only; credentials: none; "
+        "TLS verification: enabled; HTTPS only; max one redirect/page; credentials: none; "
         "install/download: no"
     )
     for name, base in MIRRORS:
