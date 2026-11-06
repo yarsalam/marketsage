@@ -110,3 +110,12 @@ The probe rejects non-HTTPS initial URLs and user-info URLs, rejects HTTPS-to-HT
 - Exact branch head after the code/test/contract update: `e19ddd8ac9367e841415122945189dd72a46521b`.
 - Exact `lifecycle.py` and `test_lifecycle.py` were copied unchanged into a temporary isolated package layout and run with `python -m unittest infra.control_plane.test_lifecycle -v`: **10 tests passed, exit code 0**.
 - This was an isolated harness, not a clean repository checkout or GitHub Actions run. It does not clear the separate manifest dependency bootstrap gate, prove durable storage, or establish process restart/distributed recovery. Continue to hold durable coordinator implementation until the manifest/lifecycle batch passes from the exact clean checkout.
+
+
+## 10. Fenced terminal-failure publication regression — 2026-11-06
+
+- A second fixture defect was found: terminal failure publication accepted only a task ID, so an expired worker could mark a task failed after a replacement worker had acquired a newer lease.
+- `mark_failed` now requires the active `Lease` and verifies owner plus monotonically increasing fencing token, matching the success-publication guard. Stale failure publication returns false and leaves the replacement lease intact.
+- Added a recovery test: worker A's expired lease cannot fail the task after worker B reclaims it; worker B can still publish the terminal failure.
+- Exact source/test files from branch head `0ad3e7323a7e20779017a47854f33c1b21c6321d` passed **11/11** in the temporary isolated harness, exit code 0.
+- Still not a clean checkout or CI run. The fixture is not durable/distributed, and manifest validation remains blocked by the separate package-index owner gate.
