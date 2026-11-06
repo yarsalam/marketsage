@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/marketsage/infra-task-v1.schema.json",
+  "$id": "urn:marketsage:infra-task-v1",
   "title": "MarketSage provider-neutral infrastructure task",
   "type": "object",
   "additionalProperties": false,
