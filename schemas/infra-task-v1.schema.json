@@ -132,10 +132,7 @@
           "const": "none"
         },
         "network_policy": {
-          "enum": [
-            "none",
-            "explicit_allowlist"
-          ]
+          "const": "none"
         },
         "production_access": {
           "const": false
