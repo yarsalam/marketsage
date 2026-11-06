@@ -105,3 +105,10 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 - The laptop Runner is registered and isolated for reviewed manual local workloads, but it is not an always-on control plane and does not establish 24/7 readiness. No local workflow is dispatched by this update.
 
 **Current status:** infrastructure not ready; durable queue/outbox, real provider adapters, restart recovery, stale-run monitoring, independent backend failover and a clean end-to-end zero-cost canary remain unproven. Research scoring/ranking, backtest approval, production deployment and trading remain disabled.
+
+
+### Additional infrastructure evidence — 2026-11-06
+
+- The in-memory fake-provider/coordinator fixture was executed in an isolated temporary harness: 9/9 lifecycle tests passed. This is not a clean repository checkout or a durable/distributed coordinator test. The manifest test remains blocked on the `jsonschema` dependency bootstrap.
+- The mirror probe has six offline regression tests, also passed only in a temporary harness. Actual worker-network reachability is still pending Issue #52.
+- PR #50's failure reporter shares the GitHub Actions runner pool it monitors. In run [42176190919](https://github.com/yarsalam/marketsage/actions/runs/42176190919), the reporter itself failed before steps with the other jobs. It cannot independently detect/report a provider-wide runner allocation outage; an external observer on a separately verified zero-cost path is required.

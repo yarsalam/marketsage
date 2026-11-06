@@ -82,3 +82,12 @@ The candidate mirror probe was reviewed and hardened before asking for a network
 **Owner-only network gate:** [Issue #52](https://github.com/yarsalam/marketsage/issues/52) tracks running the probe on the actual worker network. No mirror can be selected from desk research or this assistant's network. After a successful mirror probe, verify compatible wheels and install the unchanged dependency set in a clean isolated environment; only then run the manifest/lifecycle tests. Do not start durable storage implementation before those existing tests pass from the clean checkout.
 
 GitHub Actions remains at a zero-dollar usage/budget stop. Do not dispatch or rerun hosted workflows until included quota is verified to have reset or the owner separately authorizes spend. No paid provider, Oracle workaround, production VPS worker or private-code export is authorized.
+
+
+## 7. Isolated lifecycle-fixture execution — 2026-11-06
+
+The existing standard-library-only `infra/control_plane/lifecycle.py` and `test_lifecycle.py` were copied unchanged into a temporary isolated harness and executed with `python -m unittest`: **9 tests passed**. This provides an initial result for the in-memory fixture only. It is not a clean checkout, not a repository CI run, and not proof of persistence, process restart, distributed locking or provider failover.
+
+The `test_manifest` module still depends on `jsonschema` and remains unexecuted from a clean checkout because dependency bootstrap failed before test discovery. The exact-network mirror probe remains the next owner gate in Issue #52. Do not proceed to durable storage implementation until the prescribed clean-checkout manifest/lifecycle test batch passes.
+
+The PR #50 failure-notification job shares the same GitHub Actions runner pool as the jobs it observes. Run [42176190919](https://github.com/yarsalam/marketsage/actions/runs/42176190919) shows that the notifier also failed before steps during runner allocation. Therefore an external observer on a genuinely independent execution path is required; an Actions job cannot prove or report the health of the Actions runner pool when that pool cannot start jobs.

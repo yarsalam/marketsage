@@ -130,3 +130,19 @@ Every task must name its owner/agent, exact file scope, base commit, acceptance 
 5. Build a small Dagger portability proof only if it simplifies running the existing test commands.
 6. Select Woodpecker or Forgejo only after a suitable isolated compute host is available.
 7. Run the failover/recovery drills before expanding to other project queues.
+
+
+## 11. Independent monitoring failure domains — evidence 2026-11-06
+
+The failure-notification job added by PR #50 is hosted in the same GitHub Actions runner pool as the jobs it observes. On exact PR head `9098f110f615d46adbfa49f37e644000b832feb0`, run [42176190919](https://github.com/yarsalam/marketsage/actions/runs/42176190919) shows all hosted jobs, including `Post sanitized failure notice`, failed before any step started; the connector exposes no step logs. The owner recorded one bounded rerun with the same runner-allocation symptom.
+
+This demonstrates a failure-domain limitation: the in-workflow reporter can report ordinary job failures only when GitHub can allocate a runner for the reporter itself. It cannot independently report a provider-wide runner-allocation or account-capacity outage. It is a best-effort signal, not an external health monitor.
+
+Required design consequence:
+- Keep the GitHub-side reporter as a useful in-provider signal when it can run.
+- Add an independent observer/control-plane worker on a separately verified execution path. It must use read-only status access, detect missing/queued/stale runs and notification gaps, and persist its own heartbeat outside GitHub Actions.
+- Do not put that observer on the production Yarsalam VPS or assume the laptop is always online.
+- Do not use a second provider until its account eligibility, zero-cost hard stop, data handling and actual execution capacity are verified.
+- Do not trigger more GitHub-hosted runs while the current Actions budget is USD 0.
+
+The independent observer and recovery drill are required before the project can claim resilient unattended operation.
