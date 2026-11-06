@@ -71,8 +71,6 @@ jobs:
         with:
           node-version: 22
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-        with:
-          version: 10
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build
@@ -154,5 +152,6 @@ jobs:
           RUN_NUMBER: ${{ github.run_number }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
           SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
           API_URL: ${{ github.api_url }}
         run: python3 .github/scripts/post_ci_failure_notice.py
