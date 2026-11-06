@@ -100,6 +100,17 @@ class TaskManifestTests(unittest.TestCase):
         with self.assertRaises(ManifestValidationError):
             validate_manifest(invalid)
 
+    def test_reports_multiple_schema_errors_without_leaking_values(self) -> None:
+        invalid = {
+            **self.manifest,
+            "policy": {**self.manifest["policy"], "network_policy": "internet", "cost_ceiling_minor_units": 7},
+            "retry_policy": {"retry_on": ["not-a-retry-class"]},
+            "result_policy": {"allowed_artifacts": ["raw-market-data"]},
+        }
+        with self.assertRaises(ManifestValidationError) as caught:
+            validate_manifest(invalid)
+        self.assertGreaterEqual(len(caught.exception.issues), 4)
+
     def test_rejects_deadline_before_request(self) -> None:
         invalid = {**self.manifest, "deadline": self.manifest["requested_at"]}
         with self.assertRaises(ManifestValidationError):
