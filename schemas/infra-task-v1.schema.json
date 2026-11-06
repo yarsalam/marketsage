@@ -8,6 +8,7 @@
     "schema_version",
     "task_id",
     "idempotency_key",
+    "inputs_digest",
     "queue",
     "repository",
     "task_definition",
@@ -201,6 +202,10 @@
           "const": false
         }
       }
+    },
+    "inputs_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     }
   }
 }
