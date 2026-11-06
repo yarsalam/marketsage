@@ -1,10 +1,16 @@
 import json
+import os
 import re
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from post_ci_failure_notice import build_comment, failed_job_names, post_comment
+from post_ci_failure_notice import (
+    build_comment,
+    failed_job_names,
+    main,
+    post_comment,
+)
 
 
 class FailureNoticeTests(unittest.TestCase):
@@ -75,10 +81,33 @@ class FailureNoticeTests(unittest.TestCase):
         self.assertEqual(json.loads(request.data.decode())["body"], "sanitized only")
         self.assertNotIn("test-token", request.data.decode())
 
+    def test_main_dry_run_validates_failure_path_without_network(self):
+        env = {
+            "NEEDS_JSON": json.dumps({"analysis": {"result": "failure"}}),
+            "SERVER_URL": "https://github.com",
+            "REPOSITORY": "yarsalam/marketsage",
+            "RUN_ID": "12345",
+            "RUN_NUMBER": "67",
+            "RUN_ATTEMPT": "1",
+            "DRY_RUN": "1",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch("post_ci_failure_notice.post_comment") as mocked:
+                self.assertEqual(main(), 0)
+                mocked.assert_not_called()
+
+    def test_workflow_supplies_repository_context_to_failure_reporter(self):
+        root = Path(__file__).resolve().parents[2]
+        workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        self.assertRegex(
+            workflow,
+            r"(?m)^\\s*REPOSITORY:\\s+\\$\\{\\{\\s*github\\.repository\\s*\\}\\}\\s*$",
+        )
+
     def test_workflow_actions_are_pinned_to_full_commit_shas(self):
         root = Path(__file__).resolve().parents[2]
         workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-        refs = re.findall(r"^\s*(?:-\s*)?uses:\s+[^@\s]+@([0-9a-fA-F]+)", workflow, re.MULTILINE)
+        refs = re.findall(r"^\\s*(?:-\\s*)?uses:\\s+[^@\\s]+@([0-9a-fA-F]+)", workflow, re.MULTILINE)
         self.assertTrue(refs, "expected at least one external action")
         self.assertTrue(
             all(re.fullmatch(r"[0-9a-fA-F]{40}", ref) for ref in refs),
