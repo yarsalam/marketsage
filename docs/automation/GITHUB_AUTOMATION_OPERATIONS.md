@@ -29,6 +29,8 @@ The concurrency group is keyed by pull-request number when available, otherwise 
 
 The CI action references are pinned to full immutable commit SHAs, with the upstream release tag retained as a comment. Dependabot checks GitHub Actions weekly in one grouped PR. Review those PRs through CI before accepting an action update.
 
+A separate **Detect direct main updates** job runs only for push events to main. It compares the before/after SHAs and checks that each pushed commit is associated with a merged PR targeting main. A forced/non-fast-forward push, unassociated commit, oversized range, or unverifiable API response produces a sanitized warning on Issue #49 and a failed check. This is detection only; it does not prevent or revert a push and is not a substitute for a native ruleset/branch-protection rule. The check uses only read access to commit/PR metadata and issue-comment permission; it reports commit identifiers and fixed reason codes, not diffs, logs, or secrets.
+
 The build/test jobs and the CI-helper unit-test job use only `contents: read` and do not require repository secrets. A separate failure-notification job uses `contents: read` to check out the small reporter script and `issues: write` to add a sanitized comment to Issue #49; it reports the run link and failed job names only. It does not read logs or artifacts, write repository contents, or expose credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
 
 ## Manual-only local workflows
@@ -78,6 +80,7 @@ The current `main` branch must be protected before enabling any bot or workflow 
 - Daily schedule is merged to the default branch and at least one scheduled run succeeds.
 - Exact-head CI passes after the schedule/concurrency/timeout changes.
 - Concurrency cancellation and timeout behavior have been verified with controlled runs.
+- Direct-main-update detection has unit coverage for merged-PR commits, unassociated commits, forced/non-fast-forward pushes, and bounded range handling; the live job must be confirmed on a post-merge main push.
 - Failure notification and stuck-run detection are observable and tested.
 - Branch protection and spending limits are verified in repository/account settings.
 - A coding agent is enabled with least privilege and demonstrates a bounded issue-to-PR cycle.
