@@ -11,6 +11,7 @@ It provides:
 - Persistent task identity and idempotency-key uniqueness.
 - Atomic task claims using SQLite write transactions.
 - Monotonically increasing fencing tokens.
+- Lease renewal by the active owner without changing its fence; expired or superseded leases cannot renew, and renewal never shortens an existing expiry.
 - Lease expiry and recovery to a claimable state.
 - Rejection of stale worker results after lease expiry or reassignment.
 - Persistent terminal success/failure state.
@@ -32,7 +33,7 @@ Run the new tests from a clean checkout:
 python3 -m unittest -v infra.control_plane.test_sqlite_coordinator
 ```
 
-The tests cover restart persistence, idempotent enqueue across coordinator instances, identity conflicts, thread-level and separate-process claim exclusion, committed-state persistence after abrupt worker-process exit, lease expiry/reclaim, fencing against stale results, and terminal failure behavior.
+The tests cover restart persistence, idempotent enqueue across coordinator instances, identity conflicts, thread-level and separate-process claim exclusion, committed-state persistence after abrupt worker-process exit, lease expiry/reclaim, fenced lease renewal (including expired/stale lease rejection and no shortening), fencing against stale results, and terminal failure behavior.
 
 Before operational use, still validate:
 - Process-level contention under the intended filesystem and OS.
