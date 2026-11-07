@@ -32,7 +32,7 @@ Run the new tests from a clean checkout:
 python3 -m unittest -v infra.control_plane.test_sqlite_coordinator
 ```
 
-The tests cover restart persistence, idempotent enqueue across coordinator instances, identity conflicts, concurrent claim exclusion, lease expiry/reclaim, fencing against stale results, and terminal failure behavior.
+The tests cover restart persistence, idempotent enqueue across coordinator instances, identity conflicts, thread-level and separate-process claim exclusion, committed-state persistence after abrupt worker-process exit, lease expiry/reclaim, fencing against stale results, and terminal failure behavior.
 
 Before operational use, still validate:
 - Process-level contention under the intended filesystem and OS.
