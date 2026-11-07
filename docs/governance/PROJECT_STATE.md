@@ -1,6 +1,6 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-06  
+**Snapshot date:** 2026-11-07  
 **Repository:** yarsalam/marketsage (Private)  
 **Main HEAD:** 07e641670ceab22496ef976a584934464570fd9a  
 **Integration PR:** #6, feat/tindex-free-data-connector  
@@ -144,3 +144,17 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 - Added a regression covering stale worker A versus current worker B; stale failure publication is rejected, and the current lease can still publish a terminal test failure.
 - Exact lifecycle source/tests at `0ad3e7323a7e20779017a47854f33c1b21c6321d` passed **11/11** in a temporary isolated harness (exit code 0). This is not clean-checkout or CI evidence.
 - Durable storage, transactional outbox and real provider adapters remain blocked until the manifest/lifecycle tests pass from a clean checkout under the zero-cost policy.
+
+
+### Durable single-host coordinator and lease renewal — 2026-11-07
+
+- Draft PR [#54](https://github.com/yarsalam/marketsage/pull/54) adds a standard-library SQLite coordinator on `infra/sqlite-durable-coordinator-2026-11`. Current head: `e8f7d8add3df577120b92b8927c590aece001509`; target branch: `infra/provider-neutral-control-plane-2026-11`.
+- The component persists task/idempotency identity, state, lease owner/expiry, fencing token, result and terminal failure. It uses WAL, `synchronous=FULL`, bounded busy timeout and `BEGIN IMMEDIATE` transactions. Process-restart and separate-process claim-exclusion tests are included.
+- Added `renew_lease`: only the active, unexpired owner/fencing-token pair can renew; stale/expired leases are rejected; the expiry is never shortened. This is a primitive only—no periodic heartbeat worker or real provider dispatch is connected.
+- Owner exact-checkout validation of prior head `77d3a1a17d6f5e52b009c683cc369a5afac89eed` passed 11/11 tests. The current head adds five renewal tests (16 tests total); they have not yet been run. Exact-head owner validation is tracked in [Issue #55](https://github.com/yarsalam/marketsage/issues/55). PR #54 remains draft/open.
+- The PR branch and base have diverged from their common ancestor (8 commits ahead / 19 behind), though GitHub currently reports a clean mergeable state. Review the exact diff and latest base before any merge; no merge is authorized by this status update.
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52) now records that Novin-only isolated installation and 28/28 manifest/lifecycle/mirror tests passed on commit `99b25dc24daa8606514bd9910e883ef136cf5d7f`; a full Chabokan-only wheel installation and hash-locked dependency record remain pending.
+- [Issue #53](https://github.com/yarsalam/marketsage/issues/53) remains the owner action for GitHub Actions included-minute/reset/restriction status. No hosted dispatch or rerun is allowed until the zero-cost quota gate is resolved.
+- PR #50 remains unvalidated on its current head after runner-allocation failures before step 1. Its schedule and concurrency changes are not active on main. The failure reporter shares the same hosted pool and is not an independent outage monitor.
+
+**Infrastructure readiness remains NOT PROVEN.** SQLite is single-host only; no transactional provider outbox, real provider adapter, worker service, periodic heartbeat, dispatch reconciliation, backup/restore, disk-full/corruption recovery, independent health canary, provider failover or end-to-end 24/7 recovery drill has been demonstrated. Ordinary product/data/research work remains paused under Issue #49. PR #6 remains open and must not be merged to main without explicit owner approval; PR #14 is already merged into #6; PR #8 remains parked.
