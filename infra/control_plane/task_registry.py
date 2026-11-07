@@ -76,8 +76,10 @@ def validate_registry(records: Sequence[TaskRecord]) -> tuple[TaskRecord, ...]:
             raise TaskRegistryError(f"{record.task_id}: acceptance_criteria_missing")
         if not record.expected_artifacts or any(not item.strip() for item in record.expected_artifacts):
             raise TaskRegistryError(f"{record.task_id}: expected_artifacts_missing")
-        if record.timeout_seconds < 1:
-            raise TaskRegistryError(f"{record.task_id}: timeout_invalid")
+        if not 1 <= record.timeout_seconds <= 3600:
+            raise TaskRegistryError(f"{record.task_id}: timeout_out_of_bounds")
+        if not isinstance(record.status, TaskState):
+            raise TaskRegistryError(f"{record.task_id}: status_invalid")
         if not 1 <= record.max_attempts <= 3:
             raise TaskRegistryError(f"{record.task_id}: retry_budget_out_of_bounds")
         if not 0 <= record.attempt <= record.max_attempts:
