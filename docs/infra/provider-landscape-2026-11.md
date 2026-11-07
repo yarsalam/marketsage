@@ -118,3 +118,60 @@ Files inspected on the infrastructure branch:
 - The new branch name `infra/provider-neutral-control-plane-2026-11` is not included in the current `ci.yml` push branch filters, so ordinary pushes to this branch should not match that workflow. No workflow was dispatched and no PR was opened.
 
 Do not confuse a workflow definition with evidence of an execution. This audit is static only; no runner availability or workflow correctness is asserted.
+
+## Provider revalidation — 2026-11-07 (official pricing and limits)
+
+This section supersedes any earlier shorthand in the candidate matrix where current public pricing pages provide more precise numbers. It is still desk research: no accounts were connected, no private code was transferred, and no build was started.
+
+### Hosted execution candidates
+
+| Provider | Current public Free allowance | Interpretation for MarketSage | Current decision |
+|---|---|---|---|
+| CircleCI | Free plan: up to 6,000 build minutes on the small Docker resource class, 30,000 credits/month, 5 active users, up to 30x concurrency; no credit card required. Private repositories use the normal 30,000-credit allowance, not the larger open-source allowance. | Best first hosted fallback to test with a disposable public repository. Credits are resource-class-dependent; do not equate all job minutes with small-Docker minutes. Verify actual account access and hard-stop behavior before relying on it. | Candidate A; account login/access and quota exhaustion behavior still unverified. |
+| Buildkite | Free plan: up to 5 users, 10 concurrent self-hosted jobs, 2,000 Linux AMD64 vCPU-minutes/month on the small hosted shape, and up to 250k test executions/month. The small hosted shape is 2 vCPU, so 2,000 vCPU-minutes is not 2,000 ordinary wall-clock build minutes. | Strong secondary hosted pool plus a useful self-hosted-agent control plane. Separate the 30-day all-access trial from the ongoing Free-plan allowance. Verify the actual account's post-trial state and hard-stop behavior. | Candidate B; do not treat the trial as permanent capacity. |
+| GitLab.com Free | 400 compute minutes/month for Free namespaces on GitLab-hosted instance runners; usage resets monthly. | Good independent forge/CI fallback for a small set of high-value checks. Self-managed runners still require owner-controlled compute; do not assume they create free compute. | Candidate C; public dummy-repository test first. |
+| Gitee Go | Official Gitee product page advertises 200 free build minutes per repository and 1,000 per organization/month. | Potential additional quota, but deeply integrated with Gitee hosting. Requires a disposable public Gitee repository and a separate review of terms, account eligibility, region, webhooks, quota-stop and artifact handling. | Candidate D; no MarketSage private-code mirror or upload without separate approval. |
+| GitFlic hosted | Official documentation says companies with up to five members can use gitflic.ru without charge; CI/CD agents can be registered and Docker agents are supported. | Potential additional independent route, but legal eligibility, jurisdiction, data location, hosted limits and the trust boundary of Docker agents must be checked. | Candidate E; no private-code transfer before explicit approval and legal review. |
+
+### Lightweight external control plane candidate
+
+Cloudflare Workers Free is not a build runner. It can, however, be evaluated as a lightweight independent webhook/heartbeat/status endpoint:
+
+- Workers Free: 100,000 requests/day, 10 ms CPU per invocation and 128 MB memory.
+- D1 Free: 5 million rows read/day, 100,000 rows written/day and 5 GB total storage.
+- Queues Free: 10,000 operations/day; message retention is only 24 hours on the Free plan.
+- Queue consumers have a 15-minute wall-clock ceiling, but the Free Workers CPU limit remains very small; this is not suitable for running tests or building containers.
+
+Possible role: a thin external observer and wake-up channel, with D1 as the durable task ledger and Queue messages treated only as disposable wake-ups. The ledger must be able to reconstruct work after a Queue message expires. Keep records minimal and sanitized; review data location and terms before storing even private task metadata. This does not replace a compute worker or provide an always-on VPS.
+
+### Compute VM candidate — Google Cloud Free Tier
+
+Google Cloud documents one non-preemptible e2-micro VM per month in selected US regions, 30 GB-months of standard persistent disk and 1 GB/month outbound transfer. A billing account is required. The new-customer Free Trial gives USD 300 for 90 days and says no Google Cloud usage is billed during that trial; after upgrading to a paid billing account, usage beyond Free Tier limits is billable.
+
+The e2-micro is too small to be the primary MarketSage build worker, and the US-only region plus 1 GB egress limit make it a poor fit for repeated dependency-heavy builds. Do not create/upgrade a paid billing account or deploy resources under the current USD 0 ceiling. At most, reconsider it later for a very small external monitor after a separate hard-cost-control review.
+
+### Orchestration engine — Temporal
+
+Temporal Cloud currently advertises USD 150 in introductory credits for 90 days and usage-based pricing thereafter (including metered actions and storage); it is not a permanent free hosted control plane. Temporal OSS is self-hostable, but requires a continuously available service and persistence infrastructure. Keep it as a future engineering option, not as the current zero-cost hosted dependency. The present small coordinator prototype should first prove its manifest/lifecycle contracts and clean-checkout tests.
+
+### Revised implementation choice
+
+1. Keep GitHub as canonical source for now; do not mirror private code to another forge.
+2. Use CircleCI Free and Buildkite Free as the first two hosted-provider candidates, but test only with a disposable public repository until the owner separately approves private-repository integration.
+3. Evaluate GitLab.com Free as a third hosted CI option; use its 400-minute pool selectively.
+4. Evaluate Cloudflare Workers + D1 + Queues only for independent heartbeat/webhook/task-state metadata, never for compilation or tests.
+5. Keep Forgejo + Woodpecker as the self-hosted, replaceable worker stack when an isolated host exists. The owner's laptop remains on-demand only; Oracle signup is blocked by the provider's compliance response and must not be bypassed.
+6. Route work by measured eligibility and actual remaining quota. A missing quota API, trial credit, free-tier marketing claim or successful login is not proof that a task can run at zero cost. Stop before any overage, paid upgrade, card charge or private-code transfer.
+
+### Official sources checked on 2026-11-07
+
+- CircleCI Free pricing: https://circleci.com/pricing/
+- Buildkite Free pricing and agent limits: https://buildkite.com/pricing/
+- GitLab compute minutes: https://docs.gitlab.com/ci/pipelines/compute_minutes/
+- Gitee Go product and advertised quotas: https://gitee.com/features/gitee-go
+- GitFlic company billing and CI/CD agents: https://docs.gitflic.ru/latest/company/billing_for_company/ ; https://docs.gitflic.ru/latest/cicd/agent/ ; https://docs.gitflic.ru/latest/en/setup/runner/agent_types/
+- Cloudflare Workers limits/pricing: https://developers.cloudflare.com/workers/platform/limits/ ; https://developers.cloudflare.com/workers/platform/pricing/
+- Cloudflare D1 pricing: https://developers.cloudflare.com/d1/platform/pricing/
+- Cloudflare Queues pricing/limits: https://developers.cloudflare.com/queues/platform/pricing/ ; https://developers.cloudflare.com/queues/platform/limits/
+- Google Cloud Free Tier: https://docs.cloud.google.com/free/docs/free-cloud-features
+- Temporal Cloud pricing: https://temporal.io/pricing
