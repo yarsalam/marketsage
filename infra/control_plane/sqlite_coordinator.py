@@ -209,6 +209,40 @@ class SQLiteCoordinator:
                 connection.rollback()
                 raise
 
+    def renew_lease(
+        self,
+        *,
+        lease: Lease,
+        lease_seconds: int = 300,
+        now: Optional[float] = None,
+    ) -> bool:
+        """Extend a live lease without changing its fencing token.
+
+        An expired or superseded lease cannot be renewed, even before a
+        recovery sweep runs. Renewal never shortens an existing lease.
+        """
+        if lease_seconds < 1:
+            raise ValueError("lease_seconds must be positive")
+        current = time.time() if now is None else float(now)
+        expires = current + lease_seconds
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                cursor = connection.execute(
+                    """
+                    UPDATE tasks SET lease_expires_at=MAX(lease_expires_at, ?),
+                        updated_at=?
+                    WHERE task_id=? AND state='leased' AND owner=? AND fencing_token=?
+                        AND lease_expires_at>?
+                    """,
+                    (expires, current, lease.task_id, lease.owner, lease.fencing_token, current),
+                )
+                connection.commit()
+                return cursor.rowcount == 1
+            except Exception:
+                connection.rollback()
+                raise
+
     def recover_expired(self, *, now: Optional[float] = None) -> int:
         current = time.time() if now is None else float(now)
         with self._connection() as connection:
