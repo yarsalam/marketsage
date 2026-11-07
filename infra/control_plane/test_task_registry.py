@@ -66,6 +66,16 @@ class RegistryValidationTests(unittest.TestCase):
                 task("task-b", dependencies=("task-a",)),
             ))
 
+    def test_timeout_above_one_hour_is_rejected(self) -> None:
+        invalid = task("task-a")
+        with self.assertRaises(TaskRegistryError):
+            validate_registry((TaskRecord(**{**invalid.__dict__, "timeout_seconds": 3601}),))
+
+    def test_non_enum_task_status_is_rejected(self) -> None:
+        invalid = task("task-a")
+        with self.assertRaises(TaskRegistryError):
+            validate_registry((TaskRecord(**{**invalid.__dict__, "status": "READY"}),))
+
     def test_hard_safety_policy_rejects_cost_secret_or_privileged_actions(self) -> None:
         invalid = task("task-a")
         with self.assertRaises(TaskRegistryError):
