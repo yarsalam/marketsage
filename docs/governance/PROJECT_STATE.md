@@ -185,4 +185,4 @@ Parallel implementation is limited to isolated infrastructure streams that do no
 
 ### Governance PR for parallel decomposition — 2026-11-07
 - [PR #61](https://github.com/yarsalam/marketsage/pull/61) records the six infrastructure workstreams and their dependency/safety boundaries in this file and PR_REGISTER.md.
-- PR #61 is draft/open, documentation-only, two commits ahead of its infrastructure base at creation. No CI status checks were reported for its head at the latest inspection; hosted dispatch was not attempted due Issue #53.
+- PR #61 is draft/open and documentation-only. No CI status checks were reported for its head at the latest inspection; hosted dispatch was not attempted due Issue #53.
