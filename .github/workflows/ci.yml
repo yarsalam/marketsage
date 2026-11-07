@@ -141,7 +141,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Test sanitized failure notice helper
-        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+        run: python3 .github/scripts/test_post_ci_failure_notice.py -v
 
   notify-failure:
     name: Post sanitized failure notice
