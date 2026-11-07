@@ -95,6 +95,68 @@ class SQLiteCoordinatorTests(unittest.TestCase):
         )
         self.assertEqual(self.coordinator.get("task-1").state, "leased")
 
+    def test_active_lease_can_be_renewed_without_changing_fence(self) -> None:
+        lease = self.coordinator.claim(
+            task_id="task-1", owner="worker-a", lease_seconds=10, now=100
+        )
+        self.assertTrue(
+            self.coordinator.renew_lease(
+                lease=lease, lease_seconds=20, now=105
+            )
+        )
+        self.assertEqual(self.coordinator.get("task-1").fencing_token, lease.fencing_token)
+        self.assertEqual(self.coordinator.recover_expired(now=110), 0)
+        self.assertTrue(
+            self.coordinator.publish_result(lease=lease, result="renewed", now=124)
+        )
+
+    def test_expired_lease_cannot_be_renewed_before_recovery_sweep(self) -> None:
+        lease = self.coordinator.claim(
+            task_id="task-1", owner="worker-a", lease_seconds=2, now=100
+        )
+        self.assertFalse(
+            self.coordinator.renew_lease(
+                lease=lease, lease_seconds=30, now=102
+            )
+        )
+
+    def test_stale_lease_cannot_be_renewed_after_reclaim(self) -> None:
+        old = self.coordinator.claim(
+            task_id="task-1", owner="worker-a", lease_seconds=2, now=100
+        )
+        self.assertEqual(self.coordinator.recover_expired(now=102), 1)
+        new = self.coordinator.claim(
+            task_id="task-1", owner="worker-b", lease_seconds=30, now=102
+        )
+        self.assertFalse(
+            self.coordinator.renew_lease(
+                lease=old, lease_seconds=30, now=103
+            )
+        )
+        self.assertTrue(
+            self.coordinator.renew_lease(
+                lease=new, lease_seconds=30, now=103
+            )
+        )
+
+    def test_lease_renewal_requires_positive_duration(self) -> None:
+        lease = self.coordinator.claim(task_id="task-1", owner="worker-a", now=100)
+        with self.assertRaises(ValueError):
+            self.coordinator.renew_lease(
+                lease=lease, lease_seconds=0, now=101
+            )
+
+    def test_lease_renewal_never_shortens_existing_expiry(self) -> None:
+        lease = self.coordinator.claim(
+            task_id="task-1", owner="worker-a", lease_seconds=100, now=100
+        )
+        self.assertTrue(
+            self.coordinator.renew_lease(
+                lease=lease, lease_seconds=10, now=110
+            )
+        )
+        self.assertEqual(self.coordinator.recover_expired(now=199), 0)
+
     def test_terminal_failure_is_persisted_and_not_claimable(self) -> None:
         lease = self.coordinator.claim(
             task_id="task-1", owner="worker-a", now=100
