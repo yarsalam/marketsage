@@ -220,6 +220,10 @@ def assess_snapshot(
         reason_codes.append("provider_degraded")
     if provider_unknown:
         reason_codes.append("provider_health_unknown")
+    if not snapshot.providers:
+        reason_codes.append("provider_telemetry_missing")
+    if not snapshot.workers:
+        reason_codes.append("worker_telemetry_missing")
     if canary_missing:
         reason_codes.append("canary_missing")
     elif canary_clock_skew:
