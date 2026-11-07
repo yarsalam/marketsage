@@ -6,8 +6,8 @@ This document describes the repository automation boundary. It does not authoriz
 
 The `.github/workflows/ci.yml` workflow is intended to run on:
 
-- Pushes to `main`, `deploy/**`, `research/**`, and `ci/**`.
-- Pull requests targeting `main` or `deploy/**`.
+- Pushes to `main`, `deploy/**`, `research/**`, `ci/**`, and `infra/**`.
+- Pull requests targeting `main`, `deploy/**`, or `infra/**`.
 - A daily scheduled run at 03:17 UTC.
 - Manual `workflow_dispatch`.
 
@@ -67,7 +67,7 @@ If cloud agent is unavailable, evaluate a separately budgeted coding-agent integ
 
 ## Cost and account controls
 
-This repository is private. GitHub-hosted runner usage consumes the account's included Actions minutes and may be billed after the allowance is exhausted. The account plan, remaining quota, and billing budget are not visible to this workflow. Before increasing run frequency or adding agent jobs, inspect GitHub Actions usage and configure a hard spending limit that stops additional usage. Prefer bounded daily validation plus event-driven PR checks over minute-level polling.
+GitHub-hosted runner usage is free for standard runners in public repositories and consumes the account's included Actions minutes in private repositories; usage beyond the applicable allowance may be billed. The account plan, remaining quota, and billing budget are not visible to this workflow. Before increasing run frequency or adding agent jobs, inspect GitHub Actions usage and configure a hard spending limit that stops additional usage. Prefer bounded daily validation plus event-driven PR checks over minute-level polling.
 
 ## Protection and release boundary
 
