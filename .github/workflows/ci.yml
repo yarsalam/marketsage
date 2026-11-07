@@ -149,8 +149,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Test sanitized failure notice helper
-        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+      - name: Test CI and main provenance helpers
+        run: |
+          python3 .github/scripts/test_post_ci_failure_notice.py -v
+          python3 .github/scripts/test_detect_direct_main_update.py -v
 
   notify-failure:
     name: Post sanitized failure notice
