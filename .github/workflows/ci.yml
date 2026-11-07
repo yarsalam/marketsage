@@ -116,6 +116,31 @@ jobs:
       - name: Build all production images
         run: docker compose --env-file .env.production -f docker-compose.production.yml build
 
+  detect-direct-main-update:
+    name: Detect direct main updates
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify main commit provenance
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          API_URL: ${{ github.api_url }}
+          REPOSITORY: ${{ github.repository }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.event.after }}
+          FORCED: ${{ github.event.forced }}
+          SERVER_URL: ${{ github.server_url }}
+          RUN_ID: ${{ github.run_id }}
+        run: python3 .github/scripts/detect_direct_main_update.py
+
   ci-infra-tests:
     name: Test CI automation helpers
     runs-on: ubuntu-latest
