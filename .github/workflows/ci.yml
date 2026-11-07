@@ -2,9 +2,9 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**", "ci/**"]
+    branches: [main, "deploy/**", "research/**", "ci/**", "infra/**"]
   pull_request:
-    branches: [main, "deploy/**"]
+    branches: [main, "deploy/**", "infra/**"]
   # GitHub scheduled workflows run from the default branch after this PR is merged.
   # A daily full validation provides a bounded unattended health signal.
   schedule:
