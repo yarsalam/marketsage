@@ -115,10 +115,13 @@ class SchedulerTests(unittest.TestCase):
         record = task("task-a", attempt=1, max_attempts=2)
         started = transition(record, TaskState.RUNNING)
         self.assertEqual(started.attempt, 2)
+        waiting = transition(started, TaskState.READY)
+        self.assertEqual(waiting.attempt, 2)
         with self.assertRaises(TaskRegistryError):
-            transition(started, TaskState.READY)
+            transition(waiting, TaskState.RUNNING)
+        first_attempt = transition(task("task-b"), TaskState.RUNNING)
         with self.assertRaises(TaskRegistryError):
-            transition(transition(task("task-b"), TaskState.RUNNING), TaskState.RUNNING)
+            transition(first_attempt, TaskState.RUNNING)
 
     def test_terminal_task_cannot_be_reopened(self) -> None:
         completed = task("task-a", status=TaskState.DONE)
