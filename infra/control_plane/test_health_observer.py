@@ -122,8 +122,9 @@ class SnapshotAssessmentTests(unittest.TestCase):
             last_successful_canary_at=99,
         )
         assessment = assess_snapshot(snapshot, now=100)
-        self.assertEqual(assessment.level, HealthLevel.HEALTHY)
+        self.assertEqual(assessment.level, HealthLevel.DEGRADED)
         self.assertEqual(assessment.deadline_exceeded_count, 0)
+        self.assertIn("worker_telemetry_missing", assessment.reason_codes)
 
     def test_missing_provider_collection_is_not_reported_healthy(self) -> None:
         snapshot = ObserverSnapshot(
