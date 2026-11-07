@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 import tempfile
 import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -104,6 +108,82 @@ class SQLiteCoordinatorTests(unittest.TestCase):
         self.assertIsNone(
             self.coordinator.claim(task_id="task-1", owner="worker-b", now=102)
         )
+
+    def test_committed_task_survives_abrupt_process_exit(self) -> None:
+        script = """
+import os
+import sys
+from infra.control_plane.sqlite_coordinator import SQLiteCoordinator
+coordinator = SQLiteCoordinator(sys.argv[1])
+coordinator.enqueue(task_id="child-task", idempotency_key="child-key", input_digest="c" * 64)
+os._exit(0)
+"""
+        completed = subprocess.run(
+            [sys.executable, "-c", script, str(self.db)],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        reopened = SQLiteCoordinator(self.db)
+        self.assertEqual(reopened.get("child-task").state, "queued")
+
+    def test_only_one_separate_process_can_claim_task(self) -> None:
+        ready_a = Path(self.temp.name) / "ready-a"
+        ready_b = Path(self.temp.name) / "ready-b"
+        go = Path(self.temp.name) / "go"
+        script = """
+import pathlib
+import sys
+import time
+from infra.control_plane.sqlite_coordinator import SQLiteCoordinator
+database, ready, gate, owner = sys.argv[1:]
+pathlib.Path(ready).touch()
+deadline = time.monotonic() + 10
+while not pathlib.Path(gate).exists():
+    if time.monotonic() >= deadline:
+        raise SystemExit("claim gate timed out")
+    time.sleep(0.01)
+lease = SQLiteCoordinator(database).claim(task_id="task-1", owner=owner)
+print("CLAIMED" if lease is not None else "NOT_CLAIMED")
+"""
+        processes = [
+            subprocess.Popen(
+                [sys.executable, "-c", script, str(self.db), str(ready_a), str(go), "process-a"],
+                cwd=Path.cwd(),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            ),
+            subprocess.Popen(
+                [sys.executable, "-c", script, str(self.db), str(ready_b), str(go), "process-b"],
+                cwd=Path.cwd(),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            ),
+        ]
+        try:
+            deadline = time.monotonic() + 10
+            while not (ready_a.exists() and ready_b.exists()):
+                if time.monotonic() >= deadline:
+                    self.fail("worker processes did not reach the claim barrier")
+                time.sleep(0.01)
+            go.touch()
+            outputs = [process.communicate(timeout=10) for process in processes]
+            self.assertTrue(
+                all(process.returncode == 0 for process in processes),
+                [stderr for _, stderr in outputs],
+            )
+            outcomes = [stdout.strip() for stdout, _ in outputs]
+            self.assertCountEqual(outcomes, ["CLAIMED", "NOT_CLAIMED"])
+        finally:
+            for process in processes:
+                if process.poll() is None:
+                    process.kill()
+                    process.wait(timeout=5)
 
     def test_unknown_failure_class_is_rejected(self) -> None:
         lease = self.coordinator.claim(task_id="task-1", owner="worker-a")
