@@ -146,7 +146,7 @@ class GitHubApiTests(unittest.TestCase):
         request = mocked.call_args.args[0]
         body = json.loads(request.data.decode("utf-8"))["body"]
         self.assertNotIn("SECRET_TOKEN", body)
-        self.assertNotIn("commit message", body.lower())
+        self.assertNotIn("DO_NOT_LEAK_COMMIT_TITLE", body)
         self.assertIn("commit_without_merged_main_pr", body)
 
 
