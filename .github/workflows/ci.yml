@@ -2,19 +2,31 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**", "ci/**"]
+    branches: [main, "deploy/**", "research/**", "ci/**", "infra/**"]
   pull_request:
-    branches: [main, "deploy/**"]
+    branches: [main, "deploy/**", "infra/**"]
+  # GitHub scheduled workflows run from the default branch after this PR is merged.
+  # A daily full validation provides a bounded unattended health signal.
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+# Keep only the newest validation for the same PR/ref. A newer commit supersedes
+# an older queued run; independent branches remain isolated.
+concurrency:
+  group: marketsage-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analysis:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
           cache: pip
@@ -28,15 +40,16 @@ jobs:
 
   user-backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: user/user-backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           version: 9
       - name: Install dependencies
@@ -48,15 +61,16 @@ jobs:
 
   user-frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: user/user-frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           version: 10
       - name: Install dependencies
@@ -68,15 +82,16 @@ jobs:
 
   admin-workspace:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: admin-panel
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           version: 9
       - name: Install admin workspace dependencies
@@ -91,11 +106,71 @@ jobs:
   production-images:
     needs: [analysis, user-backend, user-frontend]
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Validate production Compose configuration
         run: |
           cp .env.production.example .env.production
           docker compose --env-file .env.production -f docker-compose.production.yml config -q
       - name: Build all production images
         run: docker compose --env-file .env.production -f docker-compose.production.yml build
+
+  infra-control-plane-tests:
+    name: Test provider-neutral control plane
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install infrastructure test dependency
+        run: python -m pip --isolated install --disable-pip-version-check --no-cache-dir -r requirements-infra.txt
+      - name: Test all control-plane modules
+        run: python -m unittest discover -s infra/control_plane -p 'test_*.py' -v
+
+  ci-infra-tests:
+    name: Test CI automation helpers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test sanitized failure notice helper
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+
+  notify-failure:
+    name: Post sanitized failure notice
+    needs:
+      - analysis
+      - user-backend
+      - user-frontend
+      - admin-workspace
+      - production-images
+      - infra-control-plane-tests
+      - ci-infra-tests
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Post job-level status to infrastructure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          API_URL: ${{ github.api_url }}
+        run: python3 .github/scripts/post_ci_failure_notice.py
