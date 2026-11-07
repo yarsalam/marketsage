@@ -125,6 +125,26 @@ class SnapshotAssessmentTests(unittest.TestCase):
         self.assertEqual(assessment.level, HealthLevel.HEALTHY)
         self.assertEqual(assessment.deadline_exceeded_count, 0)
 
+    def test_missing_provider_collection_is_not_reported_healthy(self) -> None:
+        snapshot = ObserverSnapshot(
+            collected_at=100,
+            workers=(WorkerHeartbeat("worker-a", 99),),
+            last_successful_canary_at=99,
+        )
+        assessment = assess_snapshot(snapshot, now=100)
+        self.assertEqual(assessment.level, HealthLevel.DEGRADED)
+        self.assertIn("provider_telemetry_missing", assessment.reason_codes)
+
+    def test_missing_worker_collection_is_not_reported_healthy(self) -> None:
+        snapshot = ObserverSnapshot(
+            collected_at=100,
+            providers=(ProviderTelemetry("provider-a", ProviderHealth.HEALTHY),),
+            last_successful_canary_at=99,
+        )
+        assessment = assess_snapshot(snapshot, now=100)
+        self.assertEqual(assessment.level, HealthLevel.DEGRADED)
+        self.assertIn("worker_telemetry_missing", assessment.reason_codes)
+
     def test_no_observations_is_unknown(self) -> None:
         assessment = assess_snapshot(ObserverSnapshot(collected_at=100), now=100)
         self.assertEqual(assessment.level, HealthLevel.UNKNOWN)
