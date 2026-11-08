@@ -1,8 +1,7 @@
-"""Durable, single-host SQLite task coordinator.
+"""Durable, single-host SQLite task coordinator with fenced execution lifecycle.
 
-SQLite WAL provides process-safe transactions on one host. This module is not a
-multi-host distributed database and must not be placed on an arbitrary network
-filesystem. All transitions are fenced by monotonically increasing lease tokens.
+SQLite WAL coordinates processes on one host only. Use a local persistent
+filesystem, not shared NFS. Every lease mutation is fenced by a monotonic token.
 """
 from __future__ import annotations
 
@@ -27,16 +26,16 @@ class TaskSnapshot:
     lease_expires_at: Optional[float]
     result: Optional[str]
     failure_class: Optional[str]
+    provider_id: Optional[str]
+    external_run_id: Optional[str]
+    heartbeat_at: Optional[float]
 
 
 class SQLiteCoordinator:
-    """Persistent single-host coordinator with atomic claims and fenced results.
+    """Persistent, transactional task intake, dispatch, lease and result ledger."""
 
-    Use a local persistent filesystem. Each operation opens its own connection,
-    so multiple processes can coordinate through SQLite's transactional locks.
-    """
-
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
+    _STATES = "'queued','leased','recoverable','submitted','running','succeeded','failed','cancelled'"
 
     def __init__(self, database_path: str | Path, *, busy_timeout_ms: int = 5000) -> None:
         self.database_path = str(database_path)
@@ -67,40 +66,73 @@ class SQLiteCoordinator:
         finally:
             connection.close()
 
+    @classmethod
+    def _create_tasks_table(cls, connection: sqlite3.Connection, table: str = "tasks") -> None:
+        if table not in {"tasks", "tasks_v2"}:
+            raise ValueError("invalid internal table name")
+        connection.execute(
+            f"""
+            CREATE TABLE {table} (
+                task_id TEXT PRIMARY KEY,
+                idempotency_key TEXT NOT NULL UNIQUE,
+                input_digest TEXT NOT NULL,
+                state TEXT NOT NULL CHECK (state IN ({cls._STATES})),
+                owner TEXT,
+                fencing_token INTEGER NOT NULL DEFAULT 0 CHECK (fencing_token >= 0),
+                lease_expires_at REAL,
+                result TEXT,
+                failure_class TEXT,
+                provider_id TEXT,
+                external_run_id TEXT,
+                heartbeat_at REAL,
+                created_at REAL NOT NULL,
+                updated_at REAL NOT NULL,
+                CHECK (
+                    (state = 'leased' AND owner IS NOT NULL AND lease_expires_at IS NOT NULL)
+                    OR
+                    (state <> 'leased' AND owner IS NULL AND lease_expires_at IS NULL)
+                ),
+                CHECK (
+                    (provider_id IS NULL AND external_run_id IS NULL)
+                    OR
+                    (provider_id IS NOT NULL AND external_run_id IS NOT NULL)
+                )
+            )
+            """
+        )
+
     def _initialize(self) -> None:
         with self._connection() as connection:
             connection.execute("PRAGMA journal_mode=WAL")
             version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if version not in (0, self.SCHEMA_VERSION):
+            if version not in (0, 1, self.SCHEMA_VERSION):
                 raise RuntimeError("unsupported coordinator database schema version")
             connection.execute("BEGIN IMMEDIATE")
             try:
-                connection.execute(
-                    """
-                    CREATE TABLE IF NOT EXISTS tasks (
-                        task_id TEXT PRIMARY KEY,
-                        idempotency_key TEXT NOT NULL UNIQUE,
-                        input_digest TEXT NOT NULL,
-                        state TEXT NOT NULL CHECK (
-                            state IN ('queued','leased','recoverable','succeeded','failed')
-                        ),
-                        owner TEXT,
-                        fencing_token INTEGER NOT NULL DEFAULT 0 CHECK (fencing_token >= 0),
-                        lease_expires_at REAL,
-                        result TEXT,
-                        failure_class TEXT,
-                        created_at REAL NOT NULL,
-                        updated_at REAL NOT NULL,
-                        CHECK (
-                            (state = 'leased' AND owner IS NOT NULL AND lease_expires_at IS NOT NULL)
-                            OR
-                            (state <> 'leased' AND owner IS NULL AND lease_expires_at IS NULL)
+                if version == 0:
+                    self._create_tasks_table(connection)
+                elif version == 1:
+                    # Rebuild because SQLite cannot widen the v1 CHECK constraint.
+                    connection.execute("DROP INDEX IF EXISTS tasks_state_expiry")
+                    connection.execute("ALTER TABLE tasks RENAME TO tasks_v1")
+                    self._create_tasks_table(connection)
+                    connection.execute(
+                        """
+                        INSERT INTO tasks (
+                            task_id,idempotency_key,input_digest,state,owner,fencing_token,
+                            lease_expires_at,result,failure_class,created_at,updated_at
                         )
+                        SELECT task_id,idempotency_key,input_digest,state,owner,fencing_token,
+                               lease_expires_at,result,failure_class,created_at,updated_at
+                        FROM tasks_v1
+                        """
                     )
-                    """
-                )
+                    connection.execute("DROP TABLE tasks_v1")
                 connection.execute(
                     "CREATE INDEX IF NOT EXISTS tasks_state_expiry ON tasks(state, lease_expires_at)"
+                )
+                connection.execute(
+                    "CREATE INDEX IF NOT EXISTS tasks_provider_run ON tasks(provider_id, external_run_id)"
                 )
                 connection.execute(f"PRAGMA user_version={self.SCHEMA_VERSION}")
                 connection.commit()
@@ -120,6 +152,9 @@ class SQLiteCoordinator:
             lease_expires_at=row["lease_expires_at"],
             result=row["result"],
             failure_class=row["failure_class"],
+            provider_id=row["provider_id"],
+            external_run_id=row["external_run_id"],
+            heartbeat_at=row["heartbeat_at"],
         )
 
     def enqueue(self, *, task_id: str, idempotency_key: str, input_digest: str) -> TaskSnapshot:
@@ -133,8 +168,8 @@ class SQLiteCoordinator:
                     "SELECT * FROM tasks WHERE idempotency_key=?", (idempotency_key,)
                 ).fetchone()
                 if row is not None:
-                    if row["input_digest"] != input_digest:
-                        raise IdempotencyConflict("idempotency key/input mismatch")
+                    if row["input_digest"] != input_digest or row["task_id"] != task_id:
+                        raise IdempotencyConflict("idempotency key/task identity mismatch")
                     connection.commit()
                     return self._snapshot(row)
                 row = connection.execute(
@@ -160,11 +195,7 @@ class SQLiteCoordinator:
                 raise
 
     def claim(
-        self,
-        *,
-        task_id: str,
-        owner: str,
-        lease_seconds: int = 300,
+        self, *, task_id: str, owner: str, lease_seconds: int = 300,
         now: Optional[float] = None,
     ) -> Optional[Lease]:
         if not owner or lease_seconds < 1:
@@ -210,17 +241,9 @@ class SQLiteCoordinator:
                 raise
 
     def renew_lease(
-        self,
-        *,
-        lease: Lease,
-        lease_seconds: int = 300,
-        now: Optional[float] = None,
+        self, *, lease: Lease, lease_seconds: int = 300, now: Optional[float] = None,
     ) -> bool:
-        """Extend a live lease without changing its fencing token.
-
-        An expired or superseded lease cannot be renewed, even before a
-        recovery sweep runs. Renewal never shortens an existing lease.
-        """
+        """Extend a live lease without changing its fencing token."""
         if lease_seconds < 1:
             raise ValueError("lease_seconds must be positive")
         current = time.time() if now is None else float(now)
@@ -230,8 +253,7 @@ class SQLiteCoordinator:
             try:
                 cursor = connection.execute(
                     """
-                    UPDATE tasks SET lease_expires_at=MAX(lease_expires_at, ?),
-                        updated_at=?
+                    UPDATE tasks SET lease_expires_at=MAX(lease_expires_at, ?), updated_at=?
                     WHERE task_id=? AND state='leased' AND owner=? AND fencing_token=?
                         AND lease_expires_at>?
                     """,
@@ -239,6 +261,149 @@ class SQLiteCoordinator:
                 )
                 connection.commit()
                 return cursor.rowcount == 1
+            except Exception:
+                connection.rollback()
+                raise
+
+    def release_for_reconciliation(
+        self, *, lease: Lease, now: Optional[float] = None,
+    ) -> bool:
+        """Release an active dispatch lease while preserving the outbox's retry gate."""
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            cursor = connection.execute(
+                """
+                UPDATE tasks SET state='recoverable', owner=NULL, lease_expires_at=NULL,
+                    updated_at=?
+                WHERE task_id=? AND state='leased' AND owner=? AND fencing_token=?
+                    AND lease_expires_at>?
+                """,
+                (current, lease.task_id, lease.owner, lease.fencing_token, current),
+            )
+            return cursor.rowcount == 1
+
+    def mark_submitted(
+        self, *, lease: Lease, provider_id: str, external_run_id: str,
+        now: Optional[float] = None,
+    ) -> bool:
+        """Attach the accepted backend run and release the dispatch lease atomically."""
+        if not provider_id or not external_run_id:
+            raise ValueError("provider and external run identity are required")
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                cursor = connection.execute(
+                    """
+                    UPDATE tasks SET state='submitted', owner=NULL, lease_expires_at=NULL,
+                        provider_id=?, external_run_id=?, heartbeat_at=?, updated_at=?
+                    WHERE task_id=? AND state='leased' AND owner=? AND fencing_token=?
+                        AND lease_expires_at>?
+                    """,
+                    (
+                        provider_id, external_run_id, current, current,
+                        lease.task_id, lease.owner, lease.fencing_token, current,
+                    ),
+                )
+                connection.commit()
+                return cursor.rowcount == 1
+            except Exception:
+                connection.rollback()
+                raise
+
+    def mark_provider_running(
+        self, *, task_id: str, provider_id: str, external_run_id: str,
+        now: Optional[float] = None,
+    ) -> bool:
+        return self.record_provider_heartbeat(
+            task_id=task_id, provider_id=provider_id,
+            external_run_id=external_run_id, running=True, now=now,
+        )
+
+    def record_provider_heartbeat(
+        self, *, task_id: str, provider_id: str, external_run_id: str,
+        running: bool = False, now: Optional[float] = None,
+    ) -> bool:
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                states = ("submitted", "running")
+                row = connection.execute(
+                    "SELECT state FROM tasks WHERE task_id=? AND provider_id=? AND external_run_id=?",
+                    (task_id, provider_id, external_run_id),
+                ).fetchone()
+                if row is None or row["state"] not in states:
+                    connection.commit()
+                    return False
+                target = "running" if running else row["state"]
+                connection.execute(
+                    """
+                    UPDATE tasks SET state=?, heartbeat_at=?, updated_at=?
+                    WHERE task_id=? AND provider_id=? AND external_run_id=?
+                        AND state IN ('submitted','running')
+                    """,
+                    (target, current, current, task_id, provider_id, external_run_id),
+                )
+                connection.commit()
+                return True
+            except Exception:
+                connection.rollback()
+                raise
+
+    def publish_provider_result(
+        self, *, task_id: str, provider_id: str, external_run_id: str,
+        state: str, result: Optional[str] = None,
+        failure_class: Optional[str] = None, now: Optional[float] = None,
+    ) -> bool:
+        """Persist a provider terminal state only for its bound external run."""
+        if state not in {"succeeded", "failed", "cancelled"}:
+            raise ValueError("provider result must be terminal")
+        if state == "failed" and failure_class not in {
+            "test_failure", "code_failure", "provider_failure", "worker_timeout"
+        }:
+            raise ValueError("failure_class is not allowlisted")
+        if state != "failed" and failure_class is not None:
+            raise ValueError("failure_class is only valid for failed tasks")
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                row = connection.execute(
+                    """
+                    SELECT state,result,failure_class FROM tasks
+                    WHERE task_id=? AND provider_id=? AND external_run_id=?
+                    """,
+                    (task_id, provider_id, external_run_id),
+                ).fetchone()
+                if row is None:
+                    connection.commit()
+                    return False
+                if row["state"] in {"succeeded", "failed", "cancelled"}:
+                    identical = (
+                        row["state"] == state
+                        and row["result"] == result
+                        and row["failure_class"] == failure_class
+                    )
+                    connection.commit()
+                    return identical
+                if row["state"] not in {"submitted", "running"}:
+                    connection.commit()
+                    return False
+                connection.execute(
+                    """
+                    UPDATE tasks SET state=?, result=?, failure_class=?,
+                        heartbeat_at=?, updated_at=?
+                    WHERE task_id=? AND provider_id=? AND external_run_id=?
+                        AND state IN ('submitted','running')
+                    """,
+                    (
+                        state, result, failure_class, current, current,
+                        task_id, provider_id, external_run_id,
+                    ),
+                )
+                connection.commit()
+                return True
             except Exception:
                 connection.rollback()
                 raise
@@ -284,7 +449,7 @@ class SQLiteCoordinator:
                 raise
 
     def mark_failed(
-        self, *, lease: Lease, failure_class: str, now: Optional[float] = None
+        self, *, lease: Lease, failure_class: str, now: Optional[float] = None,
     ) -> bool:
         if failure_class not in {"test_failure", "code_failure"}:
             raise ValueError("only terminal task failures are accepted here")
@@ -309,9 +474,16 @@ class SQLiteCoordinator:
 
     def get(self, task_id: str) -> TaskSnapshot:
         with self._connection() as connection:
-            row = connection.execute(
-                "SELECT * FROM tasks WHERE task_id=?", (task_id,)
-            ).fetchone()
+            row = connection.execute("SELECT * FROM tasks WHERE task_id=?", (task_id,)).fetchone()
         if row is None:
             raise KeyError(task_id)
+        return self._snapshot(row)
+
+    def get_by_idempotency_key(self, idempotency_key: str) -> TaskSnapshot:
+        with self._connection() as connection:
+            row = connection.execute(
+                "SELECT * FROM tasks WHERE idempotency_key=?", (idempotency_key,)
+            ).fetchone()
+        if row is None:
+            raise KeyError(idempotency_key)
         return self._snapshot(row)
