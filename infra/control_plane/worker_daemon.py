@@ -186,7 +186,7 @@ class DurableWorkerDaemon:
         recovered = self.coordinator.recover_expired()
         self.coordinator.record_worker_heartbeat(
             worker_id=self.worker_id,
-            status="healthy",
+            status="idle",
         )
         inspected = executed = succeeded = failed = skipped = 0
         reasons: list[str] = []
