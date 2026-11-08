@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Optional
 
 from .dispatch_outbox import DispatchSnapshot, DispatchState, SQLiteDispatchOutbox
+from .docker_worker import CoordinatedDockerWorker, WorkerRunResult
 from .lifecycle import Lease, RunState
 from .manifest import validate_manifest
 from .providers import DispatchDecision, ProviderReceipt, SafeFailoverRouter
@@ -196,6 +197,33 @@ class DurableOrchestrator:
             task_id=task_id,
             idempotency_key=idempotency_key,
             input_digest=input_digest,
+        )
+
+    def execute_with_worker(
+        self, *,
+        worker: CoordinatedDockerWorker,
+        manifest: Mapping[str, Any],
+        profile: Any,
+        trust: Any,
+        workspace: str,
+        command_id: str,
+        no_side_effects_on_failure: bool = False,
+    ) -> WorkerRunResult:
+        """Run an already-submitted task using a separately attested local sandbox worker."""
+        validate_manifest(manifest)
+        if worker.coordinator is not self.coordinator or worker.outbox is not self.outbox:
+            raise ValueError("worker must share this orchestrator's durable coordinator and outbox")
+        task_id, idempotency_key, input_digest = self._identity(manifest)
+        task = self.coordinator.get(task_id)
+        if task.idempotency_key != idempotency_key or task.input_digest != input_digest:
+            raise ValueError("manifest does not match the persisted task identity")
+        return worker.run_submitted_task(
+            manifest=manifest,
+            profile=profile,
+            trust=trust,
+            workspace=workspace,
+            command_id=command_id,
+            no_side_effects_on_failure=no_side_effects_on_failure,
         )
 
     def reconcile(self, manifest: Mapping[str, Any]) -> OrchestrationResult:
