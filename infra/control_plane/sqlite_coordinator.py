@@ -179,6 +179,15 @@ class SQLiteCoordinator:
                     "CREATE INDEX IF NOT EXISTS worker_heartbeats_updated ON worker_heartbeats(heartbeat_at)"
                 )
                 connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS health_canaries (
+                        canary_id TEXT PRIMARY KEY,
+                        last_successful_at REAL NOT NULL,
+                        success_count INTEGER NOT NULL CHECK (success_count >= 1)
+                    )
+                    """
+                )
+                connection.execute(
                     "INSERT INTO infra_schema_versions(component,version) VALUES('sqlite_coordinator',?) "
                     "ON CONFLICT(component) DO UPDATE SET version=excluded.version",
                     (self.SCHEMA_VERSION,),
@@ -620,6 +629,39 @@ class SQLiteCoordinator:
             except Exception:
                 connection.rollback()
                 raise
+
+    def record_successful_canary(
+        self, *, canary_id: str, now: Optional[float] = None,
+    ) -> float:
+        """Record a canary only after its complete end-to-end acceptance succeeds."""
+        if not canary_id or len(canary_id) > 128:
+            raise ValueError("canary_id is required and must be bounded")
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                connection.execute(
+                    """
+                    INSERT INTO health_canaries(canary_id,last_successful_at,success_count)
+                    VALUES(?,?,1)
+                    ON CONFLICT(canary_id) DO UPDATE SET
+                        last_successful_at=excluded.last_successful_at,
+                        success_count=health_canaries.success_count+1
+                    """,
+                    (canary_id, current),
+                )
+                connection.commit()
+                return current
+            except Exception:
+                connection.rollback()
+                raise
+
+    def latest_successful_canary_at(self) -> Optional[float]:
+        with self._connection() as connection:
+            row = connection.execute(
+                "SELECT MAX(last_successful_at) AS latest FROM health_canaries"
+            ).fetchone()
+        return None if row is None else row["latest"]
 
     def list_worker_heartbeats(self, *, limit: int = 256) -> tuple[WorkerHeartbeatSnapshot, ...]:
         if not 1 <= limit <= 2048:
