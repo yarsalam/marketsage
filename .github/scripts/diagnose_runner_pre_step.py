@@ -99,8 +99,10 @@ def inspect_diagnostics(runner_dir: str | Path) -> dict[str, object]:
             version_match = _VERSION.search(content)
             if version_match:
                 runner_version = version_match.group(1)
-        for category, pattern in _PATTERNS.items():
-            counts[category] += len(pattern.findall(content))
+        for line in content.splitlines():
+            for category, pattern in _PATTERNS.items():
+                if pattern.search(line):
+                    counts[category] += 1
 
     observed = {key: value for key, value in counts.items() if value}
     status = "ok" if files and read_errors < len(files) else "insufficient_evidence"
