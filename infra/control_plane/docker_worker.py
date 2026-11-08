@@ -63,6 +63,7 @@ class WorkerRunResult:
     task_state: str
     execution: Optional[SandboxExecutionResult]
     reason_code: Optional[str] = None
+    reconciled: bool = False
 
 
 class DockerSandboxExecutor:
@@ -537,6 +538,7 @@ class CoordinatedDockerWorker:
                 task_state=current.state,
                 execution=None,
                 reason_code="reconciled_from_outbox" if published else "coordinator_rejected_reconciliation",
+                reconciled=published,
             )
 
         self.coordinator.record_worker_heartbeat(
