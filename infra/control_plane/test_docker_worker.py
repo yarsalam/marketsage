@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import subprocess
 import tempfile
+import time
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -57,6 +59,10 @@ class FakeSandboxExecutor:
     def execute(self, **kwargs) -> SandboxExecutionResult:
         self.calls += 1
         return self.result
+
+
+class SimulatedWorkerProcessCrash(BaseException):
+    pass
 
 
 class CoordinatedDockerWorkerTests(unittest.TestCase):
@@ -207,6 +213,47 @@ class CoordinatedDockerWorkerTests(unittest.TestCase):
             idempotency_key=self.manifest["idempotency_key"],
             provider_id="second-backend",
         ))
+
+    def test_restart_reconciles_terminal_outbox_without_reexecuting_worker(self) -> None:
+        self.orchestrator.submit(self.manifest)
+        executor = FakeSandboxExecutor(
+            SandboxExecutionResult("completed", 0, False, False, 17, "d" * 64)
+        )
+        worker = self._worker(executor)
+        with patch.object(
+            self.coordinator,
+            "publish_result",
+            side_effect=SimulatedWorkerProcessCrash(),
+        ):
+            with self.assertRaises(SimulatedWorkerProcessCrash):
+                worker.run_submitted_task(
+                    manifest=self.manifest,
+                    profile=self.profile,
+                    trust=self.trust,
+                    workspace=self.temp.name,
+                    command_id="infra.sandbox.smoke",
+                )
+
+        self.assertEqual(executor.calls, 1)
+        self.assertEqual(
+            self.outbox.get(self.manifest["idempotency_key"]).state,
+            DispatchState.SUCCEEDED,
+        )
+        self.coordinator.recover_expired(now=time.time() + 3600)
+
+        recovered = worker.run_submitted_task(
+            manifest=self.manifest,
+            profile=self.profile,
+            trust=self.trust,
+            workspace=self.temp.name,
+            command_id="infra.sandbox.smoke",
+        )
+        self.assertTrue(recovered.claimed)
+        self.assertTrue(recovered.published)
+        self.assertEqual(recovered.task_state, "succeeded")
+        self.assertEqual(recovered.reason_code, "reconciled_from_outbox")
+        self.assertIsNone(recovered.execution)
+        self.assertEqual(executor.calls, 1)
 
     def test_worker_refuses_unsubmitted_task_without_invoking_executor(self) -> None:
         task_id, key, digest = (
