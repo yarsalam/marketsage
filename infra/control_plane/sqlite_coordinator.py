@@ -427,6 +427,49 @@ class SQLiteCoordinator:
                 connection.rollback()
                 raise
 
+    def publish_reconciled_outbox_terminal(
+        self, *, lease: Lease, provider_id: str, external_run_id: str,
+        state: str, result: str, failure_class: Optional[str] = None,
+        now: Optional[float] = None,
+    ) -> bool:
+        """Close a recovered worker lease from an already-terminal durable Outbox.
+
+        This is specifically for the crash window after Outbox terminal commit
+        but before Coordinator result publication. A live fenced lease is
+        required, and the provider/run identity must match the task record.
+        """
+        if state not in {"succeeded", "failed", "cancelled"}:
+            raise ValueError("reconciled outbox state must be terminal")
+        if state == "failed" and failure_class not in {
+            "worker_timeout", "worker_runtime_failure", "code_failure", "provider_failure"
+        }:
+            raise ValueError("failure_class is not allowlisted")
+        if state != "failed" and failure_class is not None:
+            raise ValueError("failure_class only applies to failed tasks")
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                cursor = connection.execute(
+                    """
+                    UPDATE tasks SET state=?, owner=NULL, lease_expires_at=NULL,
+                        result=?, failure_class=?, heartbeat_at=?, updated_at=?
+                    WHERE task_id=? AND state='leased' AND owner=? AND fencing_token=?
+                        AND lease_expires_at>?
+                        AND provider_id=? AND external_run_id=?
+                    """,
+                    (
+                        state, result, failure_class, current, current,
+                        lease.task_id, lease.owner, lease.fencing_token, current,
+                        provider_id, external_run_id,
+                    ),
+                )
+                connection.commit()
+                return cursor.rowcount == 1
+            except Exception:
+                connection.rollback()
+                raise
+
     def mark_provider_running(
         self, *, task_id: str, provider_id: str, external_run_id: str,
         now: Optional[float] = None,
