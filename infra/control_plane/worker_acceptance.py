@@ -141,6 +141,19 @@ def main() -> int:
             workspace=str(Path(args.workspace).resolve()),
             command_id="infra.sandbox.smoke",
         )
+        summary = {
+            "claimed": result.claimed,
+            "published": result.published,
+            "task_state": result.task_state,
+            "reason_code": result.reason_code,
+            "worker_status": result.execution.status if result.execution else None,
+            "exit_code": result.execution.exit_code if result.execution else None,
+            "timed_out": result.execution.timed_out if result.execution else None,
+            "output_limit_exceeded": result.execution.output_limit_exceeded if result.execution else None,
+            "output_bytes": result.execution.output_bytes if result.execution else None,
+            "output_sha256": result.execution.output_sha256 if result.execution else None,
+        }
+        print(json.dumps({"worker": summary}, sort_keys=True))
         if not result.claimed or not result.published or result.task_state != "succeeded":
             raise SystemExit("sandbox worker did not publish a successful terminal result")
         if result.execution is None or not result.execution.succeeded:
