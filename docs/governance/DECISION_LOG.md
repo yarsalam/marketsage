@@ -179,3 +179,29 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
+
+
+## 2026-11-08 — Resume MarketSage product development with an evidence-first coverage workspace
+
+**Decision authority:** Owner  
+**Status:** Approved explicitly in conversation; initial implementation tracked in Issue #72 and branch `research/market-coverage-workspace-2026-11`.
+
+**Decision**
+- Resume the MarketSage product workstream. Product delivery must not remain indefinitely blocked by infrastructure acceptance work.
+- Preserve the existing internal investment-decision objective and approximately six-month decision horizon across Iranian and global markets as separate investable universes.
+- Begin with a transparent Market Coverage Workspace. Surface existing source registry, runtime data-quality and Iranian provider-readiness data through the user API and Persian RTL UI.
+- Keep source permission, identity, units, timestamp quality, history, revisions, corporate actions and independent reconciliation visible as explicit acceptance gates. Unknown remains blocked, not passed.
+- Continue to treat infrastructure as a separate workstream. Its current host-level rootless setup evidence and the latest failed GitHub self-hosted acceptance run must both remain accurately recorded. This product restart does not waive the infrastructure gates or change their status.
+
+**Non-authorization / capital-risk boundary**
+- This decision does not authorize investment scoring/ranking changes, calibrated probabilities, backtest approval, production decision mode, broker integration, real-money trading or capital allocation.
+- No source approval flag may be changed merely because it appears in the UI or is represented by a working adapter.
+- No change to the product objective, asset-universe principles, fundamental modeling direction or material capital-risk assumptions is approved by this decision.
+
+**Implementation**
+- Product Phase 1 Issue: [#72](https://github.com/yarsalam/marketsage/issues/72).
+- Product plan: `docs/PRODUCT_RESTART_PLAN_2026-11.md`.
+- Initial code branch: `research/market-coverage-workspace-2026-11`.
+- PR and exact CI evidence will be recorded in the Project State and PR Register when available.
+
+**Capital-risk impact:** None. This is a product transparency and data-observability increment.
