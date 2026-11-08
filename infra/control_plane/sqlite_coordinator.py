@@ -311,6 +311,38 @@ class SQLiteCoordinator:
                 connection.rollback()
                 raise
 
+    def replace_provider_run_after_no_effect_failure(
+        self, *, task_id: str, previous_provider_id: str,
+        previous_external_run_id: str, provider_id: str, external_run_id: str,
+        no_side_effects_confirmed: bool, now: Optional[float] = None,
+    ) -> bool:
+        """Bind a failover run only after the prior run's no-effect failure is proven."""
+        if not no_side_effects_confirmed:
+            raise ValueError("provider failover requires a no-side-effects attestation")
+        if not all((previous_provider_id, previous_external_run_id, provider_id, external_run_id)):
+            raise ValueError("provider run identities are required")
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                cursor = connection.execute(
+                    """
+                    UPDATE tasks SET state='submitted', provider_id=?, external_run_id=?,
+                        heartbeat_at=?, result=NULL, failure_class=NULL, updated_at=?
+                    WHERE task_id=? AND provider_id=? AND external_run_id=?
+                        AND state IN ('submitted','running')
+                    """,
+                    (
+                        provider_id, external_run_id, current, current,
+                        task_id, previous_provider_id, previous_external_run_id,
+                    ),
+                )
+                connection.commit()
+                return cursor.rowcount == 1
+            except Exception:
+                connection.rollback()
+                raise
+
     def mark_provider_running(
         self, *, task_id: str, provider_id: str, external_run_id: str,
         now: Optional[float] = None,
