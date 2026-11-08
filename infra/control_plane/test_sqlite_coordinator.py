@@ -350,6 +350,35 @@ print("CLAIMED" if lease is not None else "NOT_CLAIMED")
         lease = migrated.claim(task_id="legacy-task", owner="post-migration")
         self.assertIsNotNone(lease)
 
+    def test_worker_heartbeat_status_is_persisted_and_updated(self) -> None:
+        first = self.coordinator.record_worker_heartbeat(
+            worker_id="worker-a", task_id="task-1", status="starting", now=100
+        )
+        self.assertEqual(first.status, "starting")
+        current = self.coordinator.record_worker_heartbeat(
+            worker_id="worker-a", task_id="task-1", status="healthy", now=105
+        )
+        self.assertEqual(current.heartbeat_at, 105)
+        self.assertEqual(current.status, "healthy")
+        self.assertEqual(len(self.coordinator.list_worker_heartbeats()), 1)
+
+    def test_failed_worker_heartbeat_requires_allowlisted_failure_code(self) -> None:
+        with self.assertRaises(ValueError):
+            self.coordinator.record_worker_heartbeat(
+                worker_id="worker-a", status="failed", failure_code="raw-exception",
+            )
+        failed = self.coordinator.record_worker_heartbeat(
+            worker_id="worker-a", task_id="task-1",
+            status="failed", failure_code="worker_timeout", now=110,
+        )
+        self.assertEqual(failed.failure_code, "worker_timeout")
+
+    def test_task_snapshots_include_creation_and_update_timestamps(self) -> None:
+        task = self.coordinator.get("task-1")
+        self.assertGreaterEqual(task.created_at, 0)
+        self.assertGreaterEqual(task.updated_at, task.created_at)
+        self.assertEqual(self.coordinator.list_tasks()[0].task_id, "task-1")
+
     def test_unknown_failure_class_is_rejected(self) -> None:
         lease = self.coordinator.claim(task_id="task-1", owner="worker-a")
         with self.assertRaises(ValueError):
