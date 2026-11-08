@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import tempfile
+import time
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -65,6 +67,10 @@ class FakeExecutor:
     def execute(self, **kwargs) -> SandboxExecutionResult:
         self.calls += 1
         return self.result
+
+
+class SimulatedDaemonCrash(BaseException):
+    pass
 
 
 class DurableWorkerDaemonTests(unittest.TestCase):
@@ -182,6 +188,32 @@ class DurableWorkerDaemonTests(unittest.TestCase):
         repeated = daemon.run_once()
         self.assertEqual(repeated.executed, 0)
         self.assertEqual(executor.calls, 1)
+
+    def test_daemon_reconciles_outbox_commit_after_crash_without_second_execution(self) -> None:
+        self.orchestrator.submit(self.manifest)
+        daemon, executor = self._daemon()
+        with patch.object(
+            self.coordinator,
+            "publish_result",
+            side_effect=SimulatedDaemonCrash(),
+        ):
+            with self.assertRaises(SimulatedDaemonCrash):
+                daemon.run_once()
+
+        self.assertEqual(executor.calls, 1)
+        self.assertEqual(
+            self.outbox.get(self.manifest["idempotency_key"]).state,
+            DispatchState.SUCCEEDED,
+        )
+        self.coordinator.recover_expired(now=time.time() + 3600)
+
+        recovered = daemon.run_once()
+        self.assertEqual(recovered.inspected, 1)
+        self.assertEqual(recovered.executed, 0)
+        self.assertEqual(recovered.reconciled, 1)
+        self.assertEqual(recovered.succeeded, 1)
+        self.assertEqual(executor.calls, 1)
+        self.assertEqual(self.coordinator.get(self.manifest["task_id"]).state, "succeeded")
 
     def test_unallowlisted_task_is_skipped_without_claiming_or_execution(self) -> None:
         self.manifest["task_definition"] = {"id": "shell.arbitrary", "version": 1}
