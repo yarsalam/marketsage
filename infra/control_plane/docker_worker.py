@@ -191,17 +191,23 @@ class DockerSandboxExecutor:
             raise RuntimePolicyError("container_tmpfs_limit_mismatch")
 
         by_destination = {str(item.get("Destination")): item for item in mounts if isinstance(item, dict)}
-        if set(by_destination) != {"/workspace", "/out", "/tmp"}:
-            raise RuntimePolicyError("container_mount_set_mismatch")
+        required_mounts = {"/workspace", "/out"}
+        unexpected_mounts = set(by_destination) - required_mounts - {"/dev/shm"}
+        if not required_mounts.issubset(by_destination) or unexpected_mounts:
+            destinations = ",".join(sorted(by_destination))
+            raise RuntimePolicyError("container_mount_set_mismatch:" + destinations)
         checkout = by_destination["/workspace"]
         output = by_destination["/out"]
-        tmp = by_destination["/tmp"]
+        shared_memory = by_destination.get("/dev/shm")
         if (
             Path(str(checkout.get("Source"))).resolve() != workspace
             or bool(checkout.get("RW"))
             or Path(str(output.get("Source"))).resolve() != output_dir
             or not bool(output.get("RW"))
-            or str(tmp.get("Type")) != "tmpfs"
+            or (
+                shared_memory is not None
+                and str(shared_memory.get("Type")) != "tmpfs"
+            )
         ):
             raise RuntimePolicyError("container_mount_policy_mismatch")
 
