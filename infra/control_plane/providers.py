@@ -394,13 +394,23 @@ class SafeFailoverRouter:
         if snapshot.state == DispatchState.FAILED and not snapshot.no_side_effects:
             return decision_for(persisted_receipt(snapshot), "terminal_failure_effects_unproven")
 
+        eligible_provider_count = 0
         for adapter in self.adapters:
             provider_id = adapter.capabilities.provider_id
             if provider_id in attempted:
                 continue
             capabilities = adapter.capabilities
-            if not capabilities.supports_idempotency or not capabilities.supports_reconcile_by_key:
+            # Manifests accepted by v1 are zero-cost, secret-free and offline.
+            # Do not route them to an adapter whose declared envelope is broader.
+            if (
+                capabilities.network_policy != "none"
+                or capabilities.secrets_required
+                or capabilities.cost_minor_units != 0
+                or not capabilities.supports_idempotency
+                or not capabilities.supports_reconcile_by_key
+            ):
                 continue
+            eligible_provider_count += 1
             reservation = outbox.begin_attempt(
                 idempotency_key=idempotency_key,
                 provider_id=provider_id,
@@ -460,7 +470,8 @@ class SafeFailoverRouter:
             return decision_for(None, "terminal_failure_effects_unproven")
 
         current = outbox.get(idempotency_key)
-        return decision_for(persisted_receipt(current), "no_provider_capacity")
+        reason = "no_provider_capacity" if eligible_provider_count else "no_eligible_provider"
+        return decision_for(persisted_receipt(current), reason)
 
     def _submit_from(
         self,
