@@ -44,15 +44,38 @@ sudo loginctl enable-linger marketsage-runner
 
 If the UID/GID subordinate ranges are absent or shorter than 65,536, allocate unused ranges for this account in both files before continuing. Do not copy another user's ranges or overlap an existing allocation.
 
-Then enter a real login session for `marketsage-runner` (a systemd user manager must be available; on systems where `sudo -iu` does not provide one, use `machinectl shell marketsage-runner@` after installing `systemd-container`) and run as that unprivileged account:
+**Important:** run the setup under the `marketsage-runner` login, not under the administrator's own account (for example, `nima`). The home directory, user systemd manager and Docker socket are all per-user. A daemon created under UID 1000 will not provide the required socket for the Runner at UID 110.
+
+Enter a real login session for the service account (a systemd user manager must be available; on systems where `sudo -iu` does not provide one, use `machinectl shell marketsage-runner@` after installing `systemd-container`):
 
 ```bash
+sudo -iu marketsage-runner
+id -u
+printf 'HOME=%s XDG_RUNTIME_DIR=%s\\n' "$HOME" "${XDG_RUNTIME_DIR:-}"
+```
+
+Continue only when `id -u` prints `110` and `XDG_RUNTIME_DIR` is `/run/user/110`. Then, still as `marketsage-runner`, configure this dedicated no-network worker daemon before installing it:
+
+```bash
+install -d -m 0700 "$HOME/.config/docker"
+cat > "$HOME/.config/docker/daemon.json" <<'JSON'
+{
+  "bridge": "none",
+  "iptables": false,
+  "ip6tables": false,
+  "ip-masq": false
+}
+JSON
+
 command -v dockerd-rootless-setuptool.sh
 dockerd-rootless-setuptool.sh install --force
+systemctl --user daemon-reload
 systemctl --user enable --now docker
 stat -Lc '%u:%g %a %n' /run/user/110/docker.sock
 DOCKER_HOST=unix:///run/user/110/docker.sock docker info --format '{{json .SecurityOptions}}'
 ```
+
+This worker contract always launches task containers with `--network none`; the dedicated daemon therefore does not need a Docker bridge or Docker-managed NAT rules. The configuration above disables those features so rootless `dockerd` does not fail while trying to create an iptables/NAT chain on hosts where unprivileged nftables changes are denied. It is not a general-purpose Docker networking configuration: bridge-networked containers and published ports are intentionally unavailable. RootlessKit's own `slirp4netns` path remains available for daemon-level image pulls.
 
 The `--force` option allows rootless setup while the system-wide Docker daemon remains enabled. Confirm that the socket is owned by UID 110 and that Docker reports both `rootless` (or `userns`) and `seccomp`. Do not repair permission errors with world-writable socket modes or by adding the account to the rootful `docker` group.
 
