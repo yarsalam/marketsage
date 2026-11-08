@@ -82,5 +82,5 @@ class CoordinatorHealthCollector:
             workers=workers,
             runs=runs,
             providers=providers,
-            last_successful_canary_at=None,
+            last_successful_canary_at=self.coordinator.latest_successful_canary_at(),
         )
