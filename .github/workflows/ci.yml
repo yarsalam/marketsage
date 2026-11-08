@@ -169,6 +169,7 @@ jobs:
         run: |
           python3 .github/scripts/test_post_ci_failure_notice.py -v
           python3 .github/scripts/test_detect_direct_main_update.py -v
+          python3 .github/scripts/test_diagnose_runner_pre_step.py -v
 
   notify-failure:
     name: Post sanitized failure notice
