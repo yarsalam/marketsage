@@ -46,13 +46,29 @@ If the UID/GID subordinate ranges are absent or shorter than 65,536, allocate un
 
 **Important:** run the setup under the `marketsage-runner` login, not under the administrator's own account (for example, `nima`). The home directory, user systemd manager and Docker socket are all per-user. A daemon created under UID 1000 will not provide the required socket for the Runner at UID 110.
 
-Enter a real login session for the service account (a systemd user manager must be available; on systems where `sudo -iu` does not provide one, use `machinectl shell marketsage-runner@` after installing `systemd-container`):
+The service account may deliberately have `/usr/sbin/nologin` as its login shell. Check it first:
 
 ```bash
+getent passwd marketsage-runner
+```
+
+If the shell is `nologin`, temporarily allow an administrative login session, then restore the original restricted shell after Docker setup and verification:
+
+```bash
+sudo usermod --shell /bin/bash marketsage-runner
 sudo -iu marketsage-runner
 id -u
 printf 'HOME=%s XDG_RUNTIME_DIR=%s\\n' "$HOME" "${XDG_RUNTIME_DIR:-}"
 ```
+
+Continue only when `id -u` prints `110` and `XDG_RUNTIME_DIR` is `/run/user/110`. After the rootless Docker service and socket have been verified, exit the service-account shell and restore its original restricted shell:
+
+```bash
+exit
+sudo usermod --shell /usr/sbin/nologin marketsage-runner
+```
+
+If the original shell shown by `getent passwd` was different, restore that exact original value instead. Do not leave an automation service account with an interactive shell unless there is an explicit operational reason.
 
 Continue only when `id -u` prints `110` and `XDG_RUNTIME_DIR` is `/run/user/110`. Then, still as `marketsage-runner`, configure this dedicated no-network worker daemon before installing it:
 
