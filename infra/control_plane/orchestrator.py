@@ -9,10 +9,10 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Optional
 
 from .dispatch_outbox import DispatchSnapshot, DispatchState, SQLiteDispatchOutbox
-from .lifecycle import RunState
+from .lifecycle import Lease, RunState
 from .manifest import validate_manifest
 from .providers import DispatchDecision, ProviderReceipt, SafeFailoverRouter
-from .sqlite_coordinator import Lease, SQLiteCoordinator, TaskSnapshot
+from .sqlite_coordinator import SQLiteCoordinator, TaskSnapshot
 
 
 @dataclass(frozen=True)
@@ -88,6 +88,32 @@ class DurableOrchestrator:
             )
             if not attached:
                 return False
+        else:
+            current = self.coordinator.get(task_id)
+            if current.provider_id and current.external_run_id and (
+                current.provider_id != receipt.provider_id
+                or current.external_run_id != receipt.external_run_id
+            ):
+                attempts = self.outbox.attempts(current.idempotency_key)
+                prior_failure_proven = any(
+                    item.provider_id == current.provider_id
+                    and item.external_run_id == current.external_run_id
+                    and item.state == DispatchState.FAILED
+                    and item.no_side_effects
+                    for item in attempts
+                )
+                if not prior_failure_proven:
+                    return False
+                attached = self.coordinator.replace_provider_run_after_no_effect_failure(
+                    task_id=task_id,
+                    previous_provider_id=current.provider_id,
+                    previous_external_run_id=current.external_run_id,
+                    provider_id=receipt.provider_id,
+                    external_run_id=receipt.external_run_id,
+                    no_side_effects_confirmed=True,
+                )
+                if not attached:
+                    return False
 
         if receipt.state == RunState.RUNNING:
             return self.coordinator.mark_provider_running(
