@@ -88,3 +88,28 @@ jobs:
             --image-id "$MARKETSAGE_WORKER_IMAGE_ID" \
             --commit-sha "$(git rev-parse HEAD)" \
             --workspace .
+  notify-failure:
+    name: Report self-hosted worker failure
+    needs: [self-hosted-worker-acceptance]
+    if: ${{ always() && needs.self-hosted-worker-acceptance.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Post sanitized runner checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -Eeuo pipefail
+          body="$(printf '%s\n' \
+            '## Self-hosted worker acceptance failed' \
+            '' \
+            "- Commit: $HEAD_SHA" \
+            "- Run: $RUN_URL (attempt $RUN_ATTEMPT)" \
+            '' \
+            'The local runner did not complete the sandbox acceptance. Inspect the linked run for the rootless Docker diagnostics. No automatic deployment or product/data work was started.')"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/issues/49/comments" -f body="$body"
