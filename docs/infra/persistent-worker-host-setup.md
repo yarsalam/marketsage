@@ -56,6 +56,13 @@ DOCKER_HOST=unix:///run/user/110/docker.sock docker info --format '{{json .Secur
 
 The `--force` option allows rootless setup while the system-wide Docker daemon remains enabled. Confirm that the socket is owned by UID 110 and that Docker reports both `rootless` (or `userns`) and `seccomp`. Do not repair permission errors with world-writable socket modes or by adding the account to the rootful `docker` group.
 
+After the rootless socket is verified, restart the registered Actions Runner service
+so the job process reconnects with the service account's correct runtime directory:
+
+```bash
+sudo systemctl restart actions.runner.yarsalam-marketsage.marketsage-local-01.service
+```
+
 Run as an administrator only for initial directory ownership:
 
 
