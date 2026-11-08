@@ -23,6 +23,7 @@ class HeartbeatLevel(str, Enum):
     STALE = "stale"
     CLOCK_SKEW = "clock_skew"
     MISSING = "missing"
+    FAILED = "failed"
 
 
 class RunState(str, Enum):
@@ -44,6 +45,8 @@ class ProviderHealth(str, Enum):
 class WorkerHeartbeat:
     worker_id: str
     last_heartbeat_at: Optional[float]
+    status: str = "healthy"
+    failure_code: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -85,6 +88,7 @@ class HealthAssessment:
     worker_stale_count: int
     worker_clock_skew_count: int
     worker_missing_count: int
+    worker_failed_count: int
     queued_delayed_count: int
     expired_lease_count: int
     deadline_exceeded_count: int
@@ -104,8 +108,12 @@ def assess_heartbeat(
 ) -> HeartbeatAssessment:
     if not heartbeat.worker_id:
         raise ValueError("worker_id is required")
+    if heartbeat.status not in {"starting", "healthy", "idle", "stopping", "failed"}:
+        raise ValueError("worker status is invalid")
     if stale_after_seconds <= 0 or clock_skew_tolerance_seconds < 0:
         raise ValueError("heartbeat thresholds are invalid")
+    if heartbeat.status == "failed":
+        return HeartbeatAssessment(heartbeat.worker_id, HeartbeatLevel.FAILED, None)
     seen = heartbeat.last_heartbeat_at
     if seen is None:
         return HeartbeatAssessment(heartbeat.worker_id, HeartbeatLevel.MISSING, None)
@@ -166,6 +174,7 @@ def assess_snapshot(
     stale_workers = sum(x.level == HeartbeatLevel.STALE for x in heartbeat_results)
     skewed_workers = sum(x.level == HeartbeatLevel.CLOCK_SKEW for x in heartbeat_results)
     missing_workers = sum(x.level == HeartbeatLevel.MISSING for x in heartbeat_results)
+    failed_workers = sum(x.level == HeartbeatLevel.FAILED for x in heartbeat_results)
 
     delayed_queue = 0
     expired_leases = 0
@@ -208,6 +217,8 @@ def assess_snapshot(
         reason_codes.append("worker_clock_skew")
     if missing_workers:
         reason_codes.append("worker_heartbeat_missing")
+    if failed_workers:
+        reason_codes.append("worker_failed")
     if delayed_queue:
         reason_codes.append("queue_delay")
     if expired_leases:
@@ -238,7 +249,7 @@ def assess_snapshot(
     if no_observations:
         level = HealthLevel.UNKNOWN
         reason_codes.append("no_observations")
-    elif stale_workers or expired_leases or overdue_runs or provider_unavailable:
+    elif stale_workers or failed_workers or expired_leases or overdue_runs or provider_unavailable:
         level = HealthLevel.CRITICAL
     elif reason_codes:
         level = HealthLevel.DEGRADED
@@ -252,6 +263,7 @@ def assess_snapshot(
         worker_stale_count=stale_workers,
         worker_clock_skew_count=skewed_workers,
         worker_missing_count=missing_workers,
+        worker_failed_count=failed_workers,
         queued_delayed_count=delayed_queue,
         expired_lease_count=expired_leases,
         deadline_exceeded_count=overdue_runs,
@@ -271,6 +283,7 @@ def _unknown(reason: str, observer_age: Optional[float] = None) -> HealthAssessm
         worker_stale_count=0,
         worker_clock_skew_count=0,
         worker_missing_count=0,
+        worker_failed_count=0,
         queued_delayed_count=0,
         expired_lease_count=0,
         deadline_exceeded_count=0,
