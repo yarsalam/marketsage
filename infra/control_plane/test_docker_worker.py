@@ -252,6 +252,7 @@ class CoordinatedDockerWorkerTests(unittest.TestCase):
         self.assertTrue(recovered.published)
         self.assertEqual(recovered.task_state, "succeeded")
         self.assertEqual(recovered.reason_code, "reconciled_from_outbox")
+        self.assertTrue(recovered.reconciled)
         self.assertIsNone(recovered.execution)
         self.assertEqual(executor.calls, 1)
 
