@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -8,6 +9,7 @@ from pathlib import Path
 from infra.control_plane.dispatch_outbox import DispatchState, SQLiteDispatchOutbox
 from infra.control_plane.docker_worker import (
     CoordinatedDockerWorker,
+    DockerSandboxExecutor,
     SandboxExecutionResult,
 )
 from infra.control_plane.lifecycle import RunState
@@ -226,6 +228,41 @@ class CoordinatedDockerWorkerTests(unittest.TestCase):
         self.assertFalse(result.claimed)
         self.assertEqual(result.reason_code, "task_not_submitted")
         self.assertEqual(executor.calls, 0)
+
+
+class SecurityOptionProbe(DockerSandboxExecutor):
+    def __init__(self, output: str) -> None:
+        super().__init__(image_id="sha256:" + "a" * 64)
+        self.output = output
+
+    def _run(self, args: list[str], *, timeout: int = 20) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(args, 0, stdout=self.output, stderr="")
+
+
+class DockerWorkerAttestationTests(unittest.TestCase):
+    def test_rootless_docker_user_namespace_is_accepted(self) -> None:
+        executor = SecurityOptionProbe(
+            '["name=seccomp,profile=builtin","name=rootless","name=cgroupns"]'
+        )
+        seccomp, userns = executor._docker_security_options()
+        self.assertTrue(seccomp)
+        self.assertTrue(userns)
+
+    def test_rootful_userns_remap_is_accepted(self) -> None:
+        executor = SecurityOptionProbe(
+            '["name=seccomp,profile=builtin","name=userns","name=cgroupns"]'
+        )
+        seccomp, userns = executor._docker_security_options()
+        self.assertTrue(seccomp)
+        self.assertTrue(userns)
+
+    def test_unconfined_seccomp_is_rejected_by_attestation(self) -> None:
+        executor = SecurityOptionProbe(
+            '["name=seccomp,profile=unconfined","name=userns"]'
+        )
+        seccomp, userns = executor._docker_security_options()
+        self.assertFalse(seccomp)
+        self.assertTrue(userns)
 
 
 if __name__ == "__main__":
