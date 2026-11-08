@@ -93,18 +93,10 @@ This worker contract always launches task containers with `--network none`; the 
 
 The `--force` option allows rootless setup while the system-wide Docker daemon remains enabled. Confirm that the socket is owned by UID 110 and that Docker reports both `rootless` (or `userns`) and `seccomp`. Do not repair permission errors with world-writable socket modes or by adding the account to the rootful `docker` group.
 
-After Docker and its security options are verified, exit the service-account shell and restore the exact original restricted shell shown by `getent passwd` (currently `/usr/sbin/nologin`):
+The one-shot bootstrap package preserves/restores the restricted service-account shell and restarts the registered Actions Runner only after all Docker checks pass. When performing the steps manually, restore the exact original shell if it was changed, then restart the Runner service:
 
 ```bash
-exit
 sudo usermod --shell /usr/sbin/nologin marketsage-runner
-sudo systemctl restart actions.runner.yarsalam-marketsage.marketsage-local-01.service
-```
-
-After the rootless socket is verified, restart the registered Actions Runner service
-so the job process reconnects with the service account's correct runtime directory:
-
-```bash
 sudo systemctl restart actions.runner.yarsalam-marketsage.marketsage-local-01.service
 ```
 
