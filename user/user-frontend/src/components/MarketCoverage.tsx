@@ -281,7 +281,11 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
     [payload, scope],
   );
   const filteredIranProviders = useMemo(
-    () => (payload?.iran.markets ?? []).filter((provider) => scope === "all" || scope === "iran" || provider.market === "crypto_global"),
+    () => (payload?.iran.markets ?? []).filter((provider) =>
+      scope === "all" ||
+      (scope === "iran" && provider.market !== "crypto_global") ||
+      (scope === "global" && provider.market === "crypto_global")
+    ),
     [payload, scope],
   );
 
