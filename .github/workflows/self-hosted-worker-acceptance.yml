@@ -35,10 +35,13 @@ jobs:
           [[ "$(id -u)" == "110" ]]
           [[ "$(id -un)" == "marketsage-runner" ]]
           command -v docker
+          echo "IDENTITY: uid=$(id -u) gid=$(id -g) user=$(id -un)"
           echo "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"
-          ls -ld "$XDG_RUNTIME_DIR" || true
-          stat -c '%u:%g %a %n' /run/user/110 /run/user/110/docker.sock 2>/dev/null || true
-          systemctl --user is-active docker || true
+          ls -ld "$XDG_RUNTIME_DIR" /run/user/110 || true
+          namei -l /run/user/110/docker.sock || true
+          stat -Lc 'SOCKET: uid=%u gid=%g mode=%a type=%F path=%n' /run/user/110/docker.sock 2>/dev/null || true
+          getfacl -p /run/user/110/docker.sock 2>/dev/null || true
+          systemctl --user show docker.service -p LoadState -p ActiveState -p SubState -p FragmentPath || true
           systemctl --user status docker --no-pager 2>&1 | tail -30 || true
           docker info --format '{{json .SecurityOptions}}' | tee /tmp/marketsage-docker-security.json
           python3 - <<'PY'
