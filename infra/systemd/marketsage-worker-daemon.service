@@ -1,0 +1,29 @@
+[Unit]
+Description=MarketSage unattended sandbox worker
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=marketsage-runner
+Group=marketsage-runner
+EnvironmentFile=/etc/marketsage/worker.env
+ExecStart=/bin/bash -lc 'cd "$MARKETSAGE_REPO_DIR" && exec /usr/bin/python3 -m infra.control_plane.worker_daemon --database "$MARKETSAGE_DB_PATH" --image-id "$MARKETSAGE_WORKER_IMAGE_ID" --workspace "$MARKETSAGE_REPO_DIR" --worker-id "$MARKETSAGE_WORKER_ID" --owner-confirmed --poll-interval-seconds 10'
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths=/srv/marketsage/data /run/user/110/docker.sock
+
+[Install]
+WantedBy=multi-user.target
