@@ -5,6 +5,7 @@ filesystem, not shared NFS. Every lease mutation is fenced by a monotonic token.
 """
 from __future__ import annotations
 
+import json
 import sqlite3
 import time
 from contextlib import contextmanager
@@ -45,7 +46,7 @@ class WorkerHeartbeatSnapshot:
 class SQLiteCoordinator:
     """Persistent, transactional task intake, dispatch, lease and result ledger."""
 
-    SCHEMA_VERSION = 2
+    SCHEMA_VERSION = 3
     _STATES = "'queued','leased','recoverable','submitted','running','succeeded','failed','cancelled'"
 
     def __init__(self, database_path: str | Path, *, busy_timeout_ms: int = 5000) -> None:
@@ -96,6 +97,7 @@ class SQLiteCoordinator:
                 provider_id TEXT,
                 external_run_id TEXT,
                 heartbeat_at REAL,
+                manifest_json TEXT,
                 created_at REAL NOT NULL,
                 updated_at REAL NOT NULL,
                 CHECK (
@@ -132,7 +134,7 @@ class SQLiteCoordinator:
                 else (1 if tasks_exists and legacy_version == 1 else
                       (self.SCHEMA_VERSION if tasks_exists and legacy_version == self.SCHEMA_VERSION else 0))
             )
-            if version not in (0, 1, self.SCHEMA_VERSION):
+            if version not in (0, 1, 2, self.SCHEMA_VERSION):
                 raise RuntimeError("unsupported coordinator database schema version")
             connection.execute("BEGIN IMMEDIATE")
             try:
@@ -155,6 +157,8 @@ class SQLiteCoordinator:
                         """
                     )
                     connection.execute("DROP TABLE tasks_v1")
+                elif version == 2:
+                    connection.execute("ALTER TABLE tasks ADD COLUMN manifest_json TEXT")
                 connection.execute(
                     "CREATE INDEX IF NOT EXISTS tasks_state_expiry ON tasks(state, lease_expires_at)"
                 )
@@ -216,9 +220,21 @@ class SQLiteCoordinator:
             updated_at=row["updated_at"],
         )
 
-    def enqueue(self, *, task_id: str, idempotency_key: str, input_digest: str) -> TaskSnapshot:
+    def enqueue(
+        self, *, task_id: str, idempotency_key: str, input_digest: str,
+        manifest_json: Optional[str] = None,
+    ) -> TaskSnapshot:
         if not task_id or not idempotency_key or not input_digest:
             raise ValueError("task identity fields are required")
+        if manifest_json is not None:
+            if not isinstance(manifest_json, str) or len(manifest_json.encode("utf-8")) > 65536:
+                raise ValueError("manifest_json exceeds the storage bound")
+            try:
+                parsed_manifest = json.loads(manifest_json)
+            except (TypeError, ValueError) as exc:
+                raise ValueError("manifest_json must be valid JSON") from exc
+            if not isinstance(parsed_manifest, dict):
+                raise ValueError("manifest_json must encode an object")
         now = time.time()
         with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -229,6 +245,14 @@ class SQLiteCoordinator:
                 if row is not None:
                     if row["input_digest"] != input_digest:
                         raise IdempotencyConflict("idempotency key/input mismatch")
+                    if manifest_json is not None and row["manifest_json"] is None:
+                        connection.execute(
+                            "UPDATE tasks SET manifest_json=?, updated_at=? WHERE task_id=?",
+                            (manifest_json, now, row["task_id"]),
+                        )
+                        row = connection.execute(
+                            "SELECT * FROM tasks WHERE task_id=?", (row["task_id"],)
+                        ).fetchone()
                     connection.commit()
                     return self._snapshot(row)
                 row = connection.execute(
@@ -239,10 +263,10 @@ class SQLiteCoordinator:
                 connection.execute(
                     """
                     INSERT INTO tasks (
-                        task_id,idempotency_key,input_digest,state,created_at,updated_at
-                    ) VALUES (?,?,?,'queued',?,?)
+                        task_id,idempotency_key,input_digest,state,manifest_json,created_at,updated_at
+                    ) VALUES (?,?,?,'queued',?,?,?)
                     """,
-                    (task_id, idempotency_key, input_digest, now, now),
+                    (task_id, idempotency_key, input_digest, manifest_json, now, now),
                 )
                 row = connection.execute(
                     "SELECT * FROM tasks WHERE task_id=?", (task_id,)
@@ -565,6 +589,20 @@ class SQLiteCoordinator:
             except Exception:
                 connection.rollback()
                 raise
+
+    def get_manifest(self, task_id: str) -> dict[str, object]:
+        with self._connection() as connection:
+            row = connection.execute(
+                "SELECT manifest_json FROM tasks WHERE task_id=?", (task_id,)
+            ).fetchone()
+        if row is None:
+            raise KeyError(task_id)
+        if row["manifest_json"] is None:
+            raise KeyError("task manifest is not persisted")
+        value = json.loads(row["manifest_json"])
+        if not isinstance(value, dict):
+            raise RuntimeError("persisted task manifest is not an object")
+        return value
 
     def get(self, task_id: str) -> TaskSnapshot:
         with self._connection() as connection:
