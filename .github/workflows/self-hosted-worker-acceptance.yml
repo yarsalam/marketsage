@@ -1,0 +1,82 @@
+name: MarketSage self-hosted worker acceptance
+
+on:
+  push:
+    branches:
+      - infra/durable-provider-dispatch-outbox-2026-11
+    paths:
+      - ".github/workflows/self-hosted-worker-acceptance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketsage-self-hosted-worker-acceptance
+  cancel-in-progress: false
+
+jobs:
+  self-hosted-worker-acceptance:
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 20
+    env:
+      DOCKER_HOST: unix:///run/user/110/docker.sock
+      XDG_RUNTIME_DIR: /run/user/110
+    steps:
+      - name: Checkout owner-controlled branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify dedicated unprivileged rootless Docker runtime
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          [[ "$(id -u)" == "110" ]]
+          [[ "$(id -un)" == "marketsage-runner" ]]
+          command -v docker
+          docker info --format '{{json .SecurityOptions}}' | tee /tmp/marketsage-docker-security.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          options = " ".join(json.loads(Path("/tmp/marketsage-docker-security.json").read_text())).lower()
+          if "seccomp" not in options or ("rootless" not in options and "userns" not in options) or "unconfined" in options:
+              raise SystemExit("rootless Docker with seccomp/userns is required")
+          PY
+
+      - name: Verify owner-controlled clean main source
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          [[ "$(git branch --show-current)" == "infra/durable-provider-dispatch-outbox-2026-11" ]]
+          git status --porcelain
+          git rev-parse HEAD
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install infrastructure dependencies from Chabokan only
+        run: |
+          python -m pip --isolated install --disable-pip-version-check --no-cache-dir \
+            --only-binary=:all: \
+            --index-url https://mirror2.chabokan.net/pypi/simple/ \
+            -r requirements-infra.txt
+
+      - name: Build immutable worker image
+        run: |
+          set -Eeuo pipefail
+          docker build --pull --no-cache \
+            --file infra/worker-image/Dockerfile \
+            --tag marketsage-worker:self-hosted-acceptance .
+          IMAGE_ID="$(docker image inspect marketsage-worker:self-hosted-acceptance --format '{{.Id}}')"
+          [[ "$IMAGE_ID" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "MARKETSAGE_WORKER_IMAGE_ID=$IMAGE_ID" >> "$GITHUB_ENV"
+
+      - name: Execute the same sandbox worker on the independent local host
+        run: |
+          python -m infra.control_plane.worker_acceptance \
+            --image-id "$MARKETSAGE_WORKER_IMAGE_ID" \
+            --commit-sha "$(git rev-parse HEAD)" \
+            --workspace .
