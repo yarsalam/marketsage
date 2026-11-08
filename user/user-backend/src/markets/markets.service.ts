@@ -36,4 +36,16 @@ export class MarketsService {
   getDataStatus() {
     return this.getAnalysis('/data-status');
   }
+
+  getSources() {
+    return this.getAnalysis('/sources');
+  }
+
+  getDataQuality() {
+    return this.getAnalysis('/data-quality');
+  }
+
+  getIranProviders() {
+    return this.getAnalysis('/iran-market/providers');
+  }
 }
