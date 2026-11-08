@@ -12,11 +12,34 @@ permissions:
   contents: read
 
 concurrency:
-  group: marketsage-self-hosted-worker-acceptance
-  cancel-in-progress: true
+  group: marketsage-self-hosted-worker-acceptance-${{ github.run_id }}
+  cancel-in-progress: false
 
 jobs:
+  cancel-stale-runs:
+    name: Cancel stale local acceptance runs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Cancel only older runs of this smoke workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          workflow_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/self-hosted-worker-acceptance.yml" --jq '.id')"
+          stale_runs="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow_id/runs?per_page=100" \
+            --jq ".workflow_runs[] | select(.id < $CURRENT_RUN_ID) | select(.status == \"queued\" or .status == \"pending\" or .status == \"in_progress\") | .id")"
+          while IFS= read -r run_id; do
+            [[ -n "$run_id" ]] || continue
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" || true
+          done <<< "$stale_runs"
+
   self-hosted-worker-acceptance:
+    needs: [cancel-stale-runs]
     runs-on: [self-hosted, linux, x64]
     timeout-minutes: 20
     env:
