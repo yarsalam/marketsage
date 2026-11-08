@@ -39,12 +39,31 @@ Operational rules:
 
 No CircleCI account was created, no OAuth consent was granted, and no external provider was activated by this change.
 
+## Independent hourly validation trigger
+
+After the owner connects the project, create a **Schedule Trigger** in CircleCI (Project Settings → Triggers → Add Trigger):
+
+- Name: `marketsage-hourly-control-plane`
+- Config branch: `main`
+- Checkout branch: `main`
+- Schedule: `23 * * * *` (once per hour, UTC)
+- Actor: **Scheduling system** (not an individual user)
+- Contexts / secrets: none
+- Pipeline: the repository's default pipeline; it runs the `provider-neutral-control-plane` workflow in this config.
+
+Use CircleCI's newer Schedule Triggers UI/API for GitHub App or GitHub OAuth projects; do not add the legacy in-config `schedule` workflow because CircleCI documents that legacy mechanism as unavailable for GitHub App pipelines. Schedule Triggers support GitHub App projects and UTC schedules. They may start up to 10 minutes after the requested time, so they are periodic health checks, not a precise real-time SLA.
+
+Official setup reference: https://circleci.com/docs/guides/orchestrate/scheduled-pipelines/
+
+Start hourly rather than every few minutes. Review actual small-Docker credit use after the first seven days; never enable paid refills or upgrades. A scheduled conformance run verifies the code/test backend only. It does not monitor a separately hosted worker daemon until an authenticated, read-only health probe for that host is deliberately added and tested.
+
 ## Acceptance state
 
 - [x] CircleCI adapter configuration added to the integration branch.
 - [x] Test command matches the GitHub provider-neutral conformance suite.
 - [x] No contexts, secrets, deploy, merge, release, or write permission required by this pipeline.
 - [ ] CircleCI account connected by the owner.
+- [ ] Hourly Schedule Trigger created by the owner with the scheduling-system actor.
 - [ ] Exact same PR head executes successfully on CircleCI and GitHub Actions.
 - [ ] Quota exhaustion and provider outage are reported as unavailable, not silently treated as a passing test.
 - [ ] Provider-router integration demonstrates safe no-duplicate failover before any task is automatically retried across these providers.
