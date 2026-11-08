@@ -133,7 +133,9 @@ class DockerSandboxExecutor:
             raise RuntimePolicyError("docker_security_attestation_unavailable") from exc
         options = " ".join(str(item).lower() for item in values)
         seccomp = "seccomp" in options and "unconfined" not in options
-        userns = "userns" in options
+        # Rootless Docker runs the daemon and containers inside a user namespace;
+        # rootful Docker userns-remap reports the explicit userns security option.
+        userns = "userns" in options or "rootless" in options
         self._seccomp_enabled = seccomp
         self._host_userns_enabled = userns
         return seccomp, userns
