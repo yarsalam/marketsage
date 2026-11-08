@@ -489,6 +489,11 @@ class CoordinatedDockerWorker:
             current = self.coordinator.get(task_id)
             return WorkerRunResult(False, False, current.state, None, "worker_claim_unavailable")
 
+        self.coordinator.record_worker_heartbeat(
+            worker_id=self.worker_id,
+            task_id=task_id,
+            status="starting",
+        )
         stop = threading.Event()
         lease_lost = threading.Event()
 
@@ -498,8 +503,19 @@ class CoordinatedDockerWorker:
                 if not self.coordinator.renew_lease(
                     lease=lease, lease_seconds=self.lease_seconds
                 ):
+                    self.coordinator.record_worker_heartbeat(
+                        worker_id=self.worker_id,
+                        task_id=task_id,
+                        status="failed",
+                        failure_code="lease_lost",
+                    )
                     lease_lost.set()
                     return
+                self.coordinator.record_worker_heartbeat(
+                    worker_id=self.worker_id,
+                    task_id=task_id,
+                    status="healthy",
+                )
 
         heartbeat = threading.Thread(target=renew, name=f"heartbeat-{self.worker_id}", daemon=True)
         heartbeat.start()
@@ -526,6 +542,20 @@ class CoordinatedDockerWorker:
             return WorkerRunResult(True, False, current.state, result, "worker_lease_lost")
 
         receipt_state = RunState.SUCCEEDED if result.succeeded else RunState.FAILED
+        heartbeat_failure = (
+            None if result.succeeded else (
+                "worker_timeout" if result.timed_out
+                else ("output_limit_exceeded" if result.output_limit_exceeded else
+                      ("runtime_rejected" if result.status == "runtime_rejected" else
+                       "worker_process_failed"))
+            )
+        )
+        self.coordinator.record_worker_heartbeat(
+            worker_id=self.worker_id,
+            task_id=task_id,
+            status="idle" if result.succeeded else "failed",
+            failure_code=heartbeat_failure,
+        )
         receipt = ProviderReceipt(
             provider_id=task.provider_id,
             external_run_id=task.external_run_id,
