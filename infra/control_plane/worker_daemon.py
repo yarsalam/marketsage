@@ -25,6 +25,7 @@ TrustResolver = Callable[[Mapping[str, object]], TaskTrustAttestation]
 class WorkerDaemonReport:
     inspected: int
     executed: int
+    reconciled: int
     succeeded: int
     failed: int
     skipped: int
@@ -35,6 +36,7 @@ class WorkerDaemonReport:
         return {
             "inspected": self.inspected,
             "executed": self.executed,
+            "reconciled": self.reconciled,
             "succeeded": self.succeeded,
             "failed": self.failed,
             "skipped": self.skipped,
@@ -188,7 +190,7 @@ class DurableWorkerDaemon:
             worker_id=self.worker_id,
             status="idle",
         )
-        inspected = executed = succeeded = failed = skipped = 0
+        inspected = executed = reconciled = succeeded = failed = skipped = 0
         reasons: list[str] = []
 
         candidates = sorted(
@@ -253,7 +255,10 @@ class DurableWorkerDaemon:
                 if result.reason_code:
                     reasons.append(result.reason_code)
                 continue
-            executed += 1
+            if result.reconciled:
+                reconciled += 1
+            else:
+                executed += 1
             if result.published and result.task_state == "succeeded":
                 succeeded += 1
             else:
@@ -266,6 +271,7 @@ class DurableWorkerDaemon:
         return WorkerDaemonReport(
             inspected=inspected,
             executed=executed,
+            reconciled=reconciled,
             succeeded=succeeded,
             failed=failed,
             skipped=skipped,
