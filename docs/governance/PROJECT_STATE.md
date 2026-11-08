@@ -151,10 +151,38 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 - Draft PR [#54](https://github.com/yarsalam/marketsage/pull/54) adds a standard-library SQLite coordinator on `infra/sqlite-durable-coordinator-2026-11`. Current head: `e8f7d8add3df577120b92b8927c590aece001509`; target branch: `infra/provider-neutral-control-plane-2026-11`.
 - The component persists task/idempotency identity, state, lease owner/expiry, fencing token, result and terminal failure. It uses WAL, `synchronous=FULL`, bounded busy timeout and `BEGIN IMMEDIATE` transactions. Process-restart and separate-process claim-exclusion tests are included.
 - Added `renew_lease`: only the active, unexpired owner/fencing-token pair can renew; stale/expired leases are rejected; the expiry is never shortened. This is a primitive only—no periodic heartbeat worker or real provider dispatch is connected.
-- Owner exact-checkout validation of prior head `77d3a1a17d6f5e52b009c683cc369a5afac89eed` passed 11/11 tests. The current head adds five renewal tests (16 tests total); they have not yet been run. Exact-head owner validation is tracked in [Issue #55](https://github.com/yarsalam/marketsage/issues/55). PR #54 remains draft/open.
+- Owner exact-checkout validation of current head `e8f7d8add3df577120b92b8927c590aece001509` passed **16/16 tests**, exit code 0; evidence is recorded in [Issue #55](https://github.com/yarsalam/marketsage/issues/55#issuecomment-6710962479), now closed. PR #54 remains draft/open pending base reconciliation and operational acceptance.
 - The PR branch and base have diverged, and the base branch has advanced since the PR's recorded base SHA. The latest PR API response reports mergeability as unknown; reconcile the head with the current base and revalidate before any merge. No merge is authorized by this status update.
 - [Issue #52](https://github.com/yarsalam/marketsage/issues/52) now records that Novin-only isolated installation and 28/28 manifest/lifecycle/mirror tests passed on commit `99b25dc24daa8606514bd9910e883ef136cf5d7f`; a full Chabokan-only wheel installation and hash-locked dependency record remain pending.
 - [Issue #53](https://github.com/yarsalam/marketsage/issues/53) remains the owner action for GitHub Actions included-minute/reset/restriction status. No hosted dispatch or rerun is allowed until the zero-cost quota gate is resolved.
 - PR #50 remains unvalidated on its current head after runner-allocation failures before step 1. Its schedule and concurrency changes are not active on main. The failure reporter shares the same hosted pool and is not an independent outage monitor.
 
 **Infrastructure readiness remains NOT PROVEN.** SQLite is single-host only; no transactional provider outbox, real provider adapter, worker service, periodic heartbeat, dispatch reconciliation, backup/restore, disk-full/corruption recovery, independent health canary, provider failover or end-to-end 24/7 recovery drill has been demonstrated. Ordinary product/data/research work remains paused under Issue #49. PR #6 remains open and must not be merged to main without explicit owner approval; PR #14 is already merged into #6; PR #8 remains parked.
+
+## Parallel infrastructure workstream decomposition — 2026-11-07
+
+The owner requested that MarketSage execution be split into independently tracked workstreams. The decomposition is now durable in GitHub Issues; each stream has its own objective, bounded scope, dependencies, acceptance criteria, and safety boundary.
+
+| Stream | Issue | Scope | Current dependency/status |
+|---|---|---|---|
+| Durable coordinator | [#54](https://github.com/yarsalam/marketsage/pull/54), [#55](https://github.com/yarsalam/marketsage/issues/55) | SQLite persistence, idempotency, fencing, lease renewal | Exact PR #54 head `e8f7d8add3df577120b92b8927c590aece001509` owner validation **16/16 passed**, exit 0; Issue #55 closed. PR #54 still diverges from its base (8 ahead / 24 behind); reconcile before merge. |
+| Provider adapters and safe failover | [#56](https://github.com/yarsalam/marketsage/issues/56) | Adapter contract, two fake backends, conformance and duplicate-safe failover | Open; depends on stable task/coordinator interfaces; no real provider activated. |
+| Portable worker and sandbox | [#57](https://github.com/yarsalam/marketsage/issues/57) | Reproducible runtime, least privilege, untrusted-task isolation, egress/resource bounds | Open; can proceed on a separate branch against the versioned task contract. |
+| Independent health observer | [#58](https://github.com/yarsalam/marketsage/issues/58) | Heartbeats, stale-run detection, queue/provider status and recovery visibility | Open; observer must not depend on the backend it monitors. |
+| GitHub event/schedule adapter | [#59](https://github.com/yarsalam/marketsage/issues/59) | PR #50 reconciliation, bounded schedules, concurrency, timeouts, direct-main-change detection | Open; hosted Actions validation remains paused pending [owner quota confirmation #53](https://github.com/yarsalam/marketsage/issues/53). |
+| Dependency-aware task registry/scheduler | [#60](https://github.com/yarsalam/marketsage/issues/60) | Stable task IDs, dependency graph, safe concurrency and durable status | Open; no broad fan-out until two-backend safe execution is proven. |
+
+### Active owner-only gates
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52): Chabokan-only isolated dependency installation and hash-locked manifest validation. Novin-only install and 28/28 prior tests are recorded; Chabokan fallback is not yet accepted.
+- [Issue #53](https://github.com/yarsalam/marketsage/issues/53): confirm included GitHub Actions quota/reset and account restrictions without increasing the USD 0 spending limit. No hosted dispatch/rerun until resolved.
+- [Issue #55](https://github.com/yarsalam/marketsage/issues/55) is **closed as completed** based on the owner's exact-head 16/16 test result; this closes only the SQLite unit-test gate, not PR integration or operational readiness.
+
+### Parallelism policy
+Parallel implementation is limited to isolated infrastructure streams that do not modify the same files/interfaces. Shared contract changes must be proposed and integrated in dependency order. The broader product/data/backtest workstream fan-out remains behind Issue #49's acceptance sequence: the same harmless idempotent task must first be demonstrated on two independent backends, including capacity-loss failover without duplicate side effects. No market-source scoring or investment analysis is activated by this decomposition.
+
+**Overall infrastructure status: NOT PROVEN.** PR #6 remains open and must not be merged to main without the owner's separate explicit approval. PR #14 is already integrated into PR #6. PR #8 remains parked; do not repeat the same GitHub-runner TSETMC ConnectTimeout. No paid resource, production deployment, ranking/scoring, broker access, trading, or capital allocation is authorized.
+
+
+### Governance PR for parallel decomposition — 2026-11-07
+- [PR #61](https://github.com/yarsalam/marketsage/pull/61) records the six infrastructure workstreams and their dependency/safety boundaries in this file and PR_REGISTER.md.
+- PR #61 is draft/open and documentation-only. No CI status checks were reported for its head at the latest inspection; hosted dispatch was not attempted due Issue #53.
