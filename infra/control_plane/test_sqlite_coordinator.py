@@ -373,6 +373,18 @@ print("CLAIMED" if lease is not None else "NOT_CLAIMED")
         )
         self.assertEqual(failed.failure_code, "worker_timeout")
 
+    def test_successful_canary_timestamp_is_durable_and_counted(self) -> None:
+        self.assertEqual(self.coordinator.latest_successful_canary_at(), None)
+        self.assertEqual(
+            self.coordinator.record_successful_canary(canary_id="worker-smoke", now=100),
+            100,
+        )
+        self.assertEqual(
+            self.coordinator.record_successful_canary(canary_id="worker-smoke", now=110),
+            110,
+        )
+        self.assertEqual(self.coordinator.latest_successful_canary_at(), 110)
+
     def test_task_snapshots_include_creation_and_update_timestamps(self) -> None:
         task = self.coordinator.get("task-1")
         self.assertGreaterEqual(task.created_at, 0)
