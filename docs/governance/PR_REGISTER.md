@@ -1,8 +1,8 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-05  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
+**Snapshot date:** 2026-11-08  
+**Repository:** yarsalam/marketsage (Public; revalidated through GitHub repository metadata)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code HEAD:** 819f8b4028469cb0d498098fec88545a18ebacc6
 
@@ -12,8 +12,14 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | infra/provider-neutral-control-plane-2026-11 | Durable provider dispatch/outbox, rootless sandbox worker, watchdog and local acceptance; Draft, open. Latest recorded self-hosted acceptance run #42465921813 failed; host-level rootless Docker setup was later owner-verified. | Keep separate from product work. Do not merge without separate owner approval. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | main ← research/market-coverage-workspace-2026-11 | Product Phase 1: source registry/data-quality/provider-readiness API and Persian Market Coverage UI; Draft, open; head `e595478016a0d3e601d176cda8314233edc846db`; CI pending. | Product work resumed; accept only after exact-head CI and review. |
 
 
+
+## Active product issue
+
+- [Issue #72](https://github.com/yarsalam/marketsage/issues/72) — Product Phase 1: evidence-first Market Coverage Workspace. Its implementation is tracked in Draft PR #73.
 
 ## Merged to main
 
@@ -53,7 +59,7 @@ main
 - #32 merged: integrated local TSETMC candidate workflow
 - #34 merged: memory-bounded/cgroup-aware candidate batches; owner re-dispatch pending; checks out immutable PR #6 integration commit 819f8b4028469cb0d498098fec88545a18ebacc6
 
-PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked.
+PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked. PR #71 remains Draft and unmerged. PR #73 is the active product PR and remains Draft pending exact-head CI/review.
 
 ## Release and capital-risk guardrails
 
