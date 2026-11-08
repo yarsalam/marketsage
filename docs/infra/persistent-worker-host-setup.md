@@ -171,6 +171,41 @@ that the current checkout is clean `main` and that its HEAD exactly matches
 the task manifest SHA. It executes only fixed handler IDs that are present in
 the worker allowlist; unrecognized task definitions are skipped.
 
+## SQLite backup and restore
+
+The coordinator and dispatch outbox share one database. Create backups with
+SQLite's online backup API so committed WAL transactions are included. The
+utility validates the snapshot, writes it with mode 0600, computes SHA-256,
+and refuses to replace an existing destination.
+
+Run as `marketsage-runner` or an administrator with appropriately restricted
+file access:
+
+```bash
+cd /srv/marketsage/app
+python -m infra.control_plane.backup backup \
+  --source /srv/marketsage/data/control-plane.sqlite3 \
+  --destination /srv/marketsage/data/backups/control-plane-$(date -u +%Y%m%dT%H%M%SZ).sqlite3
+```
+
+Restore is deliberately non-destructive: it writes to a *new* path and will
+not overwrite the live database or any existing file. First stop both worker
+and watchdog services, restore to a separate candidate file, verify the
+printed SHA-256 and integrity result, then perform a separately reviewed
+maintenance cutover. Do not replace the live database automatically.
+
+```bash
+python -m infra.control_plane.backup restore \
+  --source /srv/marketsage/data/backups/SELECTED_BACKUP.sqlite3 \
+  --destination /srv/marketsage/data/restore-candidate.sqlite3
+```
+
+The automated test `infra.control_plane.test_backup` verifies that a
+Coordinator task plus Outbox record survive backup/restore, corrupted files
+are rejected, and existing destinations are never overwritten. Backups still
+need an off-host copy and a scheduled restore drill on the independent host;
+a local snapshot alone does not protect against host loss.
+
 ## Operational limits and evidence
 
 - SQLite WAL is single-host storage. Keep `control-plane.sqlite3` on local
