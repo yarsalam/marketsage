@@ -130,8 +130,14 @@ class DurableOrchestratorTests(unittest.TestCase):
     def test_restart_after_provider_acceptance_reconciles_without_resubmit(self) -> None:
         key = self.manifest["idempotency_key"]
         digest = self.manifest["inputs_digest"]
-        # Simulate a provider accepting after the durable reservation, then the
-        # process dying before it records the receipt in SQLite.
+        # Simulate a provider accepting after the coordinator and outbox
+        # have durably registered the task, then the process dying before it
+        # records the provider receipt in SQLite.
+        self.coordinator.enqueue(
+            task_id=self.manifest["task_id"],
+            idempotency_key=key,
+            input_digest=digest,
+        )
         self.outbox.prepare(idempotency_key=key, input_digest=digest)
         self.outbox.begin_attempt(idempotency_key=key, provider_id="backend-a")
         self.backend_a.submit(idempotency_key=key, input_digest=digest)
