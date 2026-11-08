@@ -1,11 +1,56 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-05  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
-**Integration PR:** #6, feat/tindex-free-data-connector  
-**Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
-**Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
+**Current snapshot date:** 2026-11-08  
+**Repository:** yarsalam/marketsage (**Public**, verified from GitHub repository metadata)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
+**Active product issue:** [#72 — Product Phase 1: evidence-first Market Coverage Workspace](https://github.com/yarsalam/marketsage/issues/72)  
+**Active product branch:** `research/market-coverage-workspace-2026-11`  
+**Infrastructure PR:** [#71](https://github.com/yarsalam/marketsage/pull/71), Draft, open and unmerged  
+**Release posture:** research-only. No source is approved for production investment scoring; no validated probability model or strategy is approved; production allocation, broker access and trading remain disabled.
+
+## Current product state — 2026-11-08
+
+- The owner explicitly resumed MarketSage product development. Product work proceeds independently of the remaining infrastructure evidence gap; that gap must not silently be labelled accepted or complete.
+- Phase 1 is an evidence-first Market Coverage Workspace. It exposes the existing Python source registry, data-quality report and Iranian provider-readiness catalog via NestJS and a Persian RTL Next.js page.
+- In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, and `GET /api/markets/iran-providers`. Controller forwarding tests were added.
+- The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates and Iranian provider readiness. The page is the default landing tab for this increment.
+- The page reports actual registry and runtime values only. It does not create synthetic quotes, infer provider availability, approve data, or change scoring.
+- Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Current acceptance checklist: Issue #72.
+- The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PR #71 is infrastructure-only, Draft and unmerged.
+
+## Current data and investment posture
+
+- Main's source registry contains ten source definitions; none is production-approved. Yahoo Finance via yfinance is the only source wired into the current research baseline, and remains research-only.
+- FRED/ALFRED adapter exists but is not scheduled or connected to the scoring path.
+- TSETMC and CODAL are candidate-only. Iranian gold/FX sources are not selected; fixed-income/fund and local crypto sources remain unapproved.
+- The existing decision/momentum path uses a small global-proxy/crypto universe. Its nominal horizon parameter does not make the calculation a six-month-specific forecast. It is a research baseline, not a validated investment decision engine for Iran.
+- Publication-time-aware macro, news, political/geopolitical events, social sentiment, validated regime detection and calibrated probabilities are not available as production decision inputs.
+- Captured-as-of replay must not be confused with publisher-source-vintage replay. Historical Yahoo prices have retrieval time but no verified original publication timestamp.
+- No source approval, investment scoring/ranking, probability calibration, backtest approval, production deployment, broker connection, trade or capital allocation is authorized by this restart. The six-month product objective stays binding.
+
+## Infrastructure status — separately tracked
+
+- The owner supplied host output showing the dedicated UID-110 Rootless Docker daemon active, socket owned by UID 110, `rootless` and `seccomp` security options present, only `host` and `none` networks, and the system-wide Docker daemon preserved.
+- The latest GitHub-recorded self-hosted acceptance run at the time of this snapshot, [#42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813), concluded failure on `marketsage-local-01`. Therefore the host-level setup and GitHub workflow acceptance are distinct facts; the latter is not recorded as passed.
+- GitHub-hosted Docker acceptance [#42465921830](https://github.com/yarsalam/marketsage/actions/runs/42465921830) and PR CI [#42465926206](https://github.com/yarsalam/marketsage/actions/runs/42465926206) passed for the corresponding infrastructure commit.
+- PR #71 remains Draft and unmerged. No merge to main was made. Live independently operated backend failover and a complete 24-hour observation window are not evidenced in the repository at this snapshot.
+- Product Phase 1 does not dispatch local-runner jobs and does not depend on this infrastructure acceptance record.
+
+## Next product sequence
+
+1. Complete Phase 1 coverage workspace and pass exact-commit CI.
+2. Add a verified instrument/universe registry with separate Iran/global identities, venue, symbol lifecycle, quote currency and units.
+3. Close source-rights, connectivity, timestamp, historical-coverage, unit, corporate-action and independent-reconciliation gates provider by provider; keep unknowns quarantined.
+4. Stabilize point-in-time storage and FRED/ALFRED vintages; preserve raw response references, hashes, parser versions and revisions.
+5. Build verified Iranian price/FX/gold/fixed-income/crypto series as separate families; do not merge official/free-market rates or local/global crypto pairs.
+6. Add news and macro/event context only after original-source and publication/update timestamps are audited.
+7. Revisit the six-month research baseline and existing Stage 4 anomaly using the exact original dataset/hash; keep the final holdout unopened.
+8. Only after the owner-approved source and empirical gates pass may any investment-facing calculation be proposed for separate review.
+
+The prior 2026-11-05 operational snapshot is preserved below as historical evidence; its pending actions and state descriptions are not a statement of current status.
+
+## Historical snapshot — 2026-11-05
+
 
 ## Executive state
 
