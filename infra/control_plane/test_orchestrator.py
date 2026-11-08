@@ -258,6 +258,14 @@ class DurableOrchestratorTests(unittest.TestCase):
         self.assertEqual(unsafe.submit_calls, 0)
         self.assertEqual(result.outbox.state, DispatchState.PREPARED)
 
+    def test_validated_manifest_is_durable_for_restart_worker_pickup(self) -> None:
+        result = self.orchestrator.submit(self.manifest)
+        persisted = self.coordinator.get_manifest(self.manifest["task_id"])
+        self.assertEqual(persisted["task_id"], self.manifest["task_id"])
+        self.assertEqual(persisted["idempotency_key"], self.manifest["idempotency_key"])
+        self.assertEqual(persisted["task_definition"], self.manifest["task_definition"])
+        self.assertEqual(result.task.state, "submitted")
+
     def test_invalid_manifest_is_rejected_before_any_durable_registration(self) -> None:
         invalid = {
             **self.manifest,
