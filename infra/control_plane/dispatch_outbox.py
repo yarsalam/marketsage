@@ -101,7 +101,20 @@ class SQLiteDispatchOutbox:
     def _initialize(self) -> None:
         with self._connection() as connection:
             connection.execute("PRAGMA journal_mode=WAL")
-            version = connection.execute("PRAGMA user_version").fetchone()[0]
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS infra_schema_versions (component TEXT PRIMARY KEY, version INTEGER NOT NULL)"
+            )
+            metadata = connection.execute(
+                "SELECT version FROM infra_schema_versions WHERE component='dispatch_outbox'"
+            ).fetchone()
+            outbox_exists = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='dispatches'"
+            ).fetchone() is not None
+            # Older revisions shared PRAGMA user_version with SQLiteCoordinator.
+            # Presence of this component's tables, not the global pragma, identifies v1.
+            version = int(metadata["version"]) if metadata is not None else (
+                self.SCHEMA_VERSION if outbox_exists else 0
+            )
             if version not in (0, self.SCHEMA_VERSION):
                 raise RuntimeError("unsupported dispatch outbox schema version")
             connection.execute("BEGIN IMMEDIATE")
@@ -144,7 +157,11 @@ class SQLiteDispatchOutbox:
                 connection.execute(
                     "CREATE INDEX IF NOT EXISTS dispatch_attempts_state ON dispatch_attempts(state, updated_at)"
                 )
-                connection.execute(f"PRAGMA user_version={self.SCHEMA_VERSION}")
+                connection.execute(
+                    "INSERT INTO infra_schema_versions(component,version) VALUES('dispatch_outbox',?) "
+                    "ON CONFLICT(component) DO UPDATE SET version=excluded.version",
+                    (self.SCHEMA_VERSION,),
+                )
                 connection.commit()
             except Exception:
                 connection.rollback()
