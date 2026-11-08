@@ -44,36 +44,34 @@ sudo loginctl enable-linger marketsage-runner
 
 If the UID/GID subordinate ranges are absent or shorter than 65,536, allocate unused ranges for this account in both files before continuing. Do not copy another user's ranges or overlap an existing allocation.
 
-**Important:** run the setup under the `marketsage-runner` identity, not under the administrator's own account (for example, `nima`). The home directory and user systemd manager are per-user. A rootless daemon created under UID 1000 will not provide the required socket for the Runner at UID 110.
+**Important:** the rootless daemon must be installed as `marketsage-runner` (UID 110), never as the administrator account. Use the passwd-defined home directory; on the current host it is `/var/lib/marketsage-runner`.
 
-The service account may deliberately have `/usr/sbin/nologin` as its login shell. Check the original shell and home first:
+The account's original login shell is `/usr/sbin/nologin`. It does not need to be changed for non-interactive administration: invoke the required commands explicitly as that user with `sudo -u marketsage-runner`. The one-shot owner bootstrap package performs these checks and setup steps without opening an interactive shell.
 
-```bash
-getent passwd marketsage-runner
-```
-
-If the shell is `nologin`, temporarily permit an administrative login session:
+The persistent user manager must be active:
 
 ```bash
-sudo usermod --shell /bin/bash marketsage-runner
 sudo loginctl enable-linger marketsage-runner
-sudo -iu marketsage-runner
-id -u
-printf 'HOME=%s XDG_RUNTIME_DIR=%s\\n' "$HOME" "${XDG_RUNTIME_DIR:-}"
+sudo systemctl start user@110.service
+stat -Lc '%u:%g %a %n' /run/user/110/systemd/private
+sudo -u marketsage-runner env -i \
+  HOME=/var/lib/marketsage-runner USER=marketsage-runner LOGNAME=marketsage-runner \
+  XDG_RUNTIME_DIR=/run/user/110 \
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  systemctl --user show-environment
 ```
 
-Continue only when UID is `110`, username is `marketsage-runner`, and `XDG_RUNTIME_DIR` is `/run/user/110`. Use the actual HOME returned by `getent passwd`; on the currently configured host it is `/var/lib/marketsage-runner`, not `/home/marketsage-runner`.
+A lingering user manager may be active even when the separate session-bus socket `/run/user/110/bus` is absent. That socket is not the control socket used by `systemctl --user`: systemctl connects to the user's private manager socket `/run/user/110/systemd/private`. Do not make existence of `/run/user/110/bus` a prerequisite.
 
-A lingering user manager may be active even when the separate session-bus socket `/run/user/110/bus` is absent. That socket is not the control socket used by `systemctl --user`: systemctl connects to the user's private manager socket `/run/user/110/systemd/private`. Do not make existence of `/run/user/110/bus` a prerequisite. Verify the actual manager connection from the service account:
-
-```bash
-test -S "$XDG_RUNTIME_DIR/systemd/private"
-systemctl --user show-environment >/dev/null
-```
-
-Then, still as `marketsage-runner`, configure and start the dedicated no-network worker daemon:
+Configure and start the dedicated no-network worker daemon as the service account (the bootstrap package performs this block):
 
 ```bash
+sudo -u marketsage-runner env -i \
+  HOME=/var/lib/marketsage-runner USER=marketsage-runner LOGNAME=marketsage-runner \
+  XDG_RUNTIME_DIR=/run/user/110 \
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  bash -s <<'RUNNER'
+set -Eeuo pipefail
 install -d -m 0700 "$HOME/.config/docker"
 cat > "$HOME/.config/docker/daemon.json" <<'JSON'
 {
@@ -83,13 +81,12 @@ cat > "$HOME/.config/docker/daemon.json" <<'JSON'
   "ip-masq": false
 }
 JSON
-
-command -v dockerd-rootless-setuptool.sh
 dockerd-rootless-setuptool.sh install --force
 systemctl --user daemon-reload
 systemctl --user enable --now docker
 stat -Lc '%u:%g %a %n' /run/user/110/docker.sock
 DOCKER_HOST=unix:///run/user/110/docker.sock docker info --format '{{json .SecurityOptions}}'
+RUNNER
 ```
 
 This worker contract always launches task containers with `--network none`; the dedicated daemon therefore does not need a Docker bridge or Docker-managed NAT rules. The configuration above disables those features so rootless `dockerd` does not fail while trying to create an iptables/NAT chain on hosts where unprivileged nftables changes are denied. It is not a general-purpose Docker networking configuration: bridge-networked containers and published ports are intentionally unavailable. RootlessKit's own `slirp4netns` path remains available for daemon-level image pulls.
