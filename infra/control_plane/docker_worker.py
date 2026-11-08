@@ -43,6 +43,7 @@ class SandboxExecutionResult:
     output_limit_exceeded: bool
     output_bytes: int
     output_sha256: str
+    failure_code: Optional[str] = None
 
     @property
     def succeeded(self) -> bool:
@@ -70,17 +71,32 @@ class DockerSandboxExecutor:
         "infra.sandbox.smoke": (
             "python",
             "-c",
-            (
-                "import os,pathlib; "
-                "assert os.getuid() == 65532; "
-                "assert pathlib.Path('/proc/self/status').read_text().find('NoNewPrivs:\\t1') >= 0; "
-                "assert pathlib.Path('/proc/self/status').read_text().find('CapEff:\\t0000000000000000') >= 0; "
-                "p=pathlib.Path('/workspace/.marketsage-write-probe'); "
-                "exec(\"try: p.write_text('blocked'); raise AssertionError('checkout_writable')\\n"
-                "except PermissionError: pass\"); "
-                "pathlib.Path('/tmp/worker-smoke').write_text('isolated'); "
-                "print('marketsage-worker-smoke-ok')"
-            ),
+            "\\n".join((
+                "import os",
+                "from pathlib import Path",
+                "status = {}",
+                "for line in Path('/proc/self/status').read_text().splitlines():",
+                "    if ':' in line:",
+                "        key, value = line.split(':', 1)",
+                "        status[key] = value.strip()",
+                "if os.getuid() != 65532: raise SystemExit('SMOKE:uid')",
+                "if status.get('NoNewPrivs') != '1': raise SystemExit('SMOKE:no_new_privileges')",
+                "if int(status.get('CapEff', '1'), 16) != 0: raise SystemExit('SMOKE:capabilities')",
+                "probe = Path('/workspace/.marketsage-write-probe')",
+                "try:",
+                "    probe.write_text('must-not-write')",
+                "except PermissionError:",
+                "    pass",
+                "except OSError:",
+                "    raise SystemExit('SMOKE:checkout_probe_error')",
+                "else:",
+                "    raise SystemExit('SMOKE:checkout_writable')",
+                "try:",
+                "    Path('/tmp/worker-smoke').write_text('isolated')",
+                "except OSError:",
+                "    raise SystemExit('SMOKE:tmp_not_writable')",
+                "print('marketsage-worker-smoke-ok')",
+            )),
         )
     }
 
@@ -324,6 +340,7 @@ class DockerSandboxExecutor:
             timed_out = False
             exceeded = False
             status = "completed"
+            failure_code: Optional[str] = None
             exit_code: Optional[int] = None
             try:
                 inspect = self._run(["inspect", container_id], timeout=20)
@@ -376,6 +393,19 @@ class DockerSandboxExecutor:
                         process.kill()
                         process.wait(timeout=5)
                         status = "docker_client_terminated"
+                    if exit_code != 0 and command_id == "infra.sandbox.smoke":
+                        diagnostic = stderr_path.read_text(
+                            encoding="utf-8", errors="replace"
+                        )[:4096]
+                        match = re.search(r"SMOKE:([a-z0-9_]+)", diagnostic)
+                        if match:
+                            failure_code = "sandbox_" + match.group(1)
+                        elif "SyntaxError" in diagnostic:
+                            failure_code = "sandbox_python_syntax"
+                        elif "AssertionError" in diagnostic:
+                            failure_code = "sandbox_assertion"
+                        else:
+                            failure_code = "sandbox_smoke_nonzero_exit"
             finally:
                 try:
                     self._run(["rm", "--force", container_id], timeout=10)
@@ -395,6 +425,7 @@ class DockerSandboxExecutor:
                 output_limit_exceeded=exceeded,
                 output_bytes=total,
                 output_sha256=digest,
+                failure_code=failure_code,
             )
 
 
@@ -517,6 +548,7 @@ class CoordinatedDockerWorker:
                 "output_limit_exceeded": result.output_limit_exceeded,
                 "output_bytes": result.output_bytes,
                 "output_sha256": result.output_sha256,
+                "failure_code": result.failure_code,
             },
             sort_keys=True,
             separators=(",", ":"),
@@ -540,6 +572,9 @@ class CoordinatedDockerWorker:
             execution=result,
             reason_code=(
                 runtime_reason if runtime_reason is not None
-                else (None if published else "coordinator_rejected_stale_result")
+                else (
+                    result.failure_code if result.failure_code is not None
+                    else (None if published else "coordinator_rejected_stale_result")
+                )
             ),
         )
