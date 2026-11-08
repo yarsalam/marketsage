@@ -23,6 +23,7 @@ from .orchestrator import DurableOrchestrator
 from .providers import DeterministicFakeAdapter, SafeFailoverRouter
 from .sqlite_coordinator import SQLiteCoordinator
 from .worker_runtime import RuntimeProfile, TaskTrustAttestation
+from .watchdog import CoordinatorWatchdog
 
 
 def _manifest(commit_sha: str) -> dict[str, object]:
@@ -161,6 +162,14 @@ def main() -> int:
         if outbox.get(str(manifest["idempotency_key"])).state.value != "succeeded":
             raise SystemExit("dispatch outbox did not reach succeeded")
 
+        coordinator.record_successful_canary(
+            canary_id="docker-worker-end-to-end",
+        )
+        health_report = CoordinatorWatchdog(
+            coordinator,
+            worker_id="docker-worker-acceptance-watchdog",
+        ).run_once()
+
         print(json.dumps({
             "result": "success",
             "task_state": result.task_state,
@@ -174,6 +183,8 @@ def main() -> int:
             "secrets": "none",
             "uid": profile.uid,
             "cost_minor_units": 0,
+            "watchdog_health": health_report.assessment.level.value,
+            "watchdog_reason_codes": list(health_report.assessment.reason_codes),
         }, sort_keys=True))
     return 0
 
