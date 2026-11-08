@@ -1,0 +1,30 @@
+version: 2.1
+
+# Independent CI adapter for the provider-neutral control-plane conformance suite.
+# No contexts, secrets, deployments, releases, provider credentials, or write tokens.
+jobs:
+  provider-neutral-control-plane:
+    docker:
+      - image: cimg/python:3.12.11
+    resource_class: small
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Install the bounded infrastructure test dependency
+          command: timeout 5m python -m pip --isolated install --disable-pip-version-check --no-cache-dir -r requirements-infra.txt
+          no_output_timeout: 6m
+      - run:
+          name: Run provider-neutral control-plane conformance suite
+          command: timeout 12m python -m unittest discover -s infra/control_plane -p 'test_*.py' -v
+          no_output_timeout: 6m
+
+workflows:
+  provider-neutral-control-plane:
+    jobs:
+      - provider-neutral-control-plane:
+          filters:
+            branches:
+              only:
+                - main
+                - /^infra\/.*/
