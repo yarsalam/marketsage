@@ -240,14 +240,14 @@ class SQLiteCoordinator:
                         (current, task_id, current),
                     )
                     row = {"state": "recoverable"}
-                if row["state"] not in ("queued", "recoverable"):
+                if row["state"] not in ("queued", "recoverable", "submitted"):
                     connection.commit()
                     return None
                 connection.execute(
                     """
                     UPDATE tasks SET state='leased', owner=?, fencing_token=fencing_token+1,
                         lease_expires_at=?, updated_at=?
-                    WHERE task_id=? AND state IN ('queued','recoverable')
+                    WHERE task_id=? AND state IN ('queued','recoverable','submitted')
                     """,
                     (owner, expires, current, task_id),
                 )
@@ -273,11 +273,12 @@ class SQLiteCoordinator:
             try:
                 cursor = connection.execute(
                     """
-                    UPDATE tasks SET lease_expires_at=MAX(lease_expires_at, ?), updated_at=?
+                    UPDATE tasks SET lease_expires_at=MAX(lease_expires_at, ?),
+                        heartbeat_at=?, updated_at=?
                     WHERE task_id=? AND state='leased' AND owner=? AND fencing_token=?
                         AND lease_expires_at>?
                     """,
-                    (expires, current, lease.task_id, lease.owner, lease.fencing_token, current),
+                    (expires, current, current, lease.task_id, lease.owner, lease.fencing_token, current),
                 )
                 connection.commit()
                 return cursor.rowcount == 1
@@ -503,8 +504,10 @@ class SQLiteCoordinator:
     def mark_failed(
         self, *, lease: Lease, failure_class: str, now: Optional[float] = None,
     ) -> bool:
-        if failure_class not in {"test_failure", "code_failure"}:
-            raise ValueError("only terminal task failures are accepted here")
+        if failure_class not in {
+            "test_failure", "code_failure", "worker_timeout", "worker_runtime_failure"
+        }:
+            raise ValueError("failure_class is not allowlisted")
         current = time.time() if now is None else float(now)
         with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
