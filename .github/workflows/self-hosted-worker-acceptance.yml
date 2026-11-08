@@ -1,14 +1,13 @@
 name: MarketSage self-hosted worker acceptance
 
 on:
-  push:
-    branches:
-      - infra/durable-provider-dispatch-outbox-2026-11
-    paths:
-      - ".github/workflows/self-hosted-worker-acceptance.yml"
-  schedule:
-    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
+    inputs:
+      confirm_local_worker_acceptance:
+        description: "Owner confirms one bounded local sandbox acceptance on the selected immutable branch commit"
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -21,6 +20,7 @@ concurrency:
 
 jobs:
   self-hosted-worker-acceptance:
+    if: github.ref == 'refs/heads/infra/durable-provider-dispatch-outbox-2026-11' && github.actor == 'yarsalam' && inputs.confirm_local_worker_acceptance == true
     runs-on: [self-hosted, linux, x64]
     timeout-minutes: 20
     env:
