@@ -168,8 +168,8 @@ class SQLiteCoordinator:
                     "SELECT * FROM tasks WHERE idempotency_key=?", (idempotency_key,)
                 ).fetchone()
                 if row is not None:
-                    if row["input_digest"] != input_digest or row["task_id"] != task_id:
-                        raise IdempotencyConflict("idempotency key/task identity mismatch")
+                    if row["input_digest"] != input_digest:
+                        raise IdempotencyConflict("idempotency key/input mismatch")
                     connection.commit()
                     return self._snapshot(row)
                 row = connection.execute(
