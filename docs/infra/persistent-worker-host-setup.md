@@ -27,7 +27,37 @@ bounded CPU/memory/PIDs/time/output.
 
 ## Prepare the checkout and image
 
-Run as an administrator only for initial directory ownership and prerequisites:
+Rootless Docker prerequisites are specific to the service account:
+
+- `newuidmap` and `newgidmap` must be installed (normally from package `uidmap`).
+- `/etc/subuid` and `/etc/subgid` must each allocate at least 65,536 subordinate IDs to `marketsage-runner`.
+- The rootless Docker setup tool and rootless extras must be installed. With Docker CE packages, the setup tool is normally supplied by `docker-ce-rootless-extras`; distributions packaging Docker differently may place it under a distribution-specific path.
+
+Run as an administrator only for initial prerequisites:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y uidmap dbus-user-session slirp4netns fuse-overlayfs
+grep '^marketsage-runner:' /etc/subuid /etc/subgid || true
+sudo loginctl enable-linger marketsage-runner
+```
+
+If the UID/GID subordinate ranges are absent or shorter than 65,536, allocate unused ranges for this account in both files before continuing. Do not copy another user's ranges or overlap an existing allocation.
+
+Then enter a real login session for `marketsage-runner` (a systemd user manager must be available; on systems where `sudo -iu` does not provide one, use `machinectl shell marketsage-runner@` after installing `systemd-container`) and run as that unprivileged account:
+
+```bash
+command -v dockerd-rootless-setuptool.sh
+dockerd-rootless-setuptool.sh install --force
+systemctl --user enable --now docker
+stat -Lc '%u:%g %a %n' /run/user/110/docker.sock
+DOCKER_HOST=unix:///run/user/110/docker.sock docker info --format '{{json .SecurityOptions}}'
+```
+
+The `--force` option allows rootless setup while the system-wide Docker daemon remains enabled. Confirm that the socket is owned by UID 110 and that Docker reports both `rootless` (or `userns`) and `seccomp`. Do not repair permission errors with world-writable socket modes or by adding the account to the rootful `docker` group.
+
+Run as an administrator only for initial directory ownership:
+
 
 ```bash
 sudo install -d -o marketsage-runner -g marketsage-runner -m 0750 /srv/marketsage/app
