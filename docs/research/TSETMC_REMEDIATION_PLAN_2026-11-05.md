@@ -2,14 +2,14 @@
 
 ## Current baseline
 
-Workflow #41914919555 completed successfully in offline, memory-bounded mode. It processed 47 candidates: 47 quarantined, zero research-eligible, zero feature/forward-label rows. Seven parser/input errors were recorded. This is operational success, not source acceptance.
+Workflow #41914919555 completed successfully in offline, memory-bounded mode. It processed 47 candidates: 47 quarantined, zero research-eligible, zero feature/forward-label rows. Seven discovery identity conflicts were recorded; the run reported zero input-file read errors. Pipeline v1.1.0 misleadingly counted these conflicts under `INPUT_OR_PARSER_ERROR`. This is operational success, not source acceptance.
 
 ## Next stage: evidence and data remediation
 
 Do not rerun the unchanged corpus or weaken acceptance thresholds. Keep the original staged dataset read-only and preserve its hashes.
 
-### 1. Diagnose the seven parser/input errors
-Inspect records locally; publish only aggregate reason codes. Distinguish malformed source data, schema drift, encoding/date defects, missing fields, duplicate/order defects, and parser bugs. Add deterministic fixtures and tests for each distinct parser-caused defect. Preserve malformed originals; any corrected dataset must be a separately versioned derivative with lineage.
+### 1. Reconcile the seven discovery identity conflicts
+The successful run's preflight reports `identity_conflict_count=7` and `input_file_read_errors=0`. The pipeline code shows that these are conflicts between history-row `insCode`/ISIN values and sibling instrument-search/crosswalk metadata, not seven unreadable files. Inspect the seven records locally; publish only aggregate reason codes and pseudonymous references. Compare each mapping with an authoritative instrument master and historical symbol/venue mapping. Do not auto-select, fuzzy-match or overwrite the raw history. PR #39 merged the classification correction into the integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after all five required job types passed. The corrected pipeline is v1.1.1; the seven identity conflicts themselves remain unresolved.
 
 ### 2. Complete instrument identity
 For each proposed candidate, map to an authoritative instrument master: stable ID, issuer/fund, instrument type, exchange/board, symbol history, effective dates, suspensions and delisting state. Every mapping needs an evidence reference and reviewer. Fuzzy symbol matching is not proof.
@@ -31,7 +31,7 @@ Only after evidence-backed fixes, stage a new immutable dataset version, verify 
 
 ## Immediate engineering action
 
-Start with a local-only sanitized diagnostic of the seven parser/input errors and crosswalk coverage. Report counts by reason code and classify each issue as parser-caused or source/evidence-caused. Do not upload raw rows, prices, CSVs or local paths. Implement only proven parser fixes with regression tests.
+Start with a local-only review of the seven discovery identity conflicts and v2 crosswalk coverage. Report aggregate conflict categories and reviewed resolution status only. Do not upload raw rows, prices, CSVs or local paths. Investigate genuine parser defects separately only if the local evidence shows actual file/schema/date/field parsing failures.
 
 ## Owner/source evidence required
 
@@ -41,7 +41,7 @@ Engineering cannot fabricate:
 - a lawful independent price/volume reference;
 - an accountable reviewer for rights and semantic attestations.
 
-If these cannot be obtained, keep TSETMC quarantined and evaluate another permissioned source.
+If these cannot be obtained, keep TSETMC quarantined and evaluate another permissioned source. Owner actions and acceptance criteria are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40).
 
 ## Safety boundary
 

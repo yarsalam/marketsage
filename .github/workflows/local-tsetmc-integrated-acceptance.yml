@@ -33,7 +33,7 @@ jobs:
       - name: Checkout the reviewed integrated TSETMC implementation
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: 819f8b4028469cb0d498098fec88545a18ebacc6
+          ref: 1dc6894c0823f6ffe77d27fd866576f5115a042c
           path: pipeline-source
           persist-credentials: false
           clean: true
@@ -44,7 +44,7 @@ jobs:
           MARKETSAGE_OUTPUT_PARENT: /srv/marketsage/output
           MARKETSAGE_OUTPUT_ROOT: /srv/marketsage/output/tsetmc-integrated-acceptance
           MARKETSAGE_PIPELINE_ROOT: ${{ github.workspace }}/pipeline-source/user/analysis-engine
-          MARKETSAGE_PIPELINE_SHA: 819f8b4028469cb0d498098fec88545a18ebacc6
+          MARKETSAGE_PIPELINE_SHA: 1dc6894c0823f6ffe77d27fd866576f5115a042c
         run: |
           umask 077
           actual_pipeline_sha="$(git -C pipeline-source rev-parse HEAD)"

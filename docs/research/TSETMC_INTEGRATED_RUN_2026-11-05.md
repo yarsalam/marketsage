@@ -41,7 +41,7 @@ All 47 candidates have unverified identity evidence references and unrecognized 
 - Adjusted coverage below triage threshold: 47
 - Raw-history structural defects: 47
 - History too short for six-month research: 35
-- Input/parser errors: 7
+- Discovery identity conflicts: 7 (pipeline v1.1.0 also mislabeled these as `INPUT_OR_PARSER_ERROR`; the run reported `input_file_read_errors=0`).
 
 No candidate-level data, raw prices, local paths, or private output files are included in this record.
 
@@ -56,7 +56,7 @@ The dominant blockers are evidence and data completeness, not Runner execution:
 3. Explicitly establish price and volume units, currency, and raw versus adjusted/total-return semantics.
 4. Supply complete price-adjustment and share-change/corporate-action event payloads with auditable lineage.
 5. Complete lawful independent reconciliation against a separate reference.
-6. Resolve adjusted-history coverage, six-month minimum history, structural defects, and the seven parser/input errors.
+6. Resolve adjusted-history coverage, six-month minimum history, structural defects, and the seven discovery identity conflicts; do not assume they are parser failures.
 7. Establish calendar, publication/availability time, revisions, point-in-time tradability, and survivorship controls before any strategy evaluation.
 
 Do not solve these failures by weakening thresholds, auto-adjusting prices, inferring identities, fabricating evidence references, or promoting unknown values to pass. Reprocessing should occur only after the underlying source/evidence files are corrected and independently reviewed.
@@ -64,3 +64,9 @@ Do not solve these failures by weakening thresholds, auto-adjusting prices, infe
 ## Safety and release posture
 
 Research-only. No source approval, investment scoring/ranking, calibrated probabilities, backtest approval, production deployment, broker access, trading, or capital allocation is authorized by this run. PR #6 remains open and must not be merged without separate explicit owner approval.
+
+## Discovery classification correction
+
+The workflow log for run [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555) reports `discovery.identity_conflict_count=7` and `input_file_read_errors=0`. The seven generic `INPUT_OR_PARSER_ERROR` flags arose because pipeline v1.1.0 appended discovery identity conflicts to the same error list used for payload/parser failures. The source code identifies the specific condition as `insCode_conflicts_with_sibling_search_metadata`.
+
+[PR #39](https://github.com/yarsalam/marketsage/pull/39) merged the separate reason codes and remediation stages into the integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after five CI job types passed in run `42050542208`. The historical run remains a v1.1.0 result; the corrected pipeline is v1.1.1. The correction does not resolve the seven mappings. They still require local review against an authoritative instrument master and remain quarantined. See [owner action Issue #40](https://github.com/yarsalam/marketsage/issues/40).

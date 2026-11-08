@@ -179,3 +179,80 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
+
+## 2026-11-05 — Interpret the first integrated TSETMC candidate run as identity/evidence failure, not parser success
+
+**Authority:** Routine engineering evidence review within the existing owner-approved research scope.  
+**Status:** Candidate-only run completed; source remains unapproved. [Issue #40](https://github.com/yarsalam/marketsage/issues/40) tracks the external evidence required.
+
+**Observed run**
+- Manual local workflow [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555) completed in two bounded batches.
+- 47 candidates were discovered and all 47 remained quarantined; 0 research-eligible, 0 feature rows and 0 six-month forward-label rows.
+- The run reported `input_file_read_errors=0`, but its discovery preflight reported `identity_conflict_count=7`.
+- Pipeline v1.1.0 added `discovery:insCode_conflicts_with_sibling_search_metadata` to a generic error list and consequently emitted `INPUT_OR_PARSER_ERROR: 7`. This was a reason-code classification defect, not evidence of seven unreadable files.
+- No provider requests were made, no raw input was modified and no candidate-level output was uploaded.
+
+**Engineering correction**
+- PR #39 separates `DISCOVERY_IDENTITY_CONFLICT` and `DISCOVERY_AMBIGUOUS_HISTORY` from actual input/parser failures.
+- Identity conflicts and ambiguous history selection explicitly prevent identity acceptance and receive distinct remediation-queue stages.
+- The regression test checks that an identity conflict remains quarantined and scoring/backtest flags remain false.
+- PR #39 merged into the integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c` after all five required job types passed in run `42050542208`. The main local workflow pin is updated by PR #41; owner review of the exact merged workflow and pinned commit is still required before any future dispatch.
+
+**Decision effect**
+- Do not rerun the unchanged corpus or weaken thresholds.
+- All 47 candidates remain excluded until rights, authoritative identity, units/semantics, independent reconciliation and corporate-action evidence are supplied and reviewed.
+- Continue independent screening of permissioned Iranian and global sources.
+- PR #6 remains open and must not be merged to main without separate explicit owner approval.
+
+**Capital-risk impact:** None. No source acceptance, strategy backtest, scoring, production, broker or trading authorization changes.
+
+## 2026-11-05 — TSETMC official REST-service path and World Bank Pink Sheet release refresh
+
+**Authority:** Documentation-only source screening; no live provider requests or source approvals.
+
+- A Tasnim report dated 1404/10/06 (2025-12-27), quoting TSETMC, reports a new REST web service and links to `https://api.tsetmc.com/docs/`. The documentation endpoint was inaccessible in this review. Authentication, subscription/pricing, rate limits, history, units, adjustment semantics, publication timing and commercial rights remain unknown. Existing reverse-engineered CDN endpoints must not be assumed equivalent. PR #44 records this as a contract-discovery candidate only.
+- The World Bank's November 2026 Pink Sheet PDF is dated 2026-11-03 and reports monthly averages through October 2026. It exposes selected units/benchmarks and revision notes, lists third-party sources, and carries an "Official Use Only" footer. The XLSX workbook remains unparsed; per-series rights and historical vintages are unresolved. PR #43 records this as monthly macro context only.
+- Neither candidate is enabled for automated collection, research-engine use, scoring or commercial redistribution by these documentation changes.
+
+**Capital-risk impact:** None. Existing fail-closed source and scoring gates remain unchanged.
+
+
+## 2026-11-05 — Refresh source-screen PR status after integration rebase
+
+**Authority:** Routine documentation and evidence maintenance under the project execution constitution.  
+**Status:** PR #43, PR #45 and PR #46 merged into integration; PR #44 closed as stale-base.
+
+- PR #43's World Bank Pink Sheet update passed all five required CI job types in run `42051901501` and is present in the current integration catalog. The November 2026 PDF is dated 2026-11-03 and reports monthly averages through October. The landing page still labels the XLS workbook October 2026 and shows an older latest-prices card; the PDF/workbook release-label mismatch is retained as unresolved rather than inferred away.
+- PR #45's first patch accidentally regressed the catalog to the older October-only release record. The PR branch was corrected in commit `516e03cb4add2158a9f225e910a121d244f85962` to preserve the November PDF date, selected units, revision notes, third-party-source caveat and "Official Use Only" marking while keeping the TSETMC REST candidate separate from reverse-engineered CDN endpoints.
+- The corrected PR #45 head passed all five required job types in run `42055449340` and merged into the integration branch at `cbe585efe26ee129370b39e6bd983e709aecf55c`.
+- PR #44 is closed as a stale-base duplicate; PR #45 merged the TSETMC candidate screen on the updated integration branch. The official REST documentation host remains inaccessible in this review, so authentication, pricing, limits, history, units, timestamp semantics and rights remain unknown.
+- PR #46 added FIPIRAN, IFB and Investats candidate-only screening; all five required job types passed in run `42056363087`, and the PR merged into integration at `0857a48ad9db6c5dab13ae0eca95354639d47324`. No probe or procurement is authorized.
+- Issue #40 remains the durable owner-action record for local review of the seven identity conflicts, intended-Iran-network documentation review, rights, and independent price/volume reconciliation.
+- [Issue #47](https://github.com/yarsalam/marketsage/issues/47) separately records the owner's exact-hash local attribution of the unexplained +240.89% Stage 4 fold; the original monthly CSV is not present in GitHub and must not be replaced with another dataset.
+- PR #48 adds exact Git commit/worktree metadata and a sidecar manifest binding the report to the input CSV and configuration. Its exact-head CI is pending; it does not supply source provenance or release timestamps.
+
+**Capital-risk impact:** None. No provider probe, source approval, backtest approval, scoring, ranking, production deployment, broker access or trading was performed.
+
+## 2026-11-05 — Add sanitized local diagnostics and exact Stage 4 run provenance
+
+**Authority:** Routine engineering execution within the adopted research-only and least-privilege controls.  
+**Status:** PR #38 is merged to main; PR #48 is merged to integration.
+
+- PR #38 merged at `07e641670ceab22496ef976a584934464570fd9a` after all five required job types passed in run `42031417400`. Its manual-only diagnostic reads existing local input inventories, verifies their recorded hashes, and emits only aggregate categories. It has not been dispatched.
+- PR #48's corrected exact head `3235284d51371ec3c56b9f48d2d0f831fae88187` passed all five required job types in run `42060466294` and merged to the integration branch at `1d90726c593b0818982407c309ff13301798f5b3`. Post-merge CI run `42061367000` is being checked. It records exact Git commit/worktree state and binds the report to its input hash, configuration and evaluation design with a sidecar manifest.
+- The provenance enhancement does not supply source rights, publisher identity, first-availability timestamps, point-in-time vintages, or proof of economic validity. The manifest remains explicit that no source manifest was supplied.
+- No local workflow dispatch, source acceptance, backtest approval, scoring/ranking, production deployment, broker access, trading or capital allocation is authorized by these changes.
+
+**Capital-risk impact:** None.
+
+## 2026-11-05 — Screen Iran property and automobile data candidates
+
+**Authority:** Constitution Rule 2 (broad, evidence-led candidate screening).  
+**Status:** Documentation-only PR #51 is open; no provider probe or source approval.
+
+- CBI's reviewed urban CPI PDF (Tir 1405, observations through Khordad 1405, base 1400=100) is household inflation context, not a property asset-price or rental-yield series. CBI's Economic Time Series Database is annual macro/construction context, not a verified monthly property transaction feed.
+- CBI Tehran housing transaction reports ran monthly through Mordad 1403; the CBI/IBENA status statement dated 1404-09-12 says reporting stopped after the registry transition and access to replacement systems remained unavailable. Treat the series as historical-only with a structural coverage break.
+- CODAL disclosures for Iran Khodro, Pars Khodro and Saipa provide company-level production/sales fundamentals. Sales amounts, quantities and manufacturer price fields are not a market-wide executed new/used-car transaction-price index.
+- No current representative transaction-price source for Iranian property or used vehicles passed the history, point-in-time, unit, independent-reconciliation and rights gates. The asset universe remains open; no proxy is silently promoted to an investable price.
+
+**Capital-risk impact:** None. All source and scoring gates remain fail-closed.

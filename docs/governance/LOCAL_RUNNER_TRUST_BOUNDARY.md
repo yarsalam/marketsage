@@ -1,6 +1,6 @@
 # MarketSage local-data Runner — trust boundary and operating procedure
 
-**Status:** Runner registered and online; staged-dataset validator passed (run 41906518123, attempt 2). The integrated workflow's first dispatch (run 41912248800) reached the Runner but stopped at the original static 16 GiB RAM preflight. PR #34 is now merged to `main` (merge SHA `554fe2200ccb3a523442b0e241e81a748becfa44`) and adds bounded batching and cgroup-aware resource measurement.  
+**Status:** Runner registered and online; staged-dataset validator passed (run 41906518123, attempt 2). The memory-bounded integrated workflow completed its first candidate-only run in [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555): 47 candidates processed, 47 quarantined, zero research-eligible, zero input-file read errors and seven discovery identity conflicts. PR #34 is merged to `main` (merge SHA `554fe2200ccb3a523442b0e241e81a748becfa44`). Do not rerun the unchanged corpus.  
 **Repository:** yarsalam/marketsage (private), repository-scoped Runner only.  
 **Authority:** owner-approved manual-only compensating-control model in Issue #25. This is not equivalent to GitHub branch protection or rulesets.
 
@@ -10,7 +10,8 @@ The laptop Runner is limited to reviewed, owner-dispatched research workflows. O
 
 Allowed local workloads:
 1. the manual staged-dataset checksum/inventory validator on main;
-2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, which checks out the pinned integration commit `819f8b4028469cb0d498098fec88545a18ebacc6` and runs the offline TSETMC candidate-acceptance pipeline after explicit owner dispatch.
+2. `.github/workflows/local-tsetmc-integrated-acceptance.yml`, merged in PR #32 at `11f9de85c13f3ee8bd61e6eb7aea64992a7271d4`, with its immutable pipeline pin updated by this PR to corrected v1.1.1 commit `1dc6894c0823f6ffe77d27fd866576f5115a042c`; it remains manual-only and is not dispatched by this change.
+3. `.github/workflows/local-tsetmc-sanitized-diagnostics.yml`, merged in PR #38 at `07e641670ceab22496ef976a584934464570fd9a` after all five required CI jobs passed in run `42031417400`. It reads only existing local `run_manifest.json` and `input_inventory.csv` files under the private output directory, verifies inventory hashes, and emits aggregate reason/input-kind counts. It does not write inputs, make provider requests, expose raw rows/paths/identifiers, or upload artifacts; owner review is still required before manual dispatch.
 
 Disallowed:
 - fork/PR/issue/comment/schedule/push/workflow-run/repository-dispatch triggers;
@@ -84,21 +85,23 @@ Verified results:
 
 Attempt 1 failed during tar extraction. The service compatibility change and a sandboxed tar regression test were completed before re-running attempt 2. Attempt 2 is the accepted validator result. This validates staged corpus integrity only; it does not approve source rights, raw/adjusted semantics, corporate actions, independent reconciliation, point-in-time validity, research eligibility, backtest or scoring.
 
-## 6. Integrated TSETMC candidate workflow — memory-bounded correction merged; owner re-dispatch pending
+## 6. Integrated TSETMC candidate workflow — first memory-bounded candidate run completed
 
-Workflow `.github/workflows/local-tsetmc-integrated-acceptance.yml` was added by PR #32 and amended by PR #34, merged to `main` at `554fe2200ccb3a523442b0e241e81a748becfa44`. PR #34 exact head `dcf32f46b524daf3ac63e9937962cd02948ca2f8` passed all five CI jobs in run `41913385729`; the analysis suite reported 109 passed and 7 warnings. Its current behavior:
-- manual-only on main, owner-gated, explicit boolean confirmation, same Runner labels and concurrency group;
-- checks out the exact workflow commit plus immutable pipeline source commit 819f8b4028469cb0d498098fec88545a18ebacc6;
-- reads only the staged raw subtree and the explicit v2 crosswalk reconciliation_v2/instrument_details.jsonl;
-- enforces no symlinks, no input paths outside the staged dataset, no dataset writes, maximum 3,000 discovered items and 3 GiB of selected inputs;
-- checks effective available memory using both host `MemAvailable` and applicable cgroup ancestor limits; requires at least 4 GiB effective available memory and 8 GiB free output disk;
-- batches no more than 32 candidates and no more than 32 MiB of unique selected input files per batch; it rechecks memory/disk before every batch and writes each batch to a fresh, separately hash-verified local run directory;
-- validates output hashes and all fail-closed flags;
-- writes detailed candidate CSVs/reports locally under the private output directory and writes a mode-0600 aggregate progress/summary file after each completed batch;
-- prints only aggregate counts and safety flags to GitHub logs;
-- does not upload artifacts, install packages, probe providers, approve sources, approve backtests, enable ranking/scoring or trade.
+Workflow `.github/workflows/local-tsetmc-integrated-acceptance.yml` was added by PR #32 and amended by PR #34, merged to `main` at `554fe2200ccb3a523442b0e241e81a748becfa44`. PR #34 exact head `dcf32f46b524daf3ac63e9937962cd02948ca2f8` passed all five CI jobs in run `41913385729`; the analysis suite reported 109 passed and 7 warnings.
 
-The first dispatch [41912248800](https://github.com/yarsalam/marketsage/actions/runs/41912248800) checked out the exact workflow and pinned pipeline commits but stopped before analysis because the original static 16 GiB RAM gate exceeded available memory. No candidate batch ran. PR #34 corrected this and is merged to `main`; owner review and manual re-dispatch are now the only outstanding steps before candidate analysis.
+After PR #41 merges, the workflow remains manual-only on `main`, owner-gated, requires explicit boolean confirmation, checks out the exact manually selected workflow commit plus immutable integration pipeline commit `1dc6894c0823f6ffe77d27fd866576f5115a042c` (v1.1.1), and uses the repository-scoped Runner labels. It reads only the staged raw subtree and explicit v2 crosswalk, applies the memory/disk and bounded-batch checks, keeps detailed outputs local, prints sanitized aggregates only, and does not upload artifacts, make provider requests, alter inputs or enable scoring/backtesting.
+
+**First completed integrated run:** [41914919555](https://github.com/yarsalam/marketsage/actions/runs/41914919555), 2026-11-05.
+- Two batches: 32 and 15 candidates; 95 unique input files; 7,554 history rows.
+- 47 candidates discovered; 47 quarantined; 0 research-eligible.
+- 0 input-file read errors; 0 provider/network requests; raw inputs unchanged.
+- 32 output-manifest files hash-verified; no artifacts uploaded.
+- All candidates remain blocked on rights, identity evidence, price/volume semantics, independent reconciliation and corporate-action completeness.
+- The run's `identity_conflict_count=7` corresponds to history-row `insCode`/ISIN conflicts with sibling search/crosswalk metadata. Pipeline v1.1.0 also labeled those seven as `INPUT_OR_PARSER_ERROR`, despite `input_file_read_errors=0`. [PR #39](https://github.com/yarsalam/marketsage/pull/39) merged the v1.1.1 classification correction into the integration branch at `1dc6894c0823f6ffe77d27fd866576f5115a042c`; the seven mappings remain unresolved.
+
+Do not repeat the unchanged corpus. Before any future dispatch, the owner must review the exact current workflow source and pinned pipeline commit. PR #41 updates the main workflow's pinned SHA to `1dc6894c0823f6ffe77d27fd866576f5115a042c`. The owner must review the exact merged workflow and pin before any future dispatch; no dispatch is part of this PR.
+
+The external evidence actions are tracked in [Issue #40](https://github.com/yarsalam/marketsage/issues/40). No raw rows, candidate CSVs, local paths or private output files may be uploaded. No source approval, scoring, ranking, backtest approval, production deployment, broker access, trading or capital allocation is authorized.
 
 ## 7. Emergency stop, disable and unregister
 
@@ -122,7 +125,15 @@ If any local job behaves unexpectedly:
 
 ## Related records
 
-- [Issue #25 — local Runner activation](https://github.com/yarsalam/marketsage/issues/25)
+- [Issue #25 — local Runner activation (completed)](https://github.com/yarsalam/marketsage/issues/25)
+- [Issue #40 — TSETMC rights, identity and reconciliation evidence](https://github.com/yarsalam/marketsage/issues/40)
+- [PR #39 — discovery identity-conflict classification correction (merged to integration)](https://github.com/yarsalam/marketsage/pull/39)
+- [PR #41 — governance sync and corrected workflow pin](https://github.com/yarsalam/marketsage/pull/41)
+- [PR #43 — World Bank Pink Sheet release/rights refresh (merged into integration)](https://github.com/yarsalam/marketsage/pull/43)
+- [PR #44 — TSETMC official REST-service candidate screen (closed as stale-base/superseded)](https://github.com/yarsalam/marketsage/pull/44)
+- [PR #45 — TSETMC official REST-service candidate screen (merged into integration)](https://github.com/yarsalam/marketsage/pull/45)
+- [PR #46 — FIPIRAN/IFB/Investats candidate-only source screen](https://github.com/yarsalam/marketsage/pull/46)
+- [PR #38 — sanitized local TSETMC diagnostics (merged to main; manual dispatch not yet authorized)](https://github.com/yarsalam/marketsage/pull/38)
 - [Project state](PROJECT_STATE.md)
 - [Decision log](DECISION_LOG.md)
 - [Project execution constitution](PROJECT_EXECUTION_CONSTITUTION.md)
