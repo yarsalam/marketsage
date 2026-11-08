@@ -109,9 +109,9 @@ class FailureNoticeTests(unittest.TestCase):
         workflow = (root / ".github" / "workflows" / "self-hosted-worker-acceptance.yml").read_text(encoding="utf-8")
         self.assertRegex(
             workflow,
-            r"(?ms)^on:\\s*\\n\\s+workflow_dispatch:\\s*\\n\\s+inputs:\\s*\\n\\s+confirm_local_worker_acceptance:",
+            r"(?ms)^on:\s*\n\s+workflow_dispatch:\s*\n\s+inputs:\s*\n\s+confirm_local_worker_acceptance:",
         )
-        self.assertNotRegex(workflow, r"(?m)^\\s*(?:push|pull_request|schedule):")
+        self.assertNotRegex(workflow, r"(?m)^\s*(?:push|pull_request|schedule):")
         self.assertIn("github.actor == 'yarsalam'", workflow)
         self.assertIn("inputs.confirm_local_worker_acceptance == true", workflow)
         self.assertIn("github.ref == 'refs/heads/infra/durable-provider-dispatch-outbox-2026-11'", workflow)
