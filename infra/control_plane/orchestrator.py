@@ -5,6 +5,7 @@ claim to execute worker code; a concrete sandbox worker remains a separate layer
 """
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from typing import Any, Mapping, Optional
 
@@ -28,7 +29,7 @@ class DurableOrchestrator:
 
     def __init__(
         self, *, coordinator: SQLiteCoordinator, outbox: SQLiteDispatchOutbox,
-        router: SafeFailoverRouter, owner: str = "orchestrator",
+        router: Optional[SafeFailoverRouter], owner: str = "orchestrator",
         lease_seconds: int = 300,
     ) -> None:
         if not owner or lease_seconds < 1:
@@ -161,6 +162,8 @@ class DurableOrchestrator:
             blocked = DispatchDecision(None, (), "coordinator_state_unhandled")
             return self._result(task_id, blocked, idempotency_key)
 
+        if self.router is None:
+            raise RuntimeError("provider router is required for dispatch")
         decision = self.router.submit_durable(
             outbox=self.outbox,
             idempotency_key=idempotency_key,
@@ -188,6 +191,7 @@ class DurableOrchestrator:
             task_id=task_id,
             idempotency_key=idempotency_key,
             input_digest=input_digest,
+            manifest_json=json.dumps(dict(manifest), sort_keys=True, separators=(",", ":")),
         )
         self.outbox.prepare(
             idempotency_key=idempotency_key,
