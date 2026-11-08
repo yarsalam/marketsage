@@ -467,6 +467,7 @@ class CoordinatedDockerWorker:
 
         heartbeat = threading.Thread(target=renew, name=f"heartbeat-{self.worker_id}", daemon=True)
         heartbeat.start()
+        runtime_reason: Optional[str] = None
         try:
             result = self.executor.execute(
                 plan=plan,
@@ -475,7 +476,8 @@ class CoordinatedDockerWorker:
                 command_id=command_id,
                 abort_event=lease_lost,
             )
-        except RuntimePolicyError:
+        except RuntimePolicyError as exc:
+            runtime_reason = str(exc)
             result = SandboxExecutionResult(
                 "runtime_rejected", None, False, False, 0, hashlib.sha256(b"").hexdigest()
             )
@@ -530,5 +532,8 @@ class CoordinatedDockerWorker:
             published=published,
             task_state=current.state,
             execution=result,
-            reason_code=None if published else "coordinator_rejected_stale_result",
+            reason_code=(
+                runtime_reason if runtime_reason is not None
+                else (None if published else "coordinator_rejected_stale_result")
+            ),
         )
