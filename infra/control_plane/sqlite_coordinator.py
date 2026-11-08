@@ -104,7 +104,23 @@ class SQLiteCoordinator:
     def _initialize(self) -> None:
         with self._connection() as connection:
             connection.execute("PRAGMA journal_mode=WAL")
-            version = connection.execute("PRAGMA user_version").fetchone()[0]
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS infra_schema_versions (component TEXT PRIMARY KEY, version INTEGER NOT NULL)"
+            )
+            metadata = connection.execute(
+                "SELECT version FROM infra_schema_versions WHERE component='sqlite_coordinator'"
+            ).fetchone()
+            legacy_version = connection.execute("PRAGMA user_version").fetchone()[0]
+            tasks_exists = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tasks'"
+            ).fetchone() is not None
+            # The old implementation shared PRAGMA user_version with the outbox.
+            # Detect the old Coordinator schema only when its table exists.
+            version = (
+                int(metadata["version"]) if metadata is not None
+                else (1 if tasks_exists and legacy_version == 1 else
+                      (self.SCHEMA_VERSION if tasks_exists and legacy_version == self.SCHEMA_VERSION else 0))
+            )
             if version not in (0, 1, self.SCHEMA_VERSION):
                 raise RuntimeError("unsupported coordinator database schema version")
             connection.execute("BEGIN IMMEDIATE")
@@ -134,7 +150,11 @@ class SQLiteCoordinator:
                 connection.execute(
                     "CREATE INDEX IF NOT EXISTS tasks_provider_run ON tasks(provider_id, external_run_id)"
                 )
-                connection.execute(f"PRAGMA user_version={self.SCHEMA_VERSION}")
+                connection.execute(
+                    "INSERT INTO infra_schema_versions(component,version) VALUES('sqlite_coordinator',?) "
+                    "ON CONFLICT(component) DO UPDATE SET version=excluded.version",
+                    (self.SCHEMA_VERSION,),
+                )
                 connection.commit()
             except Exception:
                 connection.rollback()
