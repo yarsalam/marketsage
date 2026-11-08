@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - infra/durable-provider-dispatch-outbox-2026-11
+  schedule:
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
