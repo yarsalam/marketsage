@@ -9,7 +9,9 @@ from infra.control_plane.dispatch_outbox import DispatchState, SQLiteDispatchOut
 from infra.control_plane.lifecycle import RunState
 from infra.control_plane.manifest import derive_idempotency_key
 from infra.control_plane.orchestrator import DurableOrchestrator
-from infra.control_plane.providers import DeterministicFakeAdapter, SafeFailoverRouter
+from infra.control_plane.providers import (
+    DeterministicFakeAdapter, ProviderCapabilities, SafeFailoverRouter,
+)
 from infra.control_plane.sqlite_coordinator import SQLiteCoordinator
 
 
@@ -147,6 +149,26 @@ class DurableOrchestratorTests(unittest.TestCase):
         self.assertEqual(result.dispatch.receipt.provider_id, "backend-b")
         attempts = self.outbox.attempts(self.manifest["idempotency_key"])
         self.assertEqual([item.state for item in attempts], [DispatchState.FAILED, DispatchState.ACCEPTED])
+
+    def test_adapter_outside_zero_cost_offline_policy_is_never_called(self) -> None:
+        unsafe = DeterministicFakeAdapter("unsafe-backend")
+        unsafe.capabilities = ProviderCapabilities(
+            provider_id="unsafe-backend",
+            network_policy="internet",
+            secrets_required=True,
+            cost_minor_units=1,
+        )
+        guarded_router = SafeFailoverRouter([unsafe])
+        guarded = DurableOrchestrator(
+            coordinator=self.coordinator,
+            outbox=self.outbox,
+            router=guarded_router,
+        )
+        result = guarded.submit(self.manifest)
+        self.assertFalse(result.dispatch.accepted)
+        self.assertEqual(result.dispatch.blocked_reason, "no_eligible_provider")
+        self.assertEqual(unsafe.submit_calls, 0)
+        self.assertEqual(result.outbox.state, DispatchState.PREPARED)
 
     def test_invalid_manifest_is_rejected_before_any_durable_registration(self) -> None:
         invalid = {
