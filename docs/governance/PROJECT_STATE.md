@@ -1,8 +1,8 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-07  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 07e641670ceab22496ef976a584934464570fd9a  
+**Snapshot date:** 2026-11-08  
+**Repository:** yarsalam/marketsage (Public per live GitHub API; owner decision recorded in Issue #53)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** #6, feat/tindex-free-data-connector  
 **Current integration HEAD:** 1d90726c593b0818982407c309ff13301798f5b3  
 **Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
@@ -14,7 +14,7 @@
 - PR #8 remains parked after the GitHub-hosted TSETMC connection timeout. Do not repeat the same request from the same environment.
 - PR #27 (manual-only staged-dataset validator), PR #31 (clean governance adoption), PR #32 (manual integrated TSETMC workflow) and PR #34 (memory-bounded local analysis) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
 - PRs #7, #9, #13, #14, #16–#24, and #28–#30 are integrated into PR #6 in dependency order. Their CI results do not approve data sources or the strategy.
-- The governance constitution is adopted on main via PR #31. Main branch protection is not enabled; the local Runner uses the owner-approved manual-only compensating-control model. This is not equivalent to branch protection/rulesets.
+- The governance constitution is adopted on main via PR #31. An active repository ruleset (#26789479) protects main with PR and seven required-check rules and blocks deletion/non-fast-forward updates. It currently requires 10 approving reviews; the approval count still needs owner correction. The laptop Runner remains manual-only and is not a server.
 
 ## Local Runner and first dataset gate
 
@@ -158,3 +158,33 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 - PR #50 remains unvalidated on its current head after runner-allocation failures before step 1. Its schedule and concurrency changes are not active on main. The failure reporter shares the same hosted pool and is not an independent outage monitor.
 
 **Infrastructure readiness remains NOT PROVEN.** SQLite is single-host only; no transactional provider outbox, real provider adapter, worker service, periodic heartbeat, dispatch reconciliation, backup/restore, disk-full/corruption recovery, independent health canary, provider failover or end-to-end 24/7 recovery drill has been demonstrated. Ordinary product/data/research work remains paused under Issue #49. PR #6 remains open and must not be merged to main without explicit owner approval; PR #14 is already merged into #6; PR #8 remains parked.
+
+## Reconciled infrastructure checkpoint — 2026-11-08
+
+This section supersedes older infrastructure snapshots in this file where they conflict with the current evidence. Earlier entries remain as historical audit records.
+
+### Mainline CI and repository protection
+- `main` is `4c4b032196137af4658ea2c28e38a21605ee923b`. The cloud CI includes bounded job timeouts, same-ref concurrency, immutable Action pins, failure notice, and main-update provenance detection.
+- The daily schedule is active on main; successful scheduled event: [run 42471588681](https://github.com/yarsalam/marketsage/actions/runs/42471588681).
+- The direct-main provenance detector is a detection/reporting control, not prevention; native ruleset protection remains necessary.
+- Active ruleset #26789479 targets main, requires PRs and seven CI checks, blocks deletion and non-fast-forward updates, and has no configured bypass actors. It currently requires 10 approving reviews; owner adjustment remains open in Issue #63.
+- The GitHub API currently reports the repository as public. The previous owner decision to keep it public for standard hosted CI is recorded in Issue #53; no visibility setting was changed by this integration.
+
+### Provider-neutral control-plane implementation
+- Integration source before reconciliation: `2776d9c6e17d24d09a809c07549100e4f2c3c2ae`. It contains the task manifest/schema, SQLite coordinator, transactional dispatch outbox, provider router, Docker worker, daemon, watchdog/collector and deterministic tests.
+- PR #71 current implementation head: `0afb73c43dfbb0726f42d33f87e09966aa1254a9`. Exact-head Push CI [42489733190](https://github.com/yarsalam/marketsage/actions/runs/42489733190) and PR CI [42489735618](https://github.com/yarsalam/marketsage/actions/runs/42489735618) succeeded; the provider-neutral suite passed **164/164**. Hosted Docker worker acceptance [42489733159](https://github.com/yarsalam/marketsage/actions/runs/42489733159) succeeded.
+- The test suite covers two deterministic fake backends, capacity rejection, lost/ambiguous submission response, crash/restart reconciliation at dispatch boundaries, bounded failover after definitive no-effect outcomes, and one shared idempotent simulated side effect. No live paid provider or independently operated external backend has been activated.
+- Health-observer tests cover stale/missing/clock-skewed heartbeats, expired leases, unknown telemetry, provider outage classification and watchdog lease recovery. Process-level observer outage/restart and independent alert delivery still require operational proof.
+- The task registry remains a deterministic selector; it is not yet a complete GitHub Issue/PR → task contract → durable lease → dispatcher → Worker → status integration.
+
+### Local Runner boundary
+- Owner-provided host checks report the dedicated Runner service active with zero restarts and successful HTTPS proxy connectivity from the restricted Runner account.
+- Two later local offline TSETMC validator runs succeeded (runs [42482467531](https://github.com/yarsalam/marketsage/actions/runs/42482467531) and [42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959)). These validate the staged-data validator only; they are not the self-hosted Docker Worker acceptance.
+- The earlier self-hosted Worker Acceptance attempt [42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813) failed before its first workflow step and its job log was unavailable. The local acceptance workflow remains manual and owner-confirmed. Do not infer Worker success from the offline validator runs.
+- The laptop is not a persistent 24/7 host. A separate independently available Worker host and a full 24-hour observation window remain unproven.
+
+### Dependency and owner-action updates
+- Issue #52 records successful Chabokan-only dependency installation in a clean temporary environment and **30/30** tests on the specified integration commit. Exact wheel-hash locking remains a separate reproducibility item.
+- Issue #63 records the active main ruleset and the still-impractical 10-approval configuration. Owner action remains necessary to set the intended approval count and verify bypass semantics.
+
+**Current infrastructure verdict: NOT COMPLETE / NOT 24/7 ACCEPTED.** Preserve research-only posture. No data-source approval, production scoring, ranking, calibrated probability, backtest approval, broker, trading, deployment or capital allocation is enabled.

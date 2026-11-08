@@ -1,8 +1,8 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-07  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 07e641670ceab22496ef976a584934464570fd9a  
+**Snapshot date:** 2026-11-08  
+**Repository:** yarsalam/marketsage (Public per live GitHub API; owner decision recorded in Issue #53)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code HEAD:** 1d90726c593b0818982407c309ff13301798f5b3 (current PR #6 head; main local workflow remains pinned to 819f8b4028469cb0d498098fec88545a18ebacc6 until PR #41 is adopted)
 
@@ -141,3 +141,21 @@ PR #6 remains open and must not be merged to main without explicit owner approva
 - Main remains `07e641670ceab22496ef976a584934464570fd9a`; PR #50's schedule/concurrency changes are not active until safely merged. Its current exact head lacks a valid hosted CI result because jobs failed before starting. No further hosted dispatch is allowed before Issue #53 is resolved.
 - PR #14 is already integrated into PR #6. PR #6 remains unmerged to main pending explicit owner approval. PR #8 remains parked. Ordinary data/research PRs remain paused while Issue #49 is the first priority.
 - No paid usage, external provider registration, local workflow dispatch, production deployment, investment scoring, broker access, trading or capital allocation was performed.
+
+## Live infrastructure integration checkpoint — 2026-11-08
+
+This section supersedes older status snapshots above when they conflict with current GitHub state.
+
+| PR | Current role | Exact evidence / handling |
+|---|---|---|
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | Draft integration of the provider-neutral control-plane base into main | This merge commit reconciles integration source `2776d9c6e17d24d09a809c07549100e4f2c3c2ae` with main `4c4b032196137af4658ea2c28e38a21605ee923b`. Keep Draft until exact-head PR CI and complete diff review pass. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | Durable outbox, orchestrator, Docker Worker, daemon and Watchdog follow-up stacked on the integration branch | Head `0afb73c43dfbb0726f42d33f87e09966aa1254a9`; exact PR CI passed 164/164 control-plane tests and hosted Docker worker acceptance passed. Rebase/reconcile this stacked PR against the newly updated base, then re-run exact-head checks. Keep Draft. |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | Parallel workstream decomposition documentation | Draft and stacked on the integration branch; refresh/reconcile its base before review. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | Market Coverage Workspace product increment | Draft; ordinary product dispatch remains gated by Issue #49. Its earlier exact-head CI success does not authorize merge. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | Existing integrated data-source work | Open; never merge to main without the owner's separate explicit approval. |
+
+- PR #50 CI hardening and PR #70 direct-main provenance detection are already included in main commit `4c4b032...`; do not recreate them as duplicate PRs.
+- Main's successful scheduled run is [42471588681](https://github.com/yarsalam/marketsage/actions/runs/42471588681). The direct-main detector is detection only.
+- Active main ruleset #26789479 requires PRs and seven checks and blocks deletion/non-fast-forward updates; 10 approving reviews remain to be corrected by the owner.
+- Issue #49 remains OPEN. The current PR #71 tests prove deterministic fake-backend/outbox behavior, not external provider independence, continuous server availability or 24-hour resilience.
+- No auto-merge, release, deployment, paid resource, local workflow dispatch, provider activation, market-data source approval, investment scoring, broker or trading permission is granted.
