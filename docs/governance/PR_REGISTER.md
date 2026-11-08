@@ -1,8 +1,8 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-07  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 07e641670ceab22496ef976a584934464570fd9a  
+**Snapshot date:** 2026-11-08  
+**Repository:** yarsalam/marketsage (PUBLIC per live GitHub API; prior owner decision in Issue #53)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code HEAD:** 1d90726c593b0818982407c309ff13301798f5b3 (current PR #6 head; main local workflow remains pinned to 819f8b4028469cb0d498098fec88545a18ebacc6 until PR #41 is adopted)
 
@@ -141,3 +141,62 @@ PR #6 remains open and must not be merged to main without explicit owner approva
 - Main remains `07e641670ceab22496ef976a584934464570fd9a`; PR #50's schedule/concurrency changes are not active until safely merged. Its current exact head lacks a valid hosted CI result because jobs failed before starting. No further hosted dispatch is allowed before Issue #53 is resolved.
 - PR #14 is already integrated into PR #6. PR #6 remains unmerged to main pending explicit owner approval. PR #8 remains parked. Ordinary data/research PRs remain paused while Issue #49 is the first priority.
 - No paid usage, external provider registration, local workflow dispatch, production deployment, investment scoring, broker access, trading or capital allocation was performed.
+
+## Live GitHub register audit — 2026-11-08 (supersedes all older snapshots above)
+
+**Live default branch:** `main`  
+**Exact main HEAD:** `4c4b032196137af4658ea2c28e38a21605ee923b` (commit timestamp `2026-11-07T19:55:51Z`).  
+**Repository visibility:** GitHub API reports `public`, not private. Issue #53 records a prior explicit owner decision to keep it public. The latest execution request calls it private; no visibility change was made. Owner confirmation is required before treating either statement as current intent.  
+**Issue #49 remains OPEN.** Ordinary product/data/research/backtest work is paused again under the latest execution instruction; the earlier comment recording product restart is superseded for this checkpoint.
+
+### All currently open PRs (live API snapshot)
+
+| PR | State | Draft | Base | Head | Exact-head evidence / handling |
+|---|---|---:|---|---|---|
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | open | yes | `main` | `714fa2318afa1ed135b12fd52bef18e407db4b2c` | Push and PR CI substantive jobs passed (runs [42467762926](https://github.com/yarsalam/marketsage/actions/runs/42467762926), [42467764733](https://github.com/yarsalam/marketsage/actions/runs/42467764733)); product scope is paused under #49; leave untouched. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | open | yes | `infra/provider-neutral-control-plane-2026-11` | code checkpoint `4cddd751bbeca489faac6479a920f6174fdc91e2`; manual-only correction commits `6f97d39e8136fc5c1971373fc763f6eecee11802` and `1b49ac3fa2ab09787331caf8f027311187e39e97` | Exact code-checkpoint PR CI [42465926206](https://github.com/yarsalam/marketsage/actions/runs/42465926206) and push CI [42465921819](https://github.com/yarsalam/marketsage/actions/runs/42465921819) passed; provider-neutral job ran 164 tests. Hosted Docker worker acceptance [42465921830](https://github.com/yarsalam/marketsage/actions/runs/42465921830) passed with a real no-network container worker (UID 65532, read-only checkout, no secrets, zero cost); watchdog result was DEGRADED because provider health remained UNKNOWN. Self-hosted acceptance [42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813) failed before the first workflow step on attempt 2; log artifact was unavailable. New exact-head checks after the manual-only correction are pending; do not treat the older green runs as validation of the corrected head. Keep draft/open. |
+| [#62](https://github.com/yarsalam/marketsage/pull/62) | open | no | `main` | `54fbf4a364a91b4e8d834fdcec0245d079440982` | Seven substantive checks passed in run [42408717730](https://github.com/yarsalam/marketsage/actions/runs/42408717730); Dependabot update, no merge performed. |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | open | yes | `infra/provider-neutral-control-plane-2026-11` | `25ce24283e35dd7e55eb8545c590a047606643ee` | No exact-head check runs returned. Documentation decomposition only; do not duplicate or merge while #49 is open. |
+| [#51](https://github.com/yarsalam/marketsage/pull/51) | open | no | `feat/tindex-free-data-connector` | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | Five substantive jobs passed in run [42062133299](https://github.com/yarsalam/marketsage/actions/runs/42062133299); non-infrastructure data work is paused. |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | open | no | `main` | `162692f1a377ec8445ed958db4cc1171d4cafc47` | Five jobs passed in run [42063679856](https://github.com/yarsalam/marketsage/actions/runs/42063679856); governance synchronization remains open and its state document must not be treated as the live source of truth. |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | open | no | `fix/gdelt-fred-tindex-current-docs` | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | Known TSETMC smoke failure/ConnectTimeout. Parked; do not repeat the same request from the same environment. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | open | no | `main` | `1d90726c593b0818982407c309ff13301798f5b3` | Five substantive checks passed in run [42061863597](https://github.com/yarsalam/marketsage/actions/runs/42061863597). **Never merge to main without separate explicit owner approval.** |
+
+### Closed coordinator PR and owner validation
+
+- PR [#54](https://github.com/yarsalam/marketsage/pull/54) is **closed and not merged**, draft flag retained; head `e8f7d8add3df577120b92b8927c590aece001509`. Do not reopen/merge it as a duplicate. The exact-head owner validation is recorded in Issue [#55](https://github.com/yarsalam/marketsage/issues/55): 16/16 tests passed, exit 0. The later PR #71 branch modifies/integrates the coordinator lifecycle.
+- Issue #53 is closed: the owner chose public visibility and standard public hosted runners as the zero-cost path. No paid runner, plan change, or spending-cap increase is recorded.
+- Issue #52 remains open for the Chabokan-only isolated wheel install and hash-lock evidence on exact integration commit `2776d9c6e17d24d09a809c07549100e4f2c3c2ae`.
+- Issue #57 is the worker-runtime/local acceptance handoff. Exact self-hosted run #42465921813 failed before workflow steps; owner-side Runner diagnostics are required.
+- Issue #63 remains an owner action. Live ruleset #26789479 is active on `refs/heads/main`, but it requires **10 approving reviews**; the branch-protection endpoint itself returned 403 to this integration. The owner must verify the intended approval count and administrator/bypass semantics.
+
+### Live default-branch Actions audit
+
+- `.github/workflows/ci.yml` on main has `push` (main/deploy/**/research/**/ci/**/infra/**), `pull_request` (main/deploy/**/infra/**), daily `schedule` at `03:17 UTC`, and `workflow_dispatch`.
+- A real successful default-branch schedule run exists: [42471588681](https://github.com/yarsalam/marketsage/actions/runs/42471588681), on main SHA `4c4b032196137af4658ea2c28e38a21605ee923b`, conclusion `success`.
+- CI uses global `contents: read`; job-level permissions add only the PR/issue reads or issue-comment write required by the provenance/failure-notice jobs. Actions are pinned to full 40-character SHAs.
+- CI concurrency is keyed by PR number/ref and cancels superseded runs. Observed rapid-push runs were cancelled, but there is no independent observer for a hosted run stuck before job start or for a provider-wide hosted-runner outage.
+- Job timeouts are bounded (5–40 minutes). CI has no automatic job retry; the task scheduler has a tested bounded retry budget. No explicit artifact upload or custom log-retention override is present.
+- The CI failure reporter runs on the same GitHub-hosted runner pool it monitors and cannot report a total outage of that pool. The local self-hosted worker reporter runs on GitHub-hosted `ubuntu-latest`, so it is independent of the local runner pool, but still depends on GitHub-hosted capacity.
+- The Docker worker acceptance workflow in PR #71 uses GitHub-hosted `ubuntu-latest`, a 15-minute timeout, no-network container, and a 15-minute schedule; because it exists only on a non-default PR branch, its schedule is **not active** yet. The self-hosted acceptance workflow has been changed to owner-confirmed `workflow_dispatch` only; it must not run on push or schedule.
+- No dedicated independent 24/7 server runner is provisioned. The laptop runner is not an always-on service. The 24-hour observation window has not been completed.
+
+### Main ruleset and human gate
+
+Ruleset [#26789479](https://github.com/yarsalam/marketsage/rules/26789479) is active and targets `refs/heads/main`. It blocks branch deletion and non-fast-forward updates, requires a pull request, and requires these seven checks: `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, and `Test CI automation helpers`. It also requires **10 approvals**. Its explicit bypass actor list is empty; administrator bypass behavior was not independently verified. The ruleset collection is readable, but the classic branch-protection endpoint is not accessible to this integration (403). Owner action remains in [#63](https://github.com/yarsalam/marketsage/issues/63).
+
+### Issue #49 acceptance posture — NOT COMPLETE
+
+| Criterion | Evidence | Status |
+|---|---|---|
+| Event-driven push/PR exact-head CI | PR #71 prior code head has successful push/PR CI; corrected manual-only head awaits exact-head checks | PARTIAL |
+| Successful default-branch scheduled run | Main schedule run #42471588681 on exact main SHA | PASS for scheduled CI only; not yet a scheduled worker/orchestrator canary |
+| Two independent real backends | Two deterministic fake adapters only; no independently operated real backends | NOT PROVEN |
+| No duplicate external side effects | 164-test suite includes fake/restart/failover paths; no external side-effect ledger on two real backends | PARTIAL / NOT PROVEN |
+| Hung/stale recovery, timeout/cancel/retry | Durable lease/fencing/watchdog/scheduler tests exist; no full live 24/7 failure-injection window | PARTIAL |
+| Real isolated worker | Hosted Docker worker acceptance succeeded; local self-hosted acceptance failed before workflow steps | PARTIAL |
+| Independent health/failure notification | Local-worker failure notifier succeeded on hosted runner; CI notifier shares the hosted pool; watchdog reported provider UNKNOWN | PARTIAL |
+| Least privilege, cost guardrails, runbook | Workflow permissions, pinned actions, zero-cost public runner, sandbox policy and runbook are documented; owner review remains | PARTIAL |
+| 24-hour continuous observation | No qualifying window | NOT PROVEN |
+
+No PR was merged, no workflow was manually dispatched or rerun by this audit, no provider/account/secret was registered, and no product/data/investment work was performed.
