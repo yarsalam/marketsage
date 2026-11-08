@@ -5,6 +5,7 @@
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Active product issue:** [#72 — Product Phase 1: evidence-first Market Coverage Workspace](https://github.com/yarsalam/marketsage/issues/72)  
 **Active product branch:** `research/market-coverage-workspace-2026-11`  
+**Product PR:** [#73 — evidence-first Market Coverage workspace](https://github.com/yarsalam/marketsage/pull/73), Draft, open, head `e595478016a0d3e601d176cda8314233edc846db`  
 **Infrastructure PR:** [#71](https://github.com/yarsalam/marketsage/pull/71), Draft, open and unmerged  
 **Release posture:** research-only. No source is approved for production investment scoring; no validated probability model or strategy is approved; production allocation, broker access and trading remain disabled.
 
@@ -14,6 +15,8 @@
 - Phase 1 is an evidence-first Market Coverage Workspace. It exposes the existing Python source registry, data-quality report and Iranian provider-readiness catalog via NestJS and a Persian RTL Next.js page.
 - In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, and `GET /api/markets/iran-providers`. Controller forwarding tests were added.
 - The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates and Iranian provider readiness. The page is the default landing tab for this increment.
+- NestJS unit tests cover forwarding of the new API routes and bounded service-unavailable behavior when the analysis engine is unreachable.
+- PR #73 is Draft and open. Exact latest head: `e595478016a0d3e601d176cda8314233edc846db`. Push CI run [#42467683395](https://github.com/yarsalam/marketsage/actions/runs/42467683395) is pending; PR CI run [#42467642643](https://github.com/yarsalam/marketsage/actions/runs/42467642643) is still running against the preceding head `51a95a944764609158cd49185a356e6a4a054449`. The exact latest PR head is not green until its matching pull_request run succeeds.
 - The page reports actual registry and runtime values only. It does not create synthetic quotes, infer provider availability, approve data, or change scoring.
 - Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Current acceptance checklist: Issue #72.
 - The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PR #71 is infrastructure-only, Draft and unmerged.
@@ -38,7 +41,7 @@
 
 ## Next product sequence
 
-1. Complete Phase 1 coverage workspace and pass exact-commit CI.
+1. Complete Phase 1 coverage workspace and pass exact-commit CI for PR #73.
 2. Add a verified instrument/universe registry with separate Iran/global identities, venue, symbol lifecycle, quote currency and units.
 3. Close source-rights, connectivity, timestamp, historical-coverage, unit, corporate-action and independent-reconciliation gates provider by provider; keep unknowns quarantined.
 4. Stabilize point-in-time storage and FRED/ALFRED vintages; preserve raw response references, hashes, parser versions and revisions.
