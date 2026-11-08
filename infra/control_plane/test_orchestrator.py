@@ -10,7 +10,8 @@ from infra.control_plane.lifecycle import RunState
 from infra.control_plane.manifest import derive_idempotency_key
 from infra.control_plane.orchestrator import DurableOrchestrator
 from infra.control_plane.providers import (
-    DeterministicFakeAdapter, ProviderCapabilities, SafeFailoverRouter,
+    DeterministicFakeAdapter, IdempotentEffectLedger, ProviderCapabilities,
+    SafeFailoverRouter,
 )
 from infra.control_plane.sqlite_coordinator import SQLiteCoordinator
 
@@ -106,6 +107,30 @@ class DurableOrchestratorTests(unittest.TestCase):
         attempts = self.outbox.attempts(self.manifest["idempotency_key"])
         self.assertEqual([item.provider_id for item in attempts], ["backend-a", "backend-b"])
         self.assertEqual([item.state for item in attempts], [DispatchState.REJECTED, DispatchState.ACCEPTED])
+
+    def test_durable_failover_commits_one_shared_side_effect(self) -> None:
+        effects = IdempotentEffectLedger()
+        first = DeterministicFakeAdapter(
+            "backend-a", capacity_available=False, effects=effects
+        )
+        second = DeterministicFakeAdapter("backend-b", effects=effects)
+        guarded = DurableOrchestrator(
+            coordinator=self.coordinator,
+            outbox=self.outbox,
+            router=SafeFailoverRouter([first, second]),
+        )
+        accepted = guarded.submit(self.manifest)
+        self.assertEqual(accepted.dispatch.receipt.provider_id, "backend-b")
+        second.mark_terminal(accepted.dispatch.receipt.external_run_id, RunState.SUCCEEDED)
+        reconciled = guarded.reconcile(self.manifest)
+        repeated = guarded.submit(self.manifest)
+        self.assertEqual(reconciled.outbox.state, DispatchState.SUCCEEDED)
+        self.assertEqual(repeated.outbox.state, DispatchState.SUCCEEDED)
+        self.assertEqual(effects.effect_count, 1)
+        self.assertEqual(first.accepted_count, 0)
+        self.assertEqual(second.accepted_count, 1)
+        self.assertEqual(first.submit_calls, 1)
+        self.assertEqual(second.submit_calls, 1)
 
     def test_lost_response_reconciles_same_backend_without_failover(self) -> None:
         self.backend_a.uncertain_after_accept = True
