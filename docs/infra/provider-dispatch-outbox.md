@@ -24,3 +24,30 @@ SQLite is single-host only and must use a local persistent filesystem. It is not
 ## Tests
 
 `python -m unittest -v infra.control_plane.test_dispatch_outbox` covers restart persistence, concurrent attempt reservation, ambiguity blocking, reconciliation, safe pre-acceptance failover, provider-guaranteed no-effect failover, terminal success, immutable input binding, and bounded provider attempts.
+
+## Orchestration integration
+
+`infra/control_plane/orchestrator.py` now wires the strict manifest validator,
+`SQLiteCoordinator`, `SQLiteDispatchOutbox`, and `SafeFailoverRouter` into one
+intake-to-dispatch path. `DurableOrchestrator.submit()` validates first, persists
+the logical task, prepares the outbox, and then calls the router's
+`submit_durable()` method. `reconcile()` resumes an existing task without
+creating a new logical task.
+
+The durable router reserves each provider attempt before calling the adapter.
+It marks definite capacity rejection as rejected, records ambiguous submissions
+as unknown, and reconciles by the same immutable key before considering any
+other provider. Unexpected adapter errors are treated as ambiguous. The v1
+manifest policy is enforced against adapter declarations: non-zero cost,
+network access, or secret requirements are ineligible.
+
+The integration tests use deterministic in-process fake adapters only. They
+cover duplicate delivery, definitive capacity failover, lost-response
+reconciliation, unknown-state blocking, simulated restart after provider
+acceptance, terminal no-effect failover, invalid-manifest rejection, and
+provider-policy rejection.
+
+This still does not execute worker code, and does not turn fake provider
+contracts into evidence about any real external provider. The coordinator task
+record remains the durable intake record; a worker execution/result lifecycle
+and concrete OS sandbox remain separate acceptance stages.
