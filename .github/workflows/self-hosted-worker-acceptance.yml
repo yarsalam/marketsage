@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: marketsage-self-hosted-worker-acceptance
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   self-hosted-worker-acceptance:
