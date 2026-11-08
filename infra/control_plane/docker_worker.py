@@ -10,7 +10,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import tempfile
 import threading
@@ -22,16 +21,14 @@ from typing import Mapping, Optional
 
 from .lifecycle import RunState
 from .providers import ProviderReceipt
-from .sqlite_coordinator import Lease, SQLiteCoordinator
+from .sqlite_coordinator import SQLiteCoordinator
 from .worker_runtime import (
     LaunchPlan,
     RuntimePolicyError,
     RuntimeProfile,
     SandboxCapabilities,
     TaskTrustAttestation,
-    assert_no_symlink_components,
     build_launch_plan,
-    build_minimal_environment,
     validate_sandbox_capabilities,
 )
 
