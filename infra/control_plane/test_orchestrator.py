@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import tempfile
+import time
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -14,6 +16,10 @@ from infra.control_plane.providers import (
     SafeFailoverRouter,
 )
 from infra.control_plane.sqlite_coordinator import SQLiteCoordinator
+
+
+class SimulatedProcessCrash(BaseException):
+    """BaseException models process death outside normal adapter exception handling."""
 
 
 class DurableOrchestratorTests(unittest.TestCase):
@@ -84,7 +90,9 @@ class DurableOrchestratorTests(unittest.TestCase):
 
     def test_manifest_coordinator_outbox_and_router_are_connected(self) -> None:
         result = self.orchestrator.submit(self.manifest)
-        self.assertEqual(result.task.state, "queued")
+        self.assertEqual(result.task.state, "submitted")
+        self.assertEqual(result.task.provider_id, "backend-a")
+        self.assertEqual(result.task.external_run_id, result.dispatch.receipt.external_run_id)
         self.assertTrue(result.dispatch.accepted)
         self.assertEqual(result.dispatch.receipt.provider_id, "backend-a")
         self.assertEqual(result.outbox.state, DispatchState.ACCEPTED)
@@ -171,6 +179,55 @@ class DurableOrchestratorTests(unittest.TestCase):
         self.assertEqual(result.outbox.state, DispatchState.ACCEPTED)
         self.assertEqual(self.backend_a.submit_calls, 1)
         self.assertEqual(self.backend_b.submit_calls, 0)
+
+    def test_crash_after_acceptance_before_outbox_receipt_is_reconciled(self) -> None:
+        original_submit = self.backend_a.submit
+
+        def accept_then_crash(**kwargs):
+            original_submit(**kwargs)
+            raise SimulatedProcessCrash()
+
+        with patch.object(self.backend_a, "submit", side_effect=accept_then_crash):
+            with self.assertRaises(SimulatedProcessCrash):
+                self.orchestrator.submit(self.manifest)
+
+        self.assertEqual(self.outbox.get(self.manifest["idempotency_key"]).state, DispatchState.SUBMITTING)
+        self.assertEqual(self.coordinator.get(self.manifest["task_id"]).state, "leased")
+        self.coordinator.recover_expired(now=time.time() + 3600)
+        recovered = self.orchestrator.reconcile(self.manifest)
+        self.assertTrue(recovered.dispatch.accepted)
+        self.assertEqual(recovered.task.state, "submitted")
+        self.assertEqual(self.backend_a.submit_calls, 1)
+        self.assertEqual(self.backend_a.accepted_count, 1)
+        self.assertEqual(self.backend_b.submit_calls, 0)
+
+    def test_crash_after_outbox_acceptance_before_coordinator_attach_is_reconciled(self) -> None:
+        with patch.object(
+            self.coordinator, "mark_submitted", side_effect=SimulatedProcessCrash()
+        ):
+            with self.assertRaises(SimulatedProcessCrash):
+                self.orchestrator.submit(self.manifest)
+
+        self.assertEqual(self.outbox.get(self.manifest["idempotency_key"]).state, DispatchState.ACCEPTED)
+        self.assertEqual(self.coordinator.get(self.manifest["task_id"]).state, "leased")
+        self.coordinator.recover_expired(now=time.time() + 3600)
+        recovered = self.orchestrator.reconcile(self.manifest)
+        self.assertTrue(recovered.dispatch.accepted)
+        self.assertEqual(recovered.task.state, "submitted")
+        self.assertEqual(self.backend_a.submit_calls, 1)
+        self.assertEqual(self.backend_b.submit_calls, 0)
+
+    def test_crash_before_provider_acceptance_stays_unknown_and_never_fails_over(self) -> None:
+        with patch.object(self.backend_a, "submit", side_effect=SimulatedProcessCrash()):
+            with self.assertRaises(SimulatedProcessCrash):
+                self.orchestrator.submit(self.manifest)
+
+        self.coordinator.recover_expired(now=time.time() + 3600)
+        recovered = self.orchestrator.reconcile(self.manifest)
+        self.assertFalse(recovered.dispatch.accepted)
+        self.assertEqual(recovered.outbox.state, DispatchState.UNKNOWN)
+        self.assertEqual(self.backend_b.submit_calls, 0)
+        self.assertEqual(self.backend_a.submit_calls, 0)
 
     def test_terminal_no_effect_failure_can_advance_to_next_backend(self) -> None:
         first = self.orchestrator.submit(self.manifest)
