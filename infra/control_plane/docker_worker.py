@@ -71,7 +71,7 @@ class DockerSandboxExecutor:
         "infra.sandbox.smoke": (
             "python",
             "-c",
-            "\\n".join((
+            "\n".join((
                 "import os",
                 "from pathlib import Path",
                 "status = {}",
