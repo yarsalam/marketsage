@@ -44,33 +44,34 @@ sudo loginctl enable-linger marketsage-runner
 
 If the UID/GID subordinate ranges are absent or shorter than 65,536, allocate unused ranges for this account in both files before continuing. Do not copy another user's ranges or overlap an existing allocation.
 
-**Important:** run the setup under the `marketsage-runner` login, not under the administrator's own account (for example, `nima`). The home directory, user systemd manager and Docker socket are all per-user. A daemon created under UID 1000 will not provide the required socket for the Runner at UID 110.
+**Important:** run the setup under the `marketsage-runner` identity, not under the administrator's own account (for example, `nima`). The home directory and user systemd manager are per-user. A rootless daemon created under UID 1000 will not provide the required socket for the Runner at UID 110.
 
-The service account may deliberately have `/usr/sbin/nologin` as its login shell. Check it first:
+The service account may deliberately have `/usr/sbin/nologin` as its login shell. Check the original shell and home first:
 
 ```bash
 getent passwd marketsage-runner
 ```
 
-If the shell is `nologin`, temporarily allow an administrative login session, then restore the original restricted shell after Docker setup and verification:
+If the shell is `nologin`, temporarily permit an administrative login session:
 
 ```bash
 sudo usermod --shell /bin/bash marketsage-runner
+sudo loginctl enable-linger marketsage-runner
 sudo -iu marketsage-runner
 id -u
 printf 'HOME=%s XDG_RUNTIME_DIR=%s\\n' "$HOME" "${XDG_RUNTIME_DIR:-}"
 ```
 
-Continue only when `id -u` prints `110` and `XDG_RUNTIME_DIR` is `/run/user/110`. After the rootless Docker service and socket have been verified, exit the service-account shell and restore its original restricted shell:
+Continue only when UID is `110`, username is `marketsage-runner`, and `XDG_RUNTIME_DIR` is `/run/user/110`. Use the actual HOME returned by `getent passwd`; on the currently configured host it is `/var/lib/marketsage-runner`, not `/home/marketsage-runner`.
+
+A lingering user manager may be active even when the separate session-bus socket `/run/user/110/bus` is absent. That socket is not the control socket used by `systemctl --user`: systemctl connects to the user's private manager socket `/run/user/110/systemd/private`. Do not make existence of `/run/user/110/bus` a prerequisite. Verify the actual manager connection from the service account:
 
 ```bash
-exit
-sudo usermod --shell /usr/sbin/nologin marketsage-runner
+test -S "$XDG_RUNTIME_DIR/systemd/private"
+systemctl --user show-environment >/dev/null
 ```
 
-If the original shell shown by `getent passwd` was different, restore that exact original value instead. Do not leave an automation service account with an interactive shell unless there is an explicit operational reason.
-
-Continue only when `id -u` prints `110` and `XDG_RUNTIME_DIR` is `/run/user/110`. Then, still as `marketsage-runner`, configure this dedicated no-network worker daemon before installing it:
+Then, still as `marketsage-runner`, configure and start the dedicated no-network worker daemon:
 
 ```bash
 install -d -m 0700 "$HOME/.config/docker"
@@ -94,6 +95,14 @@ DOCKER_HOST=unix:///run/user/110/docker.sock docker info --format '{{json .Secur
 This worker contract always launches task containers with `--network none`; the dedicated daemon therefore does not need a Docker bridge or Docker-managed NAT rules. The configuration above disables those features so rootless `dockerd` does not fail while trying to create an iptables/NAT chain on hosts where unprivileged nftables changes are denied. It is not a general-purpose Docker networking configuration: bridge-networked containers and published ports are intentionally unavailable. RootlessKit's own `slirp4netns` path remains available for daemon-level image pulls.
 
 The `--force` option allows rootless setup while the system-wide Docker daemon remains enabled. Confirm that the socket is owned by UID 110 and that Docker reports both `rootless` (or `userns`) and `seccomp`. Do not repair permission errors with world-writable socket modes or by adding the account to the rootful `docker` group.
+
+After Docker and its security options are verified, exit the service-account shell and restore the exact original restricted shell shown by `getent passwd` (currently `/usr/sbin/nologin`):
+
+```bash
+exit
+sudo usermod --shell /usr/sbin/nologin marketsage-runner
+sudo systemctl restart actions.runner.yarsalam-marketsage.marketsage-local-01.service
+```
 
 After the rootless socket is verified, restart the registered Actions Runner service
 so the job process reconnects with the service account's correct runtime directory:
