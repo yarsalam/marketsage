@@ -14,34 +14,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: marketsage-self-hosted-worker-acceptance-${{ github.run_id }}
+  # One local worker host: serialize this acceptance workflow and never cancel
+  # a running worker job merely because a newer scheduled/push run arrived.
+  group: marketsage-self-hosted-worker-acceptance
   cancel-in-progress: false
 
 jobs:
-  cancel-stale-runs:
-    name: Cancel stale local acceptance runs
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      actions: write
-    steps:
-      - name: Cancel only older runs of this smoke workflow
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CURRENT_RUN_ID: ${{ github.run_id }}
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          workflow_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/self-hosted-worker-acceptance.yml" --jq '.id')"
-          stale_runs="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow_id/runs?per_page=100" \
-            --jq ".workflow_runs[] | select(.id < $CURRENT_RUN_ID) | select(.status == \"queued\" or .status == \"pending\" or .status == \"in_progress\") | .id")"
-          while IFS= read -r run_id; do
-            [[ -n "$run_id" ]] || continue
-            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" || true
-          done <<< "$stale_runs"
-
   self-hosted-worker-acceptance:
-    needs: [cancel-stale-runs]
     runs-on: [self-hosted, linux, x64]
     timeout-minutes: 20
     env:
@@ -77,12 +56,26 @@ jobs:
               raise SystemExit("rootless Docker with seccomp/userns is required")
           PY
 
-      - name: Verify owner-controlled clean main source
+      - name: Verify networkless Docker configuration
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mapfile -t networks < <(docker network ls --format '{{.Name}}' | sort)
+          printf 'Docker networks: %s\\n' "${networks[*]}"
+          [[ "${#networks[@]}" -eq 2 ]]
+          [[ "${networks[0]}" == "host" ]]
+          [[ "${networks[1]}" == "none" ]]
+          if docker network ls --format '{{.Name}}' | grep -qx bridge; then
+            echo "Unexpected default bridge network is present" >&2
+            exit 1
+          fi
+
+      - name: Verify owner-controlled PR source
         shell: bash
         run: |
           set -Eeuo pipefail
           [[ "$(git branch --show-current)" == "infra/durable-provider-dispatch-outbox-2026-11" ]]
-          git status --porcelain
+          test -z "$(git status --porcelain)"
           git rev-parse HEAD
 
       - name: Set up Python
