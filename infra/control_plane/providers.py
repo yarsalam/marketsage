@@ -265,6 +265,203 @@ class SafeFailoverRouter:
             (previous.provider_id,),
         )
 
+    def submit_durable(self, *, outbox: object, idempotency_key: str, input_digest: str) -> DispatchDecision:
+        """Submit through the durable outbox, reconciling ambiguity before failover.
+
+        The outbox reservation is committed before each adapter call. Only a
+        typed pre-acceptance capacity rejection or an attested no-effect terminal
+        failure can advance to another provider. Unexpected exceptions are
+        conservatively treated as ambiguous submissions.
+        """
+        from .dispatch_outbox import DispatchState
+
+        snapshot = outbox.get(idempotency_key)
+        if snapshot.input_digest != input_digest:
+            raise IdempotencyConflict("idempotency key/input mismatch")
+        attempted = [item.provider_id for item in outbox.attempts(idempotency_key)]
+
+        def decision_for(receipt: Optional[ProviderReceipt], reason: Optional[str] = None) -> DispatchDecision:
+            return DispatchDecision(receipt, tuple(attempted), reason)
+
+        def validate_receipt(receipt: ProviderReceipt, provider_id: str) -> None:
+            if (
+                receipt.provider_id != provider_id
+                or receipt.idempotency_key != idempotency_key
+                or receipt.input_digest != input_digest
+                or not receipt.external_run_id
+            ):
+                raise IdempotencyConflict("provider receipt identity mismatch")
+
+        def record_receipt(adapter: ProviderAdapter, receipt: ProviderReceipt) -> bool:
+            """Return True only when a verified no-effect failure permits failover."""
+            validate_receipt(receipt, adapter.capabilities.provider_id)
+            if receipt.state in TERMINAL_STATES:
+                terminal = outbox.mark_terminal(
+                    receipt=receipt,
+                    no_side_effects_on_failure=(
+                        receipt.state == RunState.FAILED
+                        and adapter.capabilities.terminal_failure_guarantees_no_side_effects
+                    ),
+                )
+                return (
+                    receipt.state == RunState.FAILED
+                    and terminal.no_side_effects
+                )
+            if receipt.state in {RunState.QUEUED, RunState.RUNNING}:
+                outbox.mark_accepted(receipt=receipt)
+                return False
+            outbox.mark_unknown(
+                idempotency_key=idempotency_key,
+                provider_id=adapter.capabilities.provider_id,
+                reason_code="response_unknown",
+            )
+            return False
+
+        def persisted_receipt(current: object) -> Optional[ProviderReceipt]:
+            provider_id = current.current_provider_id
+            external_run_id = current.external_run_id
+            if not provider_id or not external_run_id:
+                return None
+            state = {
+                DispatchState.ACCEPTED: RunState.QUEUED,
+                DispatchState.SUCCEEDED: RunState.SUCCEEDED,
+                DispatchState.FAILED: RunState.FAILED,
+                DispatchState.CANCELLED: RunState.CANCELLED,
+            }.get(current.state)
+            if state is None:
+                return None
+            adapter = self._by_id.get(provider_id)
+            if adapter is not None:
+                observed = adapter.inspect(external_run_id)
+                if observed is not None:
+                    validate_receipt(observed, provider_id)
+                    return observed
+            return ProviderReceipt(provider_id, external_run_id, idempotency_key, input_digest, state)
+
+        # A process may have died after committing SUBMITTING but before it
+        # recorded a response. Treat this exactly like a lost response.
+        if snapshot.state == DispatchState.SUBMITTING:
+            outbox.mark_unknown(
+                idempotency_key=idempotency_key,
+                provider_id=snapshot.current_provider_id,
+                reason_code="process_interrupted",
+            )
+            snapshot = outbox.get(idempotency_key)
+
+        if snapshot.state == DispatchState.UNKNOWN:
+            provider_id = snapshot.current_provider_id
+            adapter = self._by_id.get(provider_id) if provider_id else None
+            if adapter is None or not adapter.capabilities.supports_reconcile_by_key:
+                return decision_for(None, "submission_unknown")
+            try:
+                reconciled = adapter.reconcile(idempotency_key)
+            except Exception:
+                return decision_for(None, "reconciliation_unavailable")
+            if reconciled is None:
+                return decision_for(None, "submission_unknown")
+            may_failover = record_receipt(adapter, reconciled)
+            snapshot = outbox.get(idempotency_key)
+            if not may_failover:
+                if snapshot.state in {DispatchState.ACCEPTED, DispatchState.SUCCEEDED, DispatchState.CANCELLED}:
+                    return decision_for(reconciled)
+                return decision_for(None, "terminal_failure_effects_unproven")
+
+        if snapshot.state == DispatchState.ACCEPTED:
+            receipt = persisted_receipt(snapshot)
+            if receipt is None:
+                return decision_for(None, "accepted_run_unobservable")
+            adapter = self._by_id.get(receipt.provider_id)
+            if adapter is not None:
+                try:
+                    observed = adapter.inspect(receipt.external_run_id)
+                except Exception:
+                    observed = None
+                if observed is not None and observed.state in TERMINAL_STATES:
+                    validate_receipt(observed, receipt.provider_id)
+                    may_failover = record_receipt(adapter, observed)
+                    snapshot = outbox.get(idempotency_key)
+                    if may_failover:
+                        pass
+                    else:
+                        return decision_for(observed)
+                else:
+                    return decision_for(observed or receipt)
+            else:
+                return decision_for(receipt)
+
+        if snapshot.state in {DispatchState.SUCCEEDED, DispatchState.CANCELLED}:
+            return decision_for(persisted_receipt(snapshot), "dispatch_terminal")
+        if snapshot.state == DispatchState.FAILED and not snapshot.no_side_effects:
+            return decision_for(persisted_receipt(snapshot), "terminal_failure_effects_unproven")
+
+        for adapter in self.adapters:
+            provider_id = adapter.capabilities.provider_id
+            if provider_id in attempted:
+                continue
+            capabilities = adapter.capabilities
+            if not capabilities.supports_idempotency or not capabilities.supports_reconcile_by_key:
+                continue
+            reservation = outbox.begin_attempt(
+                idempotency_key=idempotency_key,
+                provider_id=provider_id,
+            )
+            if reservation is None:
+                current = outbox.get(idempotency_key)
+                return decision_for(persisted_receipt(current), "dispatch_not_reservable")
+            attempted.append(provider_id)
+            try:
+                receipt = adapter.submit(
+                    idempotency_key=idempotency_key,
+                    input_digest=input_digest,
+                )
+            except CapacityUnavailable:
+                outbox.mark_rejected(
+                    idempotency_key=idempotency_key,
+                    provider_id=provider_id,
+                    reason_code="capacity_unavailable",
+                )
+                continue
+            except SubmissionUncertain:
+                outbox.mark_unknown(
+                    idempotency_key=idempotency_key,
+                    provider_id=provider_id,
+                    reason_code="response_unknown",
+                )
+                try:
+                    receipt = adapter.reconcile(idempotency_key)
+                except Exception:
+                    receipt = None
+                if receipt is None:
+                    return decision_for(None, "submission_unknown")
+            except Exception:
+                # Unknown exceptions cannot establish that no external effect occurred.
+                outbox.mark_unknown(
+                    idempotency_key=idempotency_key,
+                    provider_id=provider_id,
+                    reason_code="response_unknown",
+                )
+                return decision_for(None, "submission_unknown")
+
+            try:
+                may_failover = record_receipt(adapter, receipt)
+            except Exception:
+                # A malformed or conflicting receipt must never unlock another backend.
+                outbox.mark_unknown(
+                    idempotency_key=idempotency_key,
+                    provider_id=provider_id,
+                    reason_code="response_unknown",
+                )
+                return decision_for(None, "provider_receipt_invalid")
+            if may_failover:
+                continue
+            snapshot = outbox.get(idempotency_key)
+            if snapshot.state in {DispatchState.ACCEPTED, DispatchState.SUCCEEDED, DispatchState.CANCELLED}:
+                return decision_for(receipt)
+            return decision_for(None, "terminal_failure_effects_unproven")
+
+        current = outbox.get(idempotency_key)
+        return decision_for(persisted_receipt(current), "no_provider_capacity")
+
     def _submit_from(
         self,
         start: int,
