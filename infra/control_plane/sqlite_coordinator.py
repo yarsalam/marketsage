@@ -29,6 +29,17 @@ class TaskSnapshot:
     provider_id: Optional[str]
     external_run_id: Optional[str]
     heartbeat_at: Optional[float]
+    created_at: float
+    updated_at: float
+
+
+@dataclass(frozen=True)
+class WorkerHeartbeatSnapshot:
+    worker_id: str
+    task_id: Optional[str]
+    status: str
+    heartbeat_at: float
+    failure_code: Optional[str]
 
 
 class SQLiteCoordinator:
@@ -151,6 +162,23 @@ class SQLiteCoordinator:
                     "CREATE INDEX IF NOT EXISTS tasks_provider_run ON tasks(provider_id, external_run_id)"
                 )
                 connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS worker_heartbeats (
+                        worker_id TEXT PRIMARY KEY,
+                        task_id TEXT,
+                        status TEXT NOT NULL CHECK (
+                            status IN ('starting','healthy','idle','stopping','failed')
+                        ),
+                        heartbeat_at REAL NOT NULL,
+                        failure_code TEXT,
+                        updated_at REAL NOT NULL
+                    )
+                    """
+                )
+                connection.execute(
+                    "CREATE INDEX IF NOT EXISTS worker_heartbeats_updated ON worker_heartbeats(heartbeat_at)"
+                )
+                connection.execute(
                     "INSERT INTO infra_schema_versions(component,version) VALUES('sqlite_coordinator',?) "
                     "ON CONFLICT(component) DO UPDATE SET version=excluded.version",
                     (self.SCHEMA_VERSION,),
@@ -175,6 +203,8 @@ class SQLiteCoordinator:
             provider_id=row["provider_id"],
             external_run_id=row["external_run_id"],
             heartbeat_at=row["heartbeat_at"],
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
         )
 
     def enqueue(self, *, task_id: str, idempotency_key: str, input_digest: str) -> TaskSnapshot:
@@ -533,6 +563,79 @@ class SQLiteCoordinator:
         if row is None:
             raise KeyError(task_id)
         return self._snapshot(row)
+
+    def list_tasks(self, *, limit: int = 500) -> tuple[TaskSnapshot, ...]:
+        if not 1 <= limit <= 5000:
+            raise ValueError("task listing limit must be between 1 and 5000")
+        with self._connection() as connection:
+            rows = connection.execute(
+                "SELECT * FROM tasks ORDER BY updated_at DESC, task_id LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return tuple(self._snapshot(row) for row in rows)
+
+    def record_worker_heartbeat(
+        self, *, worker_id: str, task_id: Optional[str] = None,
+        status: str = "healthy", failure_code: Optional[str] = None,
+        now: Optional[float] = None,
+    ) -> WorkerHeartbeatSnapshot:
+        if not worker_id or len(worker_id) > 128:
+            raise ValueError("worker_id is required and must be bounded")
+        if status not in {"starting", "healthy", "idle", "stopping", "failed"}:
+            raise ValueError("worker status is not allowlisted")
+        allowed_failures = {
+            "lease_lost", "worker_timeout", "runtime_rejected",
+            "output_limit_exceeded", "worker_process_failed",
+        }
+        if failure_code is not None and failure_code not in allowed_failures:
+            raise ValueError("worker failure code is not allowlisted")
+        if status != "failed" and failure_code is not None:
+            raise ValueError("failure code requires failed worker status")
+        current = time.time() if now is None else float(now)
+        with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                connection.execute(
+                    """
+                    INSERT INTO worker_heartbeats (
+                        worker_id,task_id,status,heartbeat_at,failure_code,updated_at
+                    ) VALUES (?,?,?,?,?,?)
+                    ON CONFLICT(worker_id) DO UPDATE SET
+                        task_id=excluded.task_id,
+                        status=excluded.status,
+                        heartbeat_at=excluded.heartbeat_at,
+                        failure_code=excluded.failure_code,
+                        updated_at=excluded.updated_at
+                    """,
+                    (worker_id, task_id, status, current, failure_code, current),
+                )
+                row = connection.execute(
+                    "SELECT * FROM worker_heartbeats WHERE worker_id=?", (worker_id,)
+                ).fetchone()
+                connection.commit()
+                return WorkerHeartbeatSnapshot(
+                    row["worker_id"], row["task_id"], row["status"],
+                    row["heartbeat_at"], row["failure_code"],
+                )
+            except Exception:
+                connection.rollback()
+                raise
+
+    def list_worker_heartbeats(self, *, limit: int = 256) -> tuple[WorkerHeartbeatSnapshot, ...]:
+        if not 1 <= limit <= 2048:
+            raise ValueError("worker listing limit must be between 1 and 2048")
+        with self._connection() as connection:
+            rows = connection.execute(
+                "SELECT * FROM worker_heartbeats ORDER BY heartbeat_at DESC, worker_id LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return tuple(
+            WorkerHeartbeatSnapshot(
+                row["worker_id"], row["task_id"], row["status"],
+                row["heartbeat_at"], row["failure_code"],
+            )
+            for row in rows
+        )
 
     def get_by_idempotency_key(self, idempotency_key: str) -> TaskSnapshot:
         with self._connection() as connection:
