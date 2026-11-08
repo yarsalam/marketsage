@@ -14,7 +14,7 @@
 - PR #8 remains parked after the GitHub-hosted TSETMC connection timeout. Do not repeat the same request from the same environment.
 - PR #27 (manual-only staged-dataset validator), PR #31 (clean governance adoption), PR #32 (manual integrated TSETMC workflow) and PR #34 (memory-bounded local analysis) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
 - PRs #7, #9, #13, #14, #16–#24, and #28–#30 are integrated into PR #6 in dependency order. Their CI results do not approve data sources or the strategy.
-- The governance constitution is adopted on main via PR #31. Main branch protection is not enabled; the local Runner uses the owner-approved manual-only compensating-control model. This is not equivalent to branch protection/rulesets.
+- The governance constitution is adopted on main via PR #31. Active ruleset #26789479 protects main with required PR/check rules and deletion/non-fast-forward blocks. It currently requires 10 approvals; owner adjustment remains pending in Issue #63. The laptop Runner remains manual-only.
 
 ## Local Runner and first dataset gate
 
@@ -188,7 +188,7 @@ This section supersedes every older infrastructure status and any stale main-SHA
 
 ### Durable coordinator, provider outbox and worker evidence
 
-- PR [#71](https://github.com/yarsalam/marketsage/pull/71) is the active infrastructure implementation branch. At the last code checkpoint before this governance refresh its head was `4cddd751bbeca489faac6479a920f6174fdc91e2`; it includes the SQLite coordinator lifecycle, durable dispatch outbox, orchestrator, fake provider adapters, task registry, Docker sandbox worker, persistent daemon, health collector/watchdog and runbooks.
+- PR [#71](https://github.com/yarsalam/marketsage/pull/71) is the active infrastructure implementation branch. Its implementation checkpoint is `0afb73c43dfbb0726f42d33f87e09966aa1254a9`; it includes the SQLite coordinator lifecycle, durable dispatch outbox, orchestrator, fake provider adapters, task registry, Docker sandbox worker, persistent daemon, health collector/watchdog and runbooks. The exact-head provider-neutral suite passed 164/164 tests and hosted Docker acceptance succeeded.
 - On exact governance/code head `3ffab7d0451630e174377a562dc67c51591e29b1`, push CI [42489505405](https://github.com/yarsalam/marketsage/actions/runs/42489505405) and PR CI [42489508263](https://github.com/yarsalam/marketsage/actions/runs/42489508263) both passed all seven substantive jobs. The provider-neutral test job ran **164 tests** successfully. These tests use deterministic fake provider adapters; they are not evidence of two independently operated real backends.
 - Hosted Docker worker acceptance [42465921830](https://github.com/yarsalam/marketsage/actions/runs/42465921830) succeeded on a GitHub-hosted runner: container UID 65532, network `none`, read-only checkout, no secrets, zero declared cost, task succeeded and output hash recorded. The same run's watchdog status was `degraded` because provider health remained `unknown`; it is not a full healthy-provider canary.
 - Local self-hosted acceptance [42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813), attempt 2, failed during GitHub's synthetic job setup before the first workflow step. The job log artifact was unavailable, so the underlying runner bootstrap error is not established. Owner host notes show Docker rootless/seccomp checks had succeeded, but that does not substitute for a completed Worker Acceptance.
@@ -203,7 +203,7 @@ This section supersedes every older infrastructure status and any stale main-SHA
 
 ### Owner-action gates
 
-- [Issue #52](https://github.com/yarsalam/marketsage/issues/52): Chabokan-only isolated wheel install and exact dependency hash lock remain unverified on the actual worker network; target commit is `2776d9c6e17d24d09a809c07549100e4f2c3c2ae`.
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52): Chabokan-only isolated installation succeeded on `2776d9c6e17d24d09a809c07549100e4f2c3c2ae`, with 30/30 tests passing. Exact wheel-hash locking remains separate and incomplete.
 - [Issue #57](https://github.com/yarsalam/marketsage/issues/57): local self-hosted acceptance failed before workflow steps; owner must inspect sanitized Runner diagnostic evidence for the precise pre-step failure. Do not repeat Docker installation or dispatch until the cause is known.
 - [Issue #63](https://github.com/yarsalam/marketsage/issues/63): owner must review the active main ruleset's 10-approval requirement and confirm the intended human gate and administrator/bypass behavior.
 - Issue #53 is closed and resolves the zero-cost hosted-runner quota gate for a public repository; no plan upgrade or spending-cap increase was used. Issue #55 is closed with exact-head 16/16 evidence.
@@ -223,3 +223,14 @@ This section supersedes every older infrastructure status and any stale main-SHA
 | 24-hour observation and 24/7 readiness | No qualifying observation window; laptop is not always-on; no independent persistent server is provisioned | NOT PROVEN |
 
 **Overall: Issue #49 is NOT COMPLETE. Do not claim 24/7 readiness.** No PR was merged, no workflow was manually dispatched or rerun by this automation, no provider/account/secret was registered, and no product/data/investment work was performed.
+
+
+## Reconciled base update for PR #71 — 2026-11-08
+
+- Integration PR #74's base branch now contains the true two-parent merge commit `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`, preserving both the provider-neutral implementation and current mainline provenance/CI controls.
+- PR #71's original implementation head `0afb73c43dfbb0726f42d33f87e09966aa1254a9` passed exact-head PR/push CI with **164/164** provider-neutral tests and hosted Docker worker acceptance. This is prior-head evidence; the refreshed base requires new exact-head validation.
+- The PR #71 branch is now reconciled against base `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0` while retaining the PR's Docker worker, dispatch outbox, orchestrator, daemon, Watchdog, systemd units, tests and host runbook.
+- Mainline `Detect direct main updates`, its tests, the combined control-plane CI job, and the merged GitHub automation operations guide are retained in the new base.
+- This rebase/merge update does not merge PR #71 or PR #74 into main and does not change the local workflow's manual/owner-confirmed boundary.
+
+**Current readiness remains NOT COMPLETE.** No independently operated external backends, separate persistent server worker, process-level outage drill, or full 24-hour observation window is evidenced. The scheduled CI heartbeat does not prove continuous worker uptime.

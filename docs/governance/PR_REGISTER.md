@@ -200,3 +200,14 @@ Ruleset [#26789479](https://github.com/yarsalam/marketsage/rules/26789479) is ac
 | 24-hour continuous observation | No qualifying window | NOT PROVEN |
 
 No PR was merged, no workflow was manually dispatched or rerun by this audit, no provider/account/secret was registered, and no product/data/investment work was performed.
+
+
+## PR #71 base reconciliation — 2026-11-08
+
+- [PR #74](https://github.com/yarsalam/marketsage/pull/74) now reconciles the provider-neutral base with main at `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`. It remains Draft/open and requires exact-head CI/review; no merge to main was performed.
+- PR #71 is being updated as a two-parent merge on its own branch: retain implementation head `0afb73c43dfbb0726f42d33f87e09966aa1254a9` as first parent and include the reconciled base `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0` as second parent.
+- The updated PR #71 tree preserves its changed worker/outbox paths and the new base's direct-main detector, combined CI workflow and reconciled automation guide. Its own governance state/register files are refreshed without discarding the worker-specific evidence.
+- Exact-head PR/push CI and hosted Docker acceptance on the original PR #71 head passed 164/164 control-plane tests, but this does not validate the refreshed merge head. New exact-head CI is required.
+- Issue #52 Chabokan-only install/test evidence is **30/30 passing** on the recorded target commit; only exact hash-lock/reproducibility remains open.
+- The local Worker Acceptance failure before its first workflow step remains distinct from the later successful offline TSETMC validator runs. Keep local dispatch manual and owner-confirmed.
+- Issue #49 remains **NOT COMPLETE** until the independent host/worker, observer recovery, operational failure drills and 24-hour observation criteria are evidenced.
