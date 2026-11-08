@@ -41,6 +41,14 @@ class CoordinatorHealthCollectorTests(unittest.TestCase):
         self.assertIn("provider_telemetry_missing", assessment.reason_codes)
         self.assertIn("canary_missing", assessment.reason_codes)
 
+    def test_successful_worker_canary_is_reflected_with_its_real_timestamp(self) -> None:
+        self.coordinator.record_successful_canary(canary_id="worker-smoke", now=100)
+        snapshot = CoordinatorHealthCollector(self.coordinator).collect(now=110)
+        self.assertEqual(snapshot.last_successful_canary_at, 100)
+        assessment = assess_snapshot(snapshot, now=110)
+        self.assertEqual(assessment.canary_age_seconds, 10)
+        self.assertNotIn("canary_missing", assessment.reason_codes)
+
     def test_collector_never_promotes_unknown_provider_to_healthy(self) -> None:
         self.coordinator.enqueue(
             task_id="task-2", idempotency_key="key-2", input_digest="b" * 64
