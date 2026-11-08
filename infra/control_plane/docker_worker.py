@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Optional
 
+from .dispatch_outbox import DispatchState
 from .lifecycle import RunState
 from .providers import ProviderReceipt
 from .sqlite_coordinator import SQLiteCoordinator
@@ -490,6 +491,53 @@ class CoordinatedDockerWorker:
         if lease is None:
             current = self.coordinator.get(task_id)
             return WorkerRunResult(False, False, current.state, None, "worker_claim_unavailable")
+
+        # Crash recovery boundary: the previous process may already have
+        # committed the terminal Outbox state but died before publishing the
+        # Coordinator result. Reconcile from that durable source; never execute
+        # the task body a second time in this case.
+        dispatch = self.outbox.get(key)
+        terminal_map = {
+            DispatchState.SUCCEEDED: "succeeded",
+            DispatchState.FAILED: "failed",
+            DispatchState.CANCELLED: "cancelled",
+        }
+        terminal_state = terminal_map.get(dispatch.state)
+        if terminal_state is not None:
+            failure_class = "worker_runtime_failure" if terminal_state == "failed" else None
+            summary = json.dumps(
+                {
+                    "status": "reconciled_from_outbox",
+                    "outbox_state": dispatch.state.value,
+                    "provider_id": dispatch.current_provider_id,
+                    "external_run_id": dispatch.external_run_id,
+                    "no_side_effects": dispatch.no_side_effects,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            published = self.coordinator.publish_reconciled_outbox_terminal(
+                lease=lease,
+                provider_id=task.provider_id,
+                external_run_id=task.external_run_id,
+                state=terminal_state,
+                result=summary,
+                failure_class=failure_class,
+            )
+            self.coordinator.record_worker_heartbeat(
+                worker_id=self.worker_id,
+                task_id=task_id,
+                status="idle" if published else "failed",
+                failure_code=None if published else "lease_lost",
+            )
+            current = self.coordinator.get(task_id)
+            return WorkerRunResult(
+                claimed=True,
+                published=published,
+                task_state=current.state,
+                execution=None,
+                reason_code="reconciled_from_outbox" if published else "coordinator_rejected_reconciliation",
+            )
 
         self.coordinator.record_worker_heartbeat(
             worker_id=self.worker_id,
