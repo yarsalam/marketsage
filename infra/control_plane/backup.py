@@ -7,9 +7,12 @@ writes to a new path; it never overwrites a live database.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
+import json
 import os
 import sqlite3
+import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -69,7 +72,7 @@ def _digest(path: Path) -> BackupReport:
             size += len(chunk)
     if size <= 0:
         raise sqlite3.DatabaseError("SQLite backup is empty")
-    connection = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
+    connection = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
     try:
         pages = _integrity_and_pages(connection)
     finally:
@@ -144,3 +147,32 @@ def restore_backup(
     # Validate the backup before copying it into a restore target.
     _digest(source)
     return _copy_and_publish(source, destination)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="MarketSage SQLite backup/restore")
+    parser.add_argument("operation", choices=("backup", "restore"))
+    parser.add_argument("--source", required=True)
+    parser.add_argument("--destination", required=True)
+    args = parser.parse_args(argv)
+    try:
+        report = (
+            create_backup(args.source, args.destination)
+            if args.operation == "backup"
+            else restore_backup(args.source, args.destination)
+        )
+    except FileExistsError:
+        print(json.dumps({"status": "refused", "reason_code": "destination_exists"}), file=sys.stderr)
+        return 2
+    except FileNotFoundError:
+        print(json.dumps({"status": "failed", "reason_code": "source_or_parent_missing"}), file=sys.stderr)
+        return 2
+    except (OSError, sqlite3.Error, ValueError):
+        print(json.dumps({"status": "failed", "reason_code": "backup_or_restore_failed"}), file=sys.stderr)
+        return 2
+    print(json.dumps({"status": "success", "operation": args.operation, **report.sanitized_dict()}, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
