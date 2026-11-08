@@ -104,6 +104,18 @@ class FailureNoticeTests(unittest.TestCase):
             r"(?m)^\s*REPOSITORY:\s+\$\{\{\s*github\.repository\s*\}\}\s*$",
         )
 
+    def test_self_hosted_worker_acceptance_is_owner_confirmed_manual_only(self):
+        root = Path(__file__).resolve().parents[2]
+        workflow = (root / ".github" / "workflows" / "self-hosted-worker-acceptance.yml").read_text(encoding="utf-8")
+        self.assertRegex(
+            workflow,
+            r"(?ms)^on:\\s*\\n\\s+workflow_dispatch:\\s*\\n\\s+inputs:\\s*\\n\\s+confirm_local_worker_acceptance:",
+        )
+        self.assertNotRegex(workflow, r"(?m)^\\s*(?:push|pull_request|schedule):")
+        self.assertIn("github.actor == 'yarsalam'", workflow)
+        self.assertIn("inputs.confirm_local_worker_acceptance == true", workflow)
+        self.assertIn("github.ref == 'refs/heads/infra/durable-provider-dispatch-outbox-2026-11'", workflow)
+
     def test_workflow_actions_are_pinned_to_full_commit_shas(self):
         root = Path(__file__).resolve().parents[2]
         workflow = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
