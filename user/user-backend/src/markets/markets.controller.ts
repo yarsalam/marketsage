@@ -35,4 +35,19 @@ export class MarketsController {
   getDataStatus() {
     return this.marketsService.getDataStatus();
   }
+
+  @Get('sources')
+  getSources() {
+    return this.marketsService.getSources();
+  }
+
+  @Get('data-quality')
+  getDataQuality() {
+    return this.marketsService.getDataQuality();
+  }
+
+  @Get('iran-providers')
+  getIranProviders() {
+    return this.marketsService.getIranProviders();
+  }
 }
