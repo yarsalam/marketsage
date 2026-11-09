@@ -36,6 +36,11 @@ export class MarketsController {
     return this.marketsService.getDataStatus();
   }
 
+  @Get('instruments')
+  getInstruments() {
+    return this.marketsService.getInstruments();
+  }
+
   @Get('sources')
   getSources() {
     return this.marketsService.getSources();
