@@ -181,43 +181,25 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 **Capital-risk impact:** None. This remains an offline data-audit workload.
 
 
-## 2026-11-08 — Resume MarketSage product development with an evidence-first coverage workspace
+## 2026-11-09 — Owner-directed parallel execution and product-value gate
 
-**Decision authority:** Owner  
-**Status:** Approved explicitly in conversation; initial implementation tracked in Issue #72 and branch `research/market-coverage-workspace-2026-11`.
+**Authority:** Explicit owner instruction in the conversation on 2026-11-09.  
+**Decision:** CONTINUE the MarketSage mission using parallel, bounded workstreams; do not keep the former infrastructure-only sequence as a blanket block on product execution.
 
-**Decision**
-- Resume the MarketSage product workstream. Product delivery must not remain indefinitely blocked by infrastructure acceptance work.
-- Preserve the existing internal investment-decision objective and approximately six-month decision horizon across Iranian and global markets as separate investable universes.
-- Begin with a transparent Market Coverage Workspace. Surface existing source registry, runtime data-quality and Iranian provider-readiness data through the user API and Persian RTL UI.
-- Keep source permission, identity, units, timestamp quality, history, revisions, corporate actions and independent reconciliation visible as explicit acceptance gates. Unknown remains blocked, not passed.
-- Continue to treat infrastructure as a separate workstream. Its current host-level rootless setup evidence and the latest failed GitHub self-hosted acceptance run must both remain accurately recorded. This product restart does not waive the infrastructure gates or change their status.
+**Reason**
+- The owner explicitly directed that the strategy be documented in GitHub and that parallel execution begin, with strict adherence to the project constitution.
+- The previous Copilot prompt imposed an infrastructure-only sequence that prevented independent product work. This narrow execution-policy conflict is superseded by the owner's current instruction.
+- The original six-month, Iranian-and-global investment research mission remains unchanged. No asset-universe narrowing, source approval or capital-risk authorization is implied.
 
-**Non-authorization / capital-risk boundary**
-- This decision does not authorize investment scoring/ranking changes, calibrated probabilities, backtest approval, production decision mode, broker integration, real-money trading or capital allocation.
-- No source approval flag may be changed merely because it appears in the UI or is represented by a working adapter.
-- No change to the product objective, asset-universe principles, fundamental modeling direction or material capital-risk assumptions is approved by this decision.
+**Execution effect**
+- Product, data-quality, backend/security, admin/operations, research-methodology and engineering-infrastructure streams may proceed in parallel only when dependencies and file ownership are isolated.
+- PR #73 and #77 remain open drafts and must be reconciled because they both modify the user landing-page/Sidebar paths.
+- PR #74 is a separate infrastructure stream. PR #71 and #61 remain dependent on #74.
+- A product task cannot be accepted from a branch CI result. It requires integration and a reproducible real user/API flow.
+- The owner receives no routine progress narration; report only an evidenced project decision or a user-value capability that resolves a real user problem.
 
-**Implementation**
-- Product Phase 1 Issue: [#72](https://github.com/yarsalam/marketsage/issues/72).
-- Product plan: `docs/PRODUCT_RESTART_PLAN_2026-11.md`.
-- Initial code branch: `research/market-coverage-workspace-2026-11`.
-- PR and exact CI evidence will be recorded in the Project State and PR Register when available.
+**Non-changes**
+- PR #6 must not be merged without separate explicit owner approval.
+- No self-hosted/laptop Runner dispatch, paid resources, production deployment, source approval, investment scoring/ranking, probability calibration, backtest approval, broker, trading or capital allocation is authorized.
 
-**Capital-risk impact:** None. This is a product transparency and data-observability increment.
-
-## 2026-11-09 — Product delivery independent of local Runner
-
-**Decision authority:** Owner, explicit instruction in conversation.
-
-**Decision**
-
-## Owner execution priority — 2026-11-09
-
-Product delivery is no longer frozen pending Issue #49 or the self-hosted Runner. The owner has instructed that the full MarketSage project continue, with GitHub-hosted CI preferred. Local-only work must be isolated behind one bounded owner command while independent work continues. Do not provision paid infrastructure or treat a single local run as 24/7 proof. The previous infrastructure-first acceptance program is retained as historical/optional engineering work and must not gate product progress. PRs #71 and #74 stay parked and unmerged; PR #74 must not be merged unchanged because it blocks product CI. Issue #57 is closed as non-blocking. PR #6 remains explicitly protected from merge absent separate approval. Product and data work remain research-only; all unapproved providers stay quarantined and no scoring/ranking, calibrated probabilities, backtest approval, production release, broker/trading or capital allocation is authorized.
-
-
-**Evidence recorded at decision time**
-- Market Coverage Phase 1 PR #73 exact head `4e50e908d68c058113c960647276833058fc5cea` passed push run #42615545257 and pull_request run #42615554518, including Python analysis, NestJS backend, Next.js frontend, admin workspace and production image build on GitHub-hosted runners.
-- Local TSETMC dataset acceptance run #42482678959 succeeded as a one-off manual run. No claim is made that the local Runner is currently online or provides 24/7 service.
-- Issue #49's former product freeze is superseded. Issue #57 is closed as no longer blocking. PR #74 remains parked due to its product-CI blocking behavior.
+**Evidence:** `STRATEGY_CHARTER.md`, `PRODUCT_ROADMAP.md`, `WORK_REGISTER.json`, `DECISION_POLICY.json`, `RELEASE_GATES.json`, `EVIDENCE_LEDGER.json` and `PROJECT_STATE.json` on branch `strategy/project-operating-system-parallel-2026-11`.
