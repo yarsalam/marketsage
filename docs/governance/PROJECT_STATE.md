@@ -35,9 +35,10 @@
 - Added a versioned provider-neutral registry for the eleven symbols already present in the global research proxy universe. It records canonical IDs separately from Yahoo symbols, explicit quote currency/unit and price basis, and leaves venue/tradability unassessed.
 - Iranian equities, gold/coins, FX, fixed income/funds and domestic crypto are represented as five empty/quarantined universes. No Iranian instrument is invented or added without evidence.
 - Analysis API exposes `/instruments`; NestJS forwards `/api/markets/instruments`; the Persian UI displays the catalog and respects Iran/global filters.
+- New temporal price snapshots now use the canonical instrument's declared semantics: crypto rows are stored as `provider_close` with `USD/usd_per_token`, while ETF rows are stored as `adjusted_close` with `USD/usd_per_share`. Each row includes the canonical instrument ID and adjustment policy. Existing stored records are not rewritten automatically; legacy records require a separate read-only audit before any migration.
 - Data-quality series now carry canonical instrument IDs when the source-symbol mapping is known. Unmapped series remain unmapped; historical temporal record schema is not rewritten.
 - Freshness thresholds apply only to registered price proxies (3 calendar days for crypto proxies, 7 for ETF proxies). Sources/instruments without an explicit policy, including macro series, remain `unknown` rather than being incorrectly labelled fresh/stale.
-- Exact final head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca` passed push run `42617872744` and PR run `42617880657`, including the production image build. This work remains in Draft PR #73; no merge or deployment occurred.
+- The previous code head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca` passed push #42617872744 and PR #42617880657. Instrument-specific temporal snapshot semantics have since been tightened and require exact-head CI before acceptance. This work remains in Draft PR #73; no merge or deployment occurred.
 
 ## Current data and investment posture
 
