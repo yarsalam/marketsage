@@ -48,6 +48,26 @@ def test_report_raises_critical_if_research_source_has_no_data():
     assert result["alerts"][0]["code"] == "research_source_has_no_captured_data"
 
 
+def test_report_warns_when_series_price_basis_differs_from_registry():
+    result = report.build_report({
+        "sources": [{
+            "source_id": "global.yahoo_finance.yfinance",
+            "used_by_research_engine": True,
+            "runtime_status": "data_present",
+            "runtime_series": [{
+                "series_key": "BTC-USD",
+                "freshness": "unknown",
+                "price_basis_status": "legacy_mismatch",
+                "expected_data_kind": "provider_close",
+                "data_kind": "adjusted_close",
+            }],
+        }]
+    })
+
+    assert result["status"] == "warning"
+    assert any(alert["code"] == "series_price_basis_mismatch" for alert in result["alerts"])
+
+
 def test_report_warns_when_series_freshness_is_unknown():
     result = report.build_report({
         "sources": [{
