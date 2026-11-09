@@ -1,6 +1,6 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-08  
+**Snapshot date:** 2026-11-09  
 **Repository:** yarsalam/marketsage (Public; revalidated through GitHub repository metadata)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
@@ -12,8 +12,9 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
-| [#71](https://github.com/yarsalam/marketsage/pull/71) | infra/provider-neutral-control-plane-2026-11 | Durable provider dispatch/outbox, rootless sandbox worker, watchdog and local acceptance; Draft, open. Latest recorded self-hosted acceptance run #42465921813 failed; host-level rootless Docker setup was later owner-verified. | Keep separate from product work. Do not merge without separate owner approval. |
-| [#73](https://github.com/yarsalam/marketsage/pull/73) | main ← research/market-coverage-workspace-2026-11 | Product Phase 1: source registry/data-quality/provider-readiness API and Persian Market Coverage UI; Draft and open; feature implementation commit `e595478016a0d3e601d176cda8314233edc846db`, followed by documentation-only state/register commits; final exact-head CI pending. | Product work resumed; accept only after exact-head CI and review. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | infra/durable-provider-dispatch-outbox-2026-11 | Durable outbox, coordinator, sandbox worker and watchdog; Draft, open. Latest one-off local dataset acceptance #42482678959 succeeded, but 24/7/independent-host acceptance remains unproven. | Parked and non-blocking. No Runner dispatch, paid host or merge without separate approval. |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | main ← infra/provider-neutral-control-plane-2026-11 | Provider-neutral CI/control-plane foundation; Draft and open. Current patch intentionally blocks product CI during a previous infrastructure-first freeze. | Parked. Do not merge unchanged; product CI must remain enabled. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | main ← research/market-coverage-workspace-2026-11 | Product Phase 1 plus manual refresh/retry and abort-safe loading; Draft and open at exact head `4e50e908d68c058113c960647276833058fc5cea`; push run #42615545257 and PR run #42615554518 passed all substantive jobs including Docker image build. | Active product PR; no merge until owner review and final acceptance. |
 
 
 
@@ -59,7 +60,7 @@ main
 - #32 merged: integrated local TSETMC candidate workflow
 - #34 merged: memory-bounded/cgroup-aware candidate batches; owner re-dispatch pending; checks out immutable PR #6 integration commit 819f8b4028469cb0d498098fec88545a18ebacc6
 
-PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked. PR #71 remains Draft and unmerged. PR #73 is the active product PR and remains Draft pending exact-head CI/review.
+PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked. PRs #71 and #74 remain Draft and unmerged; #74 must not be merged unchanged because it blocks product CI. PR #73 is the active product PR; exact-head push and PR CI both passed, and it awaits review/acceptance.
 
 ## Release and capital-risk guardrails
 
