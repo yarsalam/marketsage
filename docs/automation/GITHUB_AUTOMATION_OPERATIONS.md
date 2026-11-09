@@ -8,7 +8,7 @@ The `.github/workflows/ci.yml` workflow runs on:
 
 - Pushes to `main`, `deploy/**`, `research/**`, `ci/**`, and `infra/**`.
 - Pull requests targeting `main`, `deploy/**`, and `infra/**`.
-- Daily scheduled full validation at **03:17 UTC**.
+- Daily scheduled infrastructure-only validation at **03:17 UTC**.
 - Manual `workflow_dispatch`.
 
 Scheduled workflows run from the default branch. A schedule added on a feature branch is not operational until the workflow reaches `main`. GitHub can delay scheduled events; a daily schedule is a recurring health signal, not a real-time SLA or an always-on worker.
@@ -34,13 +34,13 @@ The live ruleset currently requires **one approving review**, not ten. Its stale
 
 | Job | Timeout | Purpose |
 | --- | ---: | --- |
-| `analysis` | 25 min | Python analysis and research-engine tests |
-| `user-backend` | 30 min | Backend build and tests |
-| `user-frontend` | 30 min | Frontend build |
-| `admin-workspace` | 30 min | Admin web/API build and tests |
-| `production-images` | 40 min | Compose validation and local image build only; no push |
+| `classify-change-scope` | 5 min | Fail-closed classification of infrastructure-only diffs; emits only an aggregate label |
+| `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images` | 2 min each | Preserved required-check contexts; skipped for allowlisted infrastructure-only changes and otherwise fail immediately during the Goal 1 freeze (no product/build commands) |
+
+
+
 | `infra-control-plane-tests` | 15 min | Discover and run every `test_*.py` module under `infra/control_plane` |
-| `ci-infra-tests` | 5 min | Offline regression tests for failure notice and direct-main provenance helpers |
+| `ci-infra-tests` | 5 min | Offline regression tests for scope classification, failure notice, and direct-main provenance helpers |
 | `detect-direct-main-update` | 5 min | Main-push-only provenance detection |
 | `notify-failure` | 5 min | Failure-only sanitized Issue #49 handoff |
 
@@ -66,7 +66,7 @@ The live main ruleset is `main-protection` (ID `26789479`), targeting `refs/head
 
 ## 5. Failure reporting and its blind spots
 
-After a failed dependency job, `notify-failure` attempts to add a sanitized comment to Issue #49. It reports the run link and safe job identifiers only. It does not upload logs/artifacts, serialize exception details, or expose credentials, raw market data, prices, private paths, or environment values.
+After a failed dependency job on a trusted non-PR event, `notify-failure` attempts to add a sanitized comment to Issue #49. It deliberately does not run on `pull_request` events, so an untrusted PR cannot receive an `issues: write` token; PR failures remain visible in their required check results. It reports the run link and safe job identifiers only. It does not upload logs/artifacts, serialize exception details, or expose credentials, raw market data, prices, private paths, or environment values.
 
 The **failure notifier shares the same GitHub-hosted runner pool as the CI jobs**. It cannot independently report a pool-wide allocation outage if that runner pool itself is unavailable. A missing Issue comment may indicate notification failure; the Actions run remains the source of truth. GitHub Mobile push delivery depends on the owner's notification settings and is not guaranteed by this workflow.
 
