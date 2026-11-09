@@ -36,7 +36,9 @@ Implementation is currently grouped with the Market Coverage product branch so t
 
 The first registry contains only the eleven symbols already present in the global research prototype. Each has a provider-neutral canonical ID separate from its Yahoo symbol, explicit USD quote convention and price basis, and a research-proxy role. Venue and tradability remain unassessed. Every instrument is blocked from production scoring.
 
-Iranian equities, gold/coins, FX, fixed income/funds and local crypto remain empty and quarantined. No placeholder securities or invented identities are inserted. The read-only analysis API exposes /instruments; NestJS forwards it as /api/markets/instruments, and the Persian Market Coverage page displays the catalog and quarantined universes.
+Iranian equities, gold/coins, FX, fixed income/funds and local crypto remain empty and quarantined. No placeholder securities or invented identities are inserted. The read-only analysis API exposes /instruments; NestJS forwards it as /api/markets/instruments, and the Persian Market Coverage page displays the catalog and quarantined universes. The data-quality response resolves observed series to canonical instrument IDs when a source-symbol mapping exists.
+
+Freshness evaluation is now policy-specific: only explicitly registered global crypto and ETF proxies use the 3-day and 7-day observed-age thresholds. Other sources (including macro series) remain unknown unless a source-specific calendar/policy is defined.
 
 This registry is metadata only: it does not collect prices, change provider eligibility or alter any research calculation.
 
@@ -95,4 +97,5 @@ This evidence discrepancy must be corrected by subsequent runs and records, but 
 - TSETMC and CODAL are candidate-only; Iranian gold/FX providers are not selected.
 - Existing decision/momentum output is a small global-proxy/crypto historical research baseline; it is not an Iran-market decision engine and its nominal horizon parameter does not make the model horizon-specific.
 - News/politics/sentiment and calibrated probabilities are not implemented as production decision inputs.
-- The first UI increment surfaces these facts without changing calculation or approval gates.
+- The Market Coverage UI surfaces these facts, the canonical instrument catalog and series-to-instrument mappings without changing calculation or approval gates.
+- Exact final PR #73 head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca` passed push run #42617872744 and pull_request run #42617880657; all substantive jobs and production image build succeeded on GitHub-hosted runners.
