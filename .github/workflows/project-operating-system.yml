@@ -2,7 +2,7 @@ name: Project Operating System
 
 on:
   push:
-    branches: [main, "strategy/**", "product/**", "data/**", "security/**", "infra/**"]
+    branches: [main, "strategy/**", "product/**", "data/**", "security/**", "infra/**", "integration/**"]
     paths:
       - "docs/governance/**"
       - ".github/scripts/validate_project_operating_system.py"
