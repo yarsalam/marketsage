@@ -12,18 +12,44 @@
   "source_approval": "NONE",
   "current_open_workstreams": [
     {
+      "task_id": "MS-OPS-001",
+      "pr": 78,
+      "state": "VALIDATION",
+      "merge_status": "OPEN_DRAFT",
+      "head": "ce133bda2efcc971ca598b14a3bbf7518755ff90",
+      "ci": "PASS"
+    },
+    {
       "task_id": "MS-PROD-001",
       "pr": 77,
       "state": "VALIDATION",
       "merge_status": "OPEN_DRAFT",
-      "head": "67356939f65224a580c915fd2caa0ea52d8d09a9"
+      "head": "67356939f65224a580c915fd2caa0ea52d8d09a9",
+      "ci": "PASS"
     },
     {
       "task_id": "MS-DATA-001",
       "pr": 73,
       "state": "VALIDATION",
       "merge_status": "OPEN_DRAFT",
-      "head": "72c57608e8270d999d1e9f2005b47ea56cb893a7"
+      "head": "72c57608e8270d999d1e9f2005b47ea56cb893a7",
+      "ci": "PASS"
+    },
+    {
+      "task_id": "MS-SEC-001",
+      "pr": 79,
+      "state": "VALIDATION",
+      "merge_status": "OPEN_DRAFT",
+      "head": "14001bdb5a03775b9772bf9cfea1d169a68f8113",
+      "ci": "PASS"
+    },
+    {
+      "task_id": "MS-ADMIN-001",
+      "pr": 80,
+      "state": "VALIDATION",
+      "merge_status": "OPEN_DRAFT",
+      "head": "51b7a7bc9ce9a7a5cae96e3e2bdec03fa122cfb7",
+      "ci": "PENDING"
     },
     {
       "task_id": "MS-INFRA-001",
@@ -53,5 +79,5 @@
     "PR #6 must not merge without explicit separate owner approval",
     "No source approval, scoring, ranking, calibrated probabilities, backtest activation, broker or trading"
   ],
-  "next_user_value_target": "Integrated market coverage and truthful research-only workflow with one reproducible browser/API acceptance scenario"
+  "next_user_value_target": "Integrate and prove a single login-protected market-coverage workflow with truthful unavailable states, authenticated source/quality APIs and one reproducible browser/API acceptance scenario"
 }
