@@ -1,25 +1,34 @@
 # MarketSage — Current Project State
 
-**Current snapshot date:** 2026-11-08  
+**Current snapshot date:** 2026-11-09  
 **Repository:** yarsalam/marketsage (**Public**, verified from GitHub repository metadata)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Active product issue:** [#72 — Product Phase 1: evidence-first Market Coverage Workspace](https://github.com/yarsalam/marketsage/issues/72)  
 **Active product branch:** `research/market-coverage-workspace-2026-11`  
-**Product PR:** [#73 — evidence-first Market Coverage workspace](https://github.com/yarsalam/marketsage/pull/73), Draft and open; feature implementation commit `e595478016a0d3e601d176cda8314233edc846db`, followed by documentation-only state/register commits  
+**Product PR:** [#73 — evidence-first Market Coverage workspace](https://github.com/yarsalam/marketsage/pull/73), Draft and open; latest exact head `4e50e908d68c058113c960647276833058fc5cea`; feature implementation, refresh/retry fix and documentation progress are on this branch  
 **Infrastructure PR:** [#71](https://github.com/yarsalam/marketsage/pull/71), Draft, open and unmerged  
 **Release posture:** research-only. No source is approved for production investment scoring; no validated probability model or strategy is approved; production allocation, broker access and trading remain disabled.
 
-## Current product state — 2026-11-08
+## Owner execution priority update — 2026-11-09
+
+- Product, data-quality, source-contract and research-system engineering continue independently of the infrastructure backlog.
+- Ordinary CI, build and test jobs use GitHub-hosted runners. No project task may wait for the owner's laptop Runner unless the exact task requires local-only data or host access.
+- If local execution is essential, provide one bounded owner command and continue unrelated product work.
+- PR #73 latest exact head `4e50e908d68c058113c960647276833058fc5cea`; push run #42615545257 and PR run #42615554518 both passed.
+- The local dataset acceptance run #42482678959 passed once; this is not evidence of 24/7 Runner availability. Issue #57 is closed as non-blocking; PRs #71 and #74 are parked. PR #74 must not be merged unchanged because its CI intentionally suppresses product tests.
+- Main remains protected. PR #6 remains explicitly unmerged. No source approval, production investment scoring/ranking, calibrated probabilities, backtest approval, production deployment, broker access, trading or capital allocation is authorized.
+
+## Current product state — 2026-11-09
 
 - The owner explicitly resumed MarketSage product development. Product work proceeds independently of the remaining infrastructure evidence gap; that gap must not silently be labelled accepted or complete.
 - Phase 1 is an evidence-first Market Coverage Workspace. It exposes the existing Python source registry, data-quality report and Iranian provider-readiness catalog via NestJS and a Persian RTL Next.js page.
 - In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, and `GET /api/markets/iran-providers`. Controller forwarding tests were added.
 - The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates and Iranian provider readiness. The page is the default landing tab for this increment.
 - NestJS unit tests cover forwarding of the new API routes and bounded service-unavailable behavior when the analysis engine is unreachable.
-- PR #73 is Draft and open. Feature implementation commit: `e595478016a0d3e601d176cda8314233edc846db`; subsequent commits only update project-state and PR-register documentation. Acceptance requires the final exact PR head to pass its matching push and pull_request CI runs.
+- PR #73 is Draft and open at exact head `4e50e908d68c058113c960647276833058fc5cea`. The coverage page now supports manual refresh and retry after fetch failure; its loading state is abort-safe. Exact-head push run [42615545257](https://github.com/yarsalam/marketsage/actions/runs/42615545257) and PR run [42615554518](https://github.com/yarsalam/marketsage/actions/runs/42615554518) both passed all substantive jobs, including analysis, backend, frontend, admin workspace and production image build. No local Runner was used.
 - The page reports actual registry and runtime values only. It does not create synthetic quotes, infer provider availability, approve data, or change scoring.
 - Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Current acceptance checklist: Issue #72.
-- The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PR #71 is infrastructure-only, Draft and unmerged.
+- The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PRs #71 and #74 are infrastructure-only, Draft and unmerged; #74's temporary product-CI freeze is superseded and that PR must not be merged unchanged.
 
 ## Current data and investment posture
 
@@ -34,7 +43,7 @@
 ## Infrastructure status — separately tracked
 
 - The owner supplied host output showing the dedicated UID-110 Rootless Docker daemon active, socket owned by UID 110, `rootless` and `seccomp` security options present, only `host` and `none` networks, and the system-wide Docker daemon preserved.
-- The latest GitHub-recorded self-hosted acceptance run at the time of this snapshot, [#42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813), concluded failure on `marketsage-local-01`. Therefore the host-level setup and GitHub workflow acceptance are distinct facts; the latter is not recorded as passed.
+- The latest recorded self-hosted dataset-acceptance dispatch [#42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959) completed successfully on 2026-11-08. This is one manual run only; it does not prove live availability, 24/7 operation, independent failure-domain recovery or general worker acceptance. Product work must not depend on this Runner.
 - GitHub-hosted Docker acceptance [#42465921830](https://github.com/yarsalam/marketsage/actions/runs/42465921830) and PR CI [#42465926206](https://github.com/yarsalam/marketsage/actions/runs/42465926206) passed for the corresponding infrastructure commit.
 - PR #71 remains Draft and unmerged. No merge to main was made. Live independently operated backend failover and a complete 24-hour observation window are not evidenced in the repository at this snapshot.
 - Product Phase 1 does not dispatch local-runner jobs and does not depend on this infrastructure acceptance record.
