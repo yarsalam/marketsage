@@ -10,6 +10,15 @@ from instrument_registry import (
 )
 
 
+def test_freshness_policy_is_specific_to_registered_instrument_type():
+    from instrument_registry import freshness_policy_for
+
+    assert freshness_policy_for("global.yahoo_finance.yfinance", "BTC-USD")[0] == 3
+    assert freshness_policy_for("global.yahoo_finance.yfinance", "SPY")[0] == 7
+    assert freshness_policy_for("other.source", "CPIAUCSL")[0] is None
+    assert freshness_policy_for("global.yahoo_finance.yfinance", "UNKNOWN")[0] is None
+
+
 def test_catalog_uses_canonical_ids_separate_from_provider_symbols():
     catalog = instrument_catalog()
     assert catalog["registry_version"] == "1.0.0"
