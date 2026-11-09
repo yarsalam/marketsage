@@ -1,5 +1,40 @@
 # MarketSage — Current Project State
 
+## Current snapshot — 2026-11-09 (authoritative override)
+
+**Repository:** yarsalam/marketsage (**Public**)  
+**Main HEAD:** `4c4b032196137af4658ea2c28e38a21605ee923b`  
+**Execution branch:** `strategy/project-operating-system-parallel-2026-11`  
+**Project decision:** CONTINUE with parallel, bounded workstreams.  
+**Product release:** NOT READY.  
+**First end-to-end user-value flow:** NOT YET PROVEN.  
+**Investment outputs:** DISABLED. No source is approved for investment use.
+
+### Active work at this snapshot
+
+| Work item | PR | Exact head | State | Interpretation |
+|---|---:|---|---|---|
+| Research-only safety and truthful UI | #77 | `67356939f65224a580c915fd2caa0ea52d8d09a9` | VALIDATION | Exact-head CI passed; draft/open, not integrated or user-flow accepted |
+| Market coverage and canonical registry | #73 | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | VALIDATION | Exact-head CI passed incl. container smoke; draft/open, not integrated or user-flow accepted |
+| Provider-neutral control plane | #74 | `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10` | IN PROGRESS | Independent infra foundation; draft/open |
+| Durable dispatch outbox | #71 | `e8785b177f93a569ce031496d1043026979828d3` | BLOCKED | Stacked on #74; integrate only after its prerequisite |
+| Provider workstream decomposition | #61 | `25ce24283e35dd7e55eb8545c590a047606643ee` | BLOCKED | Stacked on #74; integrate only after its prerequisite |
+
+### Execution boundaries
+
+- PR #6 must not be merged without separate explicit owner approval.
+- Do not run or assume the laptop/self-hosted Runner.
+- Do not spend money, provision paid resources or use paid model/API services.
+- No data source is approved for investment scoring; no ranking, calibrated probability, approved backtest, broker, trading or capital allocation is enabled.
+- Do not weaken branch protection, review requirements or security controls.
+- A PR/test/doc is activity or engineering evidence only. It is not user value until integrated and demonstrated in a real user flow.
+
+The machine-readable source of truth is `PROJECT_STATE.json`; the execution contracts are in `WORK_REGISTER.json`, `DECISION_POLICY.json`, `RELEASE_GATES.json` and `EVIDENCE_LEDGER.json`. This snapshot is reconciled against the live GitHub PR list on 2026-11-09.
+
+---
+
+## Historical snapshot (2026-11-05; superseded by the authoritative override above)
+
 **Snapshot date:** 2026-11-05  
 **Repository:** yarsalam/marketsage (Private)  
 **Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
