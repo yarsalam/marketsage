@@ -79,7 +79,7 @@ def main() -> int:
     if not output:
         return 2
     with open(output, "a", encoding="utf-8") as stream:
-        stream.write(f"infra_only={'true' if infra_only else 'false'}\\n")
+        stream.write(f"infra_only={'true' if infra_only else 'false'}\n")
     print(f"CI_SCOPE={'infrastructure_only' if infra_only else 'non_infrastructure_or_unknown'}")
     return 0
 
