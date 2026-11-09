@@ -8,6 +8,7 @@ describe('MarketsController', () => {
     getBacktest: jest.fn(),
     getDataStatus: jest.fn(),
     getSources: jest.fn(),
+    getInstruments: jest.fn(),
     getDataQuality: jest.fn(),
     getIranProviders: jest.fn(),
   };
@@ -26,6 +27,11 @@ describe('MarketsController', () => {
   it('rejects invalid transaction-cost assumptions', () => {
     expect(() => controller.getBacktest('3', '1001')).toThrow(BadRequestException);
     expect(marketsService.getBacktest).not.toHaveBeenCalled();
+  });
+
+  it('forwards the canonical instrument registry request', () => {
+    controller.getInstruments();
+    expect(marketsService.getInstruments).toHaveBeenCalledTimes(1);
   });
 
   it('forwards the source registry request', () => {
