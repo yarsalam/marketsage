@@ -1,20 +1,39 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-08  
-**Repository:** yarsalam/marketsage (PUBLIC per live GitHub API; prior owner decision in Issue #53)  
+## Live automation evidence — 2026-11-09
+
+- Main `4c4b032196137af4658ea2c28e38a21605ee923b` has a successful scheduled run [42610905309](https://github.com/yarsalam/marketsage/actions/runs/42610905309) and push run [42408566585](https://github.com/yarsalam/marketsage/actions/runs/42408566585). The schedule was successful but started at 11:40 UTC for a 03:17 UTC cron.
+- PR #71's last fully validated code head was `7d7c6b1d9eb97d6070651c8b5cda41db9753a78f`: 170 control-plane tests and a successful Docker sandbox acceptance. Later PR #71 changes intentionally carry `[skip ci]`; no exact-head result exists for them.
+- PR #74 exact head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10` passed 110 control-plane tests in run #42589290385.
+- The active ruleset #26789479 requires one human approval and seven checks, blocks deletion/force-push, has no bypass actors, and does not require strict base freshness. The ruleset is active; the legacy branch-protection read is unavailable to the connected integration.
+- `.github/workflows/ci.yml` uses push/PR/schedule/manual triggers, read-only default permissions, job-scoped issue-write permissions, per-ref concurrency cancellation, and job timeouts. It has no bounded workflow-level retry. Its failure reporter shares the GitHub-hosted runner pool.
+- `docker-worker-acceptance.yml` is now daily and main-push-only; `self-hosted-worker-acceptance.yml` remains manual-only. The new static workflow-policy tests are not yet executed on the changed head.
+- CircleCI configuration is present but no account/pipeline is connected. No independent failure observer or persistent worker service is active. Fake-adapter tests do not prove a live second backend.
+- Issue #52: Chabokan-only install and 30 tests passed; exact wheel hashes remain outstanding. Issue #53 and #55 are closed. PR #54 is closed unmerged. Issue #63 is closed with the live ruleset verified.
+- No 24/7 readiness claim is permitted. No merge, local dispatch, hosted dispatch/rerun, provider registration, secret creation, spending, release, deployment, or investment operation was performed.
+
+
+**Snapshot date:** 2026-11-09  
+**Repository:** yarsalam/marketsage (PUBLIC per live GitHub API; visibility confirmation tracked in Issue #49)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
+**Infrastructure PRs:** #74 parent integration; #71 durable outbox/worker    
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code HEAD:** 1d90726c593b0818982407c309ff13301798f5b3 (current PR #6 head; main local workflow remains pinned to 819f8b4028469cb0d498098fec88545a18ebacc6 until PR #41 is adopted)
 
-## Open PRs
+## Open PRs — live API snapshot 2026-11-09
 
-| PR | Target | Scope / current state | Handling |
-|---|---|---|---|
-| [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
-| [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
-| [#41](https://github.com/yarsalam/marketsage/pull/41) | main | Governance/evidence synchronization and corrected local workflow pin; exact-head run 42063679856 passed all five jobs | Open; no local dispatch; keep pending review during infrastructure-first priority. |\n| [#50](https://github.com/yarsalam/marketsage/pull/50) | main | CI timeouts/concurrency/schedule/failure reporter; exact head 9098f110... failed before steps with runner ID 0 in run 42176190919 | Open; do not merge; no further hosted runs while Actions budget is USD 0. |\n| [#51](https://github.com/yarsalam/marketsage/pull/51) | integration #6 | Iran property/automobile candidate screen; exact-head run 42062133299 passed five jobs | Open; ordinary data work paused under Issue #49; do not merge/extend in this phase. |
-| [#54](https://github.com/yarsalam/marketsage/pull/54) | infra/provider-neutral-control-plane-2026-11 | Draft single-host SQLite coordinator; head e8f7d8add3df577120b92b8927c590aece001509; 16 tests, five lease-renewal tests pending exact-head execution; base has advanced and mergeability is unknown | Keep draft/open. Prior head passed 11/11 owner-run tests; current-head validation tracked in [Issue #55](https://github.com/yarsalam/marketsage/issues/55). Reconcile with current base before review/merge; no hosted dispatch while [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is open. |
-
+| PR | State / draft | Base ← head | Mergeability / divergence | Exact-head evidence | Handling |
+|---|---|---|---|---|---|
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | open / draft | `main` ← `safety/research-only-output-gates-2026-11` | mergeable=true; blocked | [42624038512](https://github.com/yarsalam/marketsage/actions/runs/42624038512), exact head `67356939...`, all five required build/test jobs passed | Leave untouched; outside infrastructure scope. |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | open / draft | `main` ← `infra/provider-neutral-control-plane-2026-11` | mergeable=true; blocked; 73 ahead / 0 behind main | [42589290385](https://github.com/yarsalam/marketsage/actions/runs/42589290385), exact head `237af3ba...`, 110 control-plane tests passed; broad jobs scope-skipped | Parent infrastructure PR; no merge. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | open / draft | `main` ← `research/market-coverage-workspace-2026-11` | mergeable=true; blocked | Push [42621957914](https://github.com/yarsalam/marketsage/actions/runs/42621957914) and PR [42621965739](https://github.com/yarsalam/marketsage/actions/runs/42621965739) passed on exact head `72c57608...` | Leave untouched; research work is frozen by current Issue #49 priority. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | open / draft | `infra/provider-neutral-control-plane-2026-11` ← `infra/durable-provider-dispatch-outbox-2026-11` | mergeable=true at API snapshot; compare showed 103 ahead / 11 behind base | Prior exact head `7d7c6b1...`: [42507293048](https://github.com/yarsalam/marketsage/actions/runs/42507293048) passed 170 tests; [42507288970](https://github.com/yarsalam/marketsage/actions/runs/42507288970) Docker worker canary passed. New config/test commits are not validated. | Keep draft. Reconcile base and obtain owner-authorized exact-head validation before review/merge. |
+| [#62](https://github.com/yarsalam/marketsage/pull/62) | open / ready | `main` ← Dependabot Actions update | mergeable=true; blocked | [42408717730](https://github.com/yarsalam/marketsage/actions/runs/42408717730), exact head `54fbf4a3...`, five required jobs passed | No auto-merge; no action in this infrastructure task. |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | open / draft | `infra/provider-neutral-control-plane-2026-11` ← `docs/parallel-workstream-decomposition-2026-11` | mergeable=null; unknown | No checks on exact head `25ce2428...` | Leave as draft; no duplicate documentation branch. |
+| [#51](https://github.com/yarsalam/marketsage/pull/51) | open / ready | `feat/tindex-free-data-connector` ← research candidate screen | mergeable=true; clean | [42062133299](https://github.com/yarsalam/marketsage/actions/runs/42062133299), exact head `da803a1c...`, five jobs passed | Leave untouched; data work is frozen. |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | open / ready | `main` ← governance/evidence sync | mergeable=true; blocked | [42063679856](https://github.com/yarsalam/marketsage/actions/runs/42063679856), exact head `162692f1...`, five jobs passed | Documentation review only; no local dispatch. |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | open / ready | `fix/gdelt-fred-tindex-current-docs` ← `research/iran-free-data-smoke` | mergeable=true; unstable | TSETMC smoke [39261959033](https://github.com/yarsalam/marketsage/actions/runs/39261959033) failed by connection timeout; older broad CI passed | Parked. Do not repeat the same live request from the same environment. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | open / ready | `main` ← `feat/tindex-free-data-connector` | mergeable=false; dirty | Older exact-head CI passed on `1d90726c...`; current base/head divergence is unresolved | **Never merge without separate explicit owner approval.** |
 
 
 ## Merged to main
@@ -46,6 +65,7 @@ PRs #7, #9, #13, #14, #16, #17, #18, #19, #20, #21, #22, #23, #24, #28, #29 and 
 |---|---|
 | [#15](https://github.com/yarsalam/marketsage/pull/15) | Closed as superseded; its divergent branch was not merged. Its five governance documents were adopted through clean PR #31. |
 | [#26](https://github.com/yarsalam/marketsage/pull/26) | Closed as duplicate/superseded documentation branch. |
+| [#54](https://github.com/yarsalam/marketsage/pull/54) | Closed unmerged (draft); last head `e8f7d8add3df577120b92b8927c590aece001509`. Issue #55 records 16/16 exact-head SQLite tests. Newer SQLite/outbox/orchestrator code is in PR #71. |
 
 ## Current integration graph
 
@@ -55,7 +75,7 @@ main
 - #32 merged: integrated local TSETMC candidate workflow
 - #34 merged: memory-bounded/cgroup-aware candidate batches; owner re-dispatch pending; checks out immutable PR #6 integration commit 819f8b4028469cb0d498098fec88545a18ebacc6
 
-PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked.
+PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PR #54 is closed unmerged; its prior 16/16 validation does not validate the newer PR #71 head.
 
 ## Release and capital-risk guardrails
 

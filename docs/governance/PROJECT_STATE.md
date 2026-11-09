@@ -1,10 +1,34 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-08  
-**Repository:** yarsalam/marketsage (PUBLIC per live GitHub API; see Issue #53 and owner confirmation handoff)  
+## Live infrastructure snapshot — 2026-11-09 (authoritative)
+
+This snapshot supersedes the older dated snapshots below. The latest owner instruction reactivates Issue #49 as a hard gate; the issue body has been updated to record that instruction.
+
+- **Default branch:** `main`; HEAD `4c4b032196137af4658ea2c28e38a21605ee923b`, committed `2026-11-07T19:55:51Z`.
+- **Visibility:** the live GitHub API reports `private=false` / `public`. This conflicts with the current request's description of the repository as private. No visibility change was made. The owner confirmation handoff is recorded in Issue #49. Treat all repository content as public until resolved.
+- **Main ruleset:** `main-protection` / `26789479`, enforcement active, target `refs/heads/main`; PR required, one approving review, seven required status checks, deletion and non-fast-forward updates blocked, no bypass actors, `current_user_can_bypass=never`. Strict required-status-check policy is false. Issue #63 is closed. The legacy branch-protection endpoint returned 403; the active ruleset read is the source of truth.
+- **Infrastructure PR #74:** draft, base `main`, head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`, 73 commits ahead / 0 behind. Exact PR run [42589290385](https://github.com/yarsalam/marketsage/actions/runs/42589290385) passed the control-plane test job: 110 tests. Other broad jobs were scope-skipped, not failed. PR is not merged.
+- **Infrastructure PR #71:** draft, base `infra/provider-neutral-control-plane-2026-11`. The tested code head `7d7c6b1d9eb97d6070651c8b5cda41db9753a78f` passed 170 control-plane tests in [42507293048](https://github.com/yarsalam/marketsage/actions/runs/42507293048), and the real Docker sandbox canary passed on the same SHA in [42507288970](https://github.com/yarsalam/marketsage/actions/runs/42507288970). The branch was 103 commits ahead / 11 behind its base at the last compare. Two repository-only commits then bounded the Docker canary cadence and added workflow-policy tests; the code head before this governance snapshot is `7cf9c5ddf8f4fd858064847e01ffc36a5565c5fc`. Those later commits intentionally skipped CI because no new hosted run was authorized. The 170-test and Docker results do **not** validate the later SHA.
+- **PR #54 / SQLite:** PR #54 is closed and unmerged. Issue #55 is closed with 16/16 tests on exact commit `e8f7d8add3df577120b92b8927c590aece001509`. The newer SQLite coordinator/outbox/orchestrator implementation is in PR #71; its 170-test result applies only to the exact earlier PR #71 SHA above.
+- **Main CI schedule:** `.github/workflows/ci.yml` has push, pull-request, daily schedule (`17 3 * * *`) and manual-dispatch triggers. Main SHA `4c4b032...` has a successful scheduled run [42610905309](https://github.com/yarsalam/marketsage/actions/runs/42610905309) on 2026-11-09 and a successful push run [42408566585](https://github.com/yarsalam/marketsage/actions/runs/42408566585). The scheduled run started at 11:40:32 UTC, well after the 03:17 UTC cron time; GitHub schedule timing is not an exact-time guarantee.
+- **Workflow controls:** CI defaults to `contents: read`, with narrowly scoped `issues: write` in failure/provenance jobs; concurrency cancels superseded runs; jobs have explicit timeouts. There is no workflow-level retry policy. Failure reporters run on GitHub-hosted runners in the same hosted runner pool they monitor. The health observer is a deterministic snapshot assessor, not a deployed independent poller.
+- **Docker canary cadence change:** PR #71 now limits the heavy Docker worker acceptance workflow to a daily schedule and `main` pushes; normal push/PR validation remains in `ci.yml`. A regression test was added for daily cadence and manual-only self-hosted triggers. The new test has not been run on the changed head.
+- **Local worker boundary:** `self-hosted-worker-acceptance.yml` remains manual-only with explicit owner confirmation. No local workflow was dispatched. The laptop is not treated as always-on.
+- **Provider and recovery evidence:** two-provider failover and side-effect deduplication tests use deterministic fake adapters. No real second provider is registered. The Docker sandbox has one successful ephemeral GitHub-hosted acceptance run, not a persistent independent worker service. SQLite is single-host. Crash/restart and lease recovery are covered by tests, not by a 24/7 server drill. The watchdog/health assessment code is not an independently deployed observer or notification path.
+- **Independent failure domain:** `.circleci/config.yml` exists as a candidate adapter but no CircleCI account/pipeline is connected or verified. No notification path outside the GitHub-hosted runner pool is currently proven.
+- **Owner gates:** Issue #52 records Chabokan-only install success (30/30 tests) on the recorded exact commit; only dependency wheel hash-locking remains. Issue #53 is closed by the public-repository zero-cost decision. Issue #55 is closed; Issue #63 is closed.
+- **Execution boundary:** no hosted dispatch/rerun, local dispatch, provider registration, secret creation, paid usage, merge, release, deployment, market-data operation, product feature work, investment scoring/ranking, probability calibration, backtest approval, broker/trading, or capital allocation was performed in this snapshot.
+
+**Readiness:** NOT 24/7-ready. Real independent provider execution, an external failure observer, persistent worker hosting, live recovery drills, and exact-head validation of the newest PR #71 changes remain unproven.
+
+
+**Snapshot date:** 2026-11-09  
+**Repository:** yarsalam/marketsage (PUBLIC per live GitHub API; visibility confirmation tracked in Issue #49)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** #6, feat/tindex-free-data-connector  
 **Current integration HEAD:** 1d90726c593b0818982407c309ff13301798f5b3  
+**Infrastructure PRs:** #74 (parent integration) and #71 (durable outbox/worker)  
+
 **Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
 **Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
 
@@ -14,18 +38,18 @@
 - PR #8 remains parked after the GitHub-hosted TSETMC connection timeout. Do not repeat the same request from the same environment.
 - PR #27 (manual-only staged-dataset validator), PR #31 (clean governance adoption), PR #32 (manual integrated TSETMC workflow) and PR #34 (memory-bounded local analysis) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
 - PRs #7, #9, #13, #14, #16–#24, and #28–#30 are integrated into PR #6 in dependency order. Their CI results do not approve data sources or the strategy.
-- The governance constitution is adopted on main via PR #31. Active ruleset #26789479 protects main with required PR/check rules and deletion/non-fast-forward blocks. It currently requires 10 approvals; owner adjustment remains pending in Issue #63. The laptop Runner remains manual-only.
+- The governance constitution is adopted on main via PR #31. Active ruleset #26789479 protects main with required PR/check rules and deletion/non-fast-forward blocks. It requires one approving review and seven required checks; Issue #63 is closed. Strict required-status-check policy is false and no bypass actors are configured. The laptop Runner remains manual-only.
 
 ## Local Runner and first dataset gate
 
-**Runner:** marketsage-local-01, repository-scoped to yarsalam/marketsage, version 2.338.2, labels marketsage-local and marketsage-research plus GitHub's standard labels.
+**Runner:** [redacted local runner id], repository-scoped to yarsalam/marketsage, version 2.338.2, labels marketsage-local and marketsage-research plus GitHub's standard labels.
 
-**Service:** actions.runner.yarsalam-marketsage.marketsage-local-01.service, running as the unprivileged marketsage-runner account and enabled at boot. The account is not in sudo, docker, lxd or adm; it cannot traverse the owner's home directory.
+**Service:** actions.runner.yarsalam-marketsage.[redacted local runner id].service, running as the unprivileged [redacted runner account] account and enabled at boot. The account is not in sudo, docker, lxd or adm; it cannot traverse the owner's home directory.
 
 **Host access boundary:**
-- Staged data: /srv/marketsage/data/tsetmc_history_20261022, files mode 0440, directories mode 2750; Runner read/traverse only.
-- Output: /srv/marketsage/output, owned by Runner; the integrated-candidate workflow creates its dedicated output directory with mode 0700 and umask 077.
-- Runner workspace/install is under /opt/actions-runner/marketsage.
+- Staged data: [redacted local path], files mode 0440, directories mode 2750; Runner read/traverse only.
+- Output: [redacted local path], owned by Runner; the integrated-candidate workflow creates its dedicated output directory with mode 0700 and umask 077.
+- Runner workspace/install is under [redacted local path]
 - Service restrictions include ProtectHome=true, ProtectSystem=strict, PrivateTmp=true, NoNewPrivileges=true, kernel/module/control-group protections, the staged dataset in ReadOnlyPaths, and only the approved Runner/output paths in ReadWritePaths.
 - RestrictSUIDSGID is not enabled. Its removal followed the observed GNU tar 1.35 Function not implemented checkout failure; a nested tar extraction regression test passed in a systemd sandbox with the other principal restrictions retained.
 - Network egress is not blocked by these filesystem/systemd controls. Only reviewed manual workflows may run.
