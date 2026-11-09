@@ -40,7 +40,7 @@ type RuntimeSeries = {
   identity_status?: string;
   data_kind?: string;
   expected_data_kind?: string | null;
-  price_basis_status?: "consistent" | "legacy_mismatch" | "unknown";
+  price_basis_status?: "consistent" | "legacy_mismatch" | "not_mapped";
   stored_versions: number;
   distinct_records: number;
   latest_observed_at: string | null;
@@ -234,7 +234,7 @@ function SourceCard({ source, runtime }: { source: Source; runtime?: RuntimeSour
         {series.length > 0 && (
           <div className="mt-3 space-y-2">
             {series.slice(0, 4).map((item) => (
-              <div key={item.series_key} className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
+              <div key={`${item.series_key}:${item.data_kind ?? "unknown"}`} className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
                 <span className="flex flex-col" dir="ltr">
                   <span>{item.series_key}</span>
                   {item.canonical_instrument_id && (
@@ -243,7 +243,7 @@ function SourceCard({ source, runtime }: { source: Source; runtime?: RuntimeSour
                 </span>
                 <span className="flex flex-col items-end gap-1 text-text-secondary">
                   <span>{label(item.freshness)} · {item.distinct_records.toLocaleString("fa-IR")} رکورد · آخرین مشاهده: {formatDate(item.latest_observed_at)}</span>
-                  <span>{label(item.price_basis_status ?? "unknown")}</span>
+                  <span>{label(item.price_basis_status ?? "not_mapped")}</span>
                   {item.price_basis_status === "legacy_mismatch" && (
                     <span dir="ltr">stored: {item.data_kind} · expected: {item.expected_data_kind}</span>
                   )}
