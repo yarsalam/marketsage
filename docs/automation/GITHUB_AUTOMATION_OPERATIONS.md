@@ -36,9 +36,6 @@ The live ruleset currently requires **one approving review**, not ten. Its stale
 | --- | ---: | --- |
 | `classify-change-scope` | 5 min | Fail-closed classification of infrastructure-only diffs; emits only an aggregate label |
 | `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images` | 2 min each | Preserved required-check contexts; skipped for allowlisted infrastructure-only changes and otherwise fail immediately during the Goal 1 freeze (no product/build commands) |
-
-
-
 | `infra-control-plane-tests` | 15 min | Discover and run every `test_*.py` module under `infra/control_plane` |
 | `ci-infra-tests` | 5 min | Offline regression tests for scope classification, failure notice, and direct-main provenance helpers |
 | `detect-direct-main-update` | 5 min | Main-push-only provenance detection |
@@ -46,7 +43,7 @@ The live ruleset currently requires **one approving review**, not ten. Its stale
 
 All external Actions are pinned to immutable 40-character commit SHAs. Dependabot checks GitHub Actions weekly in one grouped PR; its updates must pass review and CI before acceptance.
 
-Workflow-level permissions default to `contents: read`. The two narrow jobs with issue-comment duties receive job-scoped `issues: write`: the direct-main provenance detector and the failure notifier. The detector also receives `pull-requests: read`. The control-plane/application validation jobs do not need repository secrets or contents-write access.
+Workflow-level permissions default to `contents: read`. The two narrow jobs with issue-comment duties receive job-scoped `issues: write`: the direct-main provenance detector and the failure notifier. The failure notifier is disabled on `pull_request` events, so untrusted PR code does not receive an issue-write token. The detector also receives `pull-requests: read`. The control-plane/application validation jobs do not need repository secrets or contents-write access.
 
 ## 3. Concurrency, cancellation, and retries
 
