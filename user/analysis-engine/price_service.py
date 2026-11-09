@@ -368,7 +368,7 @@ def data_quality() -> dict:
             series["source_id"], symbol
         )
         expected_data_kind = None
-        price_basis_status = "unknown"
+        price_basis_status = "not_mapped"
         if canonical_id:
             semantics = temporal_price_metadata_for(series["source_id"], symbol)
             expected_data_kind = semantics["data_kind"]
