@@ -213,6 +213,38 @@ def test_monthly_prices_reject_stale_month_end_observations():
     assert monthly.loc[pd.Timestamp("2024-03-31"), "SPY"] > 0
 
 
+def test_temporal_price_storage_uses_canonical_basis_and_quote_units(tmp_path):
+    retrieved_at = datetime(2026, 11, 9, 12, 0, tzinfo=timezone.utc)
+    prices = pd.DataFrame(
+        {"BTC-USD": [100.0], "SPY": [200.0]},
+        index=pd.DatetimeIndex(["2026-11-08"]),
+    )
+
+    assert price_service._persist_temporal_prices(
+        prices, retrieved_at, "a" * 64, tmp_path,
+    ) == 2
+
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    rows = store.as_of(as_of=datetime(2026, 11, 10, tzinfo=timezone.utc))
+    by_symbol = {row["payload"]["symbol"]: row for row in rows}
+
+    crypto = by_symbol["BTC-USD"]
+    assert crypto["data_kind"] == "provider_close"
+    assert crypto["payload"]["canonical_instrument_id"] == "global.proxy.crypto.bitcoin"
+    assert crypto["payload"]["currency"] == "USD"
+    assert crypto["payload"]["price_unit"] == "usd_per_token"
+    assert crypto["payload"]["price_basis"] == "provider_close"
+    assert crypto["payload"]["adjustment_policy"] == "provider_close_no_adjustment"
+
+    etf = by_symbol["SPY"]
+    assert etf["data_kind"] == "adjusted_close"
+    assert etf["payload"]["canonical_instrument_id"] == "global.proxy.etf.sp500"
+    assert etf["payload"]["currency"] == "USD"
+    assert etf["payload"]["price_unit"] == "usd_per_share"
+    assert etf["payload"]["price_basis"] == "adjusted_close"
+    assert etf["payload"]["adjustment_policy"] == "yfinance_auto_adjust_true_close"
+
+
 def test_data_quality_reports_captured_series_and_unconfigured_sources(tmp_path, monkeypatch):
     monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
     monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
