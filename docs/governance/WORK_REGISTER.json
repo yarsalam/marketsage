@@ -300,6 +300,47 @@
       ],
       "evidence_refs": [],
       "requires_user_flow_proof": true
+    },
+    {
+      "id": "MS-INTEGRATION-001",
+      "title": "Integrated authenticated market-coverage and operations workflow",
+      "track": "product-integration",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "integration/market-coverage-auth-safety-2026-11",
+      "pull_request": 81,
+      "depends_on": [
+        "MS-OPS-001",
+        "MS-PROD-001",
+        "MS-DATA-001",
+        "MS-SEC-001",
+        "MS-ADMIN-001"
+      ],
+      "timebox_hours": 8,
+      "objective": "Integrate the market coverage, research-only safety, owner authentication, read-only admin operations and machine-checked project governance into one coherent, testable candidate.",
+      "user_problem": "The user cannot currently enter a protected workspace and reliably inspect source coverage, data quality and service status in one truthful workflow.",
+      "deliverables": [
+        "Unified authenticated market-coverage workspace",
+        "Protected read-only source and data-quality APIs",
+        "Fail-closed investment-output controls",
+        "Separate read-only admin operations surface, not publicly exposed",
+        "Machine-checked strategy, work, evidence and release records"
+      ],
+      "acceptance_criteria": [
+        "Exact integration-head CI passes across application, backend, admin and production-image checks",
+        "Project operating-system validator and negative tests pass",
+        "Unauthenticated private API requests are rejected and authenticated requests include the session cookie",
+        "No investment output is enabled and no candidate source is promoted",
+        "Owner completes browser login, logout and market-coverage acceptance on an isolated local environment"
+      ],
+      "stop_conditions": [
+        "Do not merge into main or deploy without separate explicit approval",
+        "Do not expose admin workspace publicly before admin authentication, authorization and audit logging",
+        "Do not enable investment outputs or approve sources",
+        "Do not require paid resources or local Runner dispatch"
+      ],
+      "evidence_refs": [],
+      "requires_user_flow_proof": true
     }
   ]
 }
