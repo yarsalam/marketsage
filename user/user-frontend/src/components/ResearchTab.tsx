@@ -23,6 +23,10 @@ type DataStatus = Record<string, unknown>;
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 const unavailable: Record<string, { title: string; description: string; next: string }> = {
+  momentum: { title: "رتبه‌بندی مومنتوم", description: "امتیازدهی و رتبه‌بندی ابزارها تا زمان تأیید منابع و اعتبارسنجی مستقل روش، در این نسخه غیرفعال است.", next: "این تب فقط پس از تصویب روش پژوهشی شش‌ماهه، کنترل point-in-time و آزمون خارج از نمونه فعال می‌شود." },
+  risk: { title: "مرکز ریسک", description: "معیارهای فعلی از موتور آزمایشی بک‌تست می‌آیند و هنوز تأیید مستقل ندارند؛ هیچ شاخص ریسک محاسبه یا به‌عنوان مبنای تصمیم نمایش داده نمی‌شود.", next: "پس از تثبیت داده، هزینه، نقدشوندگی و اعتبارسنجی زمانی دوباره فعال خواهد شد." },
+  portfolio: { title: "تخصیص پرتفوی", description: "تخصیص سرمایه و نمایش وزن دارایی‌ها فعلاً مسدود است. مقدار سرمایهٔ پیش‌فرض قبلی دیگر به API ارسال نمی‌شود.", next: "فعال‌سازی نیازمند عبور از دروازه‌های داده و مدل و اجازهٔ صریح مالک پروژه است." },
+  backtest: { title: "آزمایشگاه بک‌تست", description: "اجرای بک‌تست و نمایش بازده/رتبه‌بندی تا زمان تأیید مجموعه‌داده و پروتکل walk-forward متوقف است.", next: "دورهٔ holdout نباید برای تنظیم پارامتر باز شود؛ هر آزمون بعدی باید با دادهٔ زمان‌مند و هزینه‌های واقعی از پیش ثبت‌شده انجام شود." },
   regime: { title: "تشخیص رژیم بازار", description: "مدل رژیم بازار هنوز به داده‌های زمان‌دار و آزمون خارج از نمونه متصل نشده است؛ در این بخش عدد یا برچسب ساختگی نمایش داده نمی‌شود.", next: "پس از تعریف ویژگی‌ها، برچسب‌ها و آزمون walk-forward، این تب به سرویس تحلیل متصل می‌شود." },
   news: { title: "هوش اخبار", description: "گردآورنده خبر، منبع معتبر و زمان انتشار قابل ممیزی هنوز پیکربندی نشده‌اند.", next: "نیازمند ارائه‌دهنده خبر، ثبت timestamp و سیاست deduplication است." },
   macro: { title: "داده‌های کلان", description: "سری‌های کلان با زمان انتشار و نسخه‌های تاریخی در حال حاضر در این سرویس در دسترس نیستند.", next: "داده‌های کلان باید با زمان انتشار واقعی منتشرکننده نگهداری شوند تا look-ahead ایجاد نشود." },
@@ -50,9 +54,8 @@ export function ResearchTab({ activeTab, onNavigate }: { activeTab: TabId; onNav
   useEffect(() => {
     const controller = new AbortController();
     let endpoint: string | null = null;
-    if (activeTab === "momentum") endpoint = "/api/markets/scores";
-    if (activeTab === "risk" || activeTab === "backtest") endpoint = "/api/markets/backtest";
-    if (activeTab === "portfolio") endpoint = "/api/decision?horizon=1M&capital=500000000";
+    // Decision outputs remain disabled until source and methodology gates pass.
+    // Only the read-only operational data-status endpoint is fetched from this component.
     if (activeTab === "settings") endpoint = "/api/markets/data-status";
     if (!endpoint) { setData(null); setError(null); setLoading(false); return () => controller.abort(); }
 
@@ -81,7 +84,7 @@ export function ResearchTab({ activeTab, onNavigate }: { activeTab: TabId; onNav
   if (loading) return <Panel title="در حال دریافت داده"><p className="animate-pulse text-text-secondary">در حال دریافت اطلاعات از API...</p></Panel>;
   if (error) return <Panel title="داده در دسترس نیست"><Notice><p role="alert">{error}</p><p className="mt-2">برای جلوگیری از نمایش اعداد ساختگی، داده نمونه جایگزین نشده است.</p><button className="mt-3 text-primary underline" onClick={() => onNavigate("decision")}>بازگشت به تصمیم پژوهشی</button></Notice></Panel>;
   if (!data) {
-    return <Panel title="تنظیمات داده"><Notice>هنوز داده‌ای در حافظه سرویس بارگذاری نشده است. برای دریافت نخستین snapshot، ابتدا تب «تصمیم سرمایه‌گذاری» را باز کن.</Notice></Panel>;
+    return <Panel title="تنظیمات داده"><Notice>هنوز داده‌ای در حافظه سرویس بارگذاری نشده است. دریافت دادهٔ بازار فقط پس از تأیید منبع و از مسیر مجاز آن انجام می‌شود.</Notice></Panel>;
   }
 
   if (activeTab === "momentum") {
