@@ -111,6 +111,24 @@ def validate_registry(
             raise InstrumentRegistryError("aliases cannot contain empty values")
 
 
+def freshness_policy_for(source_id: str, provider_symbol: str) -> tuple[int | None, str]:
+    """Return an observation-age threshold only for explicitly registered price proxies."""
+    matches = [
+        item for item in _INSTRUMENT_ROWS
+        if item.source_id == source_id and item.provider_symbol == provider_symbol
+    ]
+    if len(matches) > 1:
+        raise InstrumentRegistryError("ambiguous provider/source symbol mapping")
+    if not matches:
+        return None, "No source-specific observation freshness policy is configured."
+    instrument = matches[0]
+    if instrument.instrument_type == "crypto_spot_pair":
+        return 3, "Global crypto proxy: maximum 3 calendar days since observed_at."
+    if instrument.instrument_type == "exchange_traded_fund":
+        return 7, "Global ETF research proxy: maximum 7 calendar days since observed_at."
+    return None, "No instrument-specific observation freshness policy is configured."
+
+
 def canonical_instrument_id_for(source_id: str, provider_symbol: str) -> str | None:
     """Resolve a source symbol to a canonical ID without guessing unknown mappings."""
     matches = [
