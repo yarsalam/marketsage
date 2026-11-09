@@ -116,6 +116,25 @@ def test_canonical_instrument_registry_matches_the_existing_price_universe():
     assert registered_symbols == set(price_service.TICKERS)
 
 
+def test_observed_series_resolve_to_canonical_instrument_ids(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    prices = pd.DataFrame(
+        {"SPY": [100.0, 101.0], "BTC-USD": [200.0, 202.0]},
+        index=pd.date_range(pd.Timestamp.now().normalize() - pd.Timedelta(days=1), periods=2, freq="D"),
+    )
+    price_service.write_daily_snapshot(prices, now, tmp_path)
+
+    payload = client.get("/data-quality").json()
+    yahoo = next(item for item in payload["sources"] if item["source_id"] == "global.yahoo_finance.yfinance")
+    identities = {row["series_key"]: row for row in yahoo["runtime_series"]}
+    assert identities["SPY"]["canonical_instrument_id"] == "global.proxy.etf.sp500"
+    assert identities["SPY"]["identity_status"] == "canonical_mapping_found"
+    assert identities["BTC-USD"]["canonical_instrument_id"] == "global.proxy.crypto.bitcoin"
+    assert identities["BTC-USD"]["identity_status"] == "canonical_mapping_found"
+
+
 def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates():
     response = client.get("/sources")
     assert response.status_code == 200
