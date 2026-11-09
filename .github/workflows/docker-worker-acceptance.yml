@@ -1,12 +1,14 @@
 name: MarketSage Docker worker acceptance
 
 on:
+  # Heavy Docker canary is not repeated on every infrastructure-branch push.
+  # The normal CI workflow still validates every push and pull request.
   push:
     branches:
       - main
-      - infra/durable-provider-dispatch-outbox-2026-11
+  # One bounded daily canary on the default branch, not every 15 minutes.
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "43 4 * * *"
   workflow_dispatch:
 
 permissions:
