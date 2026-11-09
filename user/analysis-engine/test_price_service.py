@@ -8,7 +8,7 @@ from fastapi import HTTPException
 
 import price_service
 from fastapi.testclient import TestClient
-from temporal_data import PointInTimeStore
+from temporal_data import PointInTimeStore, TemporalRecord
 
 client = TestClient(price_service.app)
 
