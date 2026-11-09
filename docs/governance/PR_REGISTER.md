@@ -7,7 +7,7 @@ Main HEAD at snapshot: `4c4b032196137af4658ea2c28e38a21605ee923b`.
 
 | PR | Base | Head branch | Exact head | State | Handling |
 |---|---|---|---|---|---|
-| [#81](https://github.com/yarsalam/marketsage/pull/81) | main | integration/market-coverage-auth-safety-2026-11 | `7091a0064614aa685e6be11db776be7cf729ec7b` | Open, Draft; integration CI being rerun after all tracks were copied | Combined candidate for #73/#77/#78/#79/#80; not merged/deployed; browser acceptance pending |
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | main | integration/market-coverage-auth-safety-2026-11 | Live head tracked in GitHub PR | Open, Draft; governance validator passes; full CI incomplete on latest attempt | Combined candidate for #73/#77/#78/#79/#80; not merged/deployed; browser acceptance pending |
 | [#80](https://github.com/yarsalam/marketsage/pull/80) | main | admin/read-only-operations-workspace-2026-11 | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | Open, Draft; exact-head CI passed | Admin read-only workspace copied into #81; still not safe for public exposure |
 | [#79](https://github.com/yarsalam/marketsage/pull/79) | main | security/user-authentication-2026-11 | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | Open, Draft; exact-head CI passed | Owner login/auth routes copied into #81; browser and deployment security acceptance pending |
 | [#78](https://github.com/yarsalam/marketsage/pull/78) | main | strategy/project-operating-system-parallel-2026-11 | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | Open, Draft; exact-head CI passed | Strategy charter, work/evidence registers and read-only validator copied into #81 |
