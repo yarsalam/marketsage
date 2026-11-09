@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-09",
+  "gates": [
+    {
+      "id": "RG-01",
+      "name": "End-to-end user value",
+      "required": true,
+      "criteria": [
+        "named user and task",
+        "reproducible browser journey",
+        "actual API/data path, no mocked success",
+        "observed problem resolved"
+      ],
+      "evidence_type": "USER_FLOW"
+    },
+    {
+      "id": "RG-02",
+      "name": "Authentication and authorization",
+      "required": true,
+      "criteria": [
+        "login and logout",
+        "private routes protected",
+        "API rejects unauthenticated access",
+        "admin role separated"
+      ],
+      "evidence_type": "SECURITY"
+    },
+    {
+      "id": "RG-03",
+      "name": "Data trust",
+      "required": true,
+      "criteria": [
+        "provider rights/use conditions",
+        "instrument identity and venue",
+        "units/currency/price basis",
+        "source/retrieval/availability timestamps",
+        "gap/duplicate/stale/correction handling",
+        "independent reconciliation where applicable"
+      ],
+      "evidence_type": "SOURCE_APPROVAL"
+    },
+    {
+      "id": "RG-04",
+      "name": "Analytical validity",
+      "required": true,
+      "criteria": [
+        "point-in-time inputs",
+        "pre-registered target/universe/benchmark/costs",
+        "chronological holdout and walk-forward",
+        "risk and uncertainty measures",
+        "outlier attribution",
+        "no tuning on final holdout"
+      ],
+      "evidence_type": "RESEARCH_VALIDATION"
+    },
+    {
+      "id": "RG-05",
+      "name": "Operational readiness",
+      "required": true,
+      "criteria": [
+        "health/readiness checks",
+        "backup/restore and rollback",
+        "bounded failure/retry policy",
+        "deployment smoke on target",
+        "sanitized observability"
+      ],
+      "evidence_type": "RELEASE"
+    },
+    {
+      "id": "RG-06",
+      "name": "Investment-output activation",
+      "required": true,
+      "criteria": [
+        "all data and research gates pass",
+        "exact output has independent evidence",
+        "owner explicitly approves enabling gate"
+      ],
+      "evidence_type": "OWNER_APPROVAL"
+    }
+  ],
+  "release_default": "BLOCKED",
+  "investment_outputs_default": "DISABLED",
+  "never_infer_approval_from": [
+    "CI_SUCCESS",
+    "MOCK_TEST",
+    "OPEN_PR",
+    "DOCUMENTATION",
+    "SYNTHETIC_FIXTURE"
+  ]
+}
