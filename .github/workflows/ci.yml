@@ -2,7 +2,7 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**", "ci/**", "infra/**"]
+    branches: [main, "deploy/**", "research/**", "ci/**", "infra/**", "integration/**"]
   pull_request:
     branches: [main, "deploy/**", "infra/**"]
   # GitHub scheduled workflows run from the default branch after this PR is merged.
