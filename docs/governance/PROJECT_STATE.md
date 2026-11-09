@@ -5,7 +5,7 @@
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Active product issue:** [#72 — Product Phase 1: evidence-first Market Coverage Workspace](https://github.com/yarsalam/marketsage/issues/72)  
 **Active product branch:** `research/market-coverage-workspace-2026-11`  
-**Product PR:** [#73 — market coverage and canonical instrument registry](https://github.com/yarsalam/marketsage/pull/73), Draft and open; latest exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`; both matching push and pull_request CI passed (runs #42617872744 and #42617880657)  
+**Product PR:** [#73 — market coverage and canonical instrument registry](https://github.com/yarsalam/marketsage/pull/73), Draft and open; latest exact head `87d0eab55422f5a58d48a4c0b8faa0dc9aad10fd`; exact push and pull_request CI passed (runs #42620847077 and #42620857089)  
 **Infrastructure PR:** [#71](https://github.com/yarsalam/marketsage/pull/71), Draft, open and unmerged  
 **Release posture:** research-only. No source is approved for production investment scoring; no validated probability model or strategy is approved; production allocation, broker access and trading remain disabled.
 
@@ -14,7 +14,7 @@
 - Product, data-quality, source-contract and research-system engineering continue independently of the infrastructure backlog.
 - Ordinary CI, build and test jobs use GitHub-hosted runners. No project task may wait for the owner's laptop Runner unless the exact task requires local-only data or host access.
 - If local execution is essential, provide one bounded owner command and continue unrelated product work.
-- PR #73 latest exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`; push run #42617872744 and PR run #42617880657 both passed, including Docker production-image build.
+- PR #73 latest exact head `87d0eab55422f5a58d48a4c0b8faa0dc9aad10fd`; push run #42620847077 and PR run #42620857089 passed, including a real analysis-container startup and five read-only endpoint smoke tests.
 - The local dataset acceptance run #42482678959 passed once; this is not evidence of 24/7 Runner availability. Issue #57 is closed as non-blocking; PRs #71 and #74 are parked. PR #74 must not be merged unchanged because its CI intentionally suppresses product tests.
 - Main remains protected. PR #6 remains explicitly unmerged. No source approval, production investment scoring/ranking, calibrated probabilities, backtest approval, production deployment, broker access, trading or capital allocation is authorized.
 
@@ -25,7 +25,7 @@
 - In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, `GET /api/markets/iran-providers`, and `GET /api/markets/instruments`. Controller forwarding tests cover the routes.
 - The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates, Iranian provider readiness and canonical instrument identity. The page is the default landing tab for this increment. Manual refresh/retry and abort-safe loading are included; Iran/global filters do not mix the two instrument universes.
 - NestJS unit tests cover forwarding of the new API routes and bounded service-unavailable behavior when the analysis engine is unreachable.
-- PR #73 is Draft and open at exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`. The coverage page includes a canonical instrument catalog and maps observed price-series symbols to canonical IDs in the data-quality response. Exact-head push run [42617872744](https://github.com/yarsalam/marketsage/actions/runs/42617872744) and PR run [42617880657](https://github.com/yarsalam/marketsage/actions/runs/42617880657) both passed all jobs, including analysis, backend, frontend, admin workspace and production image build. No local Runner was used.
+- PR #73 is Draft and open at exact head `87d0eab55422f5a58d48a4c0b8faa0dc9aad10fd`. It includes the canonical instrument catalog, source-symbol mapping, source-specific freshness, price-basis mismatch detection for legacy records, typed temporal snapshot writes and an analysis Dockerfile/runtime fix. Exact-head push run [42620847077](https://github.com/yarsalam/marketsage/actions/runs/42620847077) and PR run [42620857089](https://github.com/yarsalam/marketsage/actions/runs/42620857089) passed all jobs. The production-images job built all images, launched the analysis container and verified five read-only endpoints. No local Runner was used.
 - The page reports actual registry and runtime values only. It does not create synthetic quotes, infer provider availability, approve data, or change scoring.
 - Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Phase 1 acceptance: Issue #72. Canonical identity registry: Issue #75.
 - The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PRs #71 and #74 are infrastructure-only, Draft and unmerged; #74's temporary product-CI freeze is superseded and that PR must not be merged unchanged.
@@ -152,3 +152,19 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 6. Keep source scoring, investment ranking, calibrated probabilities, production release, broker access and trading disabled until all relevant data and empirical gates pass. Any real-money allocation or trade still requires the owner's separate explicit approval.
 
 **Investment-stage status: NOT READY.** A successful Runner job, parser, dataset hash audit, or integration CI run is not an investment approval.
+
+## 2026-11-09 — Research outputs fail-closed until validation
+
+- Draft PR [#77](https://github.com/yarsalam/marketsage/pull/77) gates `/api/decision`, `/api/markets/scores` and `/api/markets/backtest` behind the exact explicit environment flag `MARKETSAGE_RESEARCH_OUTPUTS_ENABLED=true`. Absent by default, the API returns 503 before calling the analysis engine.
+- The decision UI no longer sends the prior default-capital request. Momentum, risk, portfolio allocation and backtest views are disabled in the UI pending evidence and owner approval.
+- Exact PR head `a69a72317251a0bddf53afe6ad62111af44f7bdd` passed GitHub-hosted CI run [#42618957174](https://github.com/yarsalam/marketsage/actions/runs/42618957174), including backend, analysis, frontend, admin workspace and production image build.
+- PR #77 is Draft/unmerged. No deployment environment was modified and the feature flag was not enabled.
+
+
+## Latest owner operating instruction — 2026-11-09 (supersedes local-Runner next actions)
+
+The owner instructed that the full MarketSage project continue without waiting for the laptop Runner. Use GitHub-hosted CI for normal engineering. Only tasks that truly require local-only data or host access may produce one bounded owner command; unrelated work must continue. The last known local dataset acceptance run #42482678959 succeeded once on 2026-11-08, but this does not establish present online state or 24/7 availability. The GitHub connector used here cannot read the registered-runner inventory endpoint, and no laptop access is available; therefore no claim is made that the Runner is currently online/offline, and no remote registration or laptop files have been deleted. Infrastructure PRs #71/#74 remain parked/non-blocking; PR #74 must not be merged unchanged. PR #6 remains unmerged absent explicit approval. Main remains protected and unchanged.
+
+The older local TSETMC manual dispatch steps in the historical section below are superseded as an immediate next action. They remain available only if a later, explicitly scoped local-data task genuinely requires them.
+
+**Current active PRs:** #73 (market coverage, instrument identity and temporal data semantics) and #77 (default-closed research-output safety gate). Both remain Draft and unmerged; neither authorizes deployment or investment decisions.

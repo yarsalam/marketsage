@@ -87,7 +87,7 @@ This registry is metadata only: it does not collect prices, change provider elig
 
 ## Infrastructure track — independent, not a product blocker
 
-Infrastructure acceptance continues as a separately reported workstream. Owner-reported host-level Rootless Docker checks passed for UID 110, rootless mode, seccomp and no default bridge, with the system Docker kept separate. The latest recorded local dataset-acceptance dispatch [#42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959) succeeded once on 2026-11-08; this is a single manual run, not proof of Runner availability or a 24/7 service. Infrastructure PRs #71 and #74 remain Draft and parked. Live independent-backend failover and a full 24-hour observation window are not evidenced. Product work does not depend on them.
+Infrastructure acceptance is optional and must not gate product delivery. No new Runner registration/dispatch is used for ordinary work. Owner-reported host-level Rootless Docker checks passed for UID 110, rootless mode, seccomp and no default bridge, with the system Docker kept separate. The latest recorded local dataset-acceptance dispatch [#42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959) succeeded once on 2026-11-08; this is a single manual run, not proof of Runner availability or a 24/7 service. Infrastructure PRs #71 and #74 remain Draft and parked. Live independent-backend failover and a full 24-hour observation window are not evidenced. Product work does not depend on them.
 
 This evidence discrepancy must be corrected by subsequent runs and records, but it does not prevent safe, independently scoped product development. No infrastructure acceptance claim is changed by starting this roadmap.
 
@@ -99,5 +99,14 @@ This evidence discrepancy must be corrected by subsequent runs and records, but 
 - TSETMC and CODAL are candidate-only; Iranian gold/FX providers are not selected.
 - Existing decision/momentum output is a small global-proxy/crypto historical research baseline; it is not an Iran-market decision engine and its nominal horizon parameter does not make the model horizon-specific.
 - News/politics/sentiment and calibrated probabilities are not implemented as production decision inputs.
-- The Market Coverage UI surfaces these facts, the canonical instrument catalog and series-to-instrument mappings without changing calculation or approval gates.
-- Exact final PR #73 head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca` passed push run #42617872744 and pull_request run #42617880657; all substantive jobs and production image build succeeded on GitHub-hosted runners.
+- The Market Coverage UI surfaces these facts, the canonical instrument catalog and series-to-instrument mappings without changing source approvals or investment calculation gates.
+- Legacy temporal rows whose stored price basis differs from the canonical registry are explicitly counted and flagged in the API/UI; no automatic historical rewrite is performed.
+- Future snapshot writes validate symbols before any file write and store crypto close versus ETF adjusted-close semantics with explicit units and adjustment policy.
+- Production-images CI runs the analysis image and probes `/health`, `/sources`, `/data-quality`, `/iran-market/providers` and `/instruments`.
+- Exact final PR #73 head `87d0eab55422f5a58d48a4c0b8faa0dc9aad10fd` passed push run #42620847077 and pull_request run #42620857089; all jobs succeeded. CI built all production images, started the real analysis container and validated five read-only endpoints on GitHub-hosted runners.
+
+## Owner priority update — 2026-11-09
+
+The owner directed that all product work continue without waiting for the self-hosted Runner. Standard development, tests, builds and runtime smoke use GitHub-hosted Actions. A local command is reserved only for a task that demonstrably needs a local-only dataset or host; the independent backlog continues meanwhile. No current Runner-online status has been verified, so no claim of current availability/offline state or host cleanup is made. The last known local dataset acceptance #42482678959 succeeded once on 2026-11-08; it is not 24/7 evidence.
+
+Research-output safety is separately tracked in Draft PR [#77](https://github.com/yarsalam/marketsage/pull/77): decision, scores, portfolio allocation and backtest outputs are disabled by default at the UI and NestJS API until evidence gates and explicit owner approval. Its exact head passed run #42618957174. Neither PR #73 nor #77 has been merged or deployed.
