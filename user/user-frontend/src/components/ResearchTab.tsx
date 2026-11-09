@@ -60,7 +60,7 @@ export function ResearchTab({ activeTab, onNavigate }: { activeTab: TabId; onNav
     if (!endpoint) { setData(null); setError(null); setLoading(false); return () => controller.abort(); }
 
     setLoading(true); setData(null); setError(null);
-    fetch(`${API_BASE}${endpoint}`, { headers: { Accept: "application/json" }, cache: "no-store", credentials: "include", signal: controller.signal })
+    fetch(`${API_BASE}${endpoint}`, { headers: { Accept: "application/json" }, cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
           const body = await response.json().catch(() => null);
