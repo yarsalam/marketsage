@@ -16,7 +16,7 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
-from instrument_registry import canonical_instrument_id_for, instrument_catalog
+from instrument_registry import canonical_instrument_id_for, freshness_policy_for, instrument_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
@@ -344,11 +344,16 @@ def data_quality() -> dict:
         if latest:
             observed = datetime.fromisoformat(latest.replace("Z", "+00:00"))
             age_days = max(0, (now - observed.astimezone(timezone.utc)).total_seconds() / 86400)
-            symbol = series.get("series_key", "")
-            max_age_days = 3 if symbol.endswith("-USD") else 7
+        symbol = str(series.get("series_key", ""))
+        max_age_days, freshness_rule = freshness_policy_for(
+            series["source_id"], symbol
+        )
+        if age_days is not None and max_age_days is not None:
             freshness = "fresh" if age_days <= max_age_days else "stale"
+        else:
+            freshness = "unknown"
         canonical_id = canonical_instrument_id_for(
-            series["source_id"], str(series.get("series_key", ""))
+            series["source_id"], symbol
         )
         series_by_source.setdefault(series["source_id"], []).append({
             **series,
@@ -356,7 +361,7 @@ def data_quality() -> dict:
             "identity_status": "canonical_mapping_found" if canonical_id else "not_mapped",
             "observed_age_days": round(age_days, 2) if age_days is not None else None,
             "freshness": freshness,
-            "freshness_rule": "3 days for crypto symbols ending -USD; 7 days for other global price proxies",
+            "freshness_rule": freshness_rule,
         })
 
     sources = []
