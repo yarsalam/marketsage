@@ -91,6 +91,21 @@ def test_daily_snapshot_appends_prices_to_temporal_store_idempotently(tmp_path):
     assert next(row for row in second if row["record_key"] == "SPY:2024-01-01")["payload"]["close"] == 100.0
 
 
+def test_instruments_endpoint_exposes_canonical_research_only_universe():
+    response = client.get("/instruments")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["registry_version"] == "1.0.0"
+    assert payload["summary"]["instrument_count"] == 11
+    assert payload["summary"]["iran_instrument_count"] == 0
+    assert all(item["production_approved"] is False for item in payload["instruments"])
+    assert all(item["scoring_gate"]["eligible"] is False for item in payload["instruments"])
+    assert {item["market_universe"] for item in payload["instruments"]} == {"global_proxy"}
+    assert {item["market_universe"] for item in payload["empty_universes"]} >= {
+        "iran_equities", "iran_gold_coin", "iran_fx", "iran_fixed_income", "iran_crypto",
+    }
+
+
 def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates():
     response = client.get("/sources")
     assert response.status_code == 200
