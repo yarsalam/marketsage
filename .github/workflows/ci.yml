@@ -134,6 +134,8 @@ jobs:
           done
           if [ "$ready" -ne 1 ]; then
             echo "analysis container did not become healthy"
+            docker inspect --format 'container_status={{.State.Status}} exit_code={{.State.ExitCode}}' marketsage-analysis-smoke || true
+            docker logs marketsage-analysis-smoke 2>&1 | tail -n 40 | sed -E 's/(token|password|secret|authorization)[=:][^ ]+/\1=[REDACTED]/Ig' || true
             exit 1
           fi
           python3 - <<'PY'
