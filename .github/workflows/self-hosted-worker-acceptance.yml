@@ -40,7 +40,7 @@ jobs:
           export XDG_RUNTIME_DIR="/run/user/${uid}"
           export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock"
           # Pass runtime settings to later steps without printing host paths.
-          printf 'XDG_RUNTIME_DIR=%s\\nDOCKER_HOST=%s\\n' "$XDG_RUNTIME_DIR" "$DOCKER_HOST" >> "$GITHUB_ENV"
+          printf 'XDG_RUNTIME_DIR=%s\nDOCKER_HOST=%s\n' "$XDG_RUNTIME_DIR" "$DOCKER_HOST" >> "$GITHUB_ENV"
           docker info --format '{{json .SecurityOptions}}' | python3 -c '
           import json, sys
           options = " ".join(json.load(sys.stdin)).lower()
@@ -54,7 +54,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           mapfile -t networks < <(docker network ls --format '{{.Name}}' | sort)
-          printf 'Docker networks: %s\\n' "${networks[*]}"
+          printf 'Docker networks: %s\n' "${networks[*]}"
           [[ "${#networks[@]}" -eq 2 ]]
           [[ "${networks[0]}" == "host" ]]
           [[ "${networks[1]}" == "none" ]]
