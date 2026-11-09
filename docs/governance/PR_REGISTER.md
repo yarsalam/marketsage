@@ -14,12 +14,13 @@
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
 | [#71](https://github.com/yarsalam/marketsage/pull/71) | infra/durable-provider-dispatch-outbox-2026-11 | Durable outbox, coordinator, sandbox worker and watchdog; Draft, open. Latest one-off local dataset acceptance #42482678959 succeeded, but 24/7/independent-host acceptance remains unproven. | Parked and non-blocking. No Runner dispatch, paid host or merge without separate approval. |
 | [#74](https://github.com/yarsalam/marketsage/pull/74) | main ← infra/provider-neutral-control-plane-2026-11 | Provider-neutral CI/control-plane foundation; Draft and open. Current patch intentionally blocks product CI during a previous infrastructure-first freeze. | Parked. Do not merge unchanged; product CI must remain enabled. |
-| [#73](https://github.com/yarsalam/marketsage/pull/73) | main ← research/market-coverage-workspace-2026-11 | Product Phase 1 plus manual refresh/retry and abort-safe loading; Draft and open at exact head `4e50e908d68c058113c960647276833058fc5cea`; push run #42615545257 and PR run #42615554518 passed all substantive jobs including Docker image build. | Active product PR; no merge until owner review and final acceptance. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | main ← research/market-coverage-workspace-2026-11 | Market Coverage, canonical instrument registry, series-to-instrument mapping and source-specific freshness; Draft and open at exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`; push #42617872744 and PR #42617880657 both passed all jobs including production-image build. | Active product PR; awaits owner review/approval. Not merged or deployed. |
 
 
 
-## Active product issue
+## Active product issues
 
+- [Issue #75](https://github.com/yarsalam/marketsage/issues/75) — Canonical instrument and market-universe registry; implementation is included in PR #73 and awaits PR acceptance.
 - [Issue #72](https://github.com/yarsalam/marketsage/issues/72) — Product Phase 1: evidence-first Market Coverage Workspace. Its implementation is tracked in Draft PR #73.
 
 ## Merged to main
