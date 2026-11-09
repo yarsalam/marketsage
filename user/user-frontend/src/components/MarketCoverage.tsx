@@ -329,7 +329,6 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
       <header className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <div>
             <p className="text-xs text-text-secondary">MarketSage · لایه شفافیت داده</p>
             <h1 className="mt-1 text-2xl font-bold md:text-3xl">پوشش بازار و کیفیت داده</h1>
           </div>
