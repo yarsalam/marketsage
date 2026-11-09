@@ -262,7 +262,7 @@
         "No exposure through public Compose before authentication and authorization pass"
       ],
       "evidence_refs": [
-        "EV-PR80-CI-PENDING"
+        "EV-PR80-CI"
       ],
       "requires_user_flow_proof": true
     },
