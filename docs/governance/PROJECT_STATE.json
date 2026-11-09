@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "snapshot_date": "2026-11-09",
+  "repository": "yarsalam/marketsage",
+  "visibility": "public",
+  "main_head": "4c4b032196137af4658ea2c28e38a21605ee923b",
+  "execution_branch": "strategy/project-operating-system-parallel-2026-11",
+  "project_decision": "CONTINUE",
+  "product_release_status": "NOT_READY",
+  "first_user_value_flow": "NOT_YET_PROVEN",
+  "investment_outputs": "DISABLED_BY_POLICY",
+  "source_approval": "NONE",
+  "current_open_workstreams": [
+    {
+      "task_id": "MS-PROD-001",
+      "pr": 77,
+      "state": "VALIDATION",
+      "merge_status": "OPEN_DRAFT",
+      "head": "67356939f65224a580c915fd2caa0ea52d8d09a9"
+    },
+    {
+      "task_id": "MS-DATA-001",
+      "pr": 73,
+      "state": "VALIDATION",
+      "merge_status": "OPEN_DRAFT",
+      "head": "72c57608e8270d999d1e9f2005b47ea56cb893a7"
+    },
+    {
+      "task_id": "MS-INFRA-001",
+      "pr": 74,
+      "state": "IN_PROGRESS",
+      "merge_status": "OPEN_DRAFT",
+      "head": "237af3ba7e0473aaa94e3fc5512d7f3b172d1c10"
+    },
+    {
+      "task_id": "MS-INFRA-002",
+      "pr": 71,
+      "state": "BLOCKED",
+      "merge_status": "OPEN_DRAFT_STACKED",
+      "head": "e8785b177f93a569ce031496d1043026979828d3"
+    },
+    {
+      "task_id": "MS-INFRA-003",
+      "pr": 61,
+      "state": "BLOCKED",
+      "merge_status": "OPEN_DRAFT_STACKED",
+      "head": "25ce24283e35dd7e55eb8545c590a047606643ee"
+    }
+  ],
+  "constraints": [
+    "No paid resources or APIs",
+    "No local/self-hosted Runner dispatch",
+    "PR #6 must not merge without explicit separate owner approval",
+    "No source approval, scoring, ranking, calibrated probabilities, backtest activation, broker or trading"
+  ],
+  "next_user_value_target": "Integrated market coverage and truthful research-only workflow with one reproducible browser/API acceptance scenario"
+}
