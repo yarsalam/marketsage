@@ -106,6 +106,33 @@ def test_instruments_endpoint_exposes_canonical_research_only_universe():
     }
 
 
+def test_freshness_remains_unknown_for_series_without_a_release_policy(tmp_path, monkeypatch):
+    from datetime import timedelta
+
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    store.append(TemporalRecord(
+        record_key="macro:US:CPIAUCSL:2026-10-01",
+        source_id="us.fred.alfred",
+        market="US",
+        data_kind="macro_release",
+        observed_at=now - timedelta(days=30),
+        published_at=now - timedelta(days=28),
+        retrieved_at=now,
+        payload={"value": 3.1},
+    ))
+
+    payload = client.get("/data-quality").json()
+    fred = next(item for item in payload["sources"] if item["source_id"] == "us.fred.alfred")
+    series = fred["runtime_series"][0]
+    assert series["series_key"] == "CPIAUCSL"
+    assert series["observed_age_days"] >= 29
+    assert series["freshness"] == "unknown"
+    assert "No source-specific" in series["freshness_rule"]
+
+
 def test_canonical_instrument_registry_matches_the_existing_price_universe():
     from instrument_registry import instrument_catalog
 
