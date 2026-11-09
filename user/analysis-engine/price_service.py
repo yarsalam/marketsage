@@ -16,7 +16,7 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
-from instrument_registry import canonical_instrument_id_for, freshness_policy_for, instrument_catalog
+from instrument_registry import canonical_instrument_id_for, freshness_policy_for, instrument_catalog, temporal_price_metadata_for
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
@@ -143,7 +143,7 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
 def _persist_temporal_prices(
     prices: pd.DataFrame, retrieved_at: datetime, snapshot_sha256: str, directory: Path,
 ) -> int:
-    """Append each observed daily adjusted close to the point-in-time store.
+    """Append prices using the canonical instrument's declared basis and units.
 
     Yahoo's historical response does not provide a trustworthy original publication
     timestamp for each row. We therefore leave published_at unset: captured-as-of
@@ -165,21 +165,24 @@ def _persist_temporal_prices(
         for symbol, value in row.items():
             if pd.isna(value) or not np.isfinite(float(value)) or float(value) <= 0:
                 continue
+            semantics = temporal_price_metadata_for(source_id, str(symbol))
             store.append(TemporalRecord(
                 record_key=f"{symbol}:{observed.date().isoformat()}",
                 source_id=source_id,
                 market="global_proxy",
-                data_kind="adjusted_close",
+                data_kind=semantics["data_kind"],
                 observed_at=observed_at,
                 retrieved_at=retrieved_at,
                 published_at=None,
                 source_revision=snapshot_sha256,
                 payload={
                     "symbol": str(symbol),
+                    "canonical_instrument_id": semantics["canonical_instrument_id"],
                     "close": float(value),
-                    "currency": "USD",
-                    "price_unit": "adjusted_close_usd_per_unit",
-                    "adjustment_policy": "yfinance auto_adjust=True; Close field",
+                    "currency": semantics["currency"],
+                    "price_unit": semantics["price_unit"],
+                    "price_basis": semantics["price_basis"],
+                    "adjustment_policy": semantics["adjustment_policy"],
                     "snapshot_sha256": snapshot_sha256,
                 },
             ))
