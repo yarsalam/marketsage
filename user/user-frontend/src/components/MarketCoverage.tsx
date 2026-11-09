@@ -36,6 +36,8 @@ type SourceCatalog = {
 
 type RuntimeSeries = {
   series_key: string;
+  canonical_instrument_id?: string | null;
+  identity_status?: string;
   stored_versions: number;
   distinct_records: number;
   latest_observed_at: string | null;
@@ -230,7 +232,12 @@ function SourceCard({ source, runtime }: { source: Source; runtime?: RuntimeSour
           <div className="mt-3 space-y-2">
             {series.slice(0, 4).map((item) => (
               <div key={item.series_key} className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
-                <span dir="ltr">{item.series_key}</span>
+                <span className="flex flex-col" dir="ltr">
+                  <span>{item.series_key}</span>
+                  {item.canonical_instrument_id && (
+                    <span className="mt-1 text-[10px] text-text-secondary">{item.canonical_instrument_id}</span>
+                  )}
+                </span>
                 <span className="text-text-secondary">
                   {label(item.freshness)} · {item.distinct_records.toLocaleString("fa-IR")} رکورد · آخرین مشاهده: {formatDate(item.latest_observed_at)}
                 </span>
