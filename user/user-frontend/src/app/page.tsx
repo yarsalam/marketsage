@@ -32,7 +32,7 @@ export default function Home() {
       <main className="min-w-0 flex-1 overflow-y-auto p-2 md:p-6">
         <ActiveComponent onNavigate={setActiveTab} />
       </main>
-      <AIChatbot />
+      <AIChatbot onNavigate={setActiveTab} />
     </div>
   );
 }
