@@ -78,10 +78,44 @@ type IranProviderCatalog = {
   markets: IranProvider[];
 };
 
+type Instrument = {
+  instrument_id: string;
+  display_name: string;
+  market_universe: string;
+  asset_family: string;
+  instrument_type: string;
+  research_role: string;
+  source_id: string;
+  provider_symbol: string;
+  quote_currency: string;
+  quote_unit: string;
+  price_basis: string;
+  venue: string | null;
+  identity_status: string;
+  tradability_status: string;
+  production_approved: boolean;
+  scoring_gate: { eligible: boolean; blocked_reasons: string[] };
+};
+
+type InstrumentCatalog = {
+  registry_version: string;
+  policy: string;
+  summary: {
+    instrument_count: number;
+    global_proxy_count: number;
+    production_approved_count: number;
+    iran_instrument_count: number;
+    quarantined_iran_universes: number;
+  };
+  instruments: Instrument[];
+  empty_universes: Array<{ market_universe: string; status: string; reason: string }>;
+};
+
 type CoveragePayload = {
   catalog: SourceCatalog;
   quality: DataQuality;
   iran: IranProviderCatalog;
+  instruments: InstrumentCatalog;
 };
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
@@ -249,18 +283,19 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
     setError(null);
 
     const load = async () => {
-      const [catalogResponse, qualityResponse, iranResponse] = await Promise.all([
+      const [catalogResponse, qualityResponse, iranResponse, instrumentsResponse] = await Promise.all([
         fetch(`${API_BASE}/api/markets/sources`, { cache: "no-store", signal: controller.signal }),
         fetch(`${API_BASE}/api/markets/data-quality`, { cache: "no-store", signal: controller.signal }),
         fetch(`${API_BASE}/api/markets/iran-providers`, { cache: "no-store", signal: controller.signal }),
+        fetch(`${API_BASE}/api/markets/instruments`, { cache: "no-store", signal: controller.signal }),
       ]);
-      const responses = [catalogResponse, qualityResponse, iranResponse];
+      const responses = [catalogResponse, qualityResponse, iranResponse, instrumentsResponse];
       const failed = responses.find((response) => !response.ok);
       if (failed) throw new Error(`دریافت پوشش داده ناموفق بود (HTTP ${failed.status}).`);
-      const [catalog, quality, iran] = await Promise.all(
+      const [catalog, quality, iran, instruments] = await Promise.all(
         responses.map((response) => response.json()),
       );
-      setPayload({ catalog, quality, iran });
+      setPayload({ catalog, quality, iran, instruments });
     };
 
     load()
@@ -407,6 +442,56 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
           </div>
         </section>
       )}
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-bold">رجیستری هویت ابزارها</h2>
+          <p className="mt-1 text-xs leading-6 text-text-secondary">
+            شناسه داخلی هر ابزار از نماد ارائه‌دهنده جداست. موارد زیر فقط ابزارهای پروکسی پژوهشی موجودند؛
+            این فهرست نه تأیید قابلیت معامله است و نه مجوز استفاده تولیدی.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <SummaryCard title="ابزارهای ثبت‌شده" value={payload.instruments.summary.instrument_count} detail={`نسخه رجیستری ${payload.instruments.registry_version}`} />
+          <SummaryCard title="پروکسی‌های جهانی" value={payload.instruments.summary.global_proxy_count} detail="برای پژوهش؛ نه دارایی تأییدشده در ایران" />
+          <SummaryCard title="ابزار تأییدشده تولیدی" value={payload.instruments.summary.production_approved_count} detail="فقط با تأیید صریح" />
+          <SummaryCard title="ابزارهای ایران" value={payload.instruments.summary.iran_instrument_count} detail={`${payload.instruments.summary.quarantined_iran_universes} خانواده بازار قرنطینه`} />
+        </div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {payload.instruments.instruments.map((instrument) => (
+            <article key={instrument.instrument_id} className="space-y-2 rounded-2xl border border-border bg-surface p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <strong>{instrument.display_name}</strong>
+                <span className="rounded-full border border-border px-2 py-1 text-xs">پروکسی پژوهشی</span>
+              </div>
+              <p className="break-all text-xs text-text-secondary" dir="ltr">{instrument.instrument_id}</p>
+              <p className="text-sm" dir="ltr">{instrument.provider_symbol}</p>
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div><dt className="text-text-secondary">خانواده دارایی</dt><dd className="mt-1">{instrument.asset_family.replaceAll("_", " ")}</dd></div>
+                <div><dt className="text-text-secondary">واحد مظنه</dt><dd className="mt-1" dir="ltr">{instrument.quote_currency} · {instrument.quote_unit}</dd></div>
+                <div><dt className="text-text-secondary">مبنای قیمت</dt><dd className="mt-1">{instrument.price_basis.replaceAll("_", " ")}</dd></div>
+                <div><dt className="text-text-secondary">بازار/محل معامله</dt><dd className="mt-1">{instrument.venue ?? "نامشخص"}</dd></div>
+              </dl>
+              <p className="text-xs text-text-secondary">قابلیت معامله: ارزیابی نشده · مجوز تولید: ندارد</p>
+              {instrument.scoring_gate.blocked_reasons.length > 0 && (
+                <p className="text-xs text-text-secondary">محدودیت: {instrument.scoring_gate.blocked_reasons.join("، ")}</p>
+              )}
+            </article>
+          ))}
+        </div>
+        <div className="rounded-2xl border border-border bg-surface p-4">
+          <h3 className="font-semibold">خانواده‌های بازار ایران — بدون ابزار پذیرفته‌شده</h3>
+          <p className="mt-1 text-xs text-text-secondary">تا زمان تأیید هویت، منبع، واحد و شواهد مستقل، این خانواده‌ها وارد رجیستری ابزارهای قابل استفاده نمی‌شوند.</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {payload.instruments.empty_universes.map((universe) => (
+              <div key={universe.market_universe} className="rounded-xl border border-border/70 p-3">
+                <p className="text-sm font-medium">{universe.market_universe.replaceAll("_", " ")}</p>
+                <p className="mt-1 text-xs text-text-secondary">{universe.reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="font-bold">محدودیت‌های گزارش کیفیت</h2>
