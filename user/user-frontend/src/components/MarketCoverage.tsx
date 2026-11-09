@@ -443,6 +443,7 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
         </section>
       )}
 
+      {scope !== "iran" && (
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-bold">رجیستری هویت ابزارها</h2>
@@ -479,10 +480,16 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
             </article>
           ))}
         </div>
-        <div className="rounded-2xl border border-border bg-surface p-4">
-          <h3 className="font-semibold">خانواده‌های بازار ایران — بدون ابزار پذیرفته‌شده</h3>
-          <p className="mt-1 text-xs text-text-secondary">تا زمان تأیید هویت، منبع، واحد و شواهد مستقل، این خانواده‌ها وارد رجیستری ابزارهای قابل استفاده نمی‌شوند.</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      </section>
+      )}
+
+      {(scope === "all" || scope === "iran") && (
+        <section className="space-y-3 rounded-2xl border border-border bg-surface p-4">
+          <div>
+            <h2 className="font-semibold">خانواده‌های بازار ایران — بدون ابزار پذیرفته‌شده</h2>
+            <p className="mt-1 text-xs text-text-secondary">تا زمان تأیید هویت، منبع، واحد و شواهد مستقل، این خانواده‌ها وارد رجیستری ابزارهای قابل استفاده نمی‌شوند.</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
             {payload.instruments.empty_universes.map((universe) => (
               <div key={universe.market_universe} className="rounded-xl border border-border/70 p-3">
                 <p className="text-sm font-medium">{universe.market_universe.replaceAll("_", " ")}</p>
@@ -490,8 +497,8 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="rounded-2xl border border-border bg-surface p-4">
         <h2 className="font-bold">محدودیت‌های گزارش کیفیت</h2>
