@@ -117,13 +117,17 @@ jobs:
         run: docker compose --env-file .env.production -f docker-compose.production.yml build
       - name: Smoke-test the analysis engine container
         run: |
-          IMAGE_ID="$(docker compose --env-file .env.production -f docker-compose.production.yml images -q analysis-engine | head -n 1)"
+          IMAGE_ID="$(docker image inspect --format '{{.Id}}' marketsage-analysis-engine:latest)"
           test -n "$IMAGE_ID"
-          docker run -d --name marketsage-analysis-smoke --publish 127.0.0.1:18080:8000 "$IMAGE_ID" >/dev/null
           cleanup() {
             docker rm -f marketsage-analysis-smoke >/dev/null 2>&1 || true
           }
           trap cleanup EXIT
+          if ! docker run -d --name marketsage-analysis-smoke --publish 127.0.0.1:18080:8000 "$IMAGE_ID" >/dev/null; then
+            echo "analysis image launch failed"
+            docker image inspect --format 'image={{.Id}}' "$IMAGE_ID" || true
+            exit 1
+          fi
           ready=0
           for attempt in $(seq 1 45); do
             if curl -fsS http://127.0.0.1:18080/health >/dev/null 2>&1; then
