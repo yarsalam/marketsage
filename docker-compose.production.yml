@@ -32,7 +32,9 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
-      NODE_ENV: production
+      # Local acceptance may set MARKETSAGE_BACKEND_NODE_ENV=development to allow HTTP localhost cookies.
+      # Production must retain the default secure-cookie behavior.
+      NODE_ENV: ${MARKETSAGE_BACKEND_NODE_ENV:-production}
       PORT: "4500"
       ANALYSIS_ENGINE_URL: http://analysis-engine:8000
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
