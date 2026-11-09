@@ -49,3 +49,7 @@ A successful CI run, one local dataset check, a current quote or a UI disclaimer
 ## Validation
 
 Backend tests verify closed-by-default behavior for decision, scores and backtest before downstream analysis is called. The frontend build verifies the guarded UI. All normal CI uses GitHub-hosted runners; no laptop Runner is required.
+
+## Assistant disclosure
+
+The floating chat helper is not a connected language model. It is a fixed product guide and must not return hard-coded prices, rankings, risk statistics, probabilities or claimed explanations for asset selection. The guide explicitly discloses this limitation and routes users to the operational data-status view where relevant. A real evidence-grounded assistant remains a separate product workstream requiring a model API, retrieval over approved evidence, citations and refusal on unsupported claims.
