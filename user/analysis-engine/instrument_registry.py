@@ -111,6 +111,17 @@ def validate_registry(
             raise InstrumentRegistryError("aliases cannot contain empty values")
 
 
+def canonical_instrument_id_for(source_id: str, provider_symbol: str) -> str | None:
+    """Resolve a source symbol to a canonical ID without guessing unknown mappings."""
+    matches = [
+        item.instrument_id for item in _INSTRUMENT_ROWS
+        if item.source_id == source_id and item.provider_symbol == provider_symbol
+    ]
+    if len(matches) > 1:
+        raise InstrumentRegistryError("ambiguous provider/source symbol mapping")
+    return matches[0] if matches else None
+
+
 def instrument_catalog() -> dict:
     """Return a deterministic catalog; presence does not grant investment eligibility."""
     validate_registry()
