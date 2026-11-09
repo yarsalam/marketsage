@@ -129,6 +129,32 @@ def freshness_policy_for(source_id: str, provider_symbol: str) -> tuple[int | No
     return None, "No instrument-specific observation freshness policy is configured."
 
 
+def temporal_price_metadata_for(source_id: str, provider_symbol: str) -> dict[str, str]:
+    """Return source-verified catalog semantics for storing one instrument price."""
+    matches = [
+        item for item in _INSTRUMENT_ROWS
+        if item.source_id == source_id and item.provider_symbol == provider_symbol
+    ]
+    if len(matches) > 1:
+        raise InstrumentRegistryError("ambiguous provider/source symbol mapping")
+    if not matches:
+        raise InstrumentRegistryError("price series has no canonical instrument mapping")
+    item = matches[0]
+    adjustment_policy = (
+        "provider_close_no_adjustment"
+        if item.instrument_type == "crypto_spot_pair"
+        else "yfinance_auto_adjust_true_close"
+    )
+    return {
+        "canonical_instrument_id": item.instrument_id,
+        "data_kind": item.price_basis,
+        "price_basis": item.price_basis,
+        "currency": item.quote_currency,
+        "price_unit": item.quote_unit,
+        "adjustment_policy": adjustment_policy,
+    }
+
+
 def canonical_instrument_id_for(source_id: str, provider_symbol: str) -> str | None:
     """Resolve a source symbol to a canonical ID without guessing unknown mappings."""
     matches = [
