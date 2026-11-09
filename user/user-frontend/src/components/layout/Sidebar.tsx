@@ -1,5 +1,6 @@
 "use client";
 const tabs = [
+  { id: "coverage", label: "🧭 پوشش بازار و کیفیت داده" },
   { id: "decision", label: "🎯 تصمیم سرمایه‌گذاری" },
   { id: "momentum", label: "📈 مانیتور مومنتوم" },
   { id: "regime", label: "🌍 رژیم بازار" },
@@ -19,7 +20,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => (
   <aside className="w-64 bg-surface border-l border-border h-screen overflow-y-auto p-3 flex-shrink-0">
-    <h2 className="text-lg font-bold mb-4 text-primary">MarketSage AI</h2>
+    <h2 className="text-lg font-bold mb-4 text-primary">MarketSage</h2>
     <nav className="space-y-1">
       {tabs.map((tab) => (
         <button

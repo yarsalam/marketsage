@@ -115,6 +115,57 @@ jobs:
           docker compose --env-file .env.production -f docker-compose.production.yml config -q
       - name: Build all production images
         run: docker compose --env-file .env.production -f docker-compose.production.yml build
+      - name: Smoke-test the analysis engine container
+        run: |
+          IMAGE_ID="$(docker image inspect --format '{{.Id}}' marketsage-analysis-engine:latest)"
+          test -n "$IMAGE_ID"
+          cleanup() {
+            docker rm -f marketsage-analysis-smoke >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          if ! docker run -d --name marketsage-analysis-smoke --publish 127.0.0.1:18080:8000 "$IMAGE_ID" >/dev/null; then
+            echo "analysis image launch failed"
+            docker image inspect --format 'image={{.Id}}' "$IMAGE_ID" || true
+            exit 1
+          fi
+          ready=0
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:18080/health >/dev/null 2>&1; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "analysis container did not become healthy"
+            docker inspect --format 'container_status={{.State.Status}} exit_code={{.State.ExitCode}}' marketsage-analysis-smoke || true
+            docker logs marketsage-analysis-smoke 2>&1 | tail -n 40 | sed -E 's/(token|password|secret|authorization)[=:][^ ]+/\1=[REDACTED]/Ig' || true
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          from urllib.request import urlopen
+
+          base = "http://127.0.0.1:18080"
+          def get(path):
+              with urlopen(base + path, timeout=10) as response:
+                  if response.status != 200:
+                      raise SystemExit(f"analysis runtime smoke failed: {path}")
+                  return json.loads(response.read().decode("utf-8"))
+
+          health = get("/health")
+          sources = get("/sources")
+          quality = get("/data-quality")
+          iran = get("/iran-market/providers")
+          instruments = get("/instruments")
+          assert health.get("status") == "ok"
+          assert sources.get("sources")
+          assert "storage" in quality and "sources" in quality
+          assert iran.get("markets")
+          assert instruments["summary"]["instrument_count"] == 11
+          assert instruments["summary"]["iran_instrument_count"] == 0
+          print("analysis container runtime smoke passed: 5 read-only endpoints")
+          PY
 
   detect-direct-main-update:
     name: Detect direct main updates

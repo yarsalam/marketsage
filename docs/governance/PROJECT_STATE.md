@@ -1,11 +1,80 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-05  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
-**Integration PR:** #6, feat/tindex-free-data-connector  
-**Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
-**Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
+**Current snapshot date:** 2026-11-09  
+**Repository:** yarsalam/marketsage (**Public**, verified from GitHub repository metadata)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
+**Active product issue:** [#72 — Product Phase 1: evidence-first Market Coverage Workspace](https://github.com/yarsalam/marketsage/issues/72)  
+**Active product branch:** `research/market-coverage-workspace-2026-11`  
+**Product PR:** [#73 — market coverage and canonical instrument registry](https://github.com/yarsalam/marketsage/pull/73), Draft and open; latest exact head `702944f2b5dcb98096c86db6e8a0660af360d122`; exact push and pull_request CI passed (runs #42621594086 and #42621601391)  
+**Infrastructure PR:** [#71](https://github.com/yarsalam/marketsage/pull/71), Draft, open and unmerged  
+**Release posture:** research-only. No source is approved for production investment scoring; no validated probability model or strategy is approved; production allocation, broker access and trading remain disabled.
+
+## Owner execution priority update — 2026-11-09
+
+- Product, data-quality, source-contract and research-system engineering continue independently of the infrastructure backlog.
+- Ordinary CI, build and test jobs use GitHub-hosted runners. No project task may wait for the owner's laptop Runner unless the exact task requires local-only data or host access.
+- If local execution is essential, provide one bounded owner command and continue unrelated product work.
+- PR #73 latest exact head `702944f2b5dcb98096c86db6e8a0660af360d122`; push run #42621594086 and PR run #42621601391 passed, including real analysis-container startup, five read-only endpoint smoke tests and read-only SQLite audit tests.
+- The local dataset acceptance run #42482678959 passed once; this is not evidence of 24/7 Runner availability. Issue #57 is closed as non-blocking; PRs #71 and #74 are parked. PR #74 must not be merged unchanged because its CI intentionally suppresses product tests.
+- Main remains protected. PR #6 remains explicitly unmerged. No source approval, production investment scoring/ranking, calibrated probabilities, backtest approval, production deployment, broker access, trading or capital allocation is authorized.
+
+## Current product state — 2026-11-09
+
+- The owner explicitly resumed MarketSage product development. Product work proceeds independently of the remaining infrastructure evidence gap; that gap must not silently be labelled accepted or complete.
+- Phase 1 is an evidence-first Market Coverage Workspace. It exposes the existing Python source registry, data-quality report and Iranian provider-readiness catalog via NestJS and a Persian RTL Next.js page.
+- In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, `GET /api/markets/iran-providers`, and `GET /api/markets/instruments`. Controller forwarding tests cover the routes.
+- The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates, Iranian provider readiness and canonical instrument identity. The page is the default landing tab for this increment. Manual refresh/retry and abort-safe loading are included; Iran/global filters do not mix the two instrument universes.
+- NestJS unit tests cover forwarding of the new API routes and bounded service-unavailable behavior when the analysis engine is unreachable.
+- PR #73 is Draft and open at exact head `702944f2b5dcb98096c86db6e8a0660af360d122`. It includes the canonical instrument catalog, source-symbol mapping, source-specific freshness, legacy price-basis mismatch detection, typed temporal snapshot writes, the analysis Dockerfile/runtime fix and a read-only SQLite aggregate audit utility. Exact-head push run [42621594086](https://github.com/yarsalam/marketsage/actions/runs/42621594086) and PR run [42621601391](https://github.com/yarsalam/marketsage/actions/runs/42621601391) passed all jobs. The production-images job built all images, launched the analysis container and verified five read-only endpoints; analysis tests covered the no-write audit. No local Runner or local dataset was used.
+- The page reports actual registry and runtime values only. It does not create synthetic quotes, infer provider availability, approve data, or change scoring.
+- Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Phase 1 acceptance: Issue #72. Canonical identity registry: Issue #75.
+- The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PRs #71 and #74 are infrastructure-only, Draft and unmerged; #74's temporary product-CI freeze is superseded and that PR must not be merged unchanged.
+
+## Current canonical-instrument and quality increment
+
+- Added a versioned provider-neutral registry for the eleven symbols already present in the global research proxy universe. It records canonical IDs separately from Yahoo symbols, explicit quote currency/unit and price basis, and leaves venue/tradability unassessed.
+- Iranian equities, gold/coins, FX, fixed income/funds and domestic crypto are represented as five empty/quarantined universes. No Iranian instrument is invented or added without evidence.
+- Analysis API exposes `/instruments`; NestJS forwards `/api/markets/instruments`; the Persian UI displays the catalog and respects Iran/global filters.
+
+- Added `user/analysis-engine/audit_temporal_price_basis.py`: a strictly read-only SQLite audit. It emits aggregate counts only (consistent, legacy mismatch, unmapped, invalid metadata), never raw values/paths/symbols, and makes no mutations. Four tests cover behavior and compare the database file hash before/after.
+- New temporal price snapshots now use the canonical instrument's declared semantics: crypto rows are stored as `provider_close` with `USD/usd_per_token`, while ETF rows are stored as `adjusted_close` with `USD/usd_per_share`. Each row includes the canonical instrument ID and adjustment policy. Existing stored records are not rewritten automatically; legacy records require a separate read-only audit before any migration.
+- Data-quality series now carry canonical instrument IDs when the source-symbol mapping is known. Unmapped series remain unmapped; historical temporal record schema is not rewritten.
+- Freshness thresholds apply only to registered price proxies (3 calendar days for crypto proxies, 7 for ETF proxies). Sources/instruments without an explicit policy, including macro series, remain `unknown` rather than being incorrectly labelled fresh/stale.
+- The previous code head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca` passed push #42617872744 and PR #42617880657. Instrument-specific temporal snapshot semantics have since been tightened and require exact-head CI before acceptance. This work remains in Draft PR #73; no merge or deployment occurred.
+
+## Current data and investment posture
+
+- Main's source registry contains ten source definitions; none is production-approved. Yahoo Finance via yfinance is the only source wired into the current research baseline, and remains research-only.
+- FRED/ALFRED adapter exists but is not scheduled or connected to the scoring path.
+- TSETMC and CODAL are candidate-only. Iranian gold/FX sources are not selected; fixed-income/fund and local crypto sources remain unapproved.
+- The existing decision/momentum path uses a small global-proxy/crypto universe. Its nominal horizon parameter does not make the calculation a six-month-specific forecast. It is a research baseline, not a validated investment decision engine for Iran.
+- Publication-time-aware macro, news, political/geopolitical events, social sentiment, validated regime detection and calibrated probabilities are not available as production decision inputs.
+- Captured-as-of replay must not be confused with publisher-source-vintage replay. Historical Yahoo prices have retrieval time but no verified original publication timestamp.
+- No source approval, investment scoring/ranking, probability calibration, backtest approval, production deployment, broker connection, trade or capital allocation is authorized by this restart. The six-month product objective stays binding.
+
+## Infrastructure status — separately tracked
+
+- The owner supplied host output showing the dedicated UID-110 Rootless Docker daemon active, socket owned by UID 110, `rootless` and `seccomp` security options present, only `host` and `none` networks, and the system-wide Docker daemon preserved.
+- The latest recorded self-hosted dataset-acceptance dispatch [#42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959) completed successfully on 2026-11-08. This is one manual run only; it does not prove live availability, 24/7 operation, independent failure-domain recovery or general worker acceptance. Product work must not depend on this Runner.
+- GitHub-hosted Docker acceptance [#42465921830](https://github.com/yarsalam/marketsage/actions/runs/42465921830) and PR CI [#42465926206](https://github.com/yarsalam/marketsage/actions/runs/42465926206) passed for the corresponding infrastructure commit.
+- PR #71 remains Draft and unmerged. No merge to main was made. Live independently operated backend failover and a complete 24-hour observation window are not evidenced in the repository at this snapshot.
+- Product Phase 1 does not dispatch local-runner jobs and does not depend on this infrastructure acceptance record.
+
+## Next product sequence
+
+1. Complete review and acceptance of Draft PR #73; do not merge without owner approval.
+2. Extend the canonical instrument master only when source evidence supports venue, symbol lifecycle, identity and trading semantics; preserve the current empty/quarantined Iran universes until then.
+3. Close source-rights, connectivity, timestamp, historical-coverage, unit, corporate-action and independent-reconciliation gates provider by provider; keep unknowns quarantined.
+4. Stabilize point-in-time storage and FRED/ALFRED vintages; preserve raw response references, hashes, parser versions and revisions.
+5. Build verified Iranian price/FX/gold/fixed-income/crypto series as separate families; do not merge official/free-market rates or local/global crypto pairs.
+6. Add news and macro/event context only after original-source and publication/update timestamps are audited.
+7. Revisit the six-month research baseline and existing Stage 4 anomaly using the exact original dataset/hash; keep the final holdout unopened.
+8. Only after the owner-approved source and empirical gates pass may any investment-facing calculation be proposed for separate review.
+
+The prior 2026-11-05 operational snapshot is preserved below as historical evidence; its pending actions and state descriptions are not a statement of current status.
+
+## Historical snapshot — 2026-11-05
+
 
 ## Executive state
 
@@ -85,3 +154,19 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 6. Keep source scoring, investment ranking, calibrated probabilities, production release, broker access and trading disabled until all relevant data and empirical gates pass. Any real-money allocation or trade still requires the owner's separate explicit approval.
 
 **Investment-stage status: NOT READY.** A successful Runner job, parser, dataset hash audit, or integration CI run is not an investment approval.
+
+## 2026-11-09 — Research outputs fail-closed until validation
+
+- Draft PR [#77](https://github.com/yarsalam/marketsage/pull/77) gates `/api/decision`, `/api/markets/scores` and `/api/markets/backtest` behind the exact explicit environment flag `MARKETSAGE_RESEARCH_OUTPUTS_ENABLED=true`. Absent by default, the API returns 503 before calling the analysis engine.
+- The decision UI no longer sends the prior default-capital request. Momentum, risk, portfolio allocation and backtest views are disabled in the UI pending evidence and owner approval.
+- Exact PR head `a69a72317251a0bddf53afe6ad62111af44f7bdd` passed GitHub-hosted CI run [#42618957174](https://github.com/yarsalam/marketsage/actions/runs/42618957174), including backend, analysis, frontend, admin workspace and production image build.
+- PR #77 is Draft/unmerged. No deployment environment was modified and the feature flag was not enabled.
+
+
+## Latest owner operating instruction — 2026-11-09 (supersedes local-Runner next actions)
+
+The owner instructed that the full MarketSage project continue without waiting for the laptop Runner. Use GitHub-hosted CI for normal engineering. Only tasks that truly require local-only data or host access may produce one bounded owner command; unrelated work must continue. The last known local dataset acceptance run #42482678959 succeeded once on 2026-11-08, but this does not establish present online state or 24/7 availability. The GitHub connector used here cannot read the registered-runner inventory endpoint, and no laptop access is available; therefore no claim is made that the Runner is currently online/offline, and no remote registration or laptop files have been deleted. Infrastructure PRs #71/#74 remain parked/non-blocking; PR #74 must not be merged unchanged. PR #6 remains unmerged absent explicit approval. Main remains protected and unchanged.
+
+The older local TSETMC manual dispatch steps in the historical section below are superseded as an immediate next action. They remain available only if a later, explicitly scoped local-data task genuinely requires them.
+
+**Current active PRs:** #73 (market coverage, instrument identity and temporal data semantics) and #77 (default-closed research-output safety gate). Both remain Draft and unmerged; neither authorizes deployment or investment decisions.

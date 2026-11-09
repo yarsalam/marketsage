@@ -1,8 +1,8 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-05  
-**Repository:** yarsalam/marketsage (Private)  
-**Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  
+**Snapshot date:** 2026-11-09  
+**Repository:** yarsalam/marketsage (Public; revalidated through GitHub repository metadata)  
+**Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
 **Pinned integration code HEAD:** 819f8b4028469cb0d498098fec88545a18ebacc6
 
@@ -12,8 +12,17 @@
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
 | [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | infra/durable-provider-dispatch-outbox-2026-11 | Durable outbox, coordinator, sandbox worker and watchdog; Draft, open. Latest one-off local dataset acceptance #42482678959 succeeded, but 24/7/independent-host acceptance remains unproven. | Parked and non-blocking. No Runner dispatch, paid host or merge without separate approval. |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | main ← infra/provider-neutral-control-plane-2026-11 | Provider-neutral CI/control-plane foundation; Draft and open. Current patch intentionally blocks product CI during a previous infrastructure-first freeze. | Parked. Do not merge unchanged; product CI must remain enabled. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | main ← research/market-coverage-workspace-2026-11 | Market Coverage, canonical instrument registry, source-symbol identity, freshness/basis quality, typed snapshots, real analysis-container smoke and read-only SQLite aggregate audit. Exact head `702944f2b5dcb98096c86db6e8a0660af360d122`; push #42621594086 and PR #42621601391 passed all jobs. | Active product PR; Draft, unmerged and undeployed; awaits owner review. Local DB audit has not yet been run. |
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | main ← safety/research-only-output-gates-2026-11 | Fail-closed gate for decision, scores and backtest API; UI hides unvalidated ranking/allocation outputs. Exact head `a69a72317251a0bddf53afe6ad62111af44f7bdd`; run #42618957174 passed. | Safety PR; Draft, unmerged and not deployed. Explicit owner approval required before any later re-enable. |
 
 
+
+## Active product issues
+
+- [Issue #75](https://github.com/yarsalam/marketsage/issues/75) — Canonical instrument and market-universe registry; implementation is included in PR #73 and awaits PR acceptance.
+- [Issue #72](https://github.com/yarsalam/marketsage/issues/72) — Product Phase 1: evidence-first Market Coverage Workspace. Its implementation is tracked in Draft PR #73.
 
 ## Merged to main
 
@@ -53,7 +62,7 @@ main
 - #32 merged: integrated local TSETMC candidate workflow
 - #34 merged: memory-bounded/cgroup-aware candidate batches; owner re-dispatch pending; checks out immutable PR #6 integration commit 819f8b4028469cb0d498098fec88545a18ebacc6
 
-PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked.
+PR #6 remains open and must not be merged to main without explicit owner approval. PR #8 remains parked. PRs #71 and #74 remain Draft and unmerged; #74 must not be merged unchanged because it blocks product CI. PR #73 is the active product PR; exact-head push and PR CI both passed, and it awaits review/acceptance.
 
 ## Release and capital-risk guardrails
 
@@ -62,3 +71,12 @@ PR #6 remains open and must not be merged to main without explicit owner approva
 - Do not inspect or tune against the locked final holdout.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
 - No production scoring, broker access, portfolio allocation or real-money trade is authorized. Any capital-risk action requires separate explicit owner approval.
+
+## Owner priority update — 2026-11-09
+
+- Product work proceeds independently of local Runner availability; ordinary CI/build/runtime tests use GitHub-hosted runners.
+- The analysis image runtime smoke is now part of production-images CI. At exact PR #73 head `87d0eab55422f5a58d48a4c0b8faa0dc9aad10fd`, push run #42620847077 and PR run #42620857089 both passed; the smoke starts the actual analysis image and checks five read-only endpoints.
+- PR #77 default-closes decision, scores and backtest outputs until separate owner approval; it does not modify deployment flags.
+- PRs #71/#74 stay parked and unmerged. PR #74 must not be merged unchanged. PR #6 remains open and unmerged without explicit approval.
+
+- PR #73 also contains `user/analysis-engine/audit_temporal_price_basis.py`, a read-only aggregate audit for local SQLite temporal stores; its synthetic database tests passed in exact-head CI. Local execution remains unperformed until a genuine local-only data audit is required.
