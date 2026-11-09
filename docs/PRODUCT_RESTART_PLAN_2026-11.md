@@ -29,6 +29,17 @@ The first page is intended to answer:
 
 No synthetic prices, inferred connectivity, guessed permissions, fabricated coverage or unverified source approval may be displayed.
 
+## Active product increment — Phase 2: canonical instrument and market-universe registry
+
+Issue: [#75](https://github.com/yarsalam/marketsage/issues/75)  
+Implementation is currently grouped with the Market Coverage product branch so the API and evidence UI can be reviewed together.
+
+The first registry contains only the eleven symbols already present in the global research prototype. Each has a provider-neutral canonical ID separate from its Yahoo symbol, explicit USD quote convention and price basis, and a research-proxy role. Venue and tradability remain unassessed. Every instrument is blocked from production scoring.
+
+Iranian equities, gold/coins, FX, fixed income/funds and local crypto remain empty and quarantined. No placeholder securities or invented identities are inserted. The read-only analysis API exposes /instruments; NestJS forwards it as /api/markets/instruments, and the Persian Market Coverage page displays the catalog and quarantined universes.
+
+This registry is metadata only: it does not collect prices, change provider eligibility or alter any research calculation.
+
 ## Product architecture and staged roadmap
 
 ### A. Product truth and data observability
@@ -72,11 +83,11 @@ No synthetic prices, inferred connectivity, guessed permissions, fabricated cove
 
 ## Infrastructure track — independent, not a product blocker
 
-Infrastructure acceptance continues as a separately reported workstream. Owner-reported host-level Rootless Docker checks passed for UID 110, rootless mode, seccomp and no default bridge, with the system Docker kept separate. However, the latest GitHub-recorded self-hosted Worker Acceptance run at this snapshot, [#42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813), concluded failure. The infrastructure PR #71 remains Draft and unmerged. Live independent-backend failover and a full 24-hour observation window are not yet evidenced in the repository.
+Infrastructure acceptance continues as a separately reported workstream. Owner-reported host-level Rootless Docker checks passed for UID 110, rootless mode, seccomp and no default bridge, with the system Docker kept separate. The latest recorded local dataset-acceptance dispatch [#42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959) succeeded once on 2026-11-08; this is a single manual run, not proof of Runner availability or a 24/7 service. Infrastructure PRs #71 and #74 remain Draft and parked. Live independent-backend failover and a full 24-hour observation window are not evidenced. Product work does not depend on them.
 
 This evidence discrepancy must be corrected by subsequent runs and records, but it does not prevent safe, independently scoped product development. No infrastructure acceptance claim is changed by starting this roadmap.
 
-## Current implementation facts as of 2026-11-08
+## Current implementation facts as of 2026-11-09
 
 - Python analysis service exposes `/sources`, `/data-quality`, and `/iran-market/providers`.
 - The source registry lists ten sources; none is production-approved. One source (Yahoo Finance via yfinance) is currently wired into the research baseline.
