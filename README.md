@@ -30,7 +30,7 @@ uvicorn price_service:app --reload --host 127.0.0.1 --port 8000
 pytest -q
 ```
 
-For research methodology, input requirements, limitations, and the leakage-aware backtest baseline, read [the research protocol](user/analysis-engine/research/README.md). The user API exposes `/api/markets/scores` and `/api/markets/backtest` for the current data-backed momentum ranking and historical research simulation. The remaining regime/news/macro/AI-analysis tabs intentionally show their unavailable state until real sources and validation exist. For the separate ML research scripts that use scikit-learn or XGBoost, also install `pip install -r requirements-research.txt`. Those heavier libraries are not included in the production API image.
+For research methodology, input requirements, limitations, and the leakage-aware backtest baseline, read [the research protocol](user/analysis-engine/research/README.md). The user API contains prototype routes for `/api/markets/scores`, `/api/markets/backtest`, and `/api/decision`, but the safety change closes these routes by default. They return HTTP 503 unless `MARKETSAGE_RESEARCH_OUTPUTS_ENABLED=true` is explicitly configured after separate owner approval. The remaining regime/news/macro/AI-analysis tabs intentionally show their unavailable state until real sources and validation exist. For the separate ML research scripts that use scikit-learn or XGBoost, also install `pip install -r requirements-research.txt`. Those heavier libraries are not included in the production API image.
 
 ### User backend and frontend
 
@@ -61,3 +61,8 @@ Do not start production services until config output, builds, tests, DNS, TLS, r
 4. Historical backtests and synthetic comparisons are research artifacts, not verified live performance.
 5. News, political-event and sentiment ingestion are not implemented as production data pipelines.
 6. No full end-to-end test or target-server deployment has been run from this repository.
+
+
+## Assistant and evidence boundaries
+
+The floating helper is a fixed product guide, not a connected AI model. It must not invent prices, rankings, risk metrics, probabilities, or investment explanations. News, macro, sentiment and regime-analysis tabs remain unavailable until their evidence pipelines exist.
