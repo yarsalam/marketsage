@@ -241,6 +241,7 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
   const [scope, setScope] = useState<ScopeFilter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -267,10 +268,12 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
         if (cause instanceof Error && cause.name === "AbortError") return;
         setError(cause instanceof Error ? cause.message : "دریافت وضعیت منابع ناموفق بود.");
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
 
     return () => controller.abort();
-  }, []);
+  }, [refreshToken]);
 
   const runtimeBySource = useMemo(
     () => new Map((payload?.quality.sources ?? []).map((source) => [source.source_id, source])),
@@ -299,7 +302,23 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
         <h1 className="text-2xl font-bold">پوشش بازار در دسترس نیست</h1>
         <p className="text-sm text-text-secondary">{error ?? "پاسخ معتبری از سرویس دریافت نشد."}</p>
         <p className="text-xs text-text-secondary">برای جلوگیری از نمایش دادهٔ ساختگی، از اطلاعات نمونه استفاده نشده است.</p>
-        <button className="text-sm text-primary underline" onClick={() => onNavigate("settings")}>مشاهده وضعیت خام سرویس</button>
+        <div className="flex flex-wrap gap-4">
+          <button
+            type="button"
+            className="text-sm text-primary underline disabled:opacity-50"
+            onClick={() => setRefreshToken((current) => current + 1)}
+            disabled={loading}
+          >
+            تلاش مجدد
+          </button>
+          <button
+            type="button"
+            className="text-sm text-primary underline"
+            onClick={() => onNavigate("settings")}
+          >
+            مشاهده وضعیت خام سرویس
+          </button>
+        </div>
       </section>
     );
   }
@@ -310,10 +329,21 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
       <header className="space-y-2">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
+            <div>
             <p className="text-xs text-text-secondary">MarketSage · لایه شفافیت داده</p>
             <h1 className="mt-1 text-2xl font-bold md:text-3xl">پوشش بازار و کیفیت داده</h1>
           </div>
-          <p className="text-xs text-text-secondary">آخرین ارزیابی: {formatDate(payload.quality.generated_at)}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xs text-text-secondary">آخرین ارزیابی: {formatDate(payload.quality.generated_at)}</p>
+            <button
+              type="button"
+              onClick={() => setRefreshToken((current) => current + 1)}
+              disabled={loading}
+              className="rounded-lg border border-border px-3 py-2 text-xs disabled:opacity-50"
+            >
+              {loading ? "در حال به‌روزرسانی..." : "به‌روزرسانی وضعیت"}
+            </button>
+          </div>
         </div>
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm leading-7">
           {payload.catalog.policy}
