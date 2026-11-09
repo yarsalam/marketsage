@@ -227,6 +227,38 @@ def test_monthly_prices_reject_stale_month_end_observations():
     assert monthly.loc[pd.Timestamp("2024-03-31"), "SPY"] > 0
 
 
+def test_data_quality_flags_legacy_crypto_price_basis(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    store.append(TemporalRecord(
+        record_key="BTC-USD:2026-11-08",
+        source_id="global.yahoo_finance.yfinance",
+        market="global_proxy",
+        data_kind="adjusted_close",
+        observed_at=now,
+        retrieved_at=now,
+        payload={
+            "symbol": "BTC-USD",
+            "close": 100.0,
+            "currency": "USD",
+            "price_unit": "adjusted_close_usd_per_unit",
+        },
+    ))
+
+    response = client.get("/data-quality")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["storage"]["price_basis_mismatch_count"] == 1
+    yahoo = next(item for item in payload["sources"] if item["source_id"] == "global.yahoo_finance.yfinance")
+    legacy = next(item for item in yahoo["runtime_series"] if item["series_key"] == "BTC-USD")
+    assert legacy["canonical_instrument_id"] == "global.proxy.crypto.bitcoin"
+    assert legacy["data_kind"] == "adjusted_close"
+    assert legacy["expected_data_kind"] == "provider_close"
+    assert legacy["price_basis_status"] == "legacy_mismatch"
+
+
 def test_temporal_price_storage_uses_canonical_basis_and_quote_units(tmp_path):
     retrieved_at = datetime(2026, 11, 9, 12, 0, tzinfo=timezone.utc)
     prices = pd.DataFrame(
