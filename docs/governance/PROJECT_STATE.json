@@ -77,8 +77,8 @@
       "pr": 81,
       "state": "VALIDATION",
       "merge_status": "OPEN_DRAFT",
-      "head": "PENDING_FINAL_CI",
-      "ci": "PENDING"
+      "ci": "PENDING",
+      "head_branch": "integration/market-coverage-auth-safety-2026-11"
     }
   ],
   "constraints": [
