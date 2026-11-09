@@ -16,7 +16,7 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
-from instrument_registry import instrument_catalog
+from instrument_registry import canonical_instrument_id_for, instrument_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
@@ -347,8 +347,13 @@ def data_quality() -> dict:
             symbol = series.get("series_key", "")
             max_age_days = 3 if symbol.endswith("-USD") else 7
             freshness = "fresh" if age_days <= max_age_days else "stale"
+        canonical_id = canonical_instrument_id_for(
+            series["source_id"], str(series.get("series_key", ""))
+        )
         series_by_source.setdefault(series["source_id"], []).append({
             **series,
+            "canonical_instrument_id": canonical_id,
+            "identity_status": "canonical_mapping_found" if canonical_id else "not_mapped",
             "observed_age_days": round(age_days, 2) if age_days is not None else None,
             "freshness": freshness,
             "freshness_rule": "3 days for crypto symbols ending -USD; 7 days for other global price proxies",
