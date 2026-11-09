@@ -298,10 +298,10 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
 
     const load = async () => {
       const [catalogResponse, qualityResponse, iranResponse, instrumentsResponse] = await Promise.all([
-        fetch(`${API_BASE}/api/markets/sources`, { cache: "no-store", signal: controller.signal }),
-        fetch(`${API_BASE}/api/markets/data-quality`, { cache: "no-store", signal: controller.signal }),
-        fetch(`${API_BASE}/api/markets/iran-providers`, { cache: "no-store", signal: controller.signal }),
-        fetch(`${API_BASE}/api/markets/instruments`, { cache: "no-store", signal: controller.signal }),
+        fetch(`${API_BASE}/api/markets/sources`, { cache: "no-store", credentials: "include", signal: controller.signal }),
+        fetch(`${API_BASE}/api/markets/data-quality`, { cache: "no-store", credentials: "include", signal: controller.signal }),
+        fetch(`${API_BASE}/api/markets/iran-providers`, { cache: "no-store", credentials: "include", signal: controller.signal }),
+        fetch(`${API_BASE}/api/markets/instruments`, { cache: "no-store", credentials: "include", signal: controller.signal }),
       ]);
       const responses = [catalogResponse, qualityResponse, iranResponse, instrumentsResponse];
       const failed = responses.find((response) => !response.ok);
