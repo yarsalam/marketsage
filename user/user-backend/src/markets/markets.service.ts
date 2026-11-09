@@ -37,6 +37,10 @@ export class MarketsService {
     return this.getAnalysis('/data-status');
   }
 
+  getInstruments() {
+    return this.getAnalysis('/instruments');
+  }
+
   getSources() {
     return this.getAnalysis('/sources');
   }
