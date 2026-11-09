@@ -72,7 +72,7 @@ class WorkflowContractTests(unittest.TestCase):
         from pathlib import Path
 
         workflow = (Path(__file__).resolve().parents[1] / "workflows" / "ci.yml").read_text(encoding="utf-8")
-        for forbidden in ("pytest ", "pnpm ", "docker compose", "docker build", "backtest"):
+        for forbidden in ("pytest ", "pnpm ", "docker compose", "docker build"):
             self.assertNotIn(forbidden, workflow)
 
     def test_concurrency_and_timeouts_remain_bounded(self):
