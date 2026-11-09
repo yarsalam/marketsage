@@ -1,12 +1,12 @@
 "use client";
 const tabs = [
-  { id: "decision", label: "🎯 تصمیم سرمایه‌گذاری" },
-  { id: "momentum", label: "📈 مانیتور مومنتوم" },
+  { id: "decision", label: "🎯 تصمیم پژوهشی · غیرفعال" },
+  { id: "momentum", label: "📈 مومنتوم · غیرفعال" },
   { id: "regime", label: "🌍 رژیم بازار" },
   { id: "news", label: "📰 اخبار" },
-  { id: "risk", label: "🛡️ مرکز ریسک" },
-  { id: "portfolio", label: "💰 پرتفوی" },
-  { id: "backtest", label: "🧪 آزمایشگاه بک‌تست" },
+  { id: "risk", label: "🛡️ ریسک · در انتظار اعتبارسنجی" },
+  { id: "portfolio", label: "💰 تخصیص پرتفوی · غیرفعال" },
+  { id: "backtest", label: "🧪 بک‌تست · متوقف تا تأیید داده" },
   { id: "macro", label: "📊 دید کلان" },
   { id: "analyst", label: "🤖 تحلیلگر AI" },
   { id: "settings", label: "⚙️ تنظیمات" },
