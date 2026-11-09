@@ -13,7 +13,7 @@ from typing import Iterable
 
 REGISTRY_VERSION = "1.0.0"
 RESEARCH_SOURCE_ID = "global.yahoo_finance.yfinance"
-_INSTRUMENT_ID = re.compile(r"^[a-z][a-z0-9]*(?:\.[a-z0-9]+)+$")
+_INSTRUMENT_ID = re.compile(r"^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$")
 
 
 @dataclass(frozen=True)
