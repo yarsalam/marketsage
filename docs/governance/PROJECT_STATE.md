@@ -5,7 +5,7 @@
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Active product issue:** [#72 — Product Phase 1: evidence-first Market Coverage Workspace](https://github.com/yarsalam/marketsage/issues/72)  
 **Active product branch:** `research/market-coverage-workspace-2026-11`  
-**Product PR:** [#73 — evidence-first Market Coverage workspace](https://github.com/yarsalam/marketsage/pull/73), Draft and open; latest exact head `4e50e908d68c058113c960647276833058fc5cea`; feature implementation, refresh/retry fix and documentation progress are on this branch  
+**Product PR:** [#73 — market coverage and canonical instrument registry](https://github.com/yarsalam/marketsage/pull/73), Draft and open; latest exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`; both matching push and pull_request CI passed (runs #42617872744 and #42617880657)  
 **Infrastructure PR:** [#71](https://github.com/yarsalam/marketsage/pull/71), Draft, open and unmerged  
 **Release posture:** research-only. No source is approved for production investment scoring; no validated probability model or strategy is approved; production allocation, broker access and trading remain disabled.
 
@@ -14,7 +14,7 @@
 - Product, data-quality, source-contract and research-system engineering continue independently of the infrastructure backlog.
 - Ordinary CI, build and test jobs use GitHub-hosted runners. No project task may wait for the owner's laptop Runner unless the exact task requires local-only data or host access.
 - If local execution is essential, provide one bounded owner command and continue unrelated product work.
-- PR #73 latest exact head `4e50e908d68c058113c960647276833058fc5cea`; push run #42615545257 and PR run #42615554518 both passed.
+- PR #73 latest exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`; push run #42617872744 and PR run #42617880657 both passed, including Docker production-image build.
 - The local dataset acceptance run #42482678959 passed once; this is not evidence of 24/7 Runner availability. Issue #57 is closed as non-blocking; PRs #71 and #74 are parked. PR #74 must not be merged unchanged because its CI intentionally suppresses product tests.
 - Main remains protected. PR #6 remains explicitly unmerged. No source approval, production investment scoring/ranking, calibrated probabilities, backtest approval, production deployment, broker access, trading or capital allocation is authorized.
 
@@ -22,13 +22,22 @@
 
 - The owner explicitly resumed MarketSage product development. Product work proceeds independently of the remaining infrastructure evidence gap; that gap must not silently be labelled accepted or complete.
 - Phase 1 is an evidence-first Market Coverage Workspace. It exposes the existing Python source registry, data-quality report and Iranian provider-readiness catalog via NestJS and a Persian RTL Next.js page.
-- In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, and `GET /api/markets/iran-providers`. Controller forwarding tests were added.
-- The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates and Iranian provider readiness. The page is the default landing tab for this increment.
+- In this branch, read-only NestJS endpoints were added: `GET /api/markets/sources`, `GET /api/markets/data-quality`, `GET /api/markets/iran-providers`, and `GET /api/markets/instruments`. Controller forwarding tests cover the routes.
+- The Persian coverage page reads those APIs and presents source status, market scope, asset family, research wiring, production approval state, timestamp quality, data-capture/freshness status, source gates, Iranian provider readiness and canonical instrument identity. The page is the default landing tab for this increment. Manual refresh/retry and abort-safe loading are included; Iran/global filters do not mix the two instrument universes.
 - NestJS unit tests cover forwarding of the new API routes and bounded service-unavailable behavior when the analysis engine is unreachable.
-- PR #73 is Draft and open at exact head `4e50e908d68c058113c960647276833058fc5cea`. The coverage page now supports manual refresh and retry after fetch failure; its loading state is abort-safe. Exact-head push run [42615545257](https://github.com/yarsalam/marketsage/actions/runs/42615545257) and PR run [42615554518](https://github.com/yarsalam/marketsage/actions/runs/42615554518) both passed all substantive jobs, including analysis, backend, frontend, admin workspace and production image build. No local Runner was used.
+- PR #73 is Draft and open at exact head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca`. The coverage page includes a canonical instrument catalog and maps observed price-series symbols to canonical IDs in the data-quality response. Exact-head push run [42617872744](https://github.com/yarsalam/marketsage/actions/runs/42617872744) and PR run [42617880657](https://github.com/yarsalam/marketsage/actions/runs/42617880657) both passed all jobs, including analysis, backend, frontend, admin workspace and production image build. No local Runner was used.
 - The page reports actual registry and runtime values only. It does not create synthetic quotes, infer provider availability, approve data, or change scoring.
-- Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Current acceptance checklist: Issue #72.
+- Product plan: [docs/PRODUCT_RESTART_PLAN_2026-11.md](../PRODUCT_RESTART_PLAN_2026-11.md). Phase 1 acceptance: Issue #72. Canonical identity registry: Issue #75.
 - The integration PR #6 remains open and must not be merged to main without separate explicit owner approval. PR #8 remains parked. PRs #71 and #74 are infrastructure-only, Draft and unmerged; #74's temporary product-CI freeze is superseded and that PR must not be merged unchanged.
+
+## Current canonical-instrument and quality increment
+
+- Added a versioned provider-neutral registry for the eleven symbols already present in the global research proxy universe. It records canonical IDs separately from Yahoo symbols, explicit quote currency/unit and price basis, and leaves venue/tradability unassessed.
+- Iranian equities, gold/coins, FX, fixed income/funds and domestic crypto are represented as five empty/quarantined universes. No Iranian instrument is invented or added without evidence.
+- Analysis API exposes `/instruments`; NestJS forwards `/api/markets/instruments`; the Persian UI displays the catalog and respects Iran/global filters.
+- Data-quality series now carry canonical instrument IDs when the source-symbol mapping is known. Unmapped series remain unmapped; historical temporal record schema is not rewritten.
+- Freshness thresholds apply only to registered price proxies (3 calendar days for crypto proxies, 7 for ETF proxies). Sources/instruments without an explicit policy, including macro series, remain `unknown` rather than being incorrectly labelled fresh/stale.
+- Exact final head `ffd4f279478ac78e51dbef9c3977c06085c0d3ca` passed push run `42617872744` and PR run `42617880657`, including the production image build. This work remains in Draft PR #73; no merge or deployment occurred.
 
 ## Current data and investment posture
 
@@ -50,8 +59,8 @@
 
 ## Next product sequence
 
-1. Complete Phase 1 coverage workspace and pass exact-commit CI for PR #73.
-2. Add a verified instrument/universe registry with separate Iran/global identities, venue, symbol lifecycle, quote currency and units.
+1. Complete review and acceptance of Draft PR #73; do not merge without owner approval.
+2. Extend the canonical instrument master only when source evidence supports venue, symbol lifecycle, identity and trading semantics; preserve the current empty/quarantined Iran universes until then.
 3. Close source-rights, connectivity, timestamp, historical-coverage, unit, corporate-action and independent-reconciliation gates provider by provider; keep unknowns quarantined.
 4. Stabilize point-in-time storage and FRED/ALFRED vintages; preserve raw response references, hashes, parser versions and revisions.
 5. Build verified Iranian price/FX/gold/fixed-income/crypto series as separate families; do not merge official/free-market rates or local/global crypto pairs.
