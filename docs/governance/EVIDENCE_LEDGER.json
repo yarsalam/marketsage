@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-09",
+  "evidence": [
+    {
+      "id": "EV-PR73-CI",
+      "task_id": "MS-DATA-001",
+      "type": "CI_ONLY",
+      "outcome": "PASS",
+      "commit": "72c57608e8270d999d1e9f2005b47ea56cb893a7",
+      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42621965739",
+      "observed_at": "2026-11-09",
+      "scope": "Exact-head CI including analysis, backend, frontend, admin workspace and production image/container smoke.",
+      "limitations": "Draft PR only; not merged or deployed; no live source approval or user-flow proof."
+    },
+    {
+      "id": "EV-PR77-CI",
+      "task_id": "MS-PROD-001",
+      "type": "CI_ONLY",
+      "outcome": "PASS",
+      "commit": "67356939f65224a580c915fd2caa0ea52d8d09a9",
+      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42624038512",
+      "observed_at": "2026-11-09",
+      "scope": "Exact-head CI across application and production-image jobs.",
+      "limitations": "Draft PR only; not merged/deployed; UI browser journey not demonstrated."
+    }
+  ]
+}
