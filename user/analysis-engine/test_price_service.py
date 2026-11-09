@@ -106,6 +106,16 @@ def test_instruments_endpoint_exposes_canonical_research_only_universe():
     }
 
 
+def test_canonical_instrument_registry_matches_the_existing_price_universe():
+    from instrument_registry import instrument_catalog
+
+    catalog = instrument_catalog()
+    registered_symbols = {
+        item["provider_symbol"] for item in catalog["instruments"]
+    }
+    assert registered_symbols == set(price_service.TICKERS)
+
+
 def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates():
     response = client.get("/sources")
     assert response.status_code == 200
