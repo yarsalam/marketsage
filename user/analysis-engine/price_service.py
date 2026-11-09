@@ -16,6 +16,7 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
+from instrument_registry import instrument_catalog
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
@@ -297,6 +298,12 @@ def markets() -> dict:
         "assets": [{"ticker": t, "name": n} for t, n in TICKERS.items()],
         "limitations": ["No direct Tehran Stock Exchange, Iranian gold/coin, or Iranian FX feed is configured."],
     }
+
+
+@app.get("/instruments")
+def instruments() -> dict:
+    """Return canonical identities for the current research-only instrument universe."""
+    return instrument_catalog()
 
 
 @app.get("/sources")
