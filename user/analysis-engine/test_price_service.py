@@ -9,6 +9,7 @@ from fastapi import HTTPException
 import price_service
 from fastapi.testclient import TestClient
 from temporal_data import PointInTimeStore, TemporalRecord
+from instrument_registry import InstrumentRegistryError
 
 client = TestClient(price_service.app)
 
@@ -56,7 +57,7 @@ def test_scoring_fails_when_no_assets_have_complete_recent_history():
 
 def test_daily_snapshot_has_checksum_and_is_immutable(tmp_path):
     dates = pd.date_range("2024-01-01", periods=4, freq="D")
-    prices = pd.DataFrame({"AAA": [10.0, 11.0, 12.0, 13.0]}, index=dates)
+    prices = pd.DataFrame({"SPY": [10.0, 11.0, 12.0, 13.0]}, index=dates)
     now = datetime(2024, 1, 5, 10, tzinfo=timezone.utc)
     metadata = price_service.write_daily_snapshot(prices, now, tmp_path)
     csv_before = (tmp_path / "prices-2024-01-05.csv").read_bytes()
@@ -67,6 +68,19 @@ def test_daily_snapshot_has_checksum_and_is_immutable(tmp_path):
     saved = json.loads((tmp_path / "prices-2024-01-05.json").read_text())
     assert saved["rows"] == 4
     assert saved["sha256"] == metadata["sha256"]
+
+
+def test_daily_snapshot_rejects_unknown_symbols_before_creating_files(tmp_path):
+    prices = pd.DataFrame(
+        {"UNKNOWN": [10.0]},
+        index=pd.date_range("2024-01-01", periods=1, freq="D"),
+    )
+    retrieved_at = datetime(2024, 1, 5, 10, tzinfo=timezone.utc)
+
+    with pytest.raises(InstrumentRegistryError, match="no canonical instrument mapping"):
+        price_service.write_daily_snapshot(prices, retrieved_at, tmp_path)
+
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_daily_snapshot_appends_prices_to_temporal_store_idempotently(tmp_path):
