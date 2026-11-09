@@ -26,6 +26,7 @@ describe('MarketsService source observability endpoints', () => {
 
   it.each([
     ['getSources', '/sources'],
+    ['getInstruments', '/instruments'],
     ['getDataQuality', '/data-quality'],
     ['getIranProviders', '/iran-market/providers'],
   ] as const)('forwards %s to the matching analysis endpoint', async (method, path) => {
@@ -48,6 +49,7 @@ describe('MarketsService source observability endpoints', () => {
     mockedAxios.get.mockRejectedValue(new Error('internal network detail'));
 
     await expect(service.getSources()).rejects.toBeInstanceOf(ServiceUnavailableException);
+    await expect(service.getInstruments()).rejects.toBeInstanceOf(ServiceUnavailableException);
     await expect(service.getDataQuality()).rejects.toBeInstanceOf(ServiceUnavailableException);
     await expect(service.getIranProviders()).rejects.toBeInstanceOf(ServiceUnavailableException);
   });
