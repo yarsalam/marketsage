@@ -205,3 +205,19 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR and exact CI evidence will be recorded in the Project State and PR Register when available.
 
 **Capital-risk impact:** None. This is a product transparency and data-observability increment.
+
+## 2026-11-09 — Product delivery independent of local Runner
+
+**Decision authority:** Owner, explicit instruction in conversation.
+
+**Decision**
+
+## Owner execution priority — 2026-11-09
+
+Product delivery is no longer frozen pending Issue #49 or the self-hosted Runner. The owner has instructed that the full MarketSage project continue, with GitHub-hosted CI preferred. Local-only work must be isolated behind one bounded owner command while independent work continues. Do not provision paid infrastructure or treat a single local run as 24/7 proof. The previous infrastructure-first acceptance program is retained as historical/optional engineering work and must not gate product progress. PRs #71 and #74 stay parked and unmerged; PR #74 must not be merged unchanged because it blocks product CI. Issue #57 is closed as non-blocking. PR #6 remains explicitly protected from merge absent separate approval. Product and data work remain research-only; all unapproved providers stay quarantined and no scoring/ranking, calibrated probabilities, backtest approval, production release, broker/trading or capital allocation is authorized.
+
+
+**Evidence recorded at decision time**
+- Market Coverage Phase 1 PR #73 exact head `4e50e908d68c058113c960647276833058fc5cea` passed push run #42615545257 and pull_request run #42615554518, including Python analysis, NestJS backend, Next.js frontend, admin workspace and production image build on GitHub-hosted runners.
+- Local TSETMC dataset acceptance run #42482678959 succeeded as a one-off manual run. No claim is made that the local Runner is currently online or provides 24/7 service.
+- Issue #49's former product freeze is superseded. Issue #57 is closed as no longer blocking. PR #74 remains parked due to its product-CI blocking behavior.
