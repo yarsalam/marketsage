@@ -367,10 +367,21 @@ def data_quality() -> dict:
         canonical_id = canonical_instrument_id_for(
             series["source_id"], symbol
         )
+        expected_data_kind = None
+        price_basis_status = "unknown"
+        if canonical_id:
+            semantics = temporal_price_metadata_for(series["source_id"], symbol)
+            expected_data_kind = semantics["data_kind"]
+            price_basis_status = (
+                "consistent" if series["data_kind"] == expected_data_kind
+                else "legacy_mismatch"
+            )
         series_by_source.setdefault(series["source_id"], []).append({
             **series,
             "canonical_instrument_id": canonical_id,
             "identity_status": "canonical_mapping_found" if canonical_id else "not_mapped",
+            "expected_data_kind": expected_data_kind,
+            "price_basis_status": price_basis_status,
             "observed_age_days": round(age_days, 2) if age_days is not None else None,
             "freshness": freshness,
             "freshness_rule": freshness_rule,
@@ -394,6 +405,10 @@ def data_quality() -> dict:
             "store_exists": store_path.exists(),
             "record_versions": temporal_summary["record_versions"],
             "series_count": len(temporal_summary["series"]),
+            "price_basis_mismatch_count": sum(
+                item["price_basis_status"] == "legacy_mismatch"
+                for rows in series_by_source.values() for item in rows
+            ),
         },
         "sources": sources,
         "limitations": [
