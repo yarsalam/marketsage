@@ -15,6 +15,21 @@ Scheduled workflows run from the default branch. A schedule added on a feature b
 
 Cloud CI uses standard GitHub-hosted `ubuntu-latest` runners. It does not use the owner's laptop Runner. The repository is public by the recorded owner decision; no paid/larger runner or increase to the additional-spend limit is authorized by this workflow.
 
+
+## 1A. Temporary infrastructure-only execution freeze (Goal 1)
+
+Until the owner explicitly accepts the 24/7 infrastructure evidence, CI is intentionally restricted to infrastructure work:
+
+- `schedule` runs the provider-neutral control-plane tests and CI-helper tests only. It does not run analysis/backtests, product builds, admin builds, or production image builds.
+- Pushes and pull requests on `infra/**` are classified from the actual Git diff. Only the explicit infrastructure allowlist is eligible for the infrastructure-only path. A mixed, unknown, empty, or unclassifiable diff is not eligible.
+- The existing required status-check context names are preserved. For an allowlisted infrastructure-only change, the five product/analysis/production jobs are skipped. For any other scope, those same required contexts fail immediately with a fixed freeze notice; they do not execute product or production commands. This deliberately prevents product changes from being merged during the freeze.
+- The classifier prints only a fixed aggregate scope label; it never prints changed paths, file contents, private values, or environment data. A classifier error resolves to the non-infrastructure path and therefore blocks the PR.
+- `workflow_dispatch` is not an approval to run product validation; during the freeze it follows the fail-closed path.
+
+This is a temporary engineering freeze, not evidence that product checks passed. Skipped product checks on an infrastructure-only PR do not validate product code. Do not merge product/data/analysis/production changes while this freeze is active. The native `main-protection` ruleset and its seven required check contexts are not modified by this change.
+
+The live ruleset currently requires **one approving review**, not ten. Its stale-review dismissal and strict up-to-date settings are disabled; changing those native rules is a separate governance change and is not part of this CI-path patch.
+
 ## 2. CI jobs and bounded runtime
 
 | Job | Timeout | Purpose |
