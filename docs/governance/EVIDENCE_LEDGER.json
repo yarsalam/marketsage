@@ -29,11 +29,11 @@
       "task_id": "MS-OPS-001",
       "type": "CI_ONLY",
       "outcome": "PASS",
-      "commit": "ce133bda2efcc971ca598b14a3bbf7518755ff90",
-      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42642204685",
+      "commit": "47030f24d2d0491cb53eac5b089ff1dd4a15eccc",
+      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42644297868",
       "observed_at": "2026-11-09",
-      "scope": "Exact PR-head main CI and Project Operating System validator workflow passed.",
-      "limitations": "Draft PR only; no merge, production deployment or user-value claim."
+      "scope": "Exact PR-head MarketSage CI and project operating-system validator passed.",
+      "limitations": "Draft PR only; not merged/deployed; does not establish user-flow value or 24/7 execution availability."
     },
     {
       "id": "EV-PR79-CI",
@@ -47,15 +47,15 @@
       "limitations": "Draft PR only; no secret configuration, browser E2E, reverse-proxy rate limit, deployment or security sign-off."
     },
     {
-      "id": "EV-PR80-CI-PENDING",
+      "id": "EV-PR80-CI",
       "task_id": "MS-ADMIN-001",
       "type": "CI_ONLY",
-      "outcome": "PENDING",
-      "commit": "51b7a7bc9ce9a7a5cae96e3e2bdec03fa122cfb7",
-      "reference": "https://github.com/yarsalam/marketsage/pull/80",
+      "outcome": "PASS",
+      "commit": "241241ee91f2dc944e0dc407bb6c5d1c409bc520",
+      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42644847236",
       "observed_at": "2026-11-09",
-      "scope": "Exact-head CI is running.",
-      "limitations": "Pending; not evidence of a successful build or working deployment."
+      "scope": "Exact PR-head CI passed, including admin API build/tests and frontend build.",
+      "limitations": "Read-only admin UI/API only; no admin authentication, role authorization, audit logging, production deployment or public exposure."
     }
   ]
 }
