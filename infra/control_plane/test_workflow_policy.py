@@ -44,6 +44,22 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertIn("cancel-in-progress: false", workflow)
         self.assertIn("timeout-minutes: 20", workflow)
 
+    def test_self_hosted_diagnostics_do_not_echo_host_paths(self) -> None:
+        workflow = read_workflow("self-hosted-worker-acceptance.yml")
+        for diagnostic in (
+            'echo "XDG_RUNTIME_DIR=',
+            "ls -ld ",
+            "namei -l ",
+            "stat -Lc ",
+            "getfacl -p ",
+            "systemctl --user show",
+            "systemctl --user status",
+            "tee /tmp/",
+        ):
+            self.assertNotIn(diagnostic, workflow)
+        self.assertIn('>> "$GITHUB_ENV"', workflow)
+        self.assertIn('DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock"', workflow)
+
     def test_default_branch_ci_remains_event_driven_and_daily(self) -> None:
         workflow = read_workflow("ci.yml")
         self.assertRegex(workflow, r"(?m)^  push:")
