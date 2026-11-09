@@ -103,6 +103,7 @@ This evidence discrepancy must be corrected by subsequent runs and records, but 
 - Legacy temporal rows whose stored price basis differs from the canonical registry are explicitly counted and flagged in the API/UI; no automatic historical rewrite is performed.
 - Future snapshot writes validate symbols before any file write and store crypto close versus ETF adjusted-close semantics with explicit units and adjustment policy.
 - Production-images CI runs the analysis image and probes `/health`, `/sources`, `/data-quality`, `/iran-market/providers` and `/instruments`.
+- A read-only local SQLite audit CLI is included at `user/analysis-engine/audit_temporal_price_basis.py`. It prints only aggregate counts, opens with SQLite read-only mode, and never changes the temporal database. Usage when a local-only audit is needed: `python3 user/analysis-engine/audit_temporal_price_basis.py --db <path-to-temporal.sqlite3>`. It is tested against synthetic DBs in GitHub-hosted CI; no owner DB was accessed.
 - Exact final PR #73 head `87d0eab55422f5a58d48a4c0b8faa0dc9aad10fd` passed push run #42620847077 and pull_request run #42620857089; all jobs succeeded. CI built all production images, started the real analysis container and validated five read-only endpoints on GitHub-hosted runners.
 
 ## Owner priority update — 2026-11-09
