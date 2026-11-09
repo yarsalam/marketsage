@@ -23,6 +23,39 @@
       "observed_at": "2026-11-09",
       "scope": "Exact-head CI across application and production-image jobs.",
       "limitations": "Draft PR only; not merged/deployed; UI browser journey not demonstrated."
+    },
+    {
+      "id": "EV-PR78-CI",
+      "task_id": "MS-OPS-001",
+      "type": "CI_ONLY",
+      "outcome": "PASS",
+      "commit": "ce133bda2efcc971ca598b14a3bbf7518755ff90",
+      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42642204685",
+      "observed_at": "2026-11-09",
+      "scope": "Exact PR-head main CI and Project Operating System validator workflow passed.",
+      "limitations": "Draft PR only; no merge, production deployment or user-value claim."
+    },
+    {
+      "id": "EV-PR79-CI",
+      "task_id": "MS-SEC-001",
+      "type": "CI_ONLY",
+      "outcome": "PASS",
+      "commit": "14001bdb5a03775b9772bf9cfea1d169a68f8113",
+      "reference": "https://github.com/yarsalam/marketsage/actions/runs/42643250744",
+      "observed_at": "2026-11-09",
+      "scope": "Exact PR-head build/test workflow passed including user backend Jest/build, frontend build and production image build.",
+      "limitations": "Draft PR only; no secret configuration, browser E2E, reverse-proxy rate limit, deployment or security sign-off."
+    },
+    {
+      "id": "EV-PR80-CI-PENDING",
+      "task_id": "MS-ADMIN-001",
+      "type": "CI_ONLY",
+      "outcome": "PENDING",
+      "commit": "51b7a7bc9ce9a7a5cae96e3e2bdec03fa122cfb7",
+      "reference": "https://github.com/yarsalam/marketsage/pull/80",
+      "observed_at": "2026-11-09",
+      "scope": "Exact-head CI is running.",
+      "limitations": "Pending; not evidence of a successful build or working deployment."
     }
   ]
 }
