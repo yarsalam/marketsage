@@ -106,6 +106,11 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
                          directory: Path | None = None) -> dict:
     """Persist the first successful provider snapshot per UTC day, atomically."""
     target = directory or DATA_SNAPSHOT_DIR
+    source_id = "global.yahoo_finance.yfinance"
+    # Validate every column before writing any snapshot file. Unknown symbols must
+    # not leave behind a partially committed CSV/metadata pair.
+    for symbol in prices.columns:
+        temporal_price_metadata_for(source_id, str(symbol))
     target.mkdir(parents=True, exist_ok=True)
     day = retrieved_at.astimezone(timezone.utc).date().isoformat()
     csv_path = target / f"prices-{day}.csv"
@@ -153,7 +158,6 @@ def _persist_temporal_prices(
     configured_path = os.getenv("TEMPORAL_STORE_PATH")
     store_path = Path(configured_path) if configured_path else directory / "temporal.sqlite3"
     store = PointInTimeStore(store_path)
-    source_id = "global.yahoo_finance.yfinance"
     count = 0
     for timestamp, row in prices.iterrows():
         observed = pd.Timestamp(timestamp)
