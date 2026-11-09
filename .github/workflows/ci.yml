@@ -166,7 +166,7 @@ jobs:
       - infra-control-plane-tests
       - ci-infra-tests
       - detect-direct-main-update
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    if: ${{ always() && github.event_name != 'pull_request' && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
