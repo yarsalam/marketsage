@@ -19,9 +19,9 @@
       "title": "Project operating system and evidence validator",
       "track": "governance",
       "owner": "execution-lead",
-      "status": "IN_PROGRESS",
+      "status": "VALIDATION",
       "branch": "strategy/project-operating-system-parallel-2026-11",
-      "pull_request": null,
+      "pull_request": 78,
       "depends_on": [],
       "timebox_hours": 4,
       "objective": "Create enforceable, machine-checked strategy, task, decision, evidence and release records.",
@@ -41,7 +41,9 @@
         "Do not enable code-authoring agent or paid services",
         "Do not weaken existing branch or runner boundaries"
       ],
-      "evidence_refs": [],
+      "evidence_refs": [
+        "EV-PR78-CI"
+      ],
       "requires_user_flow_proof": false
     },
     {
@@ -203,9 +205,9 @@
       "title": "User authentication and API authorization",
       "track": "security",
       "owner": "execution-lead",
-      "status": "READY",
-      "branch": null,
-      "pull_request": null,
+      "status": "VALIDATION",
+      "branch": "security/user-authentication-2026-11",
+      "pull_request": 79,
       "depends_on": [],
       "timebox_hours": 8,
       "objective": "Implement safe sign-in, route guarding and backend API authorization with fail-closed configuration.",
@@ -227,7 +229,9 @@
         "No admin privilege implied by user login",
         "Do not expose deployment until owner-provided secrets are configured securely"
       ],
-      "evidence_refs": [],
+      "evidence_refs": [
+        "EV-PR79-CI"
+      ],
       "requires_user_flow_proof": true
     },
     {
@@ -235,9 +239,9 @@
       "title": "Read-only admin operations workspace",
       "track": "admin",
       "owner": "execution-lead",
-      "status": "READY",
-      "branch": null,
-      "pull_request": null,
+      "status": "VALIDATION",
+      "branch": "admin/read-only-operations-workspace-2026-11",
+      "pull_request": 80,
       "depends_on": [],
       "timebox_hours": 8,
       "objective": "Replace starter admin surfaces with a truthful, read-only operations workspace.",
@@ -257,7 +261,9 @@
         "No destructive admin actions in first slice",
         "No exposure through public Compose before authentication and authorization pass"
       ],
-      "evidence_refs": [],
+      "evidence_refs": [
+        "EV-PR80-CI-PENDING"
+      ],
       "requires_user_flow_proof": true
     },
     {
