@@ -40,6 +40,8 @@ Iranian equities, gold/coins, FX, fixed income/funds and local crypto remain emp
 
 Freshness evaluation is now policy-specific: only explicitly registered global crypto and ETF proxies use the 3-day and 7-day observed-age thresholds. Other sources (including macro series) remain unknown unless a source-specific calendar/policy is defined.
 
+New snapshot writes now follow the canonical registry: crypto series use `provider_close` with USD per token; ETF series use `adjusted_close` with USD per share. The payload records the canonical ID, basis and adjustment policy. Existing temporal rows are deliberately not rewritten; a read-only audit must precede any possible migration.
+
 This registry is metadata only: it does not collect prices, change provider eligibility or alter any research calculation.
 
 ## Product architecture and staged roadmap
