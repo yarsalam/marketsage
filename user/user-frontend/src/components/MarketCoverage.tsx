@@ -38,6 +38,9 @@ type RuntimeSeries = {
   series_key: string;
   canonical_instrument_id?: string | null;
   identity_status?: string;
+  data_kind?: string;
+  expected_data_kind?: string | null;
+  price_basis_status?: "consistent" | "legacy_mismatch" | "unknown";
   stored_versions: number;
   distinct_records: number;
   latest_observed_at: string | null;
@@ -225,7 +228,7 @@ function SourceCard({ source, runtime }: { source: Source; runtime?: RuntimeSour
         </p>
         {series.length > 0 && (
           <p className="mt-1 text-xs text-text-secondary">
-            تازگی ثبت‌شده: {freshCount} تازه، {staleCount} قدیمی، {series.length - freshCount - staleCount} نامشخص
+            تازگی ثبت‌شده: {freshCount} تازه، {staleCount} قدیمی، {series.length - freshCount - staleCount} نامشخص · ناسازگاری مبنای قیمت: {series.filter((item) => item.price_basis_status === "legacy_mismatch").length}
           </p>
         )}
         {series.length > 0 && (
@@ -238,8 +241,12 @@ function SourceCard({ source, runtime }: { source: Source; runtime?: RuntimeSour
                     <span className="mt-1 text-[10px] text-text-secondary">{item.canonical_instrument_id}</span>
                   )}
                 </span>
-                <span className="text-text-secondary">
-                  {label(item.freshness)} · {item.distinct_records.toLocaleString("fa-IR")} رکورد · آخرین مشاهده: {formatDate(item.latest_observed_at)}
+                <span className="flex flex-col items-end gap-1 text-text-secondary">
+                  <span>{label(item.freshness)} · {item.distinct_records.toLocaleString("fa-IR")} رکورد · آخرین مشاهده: {formatDate(item.latest_observed_at)}</span>
+                  <span>{label(item.price_basis_status ?? "unknown")}</span>
+                  {item.price_basis_status === "legacy_mismatch" && (
+                    <span dir="ltr">stored: {item.data_kind} · expected: {item.expected_data_kind}</span>
+                  )}
                 </span>
               </div>
             ))}
