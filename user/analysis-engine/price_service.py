@@ -133,7 +133,11 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
         "symbols": list(prices.columns),
         "rows": int(len(prices)),
         "sha256": hashlib.sha256(csv_bytes).hexdigest(),
-        "adjustment_policy": "yfinance auto_adjust=True; Close field",
+        "adjustment_policy": "instrument-specific; see instrument_semantics",
+        "instrument_semantics": {
+            str(symbol): temporal_price_metadata_for(source_id, str(symbol))
+            for symbol in prices.columns
+        },
         "snapshot_policy": "first successful fetch per UTC date; immutable once written",
     }
     csv_tmp, meta_tmp = csv_path.with_suffix(".csv.tmp"), meta_path.with_suffix(".json.tmp")
@@ -158,6 +162,7 @@ def _persist_temporal_prices(
     configured_path = os.getenv("TEMPORAL_STORE_PATH")
     store_path = Path(configured_path) if configured_path else directory / "temporal.sqlite3"
     store = PointInTimeStore(store_path)
+    source_id = "global.yahoo_finance.yfinance"
     count = 0
     for timestamp, row in prices.iterrows():
         observed = pd.Timestamp(timestamp)
