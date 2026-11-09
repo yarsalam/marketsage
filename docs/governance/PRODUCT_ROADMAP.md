@@ -15,13 +15,12 @@
 - Data quality, time coverage, freshness, units and provenance.
 - Research-only empty states that explain the missing evidence and the next required validation.
 - One reproducible end-to-end browser/API scenario.
-**Current related implementation:** draft PR #73 (coverage/registry) and draft PR #77 (research-only output gates and truthful helper). Both remain unmerged and do not yet count as user value.
+**Current integrated candidate:** draft PR #81 combines #73 (coverage/registry) and #77 (research-only output gates and truthful helper). It also incorporates #78 governance validation, #79 owner authentication and #80 read-only admin operations. PR #81 remains unmerged; CI success is engineering evidence only, and browser acceptance is still required before this counts as user value.
 
 ## Stage 2 — Trustworthy account and operations
 **Outcome:** user data and operator controls are protected.
-- Backend login/session/authentication and route protection.
-- API authorization on private research routes.
-- Admin UI and API with role enforcement, audit trail and read-only health/source operations first.
+- Draft integration #81 contains backend login/session/authentication and route protection; owner must verify browser login, logout and protected APIs.
+- Admin read-only UI and API are copied into #81, but admin authentication, role authorization and audit trail are not yet implemented.
 - Deployment topology includes only reviewed components; no admin exposure before its security gate passes.
 
 ## Stage 3 — Data breadth and point-in-time integrity
@@ -56,4 +55,4 @@
 
 ## Parallel execution and integration
 
-Current independent streams are recorded in `WORK_REGISTER.json`. PR #73 and PR #77 are independent in intent but both change the user landing-page path; reconcile their changes into one reviewed integration before merge. PR #74 is a separate infrastructure foundation. PR #71 and PR #61 are based on PR #74 and therefore remain dependent, not independently mergeable. PR #6 remains separately protected by explicit owner approval.
+Current independent streams are recorded in `WORK_REGISTER.json`. PR #81 is the integration candidate combining PRs #73, #77, #78, #79 and #80. PR #74 is a separate infrastructure foundation. PR #71 and PR #61 are based on PR #74 and therefore remain dependent, not independently mergeable. PR #6 remains separately protected by explicit owner approval.
