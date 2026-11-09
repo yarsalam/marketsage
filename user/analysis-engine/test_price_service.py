@@ -8,7 +8,8 @@ from fastapi import HTTPException
 
 import price_service
 from fastapi.testclient import TestClient
-from temporal_data import PointInTimeStore
+from temporal_data import PointInTimeStore, TemporalRecord
+from instrument_registry import InstrumentRegistryError
 
 client = TestClient(price_service.app)
 
@@ -56,7 +57,7 @@ def test_scoring_fails_when_no_assets_have_complete_recent_history():
 
 def test_daily_snapshot_has_checksum_and_is_immutable(tmp_path):
     dates = pd.date_range("2024-01-01", periods=4, freq="D")
-    prices = pd.DataFrame({"AAA": [10.0, 11.0, 12.0, 13.0]}, index=dates)
+    prices = pd.DataFrame({"SPY": [10.0, 11.0, 12.0, 13.0]}, index=dates)
     now = datetime(2024, 1, 5, 10, tzinfo=timezone.utc)
     metadata = price_service.write_daily_snapshot(prices, now, tmp_path)
     csv_before = (tmp_path / "prices-2024-01-05.csv").read_bytes()
@@ -67,6 +68,19 @@ def test_daily_snapshot_has_checksum_and_is_immutable(tmp_path):
     saved = json.loads((tmp_path / "prices-2024-01-05.json").read_text())
     assert saved["rows"] == 4
     assert saved["sha256"] == metadata["sha256"]
+
+
+def test_daily_snapshot_rejects_unknown_symbols_before_creating_files(tmp_path):
+    prices = pd.DataFrame(
+        {"UNKNOWN": [10.0]},
+        index=pd.date_range("2024-01-01", periods=1, freq="D"),
+    )
+    retrieved_at = datetime(2024, 1, 5, 10, tzinfo=timezone.utc)
+
+    with pytest.raises(InstrumentRegistryError, match="no canonical instrument mapping"):
+        price_service.write_daily_snapshot(prices, retrieved_at, tmp_path)
+
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_daily_snapshot_appends_prices_to_temporal_store_idempotently(tmp_path):
@@ -89,6 +103,77 @@ def test_daily_snapshot_appends_prices_to_temporal_store_idempotently(tmp_path):
     second = store.as_of(as_of=datetime(2024, 1, 6, tzinfo=timezone.utc), market="global_proxy")
     assert len(second) == 5
     assert next(row for row in second if row["record_key"] == "SPY:2024-01-01")["payload"]["close"] == 100.0
+
+
+def test_instruments_endpoint_exposes_canonical_research_only_universe():
+    response = client.get("/instruments")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["registry_version"] == "1.0.0"
+    assert payload["summary"]["instrument_count"] == 11
+    assert payload["summary"]["iran_instrument_count"] == 0
+    assert all(item["production_approved"] is False for item in payload["instruments"])
+    assert all(item["scoring_gate"]["eligible"] is False for item in payload["instruments"])
+    assert {item["market_universe"] for item in payload["instruments"]} == {"global_proxy"}
+    assert {item["market_universe"] for item in payload["empty_universes"]} >= {
+        "iran_equities", "iran_gold_coin", "iran_fx", "iran_fixed_income", "iran_crypto",
+    }
+
+
+def test_freshness_remains_unknown_for_series_without_a_release_policy(tmp_path, monkeypatch):
+    from datetime import timedelta
+
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    store.append(TemporalRecord(
+        record_key="macro:US:CPIAUCSL:2026-10-01",
+        source_id="us.fred.alfred",
+        market="US",
+        data_kind="macro_release",
+        observed_at=now - timedelta(days=30),
+        published_at=now - timedelta(days=28),
+        retrieved_at=now,
+        payload={"value": 3.1},
+    ))
+
+    payload = client.get("/data-quality").json()
+    fred = next(item for item in payload["sources"] if item["source_id"] == "us.fred.alfred")
+    series = fred["runtime_series"][0]
+    assert series["series_key"] == "CPIAUCSL"
+    assert series["observed_age_days"] >= 29
+    assert series["freshness"] == "unknown"
+    assert "No source-specific" in series["freshness_rule"]
+
+
+def test_canonical_instrument_registry_matches_the_existing_price_universe():
+    from instrument_registry import instrument_catalog
+
+    catalog = instrument_catalog()
+    registered_symbols = {
+        item["provider_symbol"] for item in catalog["instruments"]
+    }
+    assert registered_symbols == set(price_service.TICKERS)
+
+
+def test_observed_series_resolve_to_canonical_instrument_ids(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    prices = pd.DataFrame(
+        {"SPY": [100.0, 101.0], "BTC-USD": [200.0, 202.0]},
+        index=pd.date_range(pd.Timestamp.now().normalize() - pd.Timedelta(days=1), periods=2, freq="D"),
+    )
+    price_service.write_daily_snapshot(prices, now, tmp_path)
+
+    payload = client.get("/data-quality").json()
+    yahoo = next(item for item in payload["sources"] if item["source_id"] == "global.yahoo_finance.yfinance")
+    identities = {row["series_key"]: row for row in yahoo["runtime_series"]}
+    assert identities["SPY"]["canonical_instrument_id"] == "global.proxy.etf.sp500"
+    assert identities["SPY"]["identity_status"] == "canonical_mapping_found"
+    assert identities["BTC-USD"]["canonical_instrument_id"] == "global.proxy.crypto.bitcoin"
+    assert identities["BTC-USD"]["identity_status"] == "canonical_mapping_found"
 
 
 def test_sources_endpoint_exposes_versioned_registry_and_unapproved_candidates():
@@ -140,6 +225,70 @@ def test_monthly_prices_reject_stale_month_end_observations():
     monthly = price_service.completed_monthly_prices(prices)
     assert pd.isna(monthly.loc[pd.Timestamp("2024-04-30"), "SPY"])
     assert monthly.loc[pd.Timestamp("2024-03-31"), "SPY"] > 0
+
+
+def test_data_quality_flags_legacy_crypto_price_basis(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEMPORAL_STORE_PATH", raising=False)
+    monkeypatch.setattr(price_service, "DATA_SNAPSHOT_DIR", tmp_path)
+    now = datetime.now(timezone.utc)
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    store.append(TemporalRecord(
+        record_key="BTC-USD:2026-11-08",
+        source_id="global.yahoo_finance.yfinance",
+        market="global_proxy",
+        data_kind="adjusted_close",
+        observed_at=now,
+        retrieved_at=now,
+        payload={
+            "symbol": "BTC-USD",
+            "close": 100.0,
+            "currency": "USD",
+            "price_unit": "adjusted_close_usd_per_unit",
+        },
+    ))
+
+    response = client.get("/data-quality")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["storage"]["price_basis_mismatch_count"] == 1
+    yahoo = next(item for item in payload["sources"] if item["source_id"] == "global.yahoo_finance.yfinance")
+    legacy = next(item for item in yahoo["runtime_series"] if item["series_key"] == "BTC-USD")
+    assert legacy["canonical_instrument_id"] == "global.proxy.crypto.bitcoin"
+    assert legacy["data_kind"] == "adjusted_close"
+    assert legacy["expected_data_kind"] == "provider_close"
+    assert legacy["price_basis_status"] == "legacy_mismatch"
+
+
+def test_temporal_price_storage_uses_canonical_basis_and_quote_units(tmp_path):
+    retrieved_at = datetime(2026, 11, 9, 12, 0, tzinfo=timezone.utc)
+    prices = pd.DataFrame(
+        {"BTC-USD": [100.0], "SPY": [200.0]},
+        index=pd.DatetimeIndex(["2026-11-08"]),
+    )
+
+    assert price_service._persist_temporal_prices(
+        prices, retrieved_at, "a" * 64, tmp_path,
+    ) == 2
+
+    store = PointInTimeStore(tmp_path / "temporal.sqlite3")
+    rows = store.as_of(as_of=datetime(2026, 11, 10, tzinfo=timezone.utc))
+    by_symbol = {row["payload"]["symbol"]: row for row in rows}
+
+    crypto = by_symbol["BTC-USD"]
+    assert crypto["data_kind"] == "provider_close"
+    assert crypto["payload"]["canonical_instrument_id"] == "global.proxy.crypto.bitcoin"
+    assert crypto["payload"]["currency"] == "USD"
+    assert crypto["payload"]["price_unit"] == "usd_per_token"
+    assert crypto["payload"]["price_basis"] == "provider_close"
+    assert crypto["payload"]["adjustment_policy"] == "provider_close_no_adjustment"
+
+    etf = by_symbol["SPY"]
+    assert etf["data_kind"] == "adjusted_close"
+    assert etf["payload"]["canonical_instrument_id"] == "global.proxy.etf.sp500"
+    assert etf["payload"]["currency"] == "USD"
+    assert etf["payload"]["price_unit"] == "usd_per_share"
+    assert etf["payload"]["price_basis"] == "adjusted_close"
+    assert etf["payload"]["adjustment_policy"] == "yfinance_auto_adjust_true_close"
 
 
 def test_data_quality_reports_captured_series_and_unconfigured_sources(tmp_path, monkeypatch):

@@ -16,6 +16,7 @@ import pandas as pd
 import yfinance as yf
 from research.backtest import BacktestConfig, run_monthly_momentum_backtest, summarize_returns
 from iran_market_data import provider_catalog
+from instrument_registry import canonical_instrument_id_for, freshness_policy_for, instrument_catalog, temporal_price_metadata_for
 from source_registry import source_catalog
 from temporal_data import PointInTimeStore, TemporalRecord
 from fastapi import FastAPI, HTTPException, Query
@@ -105,6 +106,11 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
                          directory: Path | None = None) -> dict:
     """Persist the first successful provider snapshot per UTC day, atomically."""
     target = directory or DATA_SNAPSHOT_DIR
+    source_id = "global.yahoo_finance.yfinance"
+    # Validate every column before writing any snapshot file. Unknown symbols must
+    # not leave behind a partially committed CSV/metadata pair.
+    for symbol in prices.columns:
+        temporal_price_metadata_for(source_id, str(symbol))
     target.mkdir(parents=True, exist_ok=True)
     day = retrieved_at.astimezone(timezone.utc).date().isoformat()
     csv_path = target / f"prices-{day}.csv"
@@ -127,7 +133,11 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
         "symbols": list(prices.columns),
         "rows": int(len(prices)),
         "sha256": hashlib.sha256(csv_bytes).hexdigest(),
-        "adjustment_policy": "yfinance auto_adjust=True; Close field",
+        "adjustment_policy": "instrument-specific; see instrument_semantics",
+        "instrument_semantics": {
+            str(symbol): temporal_price_metadata_for(source_id, str(symbol))
+            for symbol in prices.columns
+        },
         "snapshot_policy": "first successful fetch per UTC date; immutable once written",
     }
     csv_tmp, meta_tmp = csv_path.with_suffix(".csv.tmp"), meta_path.with_suffix(".json.tmp")
@@ -142,7 +152,7 @@ def write_daily_snapshot(prices: pd.DataFrame, retrieved_at: datetime,
 def _persist_temporal_prices(
     prices: pd.DataFrame, retrieved_at: datetime, snapshot_sha256: str, directory: Path,
 ) -> int:
-    """Append each observed daily adjusted close to the point-in-time store.
+    """Append prices using the canonical instrument's declared basis and units.
 
     Yahoo's historical response does not provide a trustworthy original publication
     timestamp for each row. We therefore leave published_at unset: captured-as-of
@@ -164,21 +174,24 @@ def _persist_temporal_prices(
         for symbol, value in row.items():
             if pd.isna(value) or not np.isfinite(float(value)) or float(value) <= 0:
                 continue
+            semantics = temporal_price_metadata_for(source_id, str(symbol))
             store.append(TemporalRecord(
                 record_key=f"{symbol}:{observed.date().isoformat()}",
                 source_id=source_id,
                 market="global_proxy",
-                data_kind="adjusted_close",
+                data_kind=semantics["data_kind"],
                 observed_at=observed_at,
                 retrieved_at=retrieved_at,
                 published_at=None,
                 source_revision=snapshot_sha256,
                 payload={
                     "symbol": str(symbol),
+                    "canonical_instrument_id": semantics["canonical_instrument_id"],
                     "close": float(value),
-                    "currency": "USD",
-                    "price_unit": "adjusted_close_usd_per_unit",
-                    "adjustment_policy": "yfinance auto_adjust=True; Close field",
+                    "currency": semantics["currency"],
+                    "price_unit": semantics["price_unit"],
+                    "price_basis": semantics["price_basis"],
+                    "adjustment_policy": semantics["adjustment_policy"],
                     "snapshot_sha256": snapshot_sha256,
                 },
             ))
@@ -299,6 +312,12 @@ def markets() -> dict:
     }
 
 
+@app.get("/instruments")
+def instruments() -> dict:
+    """Return canonical identities for the current research-only instrument universe."""
+    return instrument_catalog()
+
+
 @app.get("/sources")
 def sources() -> dict:
     """Versioned source registry with explicit readiness and validation gates."""
@@ -337,14 +356,35 @@ def data_quality() -> dict:
         if latest:
             observed = datetime.fromisoformat(latest.replace("Z", "+00:00"))
             age_days = max(0, (now - observed.astimezone(timezone.utc)).total_seconds() / 86400)
-            symbol = series.get("series_key", "")
-            max_age_days = 3 if symbol.endswith("-USD") else 7
+        symbol = str(series.get("series_key", ""))
+        max_age_days, freshness_rule = freshness_policy_for(
+            series["source_id"], symbol
+        )
+        if age_days is not None and max_age_days is not None:
             freshness = "fresh" if age_days <= max_age_days else "stale"
+        else:
+            freshness = "unknown"
+        canonical_id = canonical_instrument_id_for(
+            series["source_id"], symbol
+        )
+        expected_data_kind = None
+        price_basis_status = "not_mapped"
+        if canonical_id:
+            semantics = temporal_price_metadata_for(series["source_id"], symbol)
+            expected_data_kind = semantics["data_kind"]
+            price_basis_status = (
+                "consistent" if series["data_kind"] == expected_data_kind
+                else "legacy_mismatch"
+            )
         series_by_source.setdefault(series["source_id"], []).append({
             **series,
+            "canonical_instrument_id": canonical_id,
+            "identity_status": "canonical_mapping_found" if canonical_id else "not_mapped",
+            "expected_data_kind": expected_data_kind,
+            "price_basis_status": price_basis_status,
             "observed_age_days": round(age_days, 2) if age_days is not None else None,
             "freshness": freshness,
-            "freshness_rule": "3 days for crypto symbols ending -USD; 7 days for other global price proxies",
+            "freshness_rule": freshness_rule,
         })
 
     sources = []
@@ -365,6 +405,10 @@ def data_quality() -> dict:
             "store_exists": store_path.exists(),
             "record_versions": temporal_summary["record_versions"],
             "series_count": len(temporal_summary["series"]),
+            "price_basis_mismatch_count": sum(
+                item["price_basis_status"] == "legacy_mismatch"
+                for rows in series_by_source.values() for item in rows
+            ),
         },
         "sources": sources,
         "limitations": [

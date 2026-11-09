@@ -1,39 +1,53 @@
 "use client";
+
 const tabs = [
-  { id: "decision", label: "🎯 تصمیم سرمایه‌گذاری" },
-  { id: "momentum", label: "📈 مانیتور مومنتوم" },
-  { id: "regime", label: "🌍 رژیم بازار" },
-  { id: "news", label: "📰 اخبار" },
-  { id: "risk", label: "🛡️ مرکز ریسک" },
-  { id: "portfolio", label: "💰 پرتفوی" },
-  { id: "backtest", label: "🧪 آزمایشگاه بک‌تست" },
-  { id: "macro", label: "📊 دید کلان" },
-  { id: "analyst", label: "🤖 تحلیلگر AI" },
-  { id: "settings", label: "⚙️ تنظیمات" },
+  { id: "coverage", label: "🧭 پوشش بازار و کیفیت داده" },
+  { id: "decision", label: "🎯 تصمیم پژوهشی · غیرفعال" },
+  { id: "momentum", label: "📈 مومنتوم · غیرفعال" },
+  { id: "regime", label: "🌍 رژیم بازار · غیرفعال" },
+  { id: "news", label: "📰 اخبار · غیرفعال" },
+  { id: "risk", label: "🛡️ ریسک · غیرفعال" },
+  { id: "portfolio", label: "💰 تخصیص پرتفوی · غیرفعال" },
+  { id: "backtest", label: "🧪 بک‌تست · متوقف تا تأیید داده" },
+  { id: "macro", label: "📊 دید کلان · غیرفعال" },
+  { id: "analyst", label: "🤖 تحلیلگر AI · متصل نیست" },
+  { id: "settings", label: "⚙️ وضعیت داده" },
 ];
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (id: string) => void;
+  userName: string;
+  onLogout: () => void;
 }
 
-export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => (
-  <aside className="w-64 bg-surface border-l border-border h-screen overflow-y-auto p-3 flex-shrink-0">
-    <h2 className="text-lg font-bold mb-4 text-primary">MarketSage AI</h2>
-    <nav className="space-y-1">
+export const Sidebar = ({ activeTab, onTabChange, userName, onLogout }: SidebarProps) => (
+  <aside className="flex h-screen w-64 flex-shrink-0 flex-col overflow-y-auto border-l border-border bg-surface p-3">
+    <h2 className="mb-1 text-lg font-bold text-primary">MarketSage</h2>
+    <p className="mb-4 truncate text-xs text-text-secondary">{userName}</p>
+    <nav className="flex-1 space-y-1" aria-label="بخش‌های MarketSage">
       {tabs.map((tab) => (
         <button
           key={tab.id}
+          type="button"
           onClick={() => onTabChange(tab.id)}
-          className={`w-full text-right p-3 rounded-xl transition-colors ${
+          aria-current={activeTab === tab.id ? "page" : undefined}
+          className={`w-full rounded-xl p-3 text-right transition-colors ${
             activeTab === tab.id
-              ? "bg-primary/20 text-primary border border-primary/30"
-              : "hover:bg-background text-text-secondary"
+              ? "border border-primary/30 bg-primary/20 text-primary"
+              : "text-text-secondary hover:bg-background"
           }`}
         >
           {tab.label}
         </button>
       ))}
     </nav>
+    <button
+      type="button"
+      onClick={onLogout}
+      className="mt-4 w-full rounded-xl border border-border p-3 text-right text-sm text-text-secondary hover:bg-background"
+    >
+      خروج از حساب
+    </button>
   </aside>
 );

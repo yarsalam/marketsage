@@ -1,0 +1,40 @@
+name: Project Operating System
+
+on:
+  push:
+    branches: [main, "strategy/**", "product/**", "data/**", "security/**", "infra/**", "integration/**"]
+    paths:
+      - "docs/governance/**"
+      - ".github/scripts/validate_project_operating_system.py"
+      - ".github/scripts/test_project_operating_system.py"
+      - ".github/workflows/project-operating-system.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/governance/**"
+      - ".github/scripts/validate_project_operating_system.py"
+      - ".github/scripts/test_project_operating_system.py"
+      - ".github/workflows/project-operating-system.yml"
+  schedule:
+    - cron: "37 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketsage-project-os-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate project state, work contracts, dependencies and evidence
+        run: |
+          python3 .github/scripts/validate_project_operating_system.py
+          python3 .github/scripts/test_project_operating_system.py
