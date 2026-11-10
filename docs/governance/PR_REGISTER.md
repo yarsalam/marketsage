@@ -231,3 +231,41 @@ No PR was merged, no workflow was manually dispatched or rerun by this audit, no
 - Issue #52 Chabokan-only install/test evidence is **30/30 passing** on the recorded target commit; only exact hash-lock/reproducibility remains open.
 - The local Worker Acceptance failure before its first workflow step remains distinct from the later successful offline TSETMC validator runs. Keep local dispatch manual and owner-confirmed.
 - Issue #49 remains **NOT COMPLETE** until the independent host/worker, observer recovery, operational failure drills and 24-hour observation criteria are evidenced.
+
+
+## Live PR inventory — 2026-11-10 14:41 UTC
+
+This inventory supersedes older open-PR snapshots above. All refs and checks below were read from GitHub at this audit. No PR was merged, closed, marked ready, or auto-merged.
+
+| PR | State / target | Exact head | Exact-head evidence / handling |
+|---|---|---|---|
+| #81 | Draft, `main` | `a659fa038dc84b000c5a01b20b234d5e31f54ff3` | MarketSage CI run #42672784245 failed; Project Operating System PR run #42672784044 succeeded. Frozen; no infrastructure action. |
+| #80 | Draft, `main` | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | Listed exact-head checks succeeded in #42644847236. Frozen product/admin work. |
+| #79 | Draft, `main` | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | Listed exact-head checks succeeded in #42643250744. Frozen product/auth work. |
+| #78 | Draft, `main` | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | Exact Project Operating System/CI runs #42644297705, #42644297868 and #42644283033 succeeded. Its schedule is not on main. |
+| #77 | Draft, `main` | `67356939f65224a580c915fd2caa0ea52d8d09a9` | Run #42624038512 has successful listed jobs, but required provider-neutral control-plane context is absent. Frozen; no action. |
+| #74 | Draft, `main` | `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10` | Exact Push #42589280185 and PR #42589290385 passed the infrastructure control-plane and CI-helper tests; product jobs scope-skipped. Keep Draft. |
+| #73 | Draft, `main` | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | Exact runs #42621957914 and #42621965739 succeeded. Frozen research work. |
+| #71 | Draft, base `infra/provider-neutral-control-plane-2026-11` | `e8785b177f93a569ce031496d1043026979828d3` | Zero exact-head check runs and zero workflow runs. Base recorded at `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`; current PR #74 head is 11 commits ahead of that base. PR #71 and #74 heads diverge (108 ahead / 11 behind from the common base). Reconcile before review; do not merge. |
+| #62 | Open, non-Draft, `main` | `54fbf4a364a91b4e8d834fdcec0245d079440982` | Listed checks succeeded in #42408717730; required provider-neutral control-plane context is absent. Dependabot PR; no action under infrastructure freeze. |
+| #61 | Draft, base infrastructure branch | `25ce24283e35dd7e55eb8545c590a047606643ee` | No exact-head checks; mergeability false. Reconcile only after the primary infrastructure branch is settled. |
+| #51 | Open, non-Draft, base `feat/tindex-free-data-connector` | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | Listed exact-head checks succeeded. Research/data-source work remains frozen. |
+| #41 | Open, non-Draft, `main` | `162692f1a377ec8445ed958db4cc1171d4cafc47` | Listed exact-head checks succeeded. Data/governance work remains frozen. |
+| #8 | Open, non-Draft, base `fix/gdelt-fred-tindex-current-docs` | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | Exact `tsetmc-smoke` check failed; other listed checks succeeded. Parked after ConnectTimeout; never repeat the same request from the same environment. |
+| #6 | Open, non-Draft, `main` | `1d90726c593b0818982407c309ff13301798f5b3` | Listed checks succeeded, but PR is not mergeable against its recorded base. Never merge to main without separate explicit owner approval. PR #14 is already integrated into #6. |
+
+## Closed infrastructure reference
+
+- PR #54 is closed, Draft, and unmerged (head `e8f7d8add3df577120b92b8927c590aece001509`; mergeability false). Issue #55 records 16/16 exact-head SQLite coordinator tests with exit code 0. This is unit-test evidence only, not merge approval or distributed/operational proof.
+- Issue #52 remains open for five Chabokan wheel SHA-256 hashes. Issue #53 is closed with the public-repository zero-cost hosted-CI decision. Issue #55 is closed after exact-head validation.
+- Main remains `4c4b032196137af4658ea2c28e38a21605ee923b`; active ruleset #26789479 requires a PR, one review and seven contexts. Do not alter rulesets from this automation.
+
+## Infrastructure acceptance status
+
+- Main's scheduled CI run #42806341738 succeeded on exact main SHA `4c4b032196137af4658ea2c28e38a21605ee923b` on 2026-11-10. This proves scheduled CI execution, not scheduled worker execution; the observed start was about eight hours after the configured cron time.
+- PR #74's exact-head infrastructure tests passed, but PR #71's current exact head has no checks and is diverged from PR #74.
+- The Docker worker, daemon, watchdog, dispatch outbox and CircleCI adapter remain branch-only. CircleCI is configuration only; no account/integration/provider activation is evidenced. The self-hosted acceptance workflow remains manual-only and its generic runner selector must be narrowed before any authorized local dispatch.
+- No live two-provider canary, independent notification path, persistent server, worker-loss recovery canary, or 24-hour stability proof exists. 24/7 readiness is **NOT PROVEN**.
+- No hosted workflow was dispatched/rerun and no local workflow was dispatched during this audit. This documentation-only commit uses `[skip ci]`; it has no exact-head CI validation and must remain unmerged pending the owner's explicit bounded hosted-run authorization.
+
+Owner handoffs remain in [Issue #49](https://github.com/yarsalam/marketsage/issues/49) (visibility confirmation and bounded exact-head hosted-run authorization) and [Issue #52](https://github.com/yarsalam/marketsage/issues/52) (wheel hashes). Do not create duplicate issues.
