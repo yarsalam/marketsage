@@ -258,3 +258,63 @@ This section supersedes every older infrastructure status and any stale main-SHA
 - This rebase/merge update does not merge PR #71 or PR #74 into main and does not change the local workflow's manual/owner-confirmed boundary.
 
 **Current readiness remains NOT COMPLETE.** No independently operated external backends, separate persistent server worker, process-level outage drill, or full 24-hour observation window is evidenced. The scheduled CI heartbeat does not prove continuous worker uptime.
+
+
+## Live infrastructure audit — 2026-11-10 14:41 UTC
+
+This section supersedes older infrastructure snapshots above where they conflict. Source: live GitHub API and the exact refs/checks inspected for this run.
+
+### Repository and protected main
+
+- Default branch: `main`.
+- Main HEAD: `4c4b032196137af4658ea2c28e38a21605ee923b`, committed 2026-11-07 19:55:51 UTC.
+- Live repository metadata reports `visibility=public` (`private=false`), despite the owner's current description of the repository as private. No visibility change was made. Treat all repository content, issues, PRs, comments, and history as public until the owner confirms otherwise.
+- Active ruleset `main-protection` #26789479 targets `refs/heads/main`: pull request required, one approving review, seven required contexts, deletion and non-fast-forward updates blocked, no bypass actors, and `current_user_can_bypass=never`. Stale approvals are not dismissed and strict up-to-date checks are disabled.
+- The legacy branch-protection endpoint returned HTTP 403 to the connected integration. Ruleset data is readable and is the evidence used here; do not infer unexposed legacy settings.
+
+### Main CI and schedule
+
+- Main `.github/workflows/ci.yml` blob: `3b0bc36ae8f95c6b34c4afe6a1535716b421a864`.
+- Triggers: push on `main`, `deploy/**`, `research/**`, `ci/**`, `infra/**`; pull_request on `main`, `deploy/**`, `infra/**`; daily schedule `17 3 * * *`; and workflow_dispatch.
+- Workflow permission is `contents: read`. The direct-main provenance and failure-notification jobs scope `issues: write` to those jobs. Concurrency is per PR/ref with `cancel-in-progress: true`. Job timeouts are bounded (5–40 minutes depending on job).
+- There is no explicit retry policy, independent stale/queued-run observer, independent health endpoint, or failure-notification path outside the GitHub-hosted runner pool. The notification job uses `ubuntu-latest` in the same hosted pool.
+- No workflow artifact upload or custom artifact retention policy was found in the main CI workflow. Log/artifact retention therefore remains subject to GitHub repository/account defaults unless separately configured.
+- Scheduled run [#42806341738](https://github.com/yarsalam/marketsage/actions/runs/42806341738) completed successfully on this exact main SHA on 2026-11-10 (created 11:18:07 UTC; completed 11:19:33 UTC). Analysis, backend, frontend, admin, production-image, and CI-helper jobs succeeded; provenance and notification jobs were skipped by their conditions. The daily schedule is real, but this CI run is not a scheduled task-worker canary. Its observed start was about eight hours after the configured 03:17 UTC cron time; no independent lateness alarm exists.
+
+### Open infrastructure PRs and exact-head evidence
+
+- PR #74 is Draft/open, base `main`, head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`. Exact Push run [#42589280185](https://github.com/yarsalam/marketsage/actions/runs/42589280185) and exact PR run [#42589290385](https://github.com/yarsalam/marketsage/actions/runs/42589290385) succeeded for the infrastructure scope: classifier, provider-neutral control-plane tests, and CI-helper tests passed; product/analysis/build jobs were scope-skipped. It remains Draft and unmerged.
+- PR #71 is Draft/open, base branch `infra/provider-neutral-control-plane-2026-11`, base SHA `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`, head `e8785b177f93a569ce031496d1043026979828d3`. The exact head has zero check runs and zero workflow runs. Older successful runs on `7d7c6b1...` do not validate it.
+- The current PR #74 head is 11 commits ahead of PR #71's recorded base. PR #71 and PR #74 heads are diverged: PR #71 is 108 commits ahead and 11 commits behind PR #74's current head, with merge base `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`. Reconcile the stacked branch before review; do not merge or claim exact-head validation.
+- PR #71 contains the durable dispatch outbox, orchestrator, Docker worker, worker daemon, watchdog, backup code, a CircleCI config, and manual self-hosted acceptance workflow. These are branch-only. No CircleCI account/integration/provider activation is evidenced. The self-hosted acceptance workflow is manual-only and has an exact branch/actor/confirmation guard, but its runner selector is generic `[self-hosted, linux, x64]`; it must be narrowed to a repository-specific runner label before any authorized local dispatch. No local dispatch occurred.
+- PR #71's Docker worker acceptance workflow is also branch-only, not active on main. Its hosted Docker test is not a persistent server or 24/7 worker proof.
+
+### Other open PR inventory
+
+- #81 Draft/main, head `a659fa038dc84b000c5a01b20b234d5e31f54ff3`: exact MarketSage CI run #42672784245 failed; Project Operating System PR run #42672784044 succeeded. No infrastructure work.
+- #80 Draft/main, head `241241ee91f2dc944e0dc407bb6c5d1c409bc520`: exact-head checks succeeded in run #42644847236. Product work remains frozen.
+- #79 Draft/main, head `14001bdb5a03775b9772bf9cfea1d169a68f8113`: exact-head checks succeeded in run #42643250744. Product work remains frozen.
+- #78 Draft/main, head `47030f24d2d0491cb53eac5b089ff1dd4a15eccc`: exact Project Operating System and CI runs #42644297705, #42644297868 and #42644283033 succeeded. Its schedule exists only on the PR branch, not main.
+- #77 Draft/main, head `67356939f65224a580c915fd2caa0ea52d8d09a9`: exact run #42624038512 has successful listed jobs, but the required provider-neutral control-plane context is absent on this main-derived head.
+- #73 Draft/main, head `72c57608e8270d999d1e9f2005b47ea56cb893a7`: exact runs #42621957914 and #42621965739 succeeded; ordinary research work remains frozen.
+- #62 open/non-draft/main, head `54fbf4a364a91b4e8d834fdcec0245d079440982`: exact run #42408717730 has successful listed checks; the required provider-neutral control-plane context is absent.
+- #61 Draft, base infrastructure branch, head `25ce24283e35dd7e55eb8545c590a047606643ee`: no exact-head checks; mergeability false.
+- #51 open/non-draft, base `feat/tindex-free-data-connector`, head `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28`: listed exact-head checks succeeded; research work remains frozen.
+- #41 open/non-draft/main, head `162692f1a377ec8445ed958db4cc1171d4cafc47`: listed exact-head checks succeeded; documentation/data work remains frozen.
+- #8 remains parked after its exact `tsetmc-smoke` check failed; do not repeat the same TSETMC request from the same environment.
+- #6 remains open/non-draft/main and is not mergeable against its recorded base. Never merge it to main without the owner's separate explicit approval. PR #14 is already integrated into #6 and must not be re-merged.
+
+### SQLite coordinator PR #54
+
+- PR #54 is closed, Draft, and unmerged; head `e8f7d8add3df577120b92b8927c590aece001509`; its recorded base is `6dbd9cffe11fb75e55e44b6e8232bb35c2bea7da`; current mergeability is false.
+- Issue #55 records the owner's exact-head validation of that SHA: 16/16 tests passed, exit code 0. This validates that exact unit-test input only; it does not authorize merge or operational use. The coordinator remains single-host SQLite, not a multi-host distributed control plane.
+
+### Owner gates and safety
+
+- Issue #49 remains open and is the hard infrastructure-first gate. Product/data/research feature work and investment analysis remain paused.
+- Issue #52 remains open: Chabokan-only install and 30 tests are recorded, but five wheel SHA-256 hashes are still missing. The owner must provide the five exact package/version/hash lines; do not repeat the install/tests.
+- Issue #53 is closed: the zero-cost public-repository hosted-CI decision is recorded. This does not authorize a new hosted validation run; the current owner instruction still requires explicit approval for one bounded exact-head run. No hosted workflow was dispatched or rerun in this audit.
+- The repository-visibility confirmation and one bounded exact-head hosted-validation authorization remain recorded in Issue #49. No visibility, spending, plan, secret, provider, runner, merge, release, or deployment changes were made.
+- No two-independent-backend live execution, independent failure notification, persistent server, worker-loss recovery canary, or 24-hour stability window has been demonstrated. **24/7 readiness: NOT PROVEN.**
+
+This governance-only update is committed with `[skip ci]` to avoid starting an unapproved hosted run. The new documentation commit itself has no exact-head CI evidence and is not merge approval.
