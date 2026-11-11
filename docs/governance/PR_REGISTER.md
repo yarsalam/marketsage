@@ -15,7 +15,7 @@ Read-only GitHub state. This section supersedes the older snapshots below. No wo
 
 | PR | State / draft | Base ← head | Mergeability | Exact-head checks / handling |
 |---|---|---|---|---|
-| [#81](https://github.com/yarsalam/marketsage/pull/81) | open / Draft | `main` ← `a659fa038dc84b000c5a01b20b234d5e31f54ff3` | mergeable; blocked | MarketSage CI push/PR runs #42672776329, #42672784245 failed; Project Operating System PR run #42672784044 succeeded. Product/auth work frozen. |
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | open / Draft | `main` ← `a659fa038dc84b000c5a01b20b234d5e31f54ff3` | mergeable; blocked | MarketSage CI push/PR runs #42672776200, #42672784245 failed; Project Operating System push run #42672776329 also failed, while its PR run #42672784044 succeeded. Product/auth work frozen. |
 | [#80](https://github.com/yarsalam/marketsage/pull/80) | open / Draft | `main` ← `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | mergeable; blocked | Exact run #42644847236: 6 success, 2 skipped. Product/admin work frozen. |
 | [#79](https://github.com/yarsalam/marketsage/pull/79) | open / Draft | `main` ← `14001bdb5a03775b9772bf9cfea1d169a68f8113` | mergeable; blocked | Exact run #42643250744: 6 success, 2 skipped. Product/auth work frozen. |
 | [#78](https://github.com/yarsalam/marketsage/pull/78) | open / Draft | `main` ← `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | mergeable; blocked | Exact Project Operating System/CI runs #42644297705, #42644297868, #42644283033 completed successfully. Its schedule is not active on main. |
