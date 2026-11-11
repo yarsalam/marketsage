@@ -41,6 +41,14 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertRegex(triggers.group(1), r"(?m)^  workflow_dispatch:")
         self.assertNotRegex(triggers.group(1), r"(?m)^  (push|pull_request|schedule):")
         self.assertIn("confirm_local_worker_acceptance", workflow)
+        self.assertRegex(
+            workflow,
+            r"(?m)^    runs-on: \[self-hosted, linux, x64, marketsage-server-worker\]$",
+        )
+        self.assertNotRegex(
+            workflow,
+            r"(?m)^    runs-on: \[self-hosted, linux, x64\]$",
+        )
         self.assertIn("cancel-in-progress: false", workflow)
         self.assertIn("timeout-minutes: 20", workflow)
 

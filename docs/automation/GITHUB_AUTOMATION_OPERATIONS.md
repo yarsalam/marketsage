@@ -8,30 +8,42 @@ The `.github/workflows/ci.yml` workflow runs on:
 
 - Pushes to `main`, `deploy/**`, `research/**`, `ci/**`, and `infra/**`.
 - Pull requests targeting `main`, `deploy/**`, and `infra/**`.
-- Daily scheduled full validation at **03:17 UTC**.
+- Daily scheduled infrastructure-only validation at **03:17 UTC**.
 - Manual `workflow_dispatch`.
 
 Scheduled workflows run from the default branch. A schedule added on a feature branch is not operational until the workflow reaches `main`. GitHub can delay scheduled events; a daily schedule is a recurring health signal, not a real-time SLA or an always-on worker.
 
 Cloud CI uses standard GitHub-hosted `ubuntu-latest` runners. It does not use the owner's laptop Runner. The repository is public by the recorded owner decision; no paid/larger runner or increase to the additional-spend limit is authorized by this workflow.
 
+
+## 1A. Temporary infrastructure-only execution freeze (Goal 1)
+
+Until the owner explicitly accepts the 24/7 infrastructure evidence, CI is intentionally restricted to infrastructure work:
+
+- `schedule` runs the provider-neutral control-plane tests and CI-helper tests only. It does not run analysis/backtests, product builds, admin builds, or production image builds.
+- Pushes and pull requests on `infra/**` are classified from the actual Git diff. Only the explicit infrastructure allowlist is eligible for the infrastructure-only path. A mixed, unknown, empty, or unclassifiable diff is not eligible.
+- The existing required status-check context names are preserved. For an allowlisted infrastructure-only change, the five product/analysis/production jobs are skipped. For any other scope, those same required contexts fail immediately with a fixed freeze notice; they do not execute product or production commands. This deliberately prevents product changes from being merged during the freeze.
+- The classifier prints only a fixed aggregate scope label; it never prints changed paths, file contents, private values, or environment data. A classifier error resolves to the non-infrastructure path and therefore blocks the PR.
+- `workflow_dispatch` is not an approval to run product validation; during the freeze it follows the fail-closed path.
+
+This is a temporary engineering freeze, not evidence that product checks passed. Skipped product checks on an infrastructure-only PR do not validate product code. Do not merge product/data/analysis/production changes while this freeze is active. The native `main-protection` ruleset and its seven required check contexts are not modified by this change.
+
+The live ruleset currently requires **one approving review**, not ten. Its stale-review dismissal and strict up-to-date settings are disabled; changing those native rules is a separate governance change and is not part of this CI-path patch.
+
 ## 2. CI jobs and bounded runtime
 
 | Job | Timeout | Purpose |
 | --- | ---: | --- |
-| `analysis` | 25 min | Python analysis and research-engine tests |
-| `user-backend` | 30 min | Backend build and tests |
-| `user-frontend` | 30 min | Frontend build |
-| `admin-workspace` | 30 min | Admin web/API build and tests |
-| `production-images` | 40 min | Compose validation and local image build only; no push |
+| `classify-change-scope` | 5 min | Fail-closed classification of infrastructure-only diffs; emits only an aggregate label |
+| `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images` | 2 min each | Preserved required-check contexts; skipped for allowlisted infrastructure-only changes and otherwise fail immediately during the Goal 1 freeze (no product/build commands) |
 | `infra-control-plane-tests` | 15 min | Discover and run every `test_*.py` module under `infra/control_plane` |
-| `ci-infra-tests` | 5 min | Offline regression tests for failure notice and direct-main provenance helpers |
+| `ci-infra-tests` | 5 min | Offline regression tests for scope classification, failure notice, and direct-main provenance helpers |
 | `detect-direct-main-update` | 5 min | Main-push-only provenance detection |
 | `notify-failure` | 5 min | Failure-only sanitized Issue #49 handoff |
 
 All external Actions are pinned to immutable 40-character commit SHAs. Dependabot checks GitHub Actions weekly in one grouped PR; its updates must pass review and CI before acceptance.
 
-Workflow-level permissions default to `contents: read`. The two narrow jobs with issue-comment duties receive job-scoped `issues: write`: the direct-main provenance detector and the failure notifier. The detector also receives `pull-requests: read`. The control-plane/application validation jobs do not need repository secrets or contents-write access.
+Workflow-level permissions default to `contents: read`. The two narrow jobs with issue-comment duties receive job-scoped `issues: write`: the direct-main provenance detector and the failure notifier. The failure notifier is disabled on `pull_request` events, so untrusted PR code does not receive an issue-write token. The detector also receives `pull-requests: read`. The control-plane/application validation jobs do not need repository secrets or contents-write access.
 
 ## 3. Concurrency, cancellation, and retries
 
@@ -51,7 +63,7 @@ The live main ruleset is `main-protection` (ID `26789479`), targeting `refs/head
 
 ## 5. Failure reporting and its blind spots
 
-After a failed dependency job, `notify-failure` attempts to add a sanitized comment to Issue #49. It reports the run link and safe job identifiers only. It does not upload logs/artifacts, serialize exception details, or expose credentials, raw market data, prices, private paths, or environment values.
+After a failed dependency job on a trusted non-PR event, `notify-failure` attempts to add a sanitized comment to Issue #49. It deliberately does not run on `pull_request` events, so an untrusted PR cannot receive an `issues: write` token; PR failures remain visible in their required check results. It reports the run link and safe job identifiers only. It does not upload logs/artifacts, serialize exception details, or expose credentials, raw market data, prices, private paths, or environment values.
 
 The **failure notifier shares the same GitHub-hosted runner pool as the CI jobs**. It cannot independently report a pool-wide allocation outage if that runner pool itself is unavailable. A missing Issue comment may indicate notification failure; the Actions run remains the source of truth. GitHub Mobile push delivery depends on the owner's notification settings and is not guaranteed by this workflow.
 
@@ -62,6 +74,12 @@ The direct-main detector also posts only fixed reason codes and commit identifie
 The TSETMC integrated acceptance, offline dataset validation, and sanitized local diagnostics workflows are deliberately **manual-only**. They require the dedicated self-hosted Runner labels and explicit owner confirmation. They must not be put on a schedule or triggered by ordinary pushes/PRs. Do not dispatch them automatically.
 
 The laptop Runner `marketsage-local-01` is an owner-operated resource, not an always-on host. Its service and local proxy may be healthy while the laptop is running, but this does not establish continuous availability. Do not run untrusted PR code or general coding-agent tasks on it. Private staged datasets remain local, read-only to the Runner, and must not be uploaded to GitHub artifacts or logs.
+
+The branch-only self-hosted worker acceptance workflow must target the custom
+`marketsage-server-worker` label. Register that label only on a separately
+operated server, never on the owner's laptop or a shared runner. Keep the job
+manual-only and owner-confirmed; if no dedicated server runner is available,
+leave it unschedulable rather than falling back to generic self-hosted labels.
 
 Any persistent Worker required for unattended task execution must run on a separately managed host or equivalent independently available environment. It needs a dedicated least-privilege account, restricted egress, isolated workspaces, no untrusted-PR execution, immutable worker image, bounded CPU/memory/PIDs/time/output, process supervision, heartbeat, watchdog, disk/backup/restore checks, safe patching, and an independently observable recovery path. No new paid server or service is provisioned by this document.
 

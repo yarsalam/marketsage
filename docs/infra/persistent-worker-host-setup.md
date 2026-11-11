@@ -25,6 +25,18 @@ without sudo, as UID 65532 inside the container, with no network, no secrets,
 read-only root/checkout, dropped capabilities, seccomp, user namespaces and
 bounded CPU/memory/PIDs/time/output.
 
+## GitHub Actions Runner isolation
+
+The branch-only self-hosted acceptance workflow targets exactly
+`[self-hosted, linux, x64, marketsage-server-worker]`.
+
+- Register a repository-scoped runner only on the independently operated server.
+- Attach the custom label `marketsage-server-worker` only to that server. Never attach it to the owner's laptop, a shared machine, or a general-purpose runner.
+- Restrict the runner group to this repository and keep the workflow manual-only with its owner and confirmation guards.
+- Run the Runner service as the unprivileged `marketsage-runner` account; do not grant sudo or rootful Docker-group membership.
+- Keep the worker concurrency serialized. Do not expose secrets, raw datasets, or artifacts to this runner.
+- If the dedicated server runner is not registered and healthy, the acceptance job must remain unschedulable. Do not broaden the selector to generic self-hosted labels just to make it start.
+
 ## Prepare the checkout and image
 
 Rootless Docker prerequisites are specific to the service account:
@@ -214,8 +226,8 @@ a local snapshot alone does not protect against host loss.
   does not start another provider attempt; the Outbox remains authoritative.
 - Missing provider probes/canaries remain UNKNOWN/DEGRADED. A worker heartbeat
   alone is not evidence that a remote provider is healthy.
-- GitHub workflow `MarketSage Docker worker acceptance` is scheduled every
-  15 minutes after that workflow is merged to the default branch. Each run
+- GitHub workflow `MarketSage Docker worker acceptance` is scheduled once daily
+  at 04:43 UTC after that workflow is merged to the default branch. Each run
   exercises a fresh ephemeral GitHub-hosted VM; it does not replace the
   persistent host services described here.
 - Two independent execution backends and real cross-backend no-duplicate

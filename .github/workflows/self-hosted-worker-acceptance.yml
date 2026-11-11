@@ -21,7 +21,8 @@ concurrency:
 jobs:
   self-hosted-worker-acceptance:
     if: github.ref == 'refs/heads/infra/durable-provider-dispatch-outbox-2026-11' && github.actor == 'yarsalam' && inputs.confirm_local_worker_acceptance == true
-    runs-on: [self-hosted, linux, x64]
+    # Reserved for an independently operated server; never assign this label to the owner's laptop.
+    runs-on: [self-hosted, linux, x64, marketsage-server-worker]
     timeout-minutes: 20
     steps:
       - name: Checkout owner-controlled branch
