@@ -1,6 +1,64 @@
 # MarketSage — Pull Request Register
 
-## Live automation evidence — 2026-11-09
+## Live repository / PR audit — 2026-11-11 14:51 UTC (authoritative)
+
+Read-only GitHub state. This section supersedes the older snapshots below. No workflow was dispatched or rerun and no local runner was used in this audit.
+
+- Repository visibility: `public` / `private=false` (owner confirmation remains in [Issue #49](https://github.com/yarsalam/marketsage/issues/49)); no visibility change.
+- Default branch `main`: `4c4b032196137af4658ea2c28e38a21605ee923b`, committed 2026-11-07 19:55:51 UTC.
+- Active ruleset [#26789479](https://github.com/yarsalam/marketsage/rules/26789479): PR required, one approval, seven required contexts, deletion/non-fast-forward blocked, no bypass actors; strict status freshness false and stale approvals not dismissed. Legacy branch-protection API returned 403.
+- Main CI triggers: push, pull_request, daily schedule `17 3 * * *`, workflow_dispatch. Default permission `contents: read`; issue-write is job-scoped. Per-PR/ref concurrency cancels superseded runs; job timeouts are explicit. No workflow-level retry, independent stale/queued-run observer, external notification outside the hosted pool, custom artifact-retention override or CI artifact upload was found. The failure notifier shares the GitHub-hosted runner pool.
+- Main's current `ci.yml` lacks the required context `Test provider-neutral control plane` even though the ruleset requires it. The context is supplied on infrastructure PR #74/#71; main-derived PRs without another provider for that context remain blocked.
+- Main scheduled CI run [#43008951957](https://github.com/yarsalam/marketsage/actions/runs/43008951957) succeeded on exact main SHA `4c4b032...` on 2026-11-11, starting 11:04:56 UTC (about 7h48 after the 03:17 UTC cron). This is scheduled CI evidence, not a scheduled worker canary or punctuality proof.
+
+### All currently open pull requests (live API snapshot)
+
+| PR | State / draft | Base ← head | Mergeability | Exact-head checks / handling |
+|---|---|---|---|---|
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | open / Draft | `main` ← `a659fa038dc84b000c5a01b20b234d5e31f54ff3` | mergeable; blocked | MarketSage CI push/PR runs #42672776329, #42672784245 failed; Project Operating System PR run #42672784044 succeeded. Product/auth work frozen. |
+| [#80](https://github.com/yarsalam/marketsage/pull/80) | open / Draft | `main` ← `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | mergeable; blocked | Exact run #42644847236: 6 success, 2 skipped. Product/admin work frozen. |
+| [#79](https://github.com/yarsalam/marketsage/pull/79) | open / Draft | `main` ← `14001bdb5a03775b9772bf9cfea1d169a68f8113` | mergeable; blocked | Exact run #42643250744: 6 success, 2 skipped. Product/auth work frozen. |
+| [#78](https://github.com/yarsalam/marketsage/pull/78) | open / Draft | `main` ← `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | mergeable; blocked | Exact Project Operating System/CI runs #42644297705, #42644297868, #42644283033 completed successfully. Its schedule is not active on main. |
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | open / Draft | `main` ← `67356939f65224a580c915fd2caa0ea52d8d09a9` | mergeable; blocked | Exact run #42624038512 completed; provider-neutral control-plane required context is absent. No action outside infrastructure scope. |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | open / Draft | `main` ← `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10` | mergeable; blocked | 73 ahead / 0 behind main. Exact push #42589280185 and PR #42589290385 succeeded; 110 control-plane tests and CI helper tests passed; product jobs scope-skipped. Parent infrastructure PR; no merge. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | open / Draft | `main` ← `72c57608e8270d999d1e9f2005b47ea56cb893a7` | mergeable; blocked | Exact push #42621957914 and PR #42621965739 succeeded. Research/data work frozen. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | open / Draft | `infra/provider-neutral-control-plane-2026-11` ← `ad0f07d0d3b2a1a195857030274dcb254d82b03f` | mergeable; clean | 111 ahead / 0 behind base #74. Exact push #42980157072 and PR #42980163912 succeeded; 174 control-plane tests and 36 CI helper tests passed; product jobs scope-skipped. No Docker acceptance on this current head. Keep Draft; no merge. |
+| [#62](https://github.com/yarsalam/marketsage/pull/62) | open / ready | `main` ← `54fbf4a364a91b4e8d834fdcec0245d079440982` | mergeable; blocked | Exact run #42408717730: 6 success, 2 skipped; provider-neutral required context absent. No action in this infrastructure task. |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | open / Draft | `infra/provider-neutral-control-plane-2026-11` at `7d0736f47cd19344233973d31fb1c1b4d1a3a95f` ← `25ce24283e35dd7e55eb8545c590a047606643ee` | not mergeable; dirty | Zero exact-head check runs. Keep draft; no duplicate docs branch. |
+| [#51](https://github.com/yarsalam/marketsage/pull/51) | open / ready | `feat/tindex-free-data-connector` ← `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | mergeable; clean | 10/10 exact-head check runs successful. Research/data work frozen. |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | open / ready | `main` at `3d4e2a97da70ae5564a5252048fcb2e2971bd6e5` ← `162692f1a377ec8445ed958db4cc1171d4cafc47` | mergeable; blocked | 5/5 exact-head checks successful. Data/evidence work frozen. |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | open / ready | `fix/gdelt-fred-tindex-current-docs` ← `0cb94fd24f531162d4a3d403f9749789ce6f1797` | mergeable; unstable | 5/6 exact-head checks passed; `tsetmc-smoke` failed by prior ConnectTimeout (run #39261959033). Parked; do not repeat the same request from the same environment. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | open / ready | `main` at `07f2e968257ef868a5efbab36f379ee487658577` ← `1d90726c593b0818982407c309ff13301798f5b3` | not mergeable; dirty | 15/15 listed exact-head checks successful, but base/head are dirty/diverged. Never merge without separate explicit owner approval. PR #14 is already integrated into #6. |
+
+### Closed SQLite reference and owner gates
+
+- PR #54 is **closed, Draft, unmerged**; head `e8f7d8add3df577120b92b8927c590aece001509`, with zero GitHub check runs. Issue #55 records 16/16 owner-run tests on that exact SHA. Compared with current #74 head, the branches are diverged (PR #74 is 44 commits ahead; PR #54 contains 8 commits not on #74; merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`). No merge/reopen.
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52) remains open for the five exact Chabokan wheel SHA-256 hashes; do not repeat the 30/30 install/test run.
+- [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is closed: public-repository standard hosted CI was selected as the zero-additional-spend path; no spending-cap increase or paid runner.
+- [Issue #55](https://github.com/yarsalam/marketsage/issues/55) is closed after the exact-head 16/16 SQLite unit validation. This does not prove distributed or operational recovery.
+- [Issue #49](https://github.com/yarsalam/marketsage/issues/49) remains OPEN / NOT COMPLETE. Visibility confirmation is still an owner action. The exact PR #71 code-head push/PR validation already completed via normal events; this audit did not dispatch or rerun anything.
+
+### Issue #49 acceptance posture — NOT COMPLETE
+
+| Criterion | Evidence | Status |
+|---|---|---|
+| Push/PR validation on exact head | PR #71 code head `ad0f07d...`; runs #42980157072 and #42980163912; 174 control-plane tests | PASS for this exact code head |
+| Scheduled default-branch run | main run #43008951957, exact main SHA `4c4b032...` | PASS for scheduled CI only; worker schedule not active |
+| Concurrency/queue/idempotency/retry/failure | deterministic coordinator/outbox/orchestrator tests, including restart, ambiguity, duplicate delivery, bounded provider attempts and no-effect failover | PARTIAL; fake adapters, not real provider side effects |
+| Timeout/cancellation | workflow/job timeout and superseded-run cancellation are configured; unit-level task deadlines/cancellation exist | PARTIAL; no live failure-injection drill |
+| Hung/stale-run detection | deterministic snapshot assessment and watchdog code | NOT PROVEN operationally; no independent poller |
+| Two independent real backends | fake adapters only; CircleCI config not connected and no second provider registered | NOT PROVEN |
+| Isolated worker | prior Docker canary #42507288970 on earlier SHA `7d7c6b1...`; current head has no Docker canary | PARTIAL |
+| Worker-loss/restart recovery | unit tests and SQLite backup/restore tests | PARTIAL; no persistent-host loss/restart drill or off-host restore |
+| Independent notification | self-hosted worker notifier uses hosted runner; CI notifier shares hosted pool | PARTIAL; no external observer for hosted-pool outage |
+| Permissions/cost/runbook | read-only default, scoped issue-write, pinned Actions, bounded jobs, zero-cost decision and host/runbook docs | PARTIAL; wheel hashes and owner visibility confirmation remain |
+| Human merge gate | active ruleset requires one review + seven contexts, no bypass; strict freshness false, stale approvals retained | PARTIAL; required context missing on main's current CI |
+| 24-hour stability / end-to-end two-backend canary | no qualifying window or real second backend | NOT PROVEN |
+
+No 24/7 readiness claim is permitted. No PR was merged, no provider/account/secret was registered, no hosted workflow was dispatched/rerun, no local workflow was dispatched, no paid resource was activated, and no product/data/investment work was performed in this audit.
+
+
+## Historical automation evidence — 2026-11-09 (superseded by live audit above)
 
 - Main `4c4b032196137af4658ea2c28e38a21605ee923b` has a successful scheduled run [42610905309](https://github.com/yarsalam/marketsage/actions/runs/42610905309) and push run [42408566585](https://github.com/yarsalam/marketsage/actions/runs/42408566585). The schedule was successful but started at 11:40 UTC for a 03:17 UTC cron.
 - PR #71's last fully validated code head was `7d7c6b1d9eb97d6070651c8b5cda41db9753a78f`: 170 control-plane tests and a successful Docker sandbox acceptance. Later PR #71 changes intentionally carry `[skip ci]`; no exact-head result exists for them.
