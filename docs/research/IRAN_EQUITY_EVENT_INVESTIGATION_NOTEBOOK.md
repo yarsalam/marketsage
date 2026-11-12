@@ -66,7 +66,7 @@ The repository also has staged validation workflows and tests for TSETMC, CODAL,
 - Financial.aspx?a=0 and a=1 chart responses were obtained after adding response decompression.
 - The legacy service.tsetmc.com/tsev2/data/TseClient2.aspx InstrumentAndShare request returned HTTP 200 through Python on both HTTP and HTTPS. A Node HTTP attempt timed out; after explicitly configuring the library to HTTPS, TSE Client 2.27.6 successfully returned adjustInfo for all three instruments.
 - CODAL has a repository parser prototype and fixtures. The evidence reviewed here does **not** establish a successful, complete, live CODAL historical-event crawl or verified publication/update timestamps.
-- The official new REST documentation host https://api.tsetmc.com/docs/ has **not** been successfully inspected from the research environment, and the owner's current successful tests were against the older CDN/legacy routes, not proof of the new REST contract.
+- The browser could not open https://api.tsetmc.com/docs/ directly. The documentation content was subsequently inspected through the public m-idasa/Documents mirror (latest commit 2025-09-28, authored with an @tsetmc.com address but unsigned). The owner's successful endpoint tests are still against the older CDN/legacy routes; no authenticated new-REST live request has been performed for these three symbols.
 
 **Important diagnostic inconsistency to resolve:** the earlier dedicated raw-chart comparison reported 100% exact raw matches for all three instruments, but the subsequent event/precision audit printed large raw-source/chart differences for old وغدیر and پارسیان rows (for example, 2004-08 values for وغدیر and 2010-12 values for پارسیان). These reports may have compared different price fields, scales, snapshots or modes. Do not use the latter figures as proof of a historical scale break until the report lineage and column mapping are reconciled. Foulad's chart reports whole-unit values and 99.3% integer-rounded match in the precision audit; sub-unit decimal differences must be measured in price ticks, not only relative percent.
 
@@ -308,7 +308,7 @@ Failure of one interval does not automatically reject the whole instrument: quar
 
 | Item | Decision |
 |---|---|
-| Primary discovery source | TSETMC new official REST v2 — candidate; contract/docs/rights probe still open |
+| Primary authenticated market-data candidate | TSETMC new REST — documentation mirror inspected; credentials, roles/credit, exact rights and live three-symbol contract test remain open |
 | Existing CDN REST routes | Reuse captured data; candidate-only; do not equate them with the new official service |
 | CODAL | Targeted original-notice verification only; existing adapter remains quarantined until time/revision semantics are solved |
 | TSE Client 2.27.6 | Diagnostic reference implementation only; not the legal/source-of-truth authority |
