@@ -82,24 +82,57 @@ The repository also has staged validation workflows and tests for TSETMC, CODAL,
 
 ## 3. Primary source choice for a fast, unified first pass
 
-### Selected first source: TSETMC's newly announced official REST web service (v2)
+### TSETMC new REST API: documented capabilities and real limitations
 
-Official launch reporting dated 2025-12-27 (1404/10/06) says the new TSETMC web service is REST-based, that old SOAP and new REST were to remain supported during transition, and that future development would be on REST. The report says TSETMC displays information from TSE, IFB, Energy Exchange, Commodity Exchange and CODAL. The official documentation entry point announced is:
+Official launch reporting dated 2025-12-27 (1404/10/06) says the new TSETMC web service is REST-based, the old and new services coexist during transition, and new development is to use REST. The report says TSETMC aggregates information from TSE, IFB, Energy Exchange, Commodity Exchange and CODAL. The announced documentation URL is https://api.tsetmc.com/docs/. The page itself could not be opened by the research browser, but its documentation content is mirrored in the public GitHub repository [m-idasa/Documents](https://github.com/m-idasa/Documents). That repository's latest inspected commit is dcc57eb6dea36c036e55824bcfa676c7713ca829 (2025-09-28), authored using an @tsetmc.com email address; the commit is unsigned. Its BaseUrl.md specifies https://api.tsetmc.com, and its index says credentials are provided by TSETMC. Treat it as a high-confidence documentation mirror, while retaining the unsigned-commit caveat.
 
-- Documentation: https://api.tsetmc.com/docs/
-- Official launch announcement as reported from SENA: https://armaneghtesadi.com/954797/1404/10/06/نسخه-جدید-وبسرویس-tsetmc-منتشر-شد/
+- Official launch report: https://armaneghtesadi.com/954797/1404/10/06/نسخه-جدید-وبسرویس-tsetmc-منتشر-شد/
+- Documentation mirror: https://github.com/m-idasa/Documents
+- Base URL: https://api.tsetmc.com
+- Official documentation entry point: https://api.tsetmc.com/docs/
 
-**Why this is the most efficient first discovery source:** one official TSETMC service is the best first place to inventory instrument identity, market sessions/status, daily market data and any event/message/document links that TSETMC makes available across the Iranian markets. This avoids beginning with separate paid vendor subscriptions or building multiple unrelated crawlers.
+#### Authentication, roles and credit
 
-**Crucial distinction:** the recently tested https://cdn.tsetmc.com/api/ endpoints are an older, reverse-engineered/undocumented interface. Their successful HTTP responses prove reachability for those specific routes only. They do **not** verify the new api.tsetmc.com REST contract, its authentication, schema, quota, coverage or permitted use. Issue #40 already records the required owner-side review of that new service and its terms. Do not silently relabel the CDN routes as the new official API.
+The documented login is POST /Account/Login with a username/password. It returns a JWT and UTC expiry; subsequent requests use Authorization: Bearer <token>. The documentation explicitly says users must obtain credentials from TSETMC. This is not an anonymous public feed. Trade/InstTrade and Trade/TradeOneDayAll require named roles and apply CheckCredit. The error-code page lists -106 for credit retrieval failure and -105 when user credit is missing or zero. The documents do not publish a credit price, quota, credit-per-row formula, retention terms or redistribution licence. Therefore cost and permitted use remain unknown; do not purchase or run broad pulls until the provider states them.
 
-**Decision status:** PRIMARY_DISCOVERY_CANDIDATE — CONTRACT_NOT_YET_VERIFIED. This is a source-selection decision for the first bounded research pass, not a production/data-acceptance decision.
+#### Endpoint map relevant to this notebook
+
+| Documented route | Documented payload | Research use | Limitation / validation still needed |
+|---|---|---|---|
+| POST /Instrument/Instrument | Symbol/instrument master by market flow; InsCode, InstrumentID, identity/symbol/company names, nominal price, share count, listing date and validity | Identity and market/board crosswalk | Must validate field meanings, historical snapshots and identifier continuity |
+| POST /Instrument/InstrumentTseShare | Old/new share counts, date and InsCode by market flow | Detect share-count changes | Does not identify funding source, cash subscription price, right entitlement or economic terms |
+| POST /Instrument/InstrumentsState | Current instrument status and reason | Current halt/restriction state | Absence of a row is documented as open; test this against known cases before relying on it |
+| POST /Instrument/InstrumentStateChange | Instrument status changes for Inscode and Deven; status code, time and reason | Historical suspension/reopening timeline | Must test date coverage, event order and whether every transition is retained |
+| POST /MarketInfo/NSCStart | Only the latest 20 market-open sessions, with DEven, HEven and NSCEnd | Recent session calendar and completed-session flag | Not a long-term historical calendar |
+| POST /Trade/InstTrade | Daily data for one instrument over DateFrom/DateTo: PClosing, PDrCotVal, PriceFirst, PriceMin/Max, PriceYesterday, volume/value and trade count | Bounded historical raw-price candidate | Role + CheckCredit; maximum range/quota unknown; unit semantics need cross-check |
+| POST /Trade/TradeOneDay | All instruments with at least one non-cancelled trade on one date | Daily market snapshot | Historical daily calls may require repeated date/flow requests |
+| POST /Trade/TradeOneDayAll | All instruments on one date | Possible bulk daily acquisition | Role + CheckCredit; cost/quota unknown |
+| POST /MarketInfo/Company and POST /MarketInfo/GroupState | Documented fields DEven/HEven/TseTitle/TseDesc/Flow; examples show a stop notice | Potential market/company notice discovery | Both docs use nearly identical stop-notice examples despite different names; do not assume semantics until live fixtures confirm |
+| POST /Index/Indexb2 | Daily index fields including net-cash-return index and a cash-dividend aggregate | Contextual index-level check | Not an issuer-level dividend ledger or per-share adjustment source |
+
+#### What the new REST documentation does not establish
+
+No documented new-REST endpoint was found in this documentation set for:
+- issuer-level DPS/cash-dividend event history and entitlement/ex-date;
+- capital-increase funding composition (reserves vs cash/receivables vs mixed), subscription price or rights terms;
+- rights-instrument price/history and rights conversion lifecycle;
+- split/reverse-split, merger, demerger or security conversion terms;
+- an official per-instrument adjusted-price history or a complete adjustment-factor ledger;
+- historical event correction/amendment lineage or a durable historical trading calendar beyond the 20 latest sessions.
+
+The InstrumentTseShare endpoint is useful evidence of share-count changes, but a share ratio alone cannot calculate the theoretical ex-right price of a cash capital increase. The Indexb2 net cash-return/index dividend fields are aggregate index measures, not a replacement for company-level DPS evidence.
+
+**Documentation quality warning:** the InstTrade field table describes QTotCap as volume in one place, whereas TSETMC's other documented/observed schemas use QTotTran5J for traded volume and QTotCap for traded value/turnover. Do not normalize either field until a same-date live response is reconciled against the already tested CDN history and the exact field definition is confirmed.
+
+**Crucial interface distinction:** the recently tested https://cdn.tsetmc.com/api/ endpoints are a separate, older reverse-engineered interface. Their successful HTTP responses do not prove the authenticated REST service's access, schema, quotas, pricing or rights. Likewise, the new REST documentation does not retroactively make the CDN endpoint contract official.
+
+**Decision status:** AUTHENTICATED_PRIMARY_MARKET_DATA_CANDIDATE — PARTIAL_EVENT_COVERAGE; COST_AND_RIGHTS_UNKNOWN. Use it first for instrument identity, share-count changes and status history if owner credentials/role and legal terms are available. Use its priced endpoints only after the credit schedule and terms are known. It is not a complete standalone corporate-action/adjustment source and is not accepted for scoring or backtesting.
 
 ### CODAL's narrowly defined role
 
 Use CODAL only as the **linked primary disclosure evidence** when TSETMC points to an issuer event or when a material event's terms must be proved: general-meeting resolution, approved capital increase and its funding composition, DPS/cash dividend, subscription price/rights, merger/spin-off terms, and corrected/amended disclosures.
 
-Do not make CODAL a second broad polling project at this stage. The existing CODAL adapter is candidate-only and its Jalali publication-time, update-time and amendment semantics are unresolved. Capture the actual notice identifier/URL and original document, then verify the relevant fields and timestamps from that notice.
+Do not make CODAL a second broad polling project at this stage. The existing CODAL adapter is candidate-only and its Jalali publication-time, update-time and amendment semantics are unresolved. Capture the actual notice identifier/URL and original document, then verify the relevant fields and timestamps from that notice. This remains necessary because the inspected new-REST documentation does not document issuer-level DPS, cash-rights pricing or complete capital-increase terms.
 
 ### Sources deliberately not selected for this notebook
 
@@ -286,10 +319,12 @@ Failure of one interval does not automatically reject the whole instrument: quar
 
 ## 10. Source references and known limitations
 
-1. TSETMC new REST launch report (2025-12-27 / 1404-10-06), reporting the REST transition and the service's integrated market-information role: https://armaneghtesadi.com/954797/1404/10/06/نسخه-جدید-وبسرویس-tsetmc-منتشر-شد/
-2. Official TSETMC REST documentation entry point (not successfully inspected in this review): https://api.tsetmc.com/docs/
-3. Existing repository acceptance record and owner action: https://github.com/yarsalam/marketsage/issues/40
-4. Community-maintained reverse-engineered endpoint catalog, useful only for discovery/schema hypotheses—not an official service contract: https://github.com/amirziveh/tsetmc-skill/blob/master/references/api-endpoints.md
-5. Existing source contracts and quarantine rules: IRAN_SOURCE_ACCEPTANCE.md, SOURCE_ACCEPTANCE_EVIDENCE.md, user/analysis-engine/source_registry.py, and user/analysis-engine/source_acceptance.py.
+1. TSETMC new REST launch report (2025-12-27 / 1404-10-06): https://armaneghtesadi.com/954797/1404/10/06/نسخه-جدید-وبسرویس-tsetmc-منتشر-شد/
+2. Official TSETMC REST documentation entry point: https://api.tsetmc.com/docs/
+3. Documentation content mirror, with latest inspected commit and author metadata: https://github.com/m-idasa/Documents/commit/dcc57eb6dea36c036e55824bcfa676c7713ca829
+4. Core mirror pages: https://github.com/m-idasa/Documents/blob/main/Authentication.md, https://github.com/m-idasa/Documents/blob/main/Instrument.md, https://github.com/m-idasa/Documents/blob/main/InstrumentTseShare.md, https://github.com/m-idasa/Documents/blob/main/InstrumentStateChange.md, https://github.com/m-idasa/Documents/blob/main/NSCStart.md, https://github.com/m-idasa/Documents/blob/main/InstTrade.md, https://github.com/m-idasa/Documents/blob/main/TradeOneDayAll.md, https://github.com/m-idasa/Documents/blob/main/Company.md
+5. Existing repository acceptance record and owner action: https://github.com/yarsalam/marketsage/issues/40
+6. Community-maintained reverse-engineered CDN endpoint catalog, useful only for discovery/schema hypotheses—not the authenticated REST contract: https://github.com/amirziveh/tsetmc-skill/blob/master/references/api-endpoints.md
+7. Existing source contracts and quarantine rules: IRAN_SOURCE_ACCEPTANCE.md, SOURCE_ACCEPTANCE_EVIDENCE.md, user/analysis-engine/source_registry.py, and user/analysis-engine/source_acceptance.py.
 
 **Final rule:** a source response, successful parser, validGPLRatio=true, exact raw-price match or chart similarity is not sufficient by itself. The evidence chain is: verified security → verified event and terms → verified effective date → reproducible factor → reconciled history → documented rights and point-in-time availability. Until then, remain candidate-only.
