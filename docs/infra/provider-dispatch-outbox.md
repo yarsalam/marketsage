@@ -51,3 +51,8 @@ This still does not execute worker code, and does not turn fake provider
 contracts into evidence about any real external provider. The coordinator task
 record remains the durable intake record; a worker execution/result lifecycle
 and concrete OS sandbox remain separate acceptance stages.
+
+
+## Exact-head CI evidence
+
+A successful workflow run is evidence only for the exact commit SHA it tested. Any later commit, including documentation-only commits, must receive its own Push and Pull Request validation before this branch is considered accepted. A missing check on the current head is **unvalidated**, not implicitly successful. This rule does not authorize merge, deployment, provider credentials, or product/research execution.
