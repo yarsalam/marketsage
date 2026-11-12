@@ -123,7 +123,7 @@ These must be recorded individually; do not collapse them into a generic capital
 5. **Stock split / reverse split / nominal-value or share-unit conversion:** ratio and effective date; distinguish a real share-count conversion from a simple display-unit change.
 6. **Rights distribution or separate rights instrument:** link the right's own identity and lifecycle; do not merge its price series into the ordinary share.
 7. **Merger, demerger, spin-off, conversion or exchange of securities:** predecessor/successor identifiers, conversion ratio, consideration and effective date. If terms/value cannot be reconciled, end one series and start another rather than fabricate continuity.
-8. **Fund distribution / unit or NAV event (only if the instrument is an ETF/fund):** preserve exchange price, NAV and distribution as separate series; do not apply an equity-share formula blindly.
+8. **Rights/security conversion event (including conversion of rights into ordinary shares):** record the rights instrument, entitlement, conversion/exercise ratio, cash paid and effective date; do not merge the rights-price series into ordinary-share prices without a documented conversion.
 
 ### B. Market-state and identity events that explain dates or price observations but are not automatic adjustment factors
 
