@@ -328,3 +328,130 @@ Failure of one interval does not automatically reject the whole instrument: quar
 7. Existing source contracts and quarantine rules: IRAN_SOURCE_ACCEPTANCE.md, SOURCE_ACCEPTANCE_EVIDENCE.md, user/analysis-engine/source_registry.py, and user/analysis-engine/source_acceptance.py.
 
 **Final rule:** a source response, successful parser, validGPLRatio=true, exact raw-price match or chart similarity is not sufficient by itself. The evidence chain is: verified security → verified event and terms → verified effective date → reproducible factor → reconciled history → documented rights and point-in-time availability. Until then, remain candidate-only.
+
+
+## 11. Comparative audit of public extraction implementations
+
+**Review date:** 2026-11-12  
+**Purpose:** reuse working extraction and parsing ideas without importing an unverified adjustment rule. This is a static code/fixture review plus comparison with the owner's previously reported pilot aggregates. No live requests, new downloads, local candidate-data changes or factor calculations were performed in this review.
+
+### 11.1 Projects inspected and evidence strength
+
+| Project | Revision inspected | What was inspected | Evidence level for this pilot |
+|---|---|---|---|
+| [Fazel94/yfinance-ir](https://github.com/Fazel94/yfinance-ir) | latest repository commit observed: `c36745e568b5aa7631813dbcd41d96c8af92315e`, 2026-10-11 | TSETMC adapter, adjustment logic in `history.py`, conventions/data-source docs, unit tests and Foulad event fixtures | **Direct Foulad fixture overlap** (23 price-adjustment rows + 12 share-change rows); not a verified event ledger and not a direct row-hash comparison to the owner's local snapshot |
+| [msmahdinejad/iran-bourse-mcp](https://github.com/msmahdinejad/iran-bourse-mcp) | latest repository commit observed: `02d6373cc29190bde428bb9114f73f212c0b49a8`, 2026-11-11 | market-wide event-calendar implementation, CODAL parser, source/quirk documentation, recorded fixtures and calendar tests | **Strong method/edge-case evidence**, but the inspected test fixtures exercise other symbols; no direct three-pilot-symbol event fixture was established |
+| MarketSage local three-symbol work | owner terminal results already recorded in §2.2 | existing TSETMC CDN event counts and TSE Client comparisons | **Pilot aggregate evidence**; row-level event payloads and saved hashes are not currently available in this review context for a fresh exact re-comparison |
+
+The two public projects are community implementations, not TSETMC/CODAL source-of-truth authorities. Their GitHub code, test results and fixture data do not establish MarketSage's rights to redistribute upstream market data.
+
+### 11.2 Foulad: a concrete overlap with yfinance-ir
+
+The inspected yfinance-ir fixtures contain:
+
+| Fixture | Rows | Instrument | Event-date span |
+|---|---:|---|---|
+| `tsetmc_adjust_folad.json` | 23 | InsCode `46348559193224090` | 2009-06-23 to 2026-08-03 |
+| `tsetmc_sharechange_folad.json` | 12 | InsCode `46348559193224090` | 2011-02-14 to 2026-03-30 |
+
+These counts and the InsCode agree with the owner's previously reported Foulad `GetPriceAdjustList` (23) and `GetInstrumentShareChange` (12) results. The fixture contains actual event payload fields, including `dEven`, `pClosing`, `pClosingNotAdjusted`, `numberOfShareOld` and `numberOfShareNew`. It is useful as a second preserved example of the legacy CDN response shape.
+
+**What this does not prove:** the owner's original raw JSON files were not available here for a byte/hash comparison. Matching counts and instrument identity are strong overlap indicators, not proof that the two snapshots are byte-identical, complete, or independently verified. The Foulad fixture also does not supply the issuer's CODAL resolution or capital-increase funding source.
+
+A previous owner-side offline audit of the Foulad snapshot recorded 12 share-change rows and 23 price-adjustment rows, with five exact-date overlaps and six share changes having a price-adjustment date within ±7 calendar days. The same audit listed seven share-change dates not paired within yfinance-ir's ±3-day rule:
+
+- 2020-01-12
+- 2021-05-24
+- 2022-08-09
+- 2023-03-19
+- 2024-02-27
+- 2025-03-12
+- 2026-03-30
+
+This list is a diagnostic derived from the previously supplied Foulad audit, not proof that all seven are bonus issues or that their nearest price-adjustment row is related. The 2022-08-09 share-change date is six calendar days after a 2022-08-03 price-adjustment row; the other dates are farther away in the supplied diagnostic. **CODAL terms and the exact effective session must decide the event type, not the proximity rule.**
+
+### 11.3 yfinance-ir: useful extraction, unsafe default classification
+
+The inspected implementation uses these two legacy TSETMC feeds:
+
+- `GetPriceAdjustList`: uses `pClosing / pClosingNotAdjusted` as a price ratio and applies the ratio to bars strictly before the event date.
+- `GetInstrumentShareChange`: provides old/new share counts and event date.
+
+Its current event classification works as follows:
+
+1. A price-adjustment row with no share-change row within ±3 calendar days is classified as a cash dividend; the cash amount is inferred from the difference between the two reference prices.
+2. A share-change row found within ±3 calendar days is linked to that price-adjustment row and exposed as a split/share-change event.
+3. **Every share-count change left unpaired after that search is treated as a bonus issue**, with an `old/new` historical-price factor.
+
+The project documentation itself warns that this last assumption over-adjusts a cash-funded rights issue because the TSETMC share-count feed does not reveal the funding source. This is not a minor edge case: the Foulad audit above has seven share-change rows outside the ±3-day association rule. If the same implementation is used as-is, those rows are mechanically classified as bonus issues even though their funding composition has not been evidenced here.
+
+The project's tests demonstrate the arithmetic and output shape, including synthetic cases for cash adjustment, a paired share-count change and an unpaired bonus issue. Those tests are valuable for regression coverage, but the unpaired-bonus test asserts the same assumption; it does not prove that a real Iranian rights issue can safely be classified that way.
+
+**MarketSage decision:** reuse the endpoint wrappers, schema examples, immutable raw-response approach and parser/test ideas. Do **not** reuse its automatic "unpaired share increase = bonus issue" decision or its adjusted series as a MarketSage accepted series. An unpaired share change must remain `DISCOVERED_UNVERIFIED` until a primary notice establishes funding type, subscription price, entitlement, rights terms and effective date.
+
+### 11.4 iran-bourse-mcp: stronger event discovery and market-state handling, still not economic proof
+
+The inspected `calendar_events.py` separates two market-wide feeds by exchange flow:
+
+- `Instrument/GetInstrumentShareChangeByFlow/{flow}/{top}`: share-count changes with old/new quantities, date and instrument identity.
+- `ClosingPrice/GetPriceAdjustByFlow/{flow}/{top}`: price-adjustment observations with adjusted/unadjusted reference prices; symbol identity is nested under `instrument`, while the top-level `insCode` can be zero.
+
+Its useful event-discovery safeguards include:
+
+- **Temporary share-count round trips:** detect a temporary decrease followed by restoration to approximately the previous count within ten days (the documented observed examples were restored within one to eight days, with a 1% ratio tolerance). These are tagged as bookkeeping/round-trip pairs rather than treated as genuine capital decreases.
+- **Rights instruments:** zero-share records are labelled as rights-symbol lifecycle events rather than ordinary capital increases/decreases.
+- **Extreme price ratios:** factors outside its configured 0.1–10 range are flagged for investigation rather than silently accepted.
+- **Coverage reporting:** output records the date coverage of the share-change and price-adjustment feeds and warns when an adjustment list may be truncated.
+- **CODAL separation:** it explicitly says the market feeds do not contain DPS, AGM/ex-dividend details, rights exercise price or subscription deadlines; those terms require the linked issuer notice.
+
+Its tests use recorded market responses dated 2026-11-04 plus synthetic edge cases. They cover round-trip detection, rights-symbol handling, genuine decreases, multiple flows, extreme factors and truncation. The recorded examples in the inspected tests include other symbols (for example لبوتان، غچین، شستا، کرازی و تاصیکو), not فولاد، وغدیر or پارسیان. Thus the implementation demonstrates useful market-wide handling patterns, but its fixture tests do **not** independently reconcile our three pilot event ledgers.
+
+There is a second caution in its source notes: the project says `GetPriceAdjustList` misses some capital-increase price adjustments (it cites Foulad's 2026-03-30 share-count change from 1.5T to 1.935T shares) and describes inferring a candidate adjustment from a discontinuity between `priceYesterday` and the previous `pClosing`. The same notes acknowledge that this continuity method can fail over silent/no-trade days and that older history sometimes lacks the required continuity. That is useful for **finding an unresolved candidate**, not for asserting the economic event type or accepting a factor.
+
+**MarketSage decision:** reuse the distinction between genuine share changes, temporary round trips and rights-symbol lifecycle records; reuse per-flow coverage reporting, explicit truncation warnings and the CODAL-linked evidence workflow. Do not copy its inferred price-discontinuity factor into the canonical adjustment ledger as an accepted factor. It remains a candidate diagnostic requiring original event terms and independent reconciliation.
+
+### 11.5 Side-by-side decision
+
+| Capability | yfinance-ir | iran-bourse-mcp | MarketSage rule |
+|---|---|---|---|
+| Raw TSETMC event-feed access | Per-instrument CDN wrappers | Market-wide, flow-based wrappers | Preserve exact upstream payload and its retrieval metadata |
+| Foulad sample fixture | Yes: 23 price-adjust + 12 share-change records | No direct Foulad fixture established in inspected tests | Treat yfinance fixture as a schema/overlap reference, not a second economic authority |
+| Vaghdir / Parsian direct fixture comparison | No direct event fixtures found in inspected yfinance tree | No direct fixture test established for either pilot symbol | Keep their prior counts as owner evidence; obtain exact raw JSON snapshots before claiming row-level external comparison |
+| Share-count round-trip handling | No dedicated round-trip classification in inspected rule | Explicit pair detection and tests | Adopt as a *candidate classification*, then verify with identity, exact dates and market records |
+| Rights-symbol separation | Not established in inspected adjustment rule | Explicitly handled | Preserve separate rights security identity and lifecycle |
+| Unpaired share increase | Assumes bonus issue | Labels increase/decrease by counts; does not establish funding source | Never infer funding source from share counts alone |
+| Adjustment-factor generation | Applies feed ratios and inferred unpaired-share ratios | Parses provider adjustment ratios and documents a separate discontinuity inference | Keep provider ratios separate from independently reconstructed, terms-based factors; no inference is accepted automatically |
+| CODAL role | Includes filing parser/search and statement extraction | Links original filings and parses structured/plain letters | Use exact notice/TracingNo and original resolution to verify economic terms, dates and amendments |
+
+### 11.6 Impact on the three-symbol pilot
+
+| Symbol | Existing owner-side result | Public implementation comparison now possible | Current interpretation |
+|---|---|---|---|
+| فولاد | 23 price-adjust rows; 12 share-change rows; TSE Client comparison 23/23 and 12/12 in the prior ±7-day diagnostic | yfinance-ir provides 23 + 12 Foulad fixture rows for the same InsCode and event-feed schema; no hash-level comparison to the owner's raw files | Direct fixture overlap is confirmed at instrument/count level. The seven unpaired-by-±3-day share changes are unresolved event classifications, not proven bonus issues. |
+| وغدیر | 25 price-adjust rows; 7 share-change rows; prior TSE Client diagnostic 13/25 and 3/7 | No direct yfinance-ir fixture in the inspected tree; no iran-bourse-mcp test fixture specific to the pilot symbol | No row-by-row public implementation reconciliation yet. Obtain the exact saved raw payloads and original notices before comparing individual rows. |
+| پارسیان | 18 price-adjust rows; 9 share-change rows; prior TSE Client diagnostic 12/18 and 7/9 | No direct yfinance-ir fixture in the inspected tree; no iran-bourse-mcp test fixture specific to the pilot symbol | No row-by-row public implementation reconciliation yet. Obtain the exact saved raw payloads and original notices before comparing individual rows. |
+
+The prior ±7-day TSE Client percentages above remain discovery diagnostics only. They do not become stronger evidence merely because a third-party project uses ±3-day association. No event is merged, removed or reclassified by calendar proximity in this notebook.
+
+### 11.7 Reuse decision and next evidence needed
+
+1. **Reuse, do not copy wholesale:** yfinance-ir's TSETMC/CODAL transport and payload parsing examples; iran-bourse-mcp's round-trip, rights-symbol and market-flow coverage handling; MarketSage's own provenance, quarantine and evidence-ledger gates.
+2. **Reject as a decision rule:** classifying every unpaired share increase as a bonus issue; inferring a factor from a price gap/priceYesterday discontinuity without event terms; treating a test fixture or successful HTTP response as economic verification.
+3. **For فولاد:** compare the complete local raw event JSON hashes and row payloads against the public 23/12 fixtures when those exact local files are available; then resolve the seven unpaired share-count dates from original CODAL notices.
+4. **For وغدیر and پارسیان:** reuse the existing captured raw TSETMC event payloads and TSE Client records; do not redownload them just to reproduce counts. Compare exact event identifiers, dates and ratios, and link each unresolved event to an original CODAL notice. The required source payloads were not present in the reviewed Library artifacts, so this notebook does not claim those row-level comparisons were performed.
+5. **For all three:** retain TSETMC price-adjust ratios, share-count changes, TSE Client diagnostics and terms-based independent calculations in separate fields. A disagreement produces `CONFLICT` or `UNKNOWN`, not an averaged factor.
+
+### 11.8 Sources inspected
+
+8. yfinance-ir TSETMC adapter: https://github.com/Fazel94/yfinance-ir/blob/main/yfinance_ir/sources/tsetmc.py
+9. yfinance-ir adjustment and history logic: https://github.com/Fazel94/yfinance-ir/blob/main/yfinance_ir/history.py
+10. yfinance-ir event conventions: https://github.com/Fazel94/yfinance-ir/blob/main/docs/conventions.md
+11. yfinance-ir source limitations: https://github.com/Fazel94/yfinance-ir/blob/main/docs/data-sources.md
+12. yfinance-ir Foulad event fixtures: https://github.com/Fazel94/yfinance-ir/tree/main/tests/fixtures
+13. yfinance-ir history tests: https://github.com/Fazel94/yfinance-ir/blob/main/tests/test_history.py
+14. iran-bourse-mcp event calendar implementation: https://github.com/msmahdinejad/iran-bourse-mcp/blob/main/src/iran_bourse_mcp/calendar_events.py
+15. iran-bourse-mcp source/quirk notes: https://github.com/msmahdinejad/iran-bourse-mcp/blob/main/docs/DATA_SOURCES.md
+16. iran-bourse-mcp recorded fixture and event-calendar tests: https://github.com/msmahdinejad/iran-bourse-mcp/blob/main/tests/test_calendar_events.py
+17. iran-bourse-mcp CODAL parser: https://github.com/msmahdinejad/iran-bourse-mcp/blob/main/src/iran_bourse_mcp/codal_reports.py
+
+**Final rule:** a public extractor demonstrates a method, not the economic truth of the event. Reuse parsers and robust edge-case handling, but the accepted evidence chain remains verified instrument identity → exact source event/document → terms and effective date → reproducible independent factor → reconciled historical series → reviewed data rights and point-in-time availability. No source, event, adjusted series or investment use is approved by this comparative audit.
