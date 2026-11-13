@@ -39,6 +39,23 @@ class InfrastructurePathTests(unittest.TestCase):
             "push", "infra/ci-freeze", ["requirements-infra.txt"]
         ))
 
+    def test_main_push_with_only_allowlisted_paths_is_allowed(self):
+        self.assertTrue(is_infrastructure_only(
+            "push", "main",
+            [".github/workflows/ci.yml", "infra/control_plane/worker_runtime.py"],
+        ))
+
+    def test_main_push_with_any_product_path_is_rejected(self):
+        self.assertFalse(is_infrastructure_only(
+            "push", "main",
+            [".github/workflows/ci.yml", "user/analysis-engine/model.py"],
+        ))
+
+    def test_main_pull_request_is_not_authorized_by_branch_name(self):
+        self.assertFalse(is_infrastructure_only(
+            "pull_request", "main", [".github/workflows/ci.yml"]
+        ))
+
     def test_non_infra_branch_is_rejected(self):
         self.assertFalse(is_infrastructure_only(
             "pull_request", "feature/product", [".github/workflows/ci.yml"]
