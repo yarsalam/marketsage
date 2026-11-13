@@ -1,6 +1,6 @@
 # MarketSage — Pull Request Register
 
-**Snapshot date:** 2026-11-08  
+**Snapshot date:** 2026-11-13  
 **Repository:** yarsalam/marketsage (Public per live GitHub API; owner decision recorded in Issue #53)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** [#6](https://github.com/yarsalam/marketsage/pull/6), feat/tindex-free-data-connector  
@@ -159,3 +159,38 @@ This section supersedes older status snapshots above when they conflict with cur
 - Active main ruleset #26789479 requires PRs and seven checks and blocks deletion/non-fast-forward updates; 10 approving reviews remain to be corrected by the owner.
 - Issue #49 remains OPEN. The current PR #71 tests prove deterministic fake-backend/outbox behavior, not external provider independence, continuous server availability or 24-hour resilience.
 - No auto-merge, release, deployment, paid resource, local workflow dispatch, provider activation, market-data source approval, investment scoring, broker or trading permission is granted.
+
+
+## Live open-PR inventory — 2026-11-13 14:49 UTC
+
+This inventory supersedes the earlier open-PR table above. All rows are open; mergeability is the live PR API result, not merge authorization. Exact-head checks are read from the current head SHA. A skipped check is not a pass.
+
+| PR | Draft | Base ref | Exact head SHA | Mergeable | Exact-head checks |
+|---|---:|---|---|---:|---|
+| [#82](https://github.com/yarsalam/marketsage/pull/82) | yes | `main` | `880a1b1d683b4c3992743c5f046be2c80920c7cf` | yes | 16; all successful across Push/PR; non-infrastructure research hold; old main CI ran analysis and production-image jobs |
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | yes | `main` | `a659fa038dc84b000c5a01b20b234d5e31f54ff3` | yes | 8; all completed successful |
+| [#80](https://github.com/yarsalam/marketsage/pull/80) | yes | `main` | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | yes | 8; all completed successful |
+| [#79](https://github.com/yarsalam/marketsage/pull/79) | yes | `main` | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | yes | 8; all completed successful |
+| [#78](https://github.com/yarsalam/marketsage/pull/78) | yes | `main` | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | yes | 10; all completed successful |
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | yes | `main` | `67356939f65224a580c915fd2caa0ea52d8d09a9` | yes | 8; all completed successful |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | yes | `main` | `24b95c204749b74ba2f382f4dd528d6463173dc9` | yes | 20 records across exact Push and PR runs; infra checks passed; product checks skipped |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | yes | `main` | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | yes | 16; all completed successful |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | yes | `infra/provider-neutral-control-plane-2026-11` | `e630517c7e2916ed58b7568b0ebbbf1d390b86ce` | yes | **0 checks / 0 workflow runs**; 117 ahead / 2 behind current base; stale and unvalidated |
+| [#62](https://github.com/yarsalam/marketsage/pull/62) | no | `main` | `54fbf4a364a91b4e8d834fdcec0245d079440982` | yes | 8; all completed successful |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | yes | `infra/provider-neutral-control-plane-2026-11` | `25ce24283e35dd7e55eb8545c590a047606643ee` | no | **0 checks**; non-mergeable |
+| [#51](https://github.com/yarsalam/marketsage/pull/51) | no | `feat/tindex-free-data-connector` | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | yes | 10; all completed successful; ordinary data work remains frozen |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | no | `main` | `162692f1a377ec8445ed958db4cc1171d4cafc47` | yes | 5; all completed successful |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | no | `fix/gdelt-fred-tindex-current-docs` | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | yes | 6; `tsetmc-smoke` failed, five other checks succeeded; keep parked and do not repeat the same timeout request |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | no | `main` | `1d90726c593b0818982407c309ff13301798f5b3` | no | 15; all completed successful; **never merge without separate explicit owner approval** |
+
+### Closed infrastructure PR retained for reference
+
+- [PR #54](https://github.com/yarsalam/marketsage/pull/54): closed, Draft, unmerged; exact head `e8f7d8add3df577120b92b8927c590aece001509`; no GitHub check runs. [Issue #55](https://github.com/yarsalam/marketsage/issues/55) records 16/16 owner-run tests on this exact head (exit 0). Current base comparison is 8 ahead / 46 behind, merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`; prior 11/11 evidence applies only to its earlier commit.
+
+### Current workflow evidence and owner gates
+
+- Main HEAD remains `4c4b032196137af4658ea2c28e38a21605ee923b`. Latest successful default-branch schedule is [#43414337932](https://github.com/yarsalam/marketsage/actions/runs/43414337932), 2026-11-13, but it ran analysis, backend, frontend, admin, production-image and CI-helper jobs about 7h49m after cron. It is not a worker canary.
+- PR #74 exact-head Push [#43379843888](https://github.com/yarsalam/marketsage/actions/runs/43379843888) and PR [#43379849607](https://github.com/yarsalam/marketsage/actions/runs/43379849607) both succeeded on `24b95c204749b74ba2f382f4dd528d6463173dc9`. This does not validate PR #71.
+- [Issue #49](https://github.com/yarsalam/marketsage/issues/49) remains open. [Issue #52](https://github.com/yarsalam/marketsage/issues/52) remains open for five Chabokan wheel hashes. [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is closed by the public zero-additional-spend decision. [Issue #55](https://github.com/yarsalam/marketsage/issues/55) is closed for exact-head SQLite unit tests only. [Issue #59](https://github.com/yarsalam/marketsage/issues/59) remains open for schedule/orchestration acceptance.
+- No hosted workflow was dispatched or rerun; no local workflow, Runner, or Provider was activated. No merge, release, deployment, secret, paid resource, or visibility change occurred.
+- Main still lacks the Goal 1 CI freeze. PR #74 contains it but remains Draft/open. PR #71 is stale/unvalidated and remains Draft/open. No 24/7 claim is permitted.
