@@ -1,10 +1,51 @@
-# MarketSage — Current Project State
+## Live infrastructure snapshot — 2026-11-12 14:03 UTC (authoritative)
 
-**Snapshot date:** 2026-11-08  
-**Repository:** yarsalam/marketsage (Public per live GitHub API; owner decision recorded in Issue #53)  
+Read-only GitHub API audit. This section supersedes older snapshots below. No workflow was dispatched or rerun, no local runner was used, and no merge, provider activation, deployment, secret, paid resource, visibility change, or product/data/investment work was performed.
+
+- **Repository identity:** GitHub reports `yarsalam/marketsage` as `visibility=public` / `private=false`. The current owner request describes it as private, while Issue #53 records the earlier explicit public/zero-additional-spend decision. No visibility change is permitted or made in this run. Treat all repository content, issues, PRs, comments, history and artifacts as public until the owner resolves the conflict. See [Issue #49](https://github.com/yarsalam/marketsage/issues/49).
+- **Default branch:** `main`; exact HEAD `4c4b032196137af4658ea2c28e38a21605ee923b`, commit timestamp `2026-11-07T19:55:51Z`. Main did not advance. Repository `pushed_at=2026-11-12T07:23:30Z` reflects the PR #71 branch update, not a main update.
+- **Issue #49:** open; the latest owner priority in the issue and the current instruction make infrastructure acceptance a hard gate. The historical optional/product-first paragraph in the issue is superseded. Product feature work, data screening, investment analysis and backtest work remain frozen.
+- **Ruleset:** active [main-protection #26789479](https://github.com/yarsalam/marketsage/rules/26789479), targeting `refs/heads/main`. It requires one approving PR review and seven contexts (`analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, `Test CI automation helpers`); blocks deletion and non-fast-forward updates; has no bypass actors; strict status freshness is false; stale approvals are not dismissed. The legacy branch-protection endpoint is not readable through this connection (403); the ruleset is the available evidence.
+- **Main CI workflow:** blob `3b0bc36ae8f95c6b34c4afe6a1535716b421a864`. Triggers: push, pull_request, daily schedule `17 3 * * *`, workflow_dispatch. Default permission is `contents: read`; issue-write is job-scoped. Per-PR/ref concurrency cancels superseded runs. Job timeouts are 25–40 minutes. No bounded workflow retry, independent stale/queued-run observer, artifact upload or custom artifact-retention policy was found. Failure notification uses the same GitHub-hosted runner pool. Main's workflow still lacks the required `Test provider-neutral control plane` context required by the active ruleset.
+- **Latest main scheduled run:** [#43208785145](https://github.com/yarsalam/marketsage/actions/runs/43208785145), event `schedule`, exact main SHA `4c4b032196137af4658ea2c28e38a21605ee923b`, success. Created/started `2026-11-12T11:23:46Z`, completed `11:25:32Z`; relative to the configured 03:17 UTC cron, this is about 8h06m46s later. The job list confirms it ran analysis/research-backtest tests, backend, frontend, admin and production-image validation plus CI helper tests. This is one successful scheduled CI run, not a worker canary or punctuality proof, and the product/research jobs on main conflict with the Goal 1 freeze. This run was an automatic schedule event; this audit did not dispatch or rerun it.
+- **Infrastructure parent PR #74:** open/Draft, base `main@4c4b032196137af4658ea2c28e38a21605ee923b`, head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`, mergeable but blocked by review/rules; 73 commits ahead / 0 behind main. Exact push #42589280185 and PR #42589290385 passed; the control-plane and CI-helper contexts passed and product jobs were skipped. It carries the infrastructure-only CI freeze, but that freeze is not active on main until a permitted merge.
+- **Infrastructure child PR #71:** open/Draft, base `infra/provider-neutral-control-plane-2026-11@237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`, current head `9b8bb01e0e2d2c81aebb014d8124c761bdf5219a`, mergeable/clean; compare reports 115 commits ahead / 0 behind base. Exact Push [#43174913520](https://github.com/yarsalam/marketsage/actions/runs/43174913520) and Pull Request [#43174920464](https://github.com/yarsalam/marketsage/actions/runs/43174920464) both succeeded on this exact SHA. Each run passed scope classification, all **174** provider-neutral control-plane tests, and CI helper groups of **13 + 10 + 10 + 3 = 36** tests; product/backend/frontend/admin/production-image jobs were skipped. These were ordinary push/PR events, not workflow_dispatch or reruns. The exact-head validation requirement is satisfied for this SHA only.
+- **Worker workflows on PR #71:** `docker-worker-acceptance.yml` is branch-only, uses `ubuntu-latest`, a 15-minute worker job timeout, and declares main-push, daily `04:43 UTC` schedule and workflow_dispatch. Its schedule is not active on main until the PR path is merged; no Docker canary exists for current head `9b8bb01...`. `self-hosted-worker-acceptance.yml` is workflow_dispatch-only, requires owner confirmation, is restricted to the exact PR #71 branch and label `marketsage-server-worker`, has a 20-minute worker timeout and does not cancel an active run. The dedicated server runner is not registered/verified. Its failure notifier uses `ubuntu-latest`, so it is independent of the self-hosted host but not of the GitHub-hosted runner pool.
+- **Main local workflows:** the three TSETMC workflows are workflow_dispatch-only, require explicit boolean confirmation, target `[self-hosted, linux, x64, marketsage-local, marketsage-research]`, have 10/30/180-minute job timeouts and serialize without cancellation. They were not dispatched. They are not always-on capacity.
+- **PR #54 / SQLite:** live API says closed, Draft, unmerged; head `e8f7d8add3df577120b92b8927c590aece001509`; zero GitHub check runs. Issue #55 records 16/16 owner-run tests on that exact SHA only. Current #74 vs #54 comparison is diverged: #54 is 8 commits ahead and 44 behind, merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`. Do not reopen, merge or transfer the test result to another SHA.
+- **Owner gates:** [Issue #52](https://github.com/yarsalam/marketsage/issues/52) remains open for five exact Chabokan wheel SHA-256 hashes; do not repeat its 30/30 install/test. [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is closed with the public-repository zero-additional-spend CI decision; no spending-cap increase or paid runner. [Issue #55](https://github.com/yarsalam/marketsage/issues/55) is closed with exact-head SQLite test evidence.
+- **Independent runtime:** CircleCI configuration exists on the infrastructure branch but no connected project/OAuth pipeline or second real backend is registered. Provider adapters and no-duplicate tests still use deterministic fakes. The health observer is a pure snapshot assessor and the watchdog is a process on the same host; neither is an independently deployed poller. SQLite is single-host. No independent failure domain, live two-backend side-effect canary, persistent server worker, worker-loss/restart operational drill, off-host restore drill, or 24-hour observation window is proven.
+
+**Readiness: NOT 24/7-ready.** The current PR #71 head has exact Push/PR validation, but a subsequent documentation commit is not covered by those runs. The current main schedule still executes frozen job classes until the infrastructure-only workflow on PR #74 is activated through an explicitly permitted merge. No merge, workflow dispatch/rerun, local dispatch, provider/account activation, secret creation, paid usage, deployment, release, data operation, product feature work, investment analysis, scoring/ranking, probability calibration, backtest approval, broker/trading, or capital allocation was performed.
+
+
+## Live infrastructure snapshot — 2026-11-11 14:51 UTC (authoritative)
+
+This snapshot supersedes all older live snapshots and priority summaries below. It is based on read-only GitHub API inspection on 2026-11-11. No workflow was dispatched or rerun and no local runner was used in this audit.
+
+- **Repository:** `yarsalam/marketsage`; GitHub reports `visibility=public` and `private=false`. This conflicts with the current owner request describing it as private. No visibility change was made. Treat all repository content, history, issues, PRs, comments and artifacts as public until the owner confirms otherwise. See [Issue #49](https://github.com/yarsalam/marketsage/issues/49).
+- **Default branch:** `main`; HEAD `4c4b032196137af4658ea2c28e38a21605ee923b`, commit timestamp `2026-11-07T19:55:51Z`. Main has not advanced since the prior live audit.
+- **Priority:** Issue #49 is open and remains the hard gate under the latest owner instruction in its body. The older “optional/non-blocking” paragraph in that issue is explicitly historical and superseded. Product/data-source/investment/backtest feature work remains frozen.
+- **Main ruleset:** active `main-protection` / [#26789479](https://github.com/yarsalam/marketsage/rules/26789479), targeting `refs/heads/main`. It requires a PR, one approving review and seven contexts (`analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, `Test CI automation helpers`); blocks deletion and non-fast-forward updates; has no bypass actors; strict status freshness is false; stale approvals are not dismissed. The legacy branch-protection endpoint returned 403, so the readable ruleset is the evidence source.
+- **Main CI:** `.github/workflows/ci.yml` on main has push, pull-request, daily schedule (`17 3 * * *`) and workflow-dispatch triggers. Default permissions are `contents: read`; `issues: write` is scoped to provenance/failure-notice jobs. Per-PR/ref concurrency cancels superseded runs. Jobs have explicit timeouts. There is no bounded workflow-level retry, no independent stale/queued-run observer, no custom artifact-retention policy, and no artifact upload in this workflow. The failure notifier runs on the same GitHub-hosted runner pool it monitors. Main's current workflow does **not** define the required `Test provider-neutral control plane` context even though the ruleset requires it; the context exists on infrastructure branch #74/#71. This is a live required-check/configuration mismatch for main-derived PRs.
+- **Scheduled CI evidence:** main run [#43008951957](https://github.com/yarsalam/marketsage/actions/runs/43008951957) completed successfully on exact main SHA `4c4b032196137af4658ea2c28e38a21605ee923b` on 2026-11-11. It started at 11:04:56 UTC, about 7h48 after the 03:17 UTC cron. This proves one successful scheduled CI run only; it does not prove a scheduled worker, punctual schedule, independent observer, or 24/7 runtime.
+- **Infrastructure parent PR #74:** Draft/open, base `main`, head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`, mergeable but blocked by review/rules. It is 73 commits ahead and 0 behind main. Exact push [#42589280185](https://github.com/yarsalam/marketsage/actions/runs/42589280185) and PR [#42589290385](https://github.com/yarsalam/marketsage/actions/runs/42589290385) completed successfully. The provider-neutral control-plane and CI-helper jobs passed; broad product jobs were scope-skipped. The recorded control-plane count is 110 tests.
+- **Infrastructure child PR #71:** Draft/open, base `infra/provider-neutral-control-plane-2026-11` at #74 head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`; current code head at audit time `ad0f07d0d3b2a1a195857030274dcb254d82b03f`. Compare shows 111 commits ahead / 0 behind the base; the prior divergence is resolved. PR is mergeable/clean but remains Draft and unmerged. Exact event-triggered push [#42980157072](https://github.com/yarsalam/marketsage/actions/runs/42980157072) and pull-request [#42980163912](https://github.com/yarsalam/marketsage/actions/runs/42980163912) both succeeded on that exact SHA. The control-plane job ran **174 tests**; CI helper tests ran 13 + 10 + 10 + 3 tests. Product/analysis/backend/frontend/admin/production-image jobs were scope-skipped. These were ordinary push/PR event runs, not workflow-dispatch or reruns.
+- **Worker workflows on PR #71:** `docker-worker-acceptance.yml` exists only on PR #71, with main-push and daily `04:43 UTC` schedule plus manual dispatch. Its schedule is not active until the workflow is on the default branch. No Docker acceptance run exists on current head `ad0f07d...`; the prior hosted Docker canary [#42507288970](https://github.com/yarsalam/marketsage/actions/runs/42507288970) applies only to earlier code head `7d7c6b1d9eb97d6070651c8b5cda41db9753a78f`. `self-hosted-worker-acceptance.yml` is manual-only, owner-confirmed, guarded to this branch and the dedicated `marketsage-server-worker` label; that label is reserved for a future independent server and must never be assigned to the laptop. No local workflow was dispatched and no server runner is registered/verified.
+- **Local data workflows on main:** the three TSETMC workflows are `workflow_dispatch` only, require owner confirmation, use repository-specific local/research labels and have no push/PR/schedule triggers. They were not dispatched.
+- **SQLite PR #54:** live API says closed, Draft, unmerged; head `e8f7d8add3df577120b92b8927c590aece001509`; zero GitHub check runs. Issue #55 records the owner's **16/16** local test result on that exact SHA only. Compare against current #74 head is diverged: #74 is 44 commits ahead of #54 and #54 has 8 commits not on #74 (merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`). Do not reopen/merge or transfer the old test result to a different SHA.
+- **Owner gates:** [Issue #52](https://github.com/yarsalam/marketsage/issues/52) remains open for five exact Chabokan wheel SHA-256 hashes; the already-recorded 30/30 install tests must not be repeated. [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is closed with the public-repository zero-cost CI decision and no spending-cap increase. [Issue #55](https://github.com/yarsalam/marketsage/issues/55) is closed with exact-head SQLite test evidence. [Issue #63](https://github.com/yarsalam/marketsage/issues/63) is closed.
+- **Independent runtime:** CircleCI configuration is not an active pipeline; no CircleCI project/OAuth connection or second real provider is registered. The watchdog/health observer is deterministic code, not an independently deployed poller. SQLite is single-host. No independent failure domain, persistent server worker, live two-backend no-duplicate canary, worker-loss/restart operational drill, off-host restore drill, or 24-hour observation is proven.
+
+**Readiness: NOT 24/7-ready.** The exact PR #71 code head above has push/PR CI evidence, but this governance refresh is documentation-only and will use `[skip ci]`; its resulting documentation commit is not a new exact-head test result. No merge, workflow dispatch/rerun, local dispatch, provider/account activation, secret creation, paid usage, deployment, release, market-data operation, product feature work, investment analysis, scoring/ranking, probability calibration, backtest approval, broker/trading, or capital allocation was performed.
+
+**Snapshot date:** 2026-11-09  
+**Repository:** yarsalam/marketsage (PUBLIC per live GitHub API; visibility confirmation tracked in Issue #49)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** #6, feat/tindex-free-data-connector  
 **Current integration HEAD:** 1d90726c593b0818982407c309ff13301798f5b3  
+**Infrastructure PRs:** #74 (parent integration) and #71 (durable outbox/worker)  
+
 **Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
 **Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
 
@@ -14,18 +55,18 @@
 - PR #8 remains parked after the GitHub-hosted TSETMC connection timeout. Do not repeat the same request from the same environment.
 - PR #27 (manual-only staged-dataset validator), PR #31 (clean governance adoption), PR #32 (manual integrated TSETMC workflow) and PR #34 (memory-bounded local analysis) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
 - PRs #7, #9, #13, #14, #16–#24, and #28–#30 are integrated into PR #6 in dependency order. Their CI results do not approve data sources or the strategy.
-- The governance constitution is adopted on main via PR #31. An active repository ruleset (#26789479) protects main with PR and seven required-check rules and blocks deletion/non-fast-forward updates. It currently requires 10 approving reviews; the approval count still needs owner correction. The laptop Runner remains manual-only and is not a server.
+- The governance constitution is adopted on main via PR #31. Active ruleset #26789479 protects main with required PR/check rules and deletion/non-fast-forward blocks. It requires one approving review and seven required checks; Issue #63 is closed. Strict required-status-check policy is false and no bypass actors are configured. The laptop Runner remains manual-only.
 
 ## Local Runner and first dataset gate
 
-**Runner:** marketsage-local-01, repository-scoped to yarsalam/marketsage, version 2.338.2, labels marketsage-local and marketsage-research plus GitHub's standard labels.
+**Runner:** [redacted local runner id], repository-scoped to yarsalam/marketsage, version 2.338.2, labels marketsage-local and marketsage-research plus GitHub's standard labels.
 
-**Service:** actions.runner.yarsalam-marketsage.marketsage-local-01.service, running as the unprivileged marketsage-runner account and enabled at boot. The account is not in sudo, docker, lxd or adm; it cannot traverse the owner's home directory.
+**Service:** actions.runner.yarsalam-marketsage.[redacted local runner id].service, running as the unprivileged [redacted runner account] account and enabled at boot. The account is not in sudo, docker, lxd or adm; it cannot traverse the owner's home directory.
 
 **Host access boundary:**
-- Staged data: /srv/marketsage/data/tsetmc_history_20261022, files mode 0440, directories mode 2750; Runner read/traverse only.
-- Output: /srv/marketsage/output, owned by Runner; the integrated-candidate workflow creates its dedicated output directory with mode 0700 and umask 077.
-- Runner workspace/install is under /opt/actions-runner/marketsage.
+- Staged data: [redacted local path], files mode 0440, directories mode 2750; Runner read/traverse only.
+- Output: [redacted local path], owned by Runner; the integrated-candidate workflow creates its dedicated output directory with mode 0700 and umask 077.
+- Runner workspace/install is under [redacted local path]
 - Service restrictions include ProtectHome=true, ProtectSystem=strict, PrivateTmp=true, NoNewPrivileges=true, kernel/module/control-group protections, the staged dataset in ReadOnlyPaths, and only the approved Runner/output paths in ReadWritePaths.
 - RestrictSUIDSGID is not enabled. Its removal followed the observed GNU tar 1.35 Function not implemented checkout failure; a nested tar extraction regression test passed in a systemd sandbox with the other principal restrictions retained.
 - Network egress is not blocked by these filesystem/systemd controls. Only reviewed manual workflows may run.
@@ -159,32 +200,138 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 
 **Infrastructure readiness remains NOT PROVEN.** SQLite is single-host only; no transactional provider outbox, real provider adapter, worker service, periodic heartbeat, dispatch reconciliation, backup/restore, disk-full/corruption recovery, independent health canary, provider failover or end-to-end 24/7 recovery drill has been demonstrated. Ordinary product/data/research work remains paused under Issue #49. PR #6 remains open and must not be merged to main without explicit owner approval; PR #14 is already merged into #6; PR #8 remains parked.
 
-## Reconciled infrastructure checkpoint — 2026-11-08
+## Live infrastructure checkpoint — 2026-11-08 (authoritative current snapshot)
 
-This section supersedes older infrastructure snapshots in this file where they conflict with the current evidence. Earlier entries remain as historical audit records.
+This section supersedes every older infrastructure status and any stale main-SHA, repository-visibility, schedule, branch-protection, Actions-quota, PR #54/#55, or product-priority statement above.
 
-### Mainline CI and repository protection
-- `main` is `4c4b032196137af4658ea2c28e38a21605ee923b`. The cloud CI includes bounded job timeouts, same-ref concurrency, immutable Action pins, failure notice, and main-update provenance detection.
-- The daily schedule is active on main; successful scheduled event: [run 42471588681](https://github.com/yarsalam/marketsage/actions/runs/42471588681).
-- The direct-main provenance detector is a detection/reporting control, not prevention; native ruleset protection remains necessary.
-- Active ruleset #26789479 targets main, requires PRs and seven CI checks, blocks deletion and non-fast-forward updates, and has no configured bypass actors. It currently requires 10 approving reviews; owner adjustment remains open in Issue #63.
-- The GitHub API currently reports the repository as public. The previous owner decision to keep it public for standard hosted CI is recorded in Issue #53; no visibility setting was changed by this integration.
+### Repository and authority
 
-### Provider-neutral control-plane implementation
-- Integration source before reconciliation: `2776d9c6e17d24d09a809c07549100e4f2c3c2ae`. It contains the task manifest/schema, SQLite coordinator, transactional dispatch outbox, provider router, Docker worker, daemon, watchdog/collector and deterministic tests.
-- PR #71 current implementation head: `0afb73c43dfbb0726f42d33f87e09966aa1254a9`. Exact-head Push CI [42489733190](https://github.com/yarsalam/marketsage/actions/runs/42489733190) and PR CI [42489735618](https://github.com/yarsalam/marketsage/actions/runs/42489735618) succeeded; the provider-neutral suite passed **164/164**. Hosted Docker worker acceptance [42489733159](https://github.com/yarsalam/marketsage/actions/runs/42489733159) succeeded.
-- The test suite covers two deterministic fake backends, capacity rejection, lost/ambiguous submission response, crash/restart reconciliation at dispatch boundaries, bounded failover after definitive no-effect outcomes, and one shared idempotent simulated side effect. No live paid provider or independently operated external backend has been activated.
-- Health-observer tests cover stale/missing/clock-skewed heartbeats, expired leases, unknown telemetry, provider outage classification and watchdog lease recovery. Process-level observer outage/restart and independent alert delivery still require operational proof.
-- The task registry remains a deterministic selector; it is not yet a complete GitHub Issue/PR → task contract → durable lease → dispatcher → Worker → status integration.
+- GitHub API reports repository visibility `public`; the latest owner prompt describes it as private. Issue #53 records a prior owner decision to keep it public. No visibility change was made. Owner confirmation is required before any change or further assumption.
+- Default branch: `main`; exact HEAD `4c4b032196137af4658ea2c28e38a21605ee923b`, commit timestamp `2026-11-07T19:55:51Z`.
+- Issue [#49](https://github.com/yarsalam/marketsage/issues/49) remains open and is the controlling priority. The latest execution instruction reimposes an infrastructure-first pause; the earlier Issue #49 comment recording a product restart is superseded for this checkpoint. Do not advance product/data/research/backtest work until #49 is accepted.
+- PR #6 remains open and is not to be merged without separate explicit owner approval. PR #14 is already integrated into #6; no repeat merge. PR #8 remains parked after the known TSETMC ConnectTimeout.
 
-### Local Runner boundary
-- Owner-provided host checks report the dedicated Runner service active with zero restarts and successful HTTPS proxy connectivity from the restricted Runner account.
-- Two later local offline TSETMC validator runs succeeded (runs [42482467531](https://github.com/yarsalam/marketsage/actions/runs/42482467531) and [42482678959](https://github.com/yarsalam/marketsage/actions/runs/42482678959)). These validate the staged-data validator only; they are not the self-hosted Docker Worker acceptance.
-- The earlier self-hosted Worker Acceptance attempt [42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813) failed before its first workflow step and its job log was unavailable. The local acceptance workflow remains manual and owner-confirmed. Do not infer Worker success from the offline validator runs.
-- The laptop is not a persistent 24/7 host. A separate independently available Worker host and a full 24-hour observation window remain unproven.
+### Event-driven and scheduled GitHub automation
 
-### Dependency and owner-action updates
-- Issue #52 records successful Chabokan-only dependency installation in a clean temporary environment and **30/30** tests on the specified integration commit. Exact wheel-hash locking remains a separate reproducibility item.
-- Issue #63 records the active main ruleset and the still-impractical 10-approval configuration. Owner action remains necessary to set the intended approval count and verify bypass semantics.
+- Main `.github/workflows/ci.yml` is active for pushes to `main`, `deploy/**`, `research/**`, `ci/**`, and `infra/**`; PRs targeting `main`, `deploy/**`, and `infra/**`; a daily `03:17 UTC` schedule; and manual `workflow_dispatch`.
+- Exact default-branch scheduled evidence: run [42471588681](https://github.com/yarsalam/marketsage/actions/runs/42471588681), event `schedule`, branch `main`, SHA `4c4b032196137af4658ea2c28e38a21605ee923b`, conclusion `success`.
+- CI uses global `contents: read`; the provenance detector has only the PR/issue permissions it needs, and the sanitized failure reporter has issue-comment write. External actions are pinned to immutable full commit SHAs.
+- Concurrency groups are per PR/ref and cancel superseded runs. Job timeouts are bounded between 5 and 40 minutes. CI has no automatic retry; the provider-neutral task scheduler has a bounded retry budget covered by tests.
+- No artifact upload or custom log-retention override is configured. The CI failure notifier depends on the same GitHub-hosted runner pool it monitors, so it cannot report a total outage of that pool. The local-worker failure notifier runs on GitHub-hosted capacity, independent of the local self-hosted pool but not independent of GitHub itself.
+- GitHub Actions run history includes cancelled superseded commits; cancelled/queued/pre-step failures are not counted as successful validations.
 
-**Current infrastructure verdict: NOT COMPLETE / NOT 24/7 ACCEPTED.** Preserve research-only posture. No data-source approval, production scoring, ranking, calibrated probability, backtest approval, broker, trading, deployment or capital allocation is enabled.
+### Branch protection and human merge gate
+
+- Live ruleset ID `26789479`, name `main-protection`, is active and targets `refs/heads/main`.
+- It blocks branch deletion and non-fast-forward updates, requires PRs, and requires seven status checks: `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, and `Test CI automation helpers`.
+- The ruleset currently requires **10 approving reviews**, which may make routine merges impractical. Its explicit bypass-actor list is empty; administrator bypass behavior was not independently verified. The classic branch-protection endpoint returned 403 to the connected integration, so no classic protection claim is made.
+- Owner review of the 10-approval setting and bypass semantics is tracked in [Issue #63](https://github.com/yarsalam/marketsage/issues/63). No ruleset mutation was made by this automation.
+
+### Durable coordinator, provider outbox and worker evidence
+
+- PR [#71](https://github.com/yarsalam/marketsage/pull/71) is the active infrastructure implementation branch. Its implementation checkpoint is `0afb73c43dfbb0726f42d33f87e09966aa1254a9`; it includes the SQLite coordinator lifecycle, durable dispatch outbox, orchestrator, fake provider adapters, task registry, Docker sandbox worker, persistent daemon, health collector/watchdog and runbooks. The exact-head provider-neutral suite passed 164/164 tests and hosted Docker acceptance succeeded.
+- On exact governance/code head `3ffab7d0451630e174377a562dc67c51591e29b1`, push CI [42489505405](https://github.com/yarsalam/marketsage/actions/runs/42489505405) and PR CI [42489508263](https://github.com/yarsalam/marketsage/actions/runs/42489508263) both passed all seven substantive jobs. The provider-neutral test job ran **164 tests** successfully. These tests use deterministic fake provider adapters; they are not evidence of two independently operated real backends.
+- Hosted Docker worker acceptance [42465921830](https://github.com/yarsalam/marketsage/actions/runs/42465921830) succeeded on a GitHub-hosted runner: container UID 65532, network `none`, read-only checkout, no secrets, zero declared cost, task succeeded and output hash recorded. The same run's watchdog status was `degraded` because provider health remained `unknown`; it is not a full healthy-provider canary.
+- Local self-hosted acceptance [42465921813](https://github.com/yarsalam/marketsage/actions/runs/42465921813), attempt 2, failed during GitHub's synthetic job setup before the first workflow step. The job log artifact was unavailable, so the underlying runner bootstrap error is not established. Owner host notes show Docker rootless/seccomp checks had succeeded, but that does not substitute for a completed Worker Acceptance.
+- To prevent accidental use of the laptop runner, `.github/workflows/self-hosted-worker-acceptance.yml` was changed to owner-confirmed `workflow_dispatch` only, with no push or schedule trigger, and a regression test was added. Workflow change commit: `6f97d39e8136fc5c1971373fc763f6eecee11802`; test correction commit: `1b49ac3fa2ab09787331caf8f027311187e39e97`. The correction passed exact-head push CI [42489253646](https://github.com/yarsalam/marketsage/actions/runs/42489253646) and PR CI [42489256825](https://github.com/yarsalam/marketsage/actions/runs/42489256825). The later governance/code checkpoint `3ffab7d0451630e174377a562dc67c51591e29b1` also passed exact-head push and PR CI.
+- The Docker worker acceptance workflow has a 15-minute timeout and a 15-minute schedule, but it exists only on PR #71's non-default branch; GitHub schedule events execute from the default branch, so this worker canary schedule is not active yet. Main's daily CI schedule is active, but it is not a scheduled execution of the persistent task daemon.
+
+### SQLite PR #54 / Issue #55 reconciliation
+
+- PR [#54](https://github.com/yarsalam/marketsage/pull/54) is closed and **not merged**. Its head is `e8f7d8add3df577120b92b8927c590aece001509`.
+- Issue [#55](https://github.com/yarsalam/marketsage/issues/55) is closed with owner evidence that the exact PR #54 head passed **16/16 tests**, exit code 0. The older 11/11 result applies only to the prior head.
+- Do not reopen or merge #54 as a duplicate; PR #71 contains subsequent coordinator integration work. The integration branch used as PR #71's base is divergent from main (merge base `07e641670ceab22496ef976a584934464570fd9a`; main has 2 commits not in that branch, and the integration branch has 61 commits not in main). No rebase/merge was performed.
+
+### Owner-action gates
+
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52): Chabokan-only isolated installation succeeded on `2776d9c6e17d24d09a809c07549100e4f2c3c2ae`, with 30/30 tests passing. Exact wheel-hash locking remains separate and incomplete.
+- [Issue #57](https://github.com/yarsalam/marketsage/issues/57): local self-hosted acceptance failed before workflow steps; owner must inspect sanitized Runner diagnostic evidence for the precise pre-step failure. Do not repeat Docker installation or dispatch until the cause is known.
+- [Issue #63](https://github.com/yarsalam/marketsage/issues/63): owner must review the active main ruleset's 10-approval requirement and confirm the intended human gate and administrator/bypass behavior.
+- Issue #53 is closed and resolves the zero-cost hosted-runner quota gate for a public repository; no plan upgrade or spending-cap increase was used. Issue #55 is closed with exact-head 16/16 evidence.
+
+### Issue #49 acceptance matrix — NOT COMPLETE
+
+| Requirement | Current evidence | Status |
+|---|---|---|
+| Event-driven exact-head push/PR validation | Previous PR #71 code checkpoint green; manual-only correction head pending exact checks | PARTIAL |
+| Scheduled default-branch run | Main daily schedule #42471588681 succeeded on exact main SHA | PASS for CI schedule only |
+| Same task on two independent real backends | Two deterministic fake adapters only | NOT PROVEN |
+| Lost response/restart without duplicate external effect | Durable outbox/reconciliation tests; no two-real-backend external effect ledger | PARTIAL / NOT PROVEN |
+| Hung/stale recovery, timeout, cancellation and retry | Lease/fencing/watchdog/scheduler tests; no complete live failure-injection/24-hour window | PARTIAL |
+| Real isolated worker | Hosted Docker sandbox canary passed; local self-hosted acceptance failed before steps | PARTIAL |
+| Independent health and failure notification | Local-pool failure notifier ran on hosted pool; hosted-CI notifier shares its pool; watchdog reported provider UNKNOWN | PARTIAL |
+| Least privilege, cost controls, runbook and merge gate | Controls and runbooks exist; ruleset approval count/bypass still needs owner review | PARTIAL |
+| 24-hour observation and 24/7 readiness | No qualifying observation window; laptop is not always-on; no independent persistent server is provisioned | NOT PROVEN |
+
+**Overall: Issue #49 is NOT COMPLETE. Do not claim 24/7 readiness.** No PR was merged, no workflow was manually dispatched or rerun by this automation, no provider/account/secret was registered, and no product/data/investment work was performed.
+
+
+## Reconciled base update for PR #71 — 2026-11-08
+
+- Integration PR #74's base branch now contains the true two-parent merge commit `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`, preserving both the provider-neutral implementation and current mainline provenance/CI controls.
+- PR #71's original implementation head `0afb73c43dfbb0726f42d33f87e09966aa1254a9` passed exact-head PR/push CI with **164/164** provider-neutral tests and hosted Docker worker acceptance. This is prior-head evidence; the refreshed base requires new exact-head validation.
+- The PR #71 branch is now reconciled against base `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0` while retaining the PR's Docker worker, dispatch outbox, orchestrator, daemon, Watchdog, systemd units, tests and host runbook.
+- Mainline `Detect direct main updates`, its tests, the combined control-plane CI job, and the merged GitHub automation operations guide are retained in the new base.
+- This rebase/merge update does not merge PR #71 or PR #74 into main and does not change the local workflow's manual/owner-confirmed boundary.
+
+**Current readiness remains NOT COMPLETE.** No independently operated external backends, separate persistent server worker, process-level outage drill, or full 24-hour observation window is evidenced. The scheduled CI heartbeat does not prove continuous worker uptime.
+
+
+## Live infrastructure audit — 2026-11-10 14:41 UTC
+
+This section supersedes older infrastructure snapshots above where they conflict. Source: live GitHub API and the exact refs/checks inspected for this run.
+
+### Repository and protected main
+
+- Default branch: `main`.
+- Main HEAD: `4c4b032196137af4658ea2c28e38a21605ee923b`, committed 2026-11-07 19:55:51 UTC.
+- Live repository metadata reports `visibility=public` (`private=false`), despite the owner's current description of the repository as private. No visibility change was made. Treat all repository content, issues, PRs, comments, and history as public until the owner confirms otherwise.
+- Active ruleset `main-protection` #26789479 targets `refs/heads/main`: pull request required, one approving review, seven required contexts, deletion and non-fast-forward updates blocked, no bypass actors, and `current_user_can_bypass=never`. Stale approvals are not dismissed and strict up-to-date checks are disabled.
+- The legacy branch-protection endpoint returned HTTP 403 to the connected integration. Ruleset data is readable and is the evidence used here; do not infer unexposed legacy settings.
+
+### Main CI and schedule
+
+- Main `.github/workflows/ci.yml` blob: `3b0bc36ae8f95c6b34c4afe6a1535716b421a864`.
+- Triggers: push on `main`, `deploy/**`, `research/**`, `ci/**`, `infra/**`; pull_request on `main`, `deploy/**`, `infra/**`; daily schedule `17 3 * * *`; and workflow_dispatch.
+- Workflow permission is `contents: read`. The direct-main provenance and failure-notification jobs scope `issues: write` to those jobs. Concurrency is per PR/ref with `cancel-in-progress: true`. Job timeouts are bounded (5–40 minutes depending on job).
+- There is no explicit retry policy, independent stale/queued-run observer, independent health endpoint, or failure-notification path outside the GitHub-hosted runner pool. The notification job uses `ubuntu-latest` in the same hosted pool.
+- No workflow artifact upload or custom artifact retention policy was found in the main CI workflow. Log/artifact retention therefore remains subject to GitHub repository/account defaults unless separately configured.
+- Scheduled run [#42806341738](https://github.com/yarsalam/marketsage/actions/runs/42806341738) completed successfully on this exact main SHA on 2026-11-10 (created 11:18:07 UTC; completed 11:19:33 UTC). Analysis, backend, frontend, admin, production-image, and CI-helper jobs succeeded; provenance and notification jobs were skipped by their conditions. The daily schedule is real, but this CI run is not a scheduled task-worker canary. Its observed start was about eight hours after the configured 03:17 UTC cron time; no independent lateness alarm exists.
+
+### Open infrastructure PRs and exact-head evidence
+
+- PR #74 is Draft/open, base `main`, head `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`. Exact Push run [#42589280185](https://github.com/yarsalam/marketsage/actions/runs/42589280185) and exact PR run [#42589290385](https://github.com/yarsalam/marketsage/actions/runs/42589290385) succeeded for the infrastructure scope: classifier, provider-neutral control-plane tests, and CI-helper tests passed; product/analysis/build jobs were scope-skipped. It remains Draft and unmerged.
+- PR #71 is Draft/open, base branch `infra/provider-neutral-control-plane-2026-11`, base SHA `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`, head `e8785b177f93a569ce031496d1043026979828d3`. The exact head has zero check runs and zero workflow runs. Older successful runs on `7d7c6b1...` do not validate it.
+- The current PR #74 head is 11 commits ahead of PR #71's recorded base. PR #71 and PR #74 heads are diverged: PR #71 is 108 commits ahead and 11 commits behind PR #74's current head, with merge base `6dcfe5780d021cb3eb4ee2c0701003f8db39b7a0`. Reconcile the stacked branch before review; do not merge or claim exact-head validation.
+- PR #71 contains the durable dispatch outbox, orchestrator, Docker worker, worker daemon, watchdog, backup code, a CircleCI config, and manual self-hosted acceptance workflow. These are branch-only. No CircleCI account/integration/provider activation is evidenced. The self-hosted acceptance workflow is manual-only and has an exact branch/actor/confirmation guard, but its runner selector is generic `[self-hosted, linux, x64]`; it must be narrowed to a repository-specific runner label before any authorized local dispatch. No local dispatch occurred.
+- PR #71's Docker worker acceptance workflow is also branch-only, not active on main. Its hosted Docker test is not a persistent server or 24/7 worker proof.
+
+### Other open PR inventory
+
+- #81 Draft/main, head `a659fa038dc84b000c5a01b20b234d5e31f54ff3`: exact MarketSage CI run #42672784245 failed; Project Operating System PR run #42672784044 succeeded. No infrastructure work.
+- #80 Draft/main, head `241241ee91f2dc944e0dc407bb6c5d1c409bc520`: exact-head checks succeeded in run #42644847236. Product work remains frozen.
+- #79 Draft/main, head `14001bdb5a03775b9772bf9cfea1d169a68f8113`: exact-head checks succeeded in run #42643250744. Product work remains frozen.
+- #78 Draft/main, head `47030f24d2d0491cb53eac5b089ff1dd4a15eccc`: exact Project Operating System and CI runs #42644297705, #42644297868 and #42644283033 succeeded. Its schedule exists only on the PR branch, not main.
+- #77 Draft/main, head `67356939f65224a580c915fd2caa0ea52d8d09a9`: exact run #42624038512 has successful listed jobs, but the required provider-neutral control-plane context is absent on this main-derived head.
+- #73 Draft/main, head `72c57608e8270d999d1e9f2005b47ea56cb893a7`: exact runs #42621957914 and #42621965739 succeeded; ordinary research work remains frozen.
+- #62 open/non-draft/main, head `54fbf4a364a91b4e8d834fdcec0245d079440982`: exact run #42408717730 has successful listed checks; the required provider-neutral control-plane context is absent.
+- #61 Draft, base infrastructure branch, head `25ce24283e35dd7e55eb8545c590a047606643ee`: no exact-head checks; mergeability false.
+- #51 open/non-draft, base `feat/tindex-free-data-connector`, head `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28`: listed exact-head checks succeeded; research work remains frozen.
+- #41 open/non-draft/main, head `162692f1a377ec8445ed958db4cc1171d4cafc47`: listed exact-head checks succeeded; documentation/data work remains frozen.
+- #8 remains parked after its exact `tsetmc-smoke` check failed; do not repeat the same TSETMC request from the same environment.
+- #6 remains open/non-draft/main and is not mergeable against its recorded base. Never merge it to main without the owner's separate explicit approval. PR #14 is already integrated into #6 and must not be re-merged.
+
+### SQLite coordinator PR #54
+
+- PR #54 is closed, Draft, and unmerged; head `e8f7d8add3df577120b92b8927c590aece001509`; its recorded base is `6dbd9cffe11fb75e55e44b6e8232bb35c2bea7da`; current mergeability is false.
+- Issue #55 records the owner's exact-head validation of that SHA: 16/16 tests passed, exit code 0. This validates that exact unit-test input only; it does not authorize merge or operational use. The coordinator remains single-host SQLite, not a multi-host distributed control plane.
+
+### Owner gates and safety
+
+- Issue #49 remains open and is the hard infrastructure-first gate. Product/data/research feature work and investment analysis remain paused.
+- Issue #52 remains open: Chabokan-only install and 30 tests are recorded, but five wheel SHA-256 hashes are still missing. The owner must provide the five exact package/version/hash lines; do not repeat the install/tests.
+- Issue #53 is closed: the zero-cost public-repository hosted-CI decision is recorded. This does not authorize a new hosted validation run; the current owner instruction still requires explicit approval for one bounded exact-head run. No hosted workflow was dispatched or rerun in this audit.
+- The repository-visibility confirmation and one bounded exact-head hosted-validation authorization remain recorded in Issue #49. No visibility, spending, plan, secret, provider, runner, merge, release, or deployment changes were made.
+- No two-independent-backend live execution, independent failure notification, persistent server, worker-loss recovery canary, or 24-hour stability window has been demonstrated. **24/7 readiness: NOT PROVEN.**
+
+This governance-only update is committed with `[skip ci]` to avoid starting an unapproved hosted run. The new documentation commit itself has no exact-head CI evidence and is not merge approval.

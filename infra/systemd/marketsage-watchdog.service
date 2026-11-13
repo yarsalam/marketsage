@@ -1,0 +1,28 @@
+[Unit]
+Description=MarketSage independent health watchdog
+After=local-fs.target
+
+[Service]
+Type=simple
+User=marketsage-runner
+Group=marketsage-runner
+EnvironmentFile=/etc/marketsage/watchdog.env
+ExecStart=/bin/bash -lc 'cd "$MARKETSAGE_REPO_DIR" && exec /usr/bin/python3 -m infra.control_plane.watchdog --database "$MARKETSAGE_DB_PATH" --loop --interval-seconds 30'
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+KillSignal=SIGTERM
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths=/srv/marketsage/data
+
+[Install]
+WantedBy=multi-user.target

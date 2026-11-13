@@ -15,6 +15,21 @@ class InfrastructurePathTests(unittest.TestCase):
         self.assertTrue(is_allowed_infrastructure_path("docs/governance/PROJECT_STATE.md"))
         self.assertTrue(is_allowed_infrastructure_path("infra/control_plane/worker_runtime.py"))
 
+    def test_worker_and_provider_automation_paths_are_allowed(self):
+        for path in (
+            ".circleci/config.yml",
+            ".github/scripts/diagnose_runner_pre_step.py",
+            ".github/scripts/test_diagnose_runner_pre_step.py",
+            ".github/scripts/test_post_ci_failure_notice.py",
+            ".github/workflows/docker-worker-acceptance.yml",
+            ".github/workflows/self-hosted-worker-acceptance.yml",
+            "infra/systemd/marketsage-watchdog.service",
+            "infra/worker-image/Dockerfile",
+        ):
+            with self.subTest(path=path):
+                self.assertTrue(is_allowed_infrastructure_path(path))
+        self.assertFalse(is_allowed_infrastructure_path(".github/workflows/deploy.yml"))
+
     def test_product_and_unknown_paths_are_rejected(self):
         self.assertFalse(is_allowed_infrastructure_path("user/analysis-engine/model.py"))
         self.assertFalse(is_allowed_infrastructure_path("user/user-backend/src/app.ts"))

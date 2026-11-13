@@ -247,6 +247,150 @@ print("CLAIMED" if lease is not None else "NOT_CLAIMED")
                     process.kill()
                     process.wait(timeout=5)
 
+    def test_provider_acceptance_is_attached_to_current_lease(self) -> None:
+        lease = self.coordinator.claim(task_id="task-1", owner="dispatcher", now=100)
+        self.assertTrue(self.coordinator.mark_submitted(
+            lease=lease, provider_id="backend-a", external_run_id="run-1", now=101
+        ))
+        task = self.coordinator.get("task-1")
+        self.assertEqual(task.state, "submitted")
+        self.assertIsNone(task.owner)
+        self.assertIsNone(task.lease_expires_at)
+        self.assertEqual(task.provider_id, "backend-a")
+        self.assertEqual(task.external_run_id, "run-1")
+
+    def test_stale_lease_cannot_attach_provider_acceptance(self) -> None:
+        lease = self.coordinator.claim(
+            task_id="task-1", owner="dispatcher", lease_seconds=2, now=100
+        )
+        self.assertFalse(self.coordinator.mark_submitted(
+            lease=lease, provider_id="backend-a", external_run_id="run-1", now=102
+        ))
+        self.assertEqual(self.coordinator.get("task-1").state, "leased")
+
+    def test_provider_heartbeat_and_terminal_result_are_bound_to_run_identity(self) -> None:
+        lease = self.coordinator.claim(task_id="task-1", owner="dispatcher", now=100)
+        self.assertTrue(self.coordinator.mark_submitted(
+            lease=lease, provider_id="backend-a", external_run_id="run-1", now=101
+        ))
+        self.assertFalse(self.coordinator.mark_provider_running(
+            task_id="task-1", provider_id="backend-b",
+            external_run_id="run-1", now=102,
+        ))
+        self.assertTrue(self.coordinator.mark_provider_running(
+            task_id="task-1", provider_id="backend-a",
+            external_run_id="run-1", now=102,
+        ))
+        running = self.coordinator.get("task-1")
+        self.assertEqual(running.state, "running")
+        self.assertEqual(running.heartbeat_at, 102)
+        self.assertTrue(self.coordinator.publish_provider_result(
+            task_id="task-1", provider_id="backend-a", external_run_id="run-1",
+            state="succeeded", result="artifact:sha256:test", now=103,
+        ))
+        self.assertEqual(self.coordinator.get("task-1").state, "succeeded")
+        self.assertTrue(self.coordinator.publish_provider_result(
+            task_id="task-1", provider_id="backend-a", external_run_id="run-1",
+            state="succeeded", result="artifact:sha256:test", now=104,
+        ))
+        self.assertFalse(self.coordinator.publish_provider_result(
+            task_id="task-1", provider_id="backend-b", external_run_id="run-2",
+            state="succeeded", result="artifact:sha256:test", now=105,
+        ))
+
+    def test_expired_dispatch_lease_is_released_and_reclaimed_with_new_fence(self) -> None:
+        old = self.coordinator.claim(
+            task_id="task-1", owner="dispatcher-a", lease_seconds=3, now=100
+        )
+        self.assertEqual(self.coordinator.recover_expired(now=103), 1)
+        new = self.coordinator.claim(
+            task_id="task-1", owner="dispatcher-b", lease_seconds=30, now=103
+        )
+        self.assertGreater(new.fencing_token, old.fencing_token)
+        self.assertFalse(self.coordinator.mark_submitted(
+            lease=old, provider_id="backend-a", external_run_id="stale", now=104
+        ))
+
+    def test_v1_database_migrates_without_losing_queued_tasks(self) -> None:
+        legacy = Path(self.temp.name) / "legacy-v1.sqlite3"
+        import sqlite3
+        with sqlite3.connect(legacy) as connection:
+            connection.executescript(
+                """
+                CREATE TABLE tasks (
+                    task_id TEXT PRIMARY KEY,
+                    idempotency_key TEXT NOT NULL UNIQUE,
+                    input_digest TEXT NOT NULL,
+                    state TEXT NOT NULL CHECK (state IN ('queued','leased','recoverable','succeeded','failed')),
+                    owner TEXT,
+                    fencing_token INTEGER NOT NULL DEFAULT 0 CHECK (fencing_token >= 0),
+                    lease_expires_at REAL,
+                    result TEXT,
+                    failure_class TEXT,
+                    created_at REAL NOT NULL,
+                    updated_at REAL NOT NULL,
+                    CHECK (
+                        (state = 'leased' AND owner IS NOT NULL AND lease_expires_at IS NOT NULL)
+                        OR
+                        (state <> 'leased' AND owner IS NULL AND lease_expires_at IS NULL)
+                    )
+                );
+                INSERT INTO tasks VALUES (
+                    'legacy-task','legacy-key','aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                    'queued',NULL,0,NULL,NULL,NULL,1,1
+                );
+                PRAGMA user_version=1;
+                """
+            )
+        migrated = SQLiteCoordinator(legacy)
+        task = migrated.get("legacy-task")
+        self.assertEqual(task.state, "queued")
+        self.assertIsNone(task.provider_id)
+        self.assertIsNone(task.external_run_id)
+        lease = migrated.claim(task_id="legacy-task", owner="post-migration")
+        self.assertIsNotNone(lease)
+
+    def test_worker_heartbeat_status_is_persisted_and_updated(self) -> None:
+        first = self.coordinator.record_worker_heartbeat(
+            worker_id="worker-a", task_id="task-1", status="starting", now=100
+        )
+        self.assertEqual(first.status, "starting")
+        current = self.coordinator.record_worker_heartbeat(
+            worker_id="worker-a", task_id="task-1", status="healthy", now=105
+        )
+        self.assertEqual(current.heartbeat_at, 105)
+        self.assertEqual(current.status, "healthy")
+        self.assertEqual(len(self.coordinator.list_worker_heartbeats()), 1)
+
+    def test_failed_worker_heartbeat_requires_allowlisted_failure_code(self) -> None:
+        with self.assertRaises(ValueError):
+            self.coordinator.record_worker_heartbeat(
+                worker_id="worker-a", status="failed", failure_code="raw-exception",
+            )
+        failed = self.coordinator.record_worker_heartbeat(
+            worker_id="worker-a", task_id="task-1",
+            status="failed", failure_code="worker_timeout", now=110,
+        )
+        self.assertEqual(failed.failure_code, "worker_timeout")
+
+    def test_successful_canary_timestamp_is_durable_and_counted(self) -> None:
+        self.assertEqual(self.coordinator.latest_successful_canary_at(), None)
+        self.assertEqual(
+            self.coordinator.record_successful_canary(canary_id="worker-smoke", now=100),
+            100,
+        )
+        self.assertEqual(
+            self.coordinator.record_successful_canary(canary_id="worker-smoke", now=110),
+            110,
+        )
+        self.assertEqual(self.coordinator.latest_successful_canary_at(), 110)
+
+    def test_task_snapshots_include_creation_and_update_timestamps(self) -> None:
+        task = self.coordinator.get("task-1")
+        self.assertGreaterEqual(task.created_at, 0)
+        self.assertGreaterEqual(task.updated_at, task.created_at)
+        self.assertEqual(self.coordinator.list_tasks()[0].task_id, "task-1")
+
     def test_unknown_failure_class_is_rejected(self) -> None:
         lease = self.coordinator.claim(task_id="task-1", owner="worker-a")
         with self.assertRaises(ValueError):

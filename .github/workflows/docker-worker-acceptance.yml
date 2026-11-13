@@ -1,0 +1,111 @@
+name: MarketSage Docker worker acceptance
+
+on:
+  # Heavy Docker canary is not repeated on every infrastructure-branch push.
+  # The normal CI workflow still validates every push and pull request.
+  push:
+    branches:
+      - main
+  # One bounded daily canary on the default branch, not every 15 minutes.
+  schedule:
+    - cron: "43 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketsage-docker-worker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-worker-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout owner-controlled source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Enable Docker user-namespace remapping
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if ! id dockremap >/dev/null 2>&1; then
+            sudo useradd --system --no-create-home --shell /usr/sbin/nologin dockremap
+          fi
+          grep -q '^dockremap:' /etc/subuid || echo 'dockremap:100000:65536' | sudo tee -a /etc/subuid
+          grep -q '^dockremap:' /etc/subgid || echo 'dockremap:100000:65536' | sudo tee -a /etc/subgid
+          sudo install -d -m 0755 /etc/docker
+          sudo python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("/etc/docker/daemon.json")
+          current = json.loads(path.read_text()) if path.exists() else {}
+          current["userns-remap"] = "dockremap"
+          path.write_text(json.dumps(current, sort_keys=True) + "\n")
+          PY
+          sudo systemctl restart docker
+          for attempt in $(seq 1 30); do
+            if docker info >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          docker info --format '{{json .SecurityOptions}}' | tee /tmp/docker-security-options.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          options = " ".join(json.loads(Path("/tmp/docker-security-options.json").read_text())).lower()
+          if "userns" not in options or "seccomp" not in options or "unconfined" in options:
+              raise SystemExit("Docker userns/seccomp security prerequisites are not active")
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install infrastructure dependencies
+        run: python -m pip --isolated install --disable-pip-version-check --no-cache-dir -r requirements-infra.txt
+
+      - name: Build immutable worker image
+        run: |
+          set -Eeuo pipefail
+          docker build --pull --no-cache \
+            --file infra/worker-image/Dockerfile \
+            --tag marketsage-worker:acceptance .
+          IMAGE_ID="$(docker image inspect marketsage-worker:acceptance --format '{{.Id}}')"
+          [[ "$IMAGE_ID" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "MARKETSAGE_WORKER_IMAGE_ID=$IMAGE_ID" >> "$GITHUB_ENV"
+
+      - name: Execute real no-network sandbox worker through Orchestrator
+        run: |
+          python -m infra.control_plane.worker_acceptance \
+            --image-id "$MARKETSAGE_WORKER_IMAGE_ID" \
+            --commit-sha "$(git rev-parse HEAD)" \
+            --workspace .
+  notify-failure:
+    name: Report worker canary failure
+    needs: [docker-worker-acceptance]
+    if: ${{ always() && needs.docker-worker-acceptance.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Post sanitized failure checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -Eeuo pipefail
+          body="$(printf '%s\n' \
+            '## Docker worker canary failed' \
+            '' \
+            "- Commit: $HEAD_SHA" \
+            "- Run: $RUN_URL (attempt $RUN_ATTEMPT)" \
+            '' \
+            'The isolated worker acceptance did not complete. Inspect the linked run for the sanitized failure step. No automatic deployment or product/data work was started.')"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/issues/49/comments" -f body="$body"

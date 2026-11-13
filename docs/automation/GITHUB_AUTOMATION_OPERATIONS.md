@@ -75,6 +75,12 @@ The TSETMC integrated acceptance, offline dataset validation, and sanitized loca
 
 The laptop Runner `marketsage-local-01` is an owner-operated resource, not an always-on host. Its service and local proxy may be healthy while the laptop is running, but this does not establish continuous availability. Do not run untrusted PR code or general coding-agent tasks on it. Private staged datasets remain local, read-only to the Runner, and must not be uploaded to GitHub artifacts or logs.
 
+The branch-only self-hosted worker acceptance workflow must target the custom
+`marketsage-server-worker` label. Register that label only on a separately
+operated server, never on the owner's laptop or a shared runner. Keep the job
+manual-only and owner-confirmed; if no dedicated server runner is available,
+leave it unschedulable rather than falling back to generic self-hosted labels.
+
 Any persistent Worker required for unattended task execution must run on a separately managed host or equivalent independently available environment. It needs a dedicated least-privilege account, restricted egress, isolated workspaces, no untrusted-PR execution, immutable worker image, bounded CPU/memory/PIDs/time/output, process supervision, heartbeat, watchdog, disk/backup/restore checks, safe patching, and an independently observable recovery path. No new paid server or service is provisioned by this document.
 
 ## 7. Daily operations and recovery

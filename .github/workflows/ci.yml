@@ -148,11 +148,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Test CI scope classifier and automation helpers
+      - name: Test CI scope, runner diagnostics, and automation helpers
         run: |
           python3 .github/scripts/test_classify_ci_scope.py -v
           python3 .github/scripts/test_post_ci_failure_notice.py -v
           python3 .github/scripts/test_detect_direct_main_update.py -v
+          python3 .github/scripts/test_diagnose_runner_pre_step.py -v
 
   notify-failure:
     name: Post sanitized failure notice

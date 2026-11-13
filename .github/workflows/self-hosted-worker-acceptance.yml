@@ -1,0 +1,127 @@
+name: MarketSage self-hosted worker acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_local_worker_acceptance:
+        description: "Owner confirms one bounded local sandbox acceptance on the selected immutable branch commit"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # One local worker host: serialize this acceptance workflow and never cancel
+  # a running worker job merely because a newer scheduled/push run arrived.
+  group: marketsage-self-hosted-worker-acceptance
+  cancel-in-progress: false
+
+jobs:
+  self-hosted-worker-acceptance:
+    if: github.ref == 'refs/heads/infra/durable-provider-dispatch-outbox-2026-11' && github.actor == 'yarsalam' && inputs.confirm_local_worker_acceptance == true
+    # Reserved for an independently operated server; never assign this label to the owner's laptop.
+    runs-on: [self-hosted, linux, x64, marketsage-server-worker]
+    timeout-minutes: 20
+    steps:
+      - name: Checkout owner-controlled branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify dedicated unprivileged rootless Docker runtime
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uid="$(id -u)"
+          [[ "$uid" == "110" ]]
+          [[ "$(id -un)" == "marketsage-runner" ]]
+          command -v docker >/dev/null
+          export XDG_RUNTIME_DIR="/run/user/${uid}"
+          export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock"
+          # Pass runtime settings to later steps without printing host paths.
+          printf 'XDG_RUNTIME_DIR=%s\nDOCKER_HOST=%s\n' "$XDG_RUNTIME_DIR" "$DOCKER_HOST" >> "$GITHUB_ENV"
+          docker info --format '{{json .SecurityOptions}}' | python3 -c '
+          import json, sys
+          options = " ".join(json.load(sys.stdin)).lower()
+          if "seccomp" not in options or ("rootless" not in options and "userns" not in options) or "unconfined" in options:
+              raise SystemExit("rootless Docker with seccomp/userns is required")
+          print("DOCKER_SECURITY=PASS")
+          '
+
+      - name: Verify networkless Docker configuration
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mapfile -t networks < <(docker network ls --format '{{.Name}}' | sort)
+          printf 'Docker networks: %s\n' "${networks[*]}"
+          [[ "${#networks[@]}" -eq 2 ]]
+          [[ "${networks[0]}" == "host" ]]
+          [[ "${networks[1]}" == "none" ]]
+          if docker network ls --format '{{.Name}}' | grep -qx bridge; then
+            echo "Unexpected default bridge network is present" >&2
+            exit 1
+          fi
+
+      - name: Verify owner-controlled PR source
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          [[ "$(git branch --show-current)" == "infra/durable-provider-dispatch-outbox-2026-11" ]]
+          test -z "$(git status --porcelain)"
+          git rev-parse HEAD
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install infrastructure dependencies from Chabokan only
+        run: |
+          python -m pip --isolated install --disable-pip-version-check --no-cache-dir \
+            --only-binary=:all: \
+            --index-url https://mirror2.chabokan.net/pypi/simple/ \
+            -r requirements-infra.txt
+
+      - name: Build immutable worker image
+        run: |
+          set -Eeuo pipefail
+          docker build --pull --no-cache \
+            --file infra/worker-image/Dockerfile \
+            --tag marketsage-worker:self-hosted-acceptance .
+          IMAGE_ID="$(docker image inspect marketsage-worker:self-hosted-acceptance --format '{{.Id}}')"
+          [[ "$IMAGE_ID" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "MARKETSAGE_WORKER_IMAGE_ID=$IMAGE_ID" >> "$GITHUB_ENV"
+
+      - name: Execute the same sandbox worker on the independent local host
+        run: |
+          python -m infra.control_plane.worker_acceptance \
+            --image-id "$MARKETSAGE_WORKER_IMAGE_ID" \
+            --commit-sha "$(git rev-parse HEAD)" \
+            --workspace .
+  notify-failure:
+    name: Report self-hosted worker failure
+    needs: [self-hosted-worker-acceptance]
+    if: ${{ always() && needs.self-hosted-worker-acceptance.result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Post sanitized runner checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -Eeuo pipefail
+          body="$(printf '%s\n' \
+            '## Self-hosted worker acceptance failed' \
+            '' \
+            "- Commit: $HEAD_SHA" \
+            "- Run: $RUN_URL (attempt $RUN_ATTEMPT)" \
+            '' \
+            'The local runner did not complete the sandbox acceptance. Inspect the linked run for the rootless Docker diagnostics. No automatic deployment or product/data work was started.')"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/issues/49/comments" -f body="$body"

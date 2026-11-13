@@ -30,6 +30,13 @@ class HeartbeatAssessmentTests(unittest.TestCase):
         result = assess_heartbeat(WorkerHeartbeat("worker-a", 200), now=100)
         self.assertEqual(result.level, HeartbeatLevel.CLOCK_SKEW)
 
+    def test_explicit_worker_failure_is_critical_even_with_recent_heartbeat(self) -> None:
+        result = assess_heartbeat(
+            WorkerHeartbeat("worker-a", 99, status="failed", failure_code="worker_timeout"),
+            now=100,
+        )
+        self.assertEqual(result.level, HeartbeatLevel.FAILED)
+
     def test_missing_heartbeat_is_not_healthy(self) -> None:
         result = assess_heartbeat(WorkerHeartbeat("worker-a", None), now=100)
         self.assertEqual(result.level, HeartbeatLevel.MISSING)
@@ -150,6 +157,18 @@ class SnapshotAssessmentTests(unittest.TestCase):
         assessment = assess_snapshot(ObserverSnapshot(collected_at=100), now=100)
         self.assertEqual(assessment.level, HealthLevel.UNKNOWN)
         self.assertIn("no_observations", assessment.reason_codes)
+
+    def test_failed_worker_is_critical_and_has_sanitized_reason_code(self) -> None:
+        snapshot = ObserverSnapshot(
+            collected_at=100,
+            workers=(WorkerHeartbeat("worker-a", 99, status="failed", failure_code="worker_timeout"),),
+            providers=(ProviderTelemetry("provider-a", ProviderHealth.HEALTHY),),
+            last_successful_canary_at=99,
+        )
+        assessment = assess_snapshot(snapshot, now=100)
+        self.assertEqual(assessment.level, HealthLevel.CRITICAL)
+        self.assertEqual(assessment.worker_failed_count, 1)
+        self.assertIn("worker_failed", assessment.reason_codes)
 
     def test_worker_clock_skew_is_degraded(self) -> None:
         snapshot = ObserverSnapshot(

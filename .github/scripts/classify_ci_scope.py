@@ -9,9 +9,15 @@ from pathlib import PurePosixPath
 
 
 ALLOWED_EXACT = {
-    ".github/workflows/ci.yml",
+    ".circleci/config.yml",
     ".github/scripts/classify_ci_scope.py",
+    ".github/scripts/diagnose_runner_pre_step.py",
     ".github/scripts/test_classify_ci_scope.py",
+    ".github/scripts/test_diagnose_runner_pre_step.py",
+    ".github/scripts/test_post_ci_failure_notice.py",
+    ".github/workflows/ci.yml",
+    ".github/workflows/docker-worker-acceptance.yml",
+    ".github/workflows/self-hosted-worker-acceptance.yml",
     "requirements-infra.txt",
     "schemas/infra-task-v1.schema.json",
 }
@@ -20,6 +26,8 @@ ALLOWED_PREFIXES = (
     "docs/governance/",
     "docs/infra/",
     "infra/control_plane/",
+    "infra/systemd/",
+    "infra/worker-image/",
 )
 
 
