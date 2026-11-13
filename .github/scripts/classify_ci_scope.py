@@ -35,7 +35,16 @@ def is_infrastructure_only(event_name: str, branch_name: str, changed_paths: lis
         return True
     if event_name not in {"push", "pull_request"}:
         return False
-    if not branch_name.startswith("infra/") or not changed_paths:
+    if not changed_paths:
+        return False
+
+    # A merge commit delivered to main must still be classified from its actual
+    # changed paths. Otherwise the default-branch push would fail the freeze
+    # gate even when it contains only allowlisted infrastructure changes.
+    allowed_branch = branch_name.startswith("infra/") or (
+        event_name == "push" and branch_name == "main"
+    )
+    if not allowed_branch:
         return False
     return all(is_allowed_infrastructure_path(path) for path in changed_paths)
 
