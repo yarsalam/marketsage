@@ -455,3 +455,100 @@ The prior ±7-day TSE Client percentages above remain discovery diagnostics only
 17. iran-bourse-mcp CODAL parser: https://github.com/msmahdinejad/iran-bourse-mcp/blob/main/src/iran_bourse_mcp/codal_reports.py
 
 **Final rule:** a public extractor demonstrates a method, not the economic truth of the event. Reuse parsers and robust edge-case handling, but the accepted evidence chain remains verified instrument identity → exact source event/document → terms and effective date → reproducible independent factor → reconciled historical series → reviewed data rights and point-in-time availability. No source, event, adjusted series or investment use is approved by this comparative audit.
+
+
+## 12. Vaghdir 2011 case reconstruction and independent-event test queue
+
+**Research update:** 2026-11-13  
+**Evidence basis:** owner-supplied local terminal outputs and preserved CODAL extracts; secondary history page used only to select additional test candidates. No local raw files were modified by this update.
+
+### 12.1 Issuer terms established from preserved CODAL extracts
+
+- TracingNo 38803 (AGM decisions): the AGM for fiscal year ended 1389/09/30 was held on 1390/01/29 and approved 500 Rial cash dividend per share.
+- TracingNo 38805 (EGM decisions): on 1390/01/29 capital increased from 6,075,000 million Rial to 12,000,000 million Rial. Funding: 1,410,000 million Rial retained earnings, 2,721,000 million Rial reserves, 1,794,000 million Rial claims/cash contribution, zero share premium.
+- The old/new share ratio is 6.075 / 12 = 0.50625, matching the preserved TSETMC share-change row dated 2011-04-23 (6.075bn old; 12bn new shares).
+- TracingNo 46666 extends the rights-use period from 1390/04/13 through 1390/05/11.
+- TracingNo 59965 records 1,770,016,021 shares used through existing rights and 23,983,979 shares offered for public subscription (sum: 1,794,000,000); subscription window 1390/09/27–1390/10/26.
+- TracingNo 61220 states the capital increase was registered on 1390/10/12. The April 2011 TSETMC records must not be conflated with later rights, subscription and legal-registration dates.
+
+### 12.2 Raw provider records and trading chronology
+
+The preserved owner-side outputs report:
+
+| Date | Raw daily observation | Interpretation |
+|---|---|---|
+| 2011-04-16 | pClosing 7,252; 1,338 trades | Last supplied pre-event traded session |
+| 2011-04-17 through 2011-04-20 | pClosing 7,252; zero trades | Stale/no-trade observations |
+| 2011-04-23 | pClosing 3,820; zero trades | Provider/stale observation, not an executed close |
+| 2011-04-24 and 2011-04-25 | pClosing 3,820; zero trades | No-trade observations |
+| 2011-04-26 | pClosing 3,569; priceYesterday 3,820; 1,131 trades | First supplied traded close after the no-trade interval |
+| 2011-04-27 | pClosing 3,436; 1,125 trades | Subsequent traded session |
+
+Provider event tuples, in the original field order (pClosing, pClosingNotAdjusted):
+
+| Provider date | Tuple | Diagnostic interpretation only |
+|---|---:|---|
+| 2011-04-23 | (3,820; 7,252) | Ratio 0.526751; close to mixed capital-increase theoretical reference before DPS |
+| 2011-04-26 | (7,252; 3,820) | Reciprocal of the 23-Apr tuple; exact provider meaning/reason remains unresolved |
+| 2011-04-26 | (6,752; 7,252) | Difference 500 Rial; aligns arithmetically with approved DPS |
+| 2011-04-26 | (3,567; 6,752) | Ratio 0.528288; close to mixed increase theoretical reference after DPS |
+
+The share-change row dated 2011-04-23 has old shares 6,075,000,000 and new shares 12,000,000,000.
+
+### 12.3 Reconstructable arithmetic
+
+Using billions of shares and nominal subscription value 1,000 Rial:
+
+(7,252 × 6.075 + 1,000 × 1.794) / 12 = 3,820.825.
+
+After subtracting the 500-Rial approved dividend:
+
+(6,752 × 6.075 + 1,000 × 1.794) / 12 = 3,567.7.
+
+These values are within approximately one Rial of the TSETMC reference tuples 3,820 and 3,567. This is strong arithmetic correspondence, not yet proof of the provider's ordering semantics or of the exact market-effective chronology.
+
+### 12.4 Independent chart check
+
+The decoded chart file has semicolon-separated records and comma-separated fields; it must not be parsed as a one-header CSV. The corrected extraction returns:
+
+| Date | Chart close |
+|---|---:|
+| 2011-04-16 | 60 |
+| 2011-04-26 | 56 |
+| 2011-04-27 | 54 |
+| 2011-04-30 | 53 |
+
+The implied chart-factor ratio between 16-Apr and 26-Apr is approximately 0.527293. It is close to the two individual capital-related candidates (0.526751 and 0.528288), and materially different from their combined product with the dividend factor (approximately 0.491864). However, integer-rounded chart values and multiple provider tuples inside the same observation interval prevent a definitive conclusion about whether the chart includes cash dividends. The supplied candidate series has about 15.3% normalized error at 2011-04-26 and remains unaccepted.
+
+### 12.5 Independent event candidates selected for the next test
+
+The preserved Vaghdir feed lists the following candidate rows. The event type is not inferred from the price ratio:
+
+| Gregorian provider date | Jalali date on secondary history page | Share-change evidence | Price-adjust observation | Current status |
+|---|---|---|---|---|
+| 2012-12-08 | 1391/09/18 | 12bn → 16bn; ratio 0.75 | Approximately 0.749902 | Candidate capital-increase-only sample; original EGM terms and effective session still required |
+| 2013-04-09 | 1392/01/20 | 16bn → 18bn; ratio 0.8888889 | Approximately 0.888807 | Candidate capital-increase-only sample; original EGM terms and effective session still required |
+| 2012-02-20 | 1390/12/01 | No same-date share-change row in the preserved list | Approximately 0.890370 | Cash-distribution candidate only; DPS and ex-date not verified |
+| 2013-02-27 | 1391/12/09 | No same-date share-change row in the preserved list | Approximately 0.892311 | Cash-distribution candidate only; DPS and ex-date not verified |
+
+No same-date share-change row does not prove an event is a dividend or prove there was no related corporate action nearby. Search the full neighborhood and original documents before choosing the cleanest cash-distribution sample.
+
+### 12.6 Next actions and exit criteria
+
+1. Retrieve original CODAL AGM/EGM resolutions, amendments and implementation notices for the four candidate dates.
+2. Search issuer and official newspaper advertisements when CODAL is missing or incomplete; preserve the original publication and identify it as primary only for the facts it directly announces.
+3. Establish the exact first affected trading session independently of meeting and registration dates.
+4. Select at least one clean capital-increase-only event and one clean cash-distribution-only event.
+5. Reconstruct the terms-based factor and compare provider tuple, raw daily observations and independent chart on the same sessions and price fields.
+6. Conclude each sample as CONFIRMED_SINGLE_FACTOR, MIXED_OR_LINKED, CONFLICT or UNRESOLVED.
+
+Do not close the Vaghdir method study until those two standalone tests are adequately evidenced. Do not use the 2011 mixed case as a universal factor rule.
+
+### 12.7 Secondary locator used for candidate selection
+
+BourseEye's Vaghdir capital-increase/history page lists the share-count changes on 1391/09/18 (12bn → 16bn) and 1392/01/20 (16bn → 18bn), along with price-adjust observations on those dates and 1390/12/01 and 1391/12/09. The page explicitly states that its price-adjust list does not identify whether an adjustment is caused by dividend or capital increase. It is therefore a locator/cross-check only:
+https://bourseeye.com/stocks/137/وغدیر-سرمایه‌گذاری-غدیر-هلدینگ/capital-increases
+
+A contemporaneous secondary blog reports an EGM on 1391/09/14 approving a 33.3% increase from retained earnings. Treat this only as a search lead until the original CODAL resolution is obtained:
+https://secretgroup.blogfa.com/1391/09/3
+
