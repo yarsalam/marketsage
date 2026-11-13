@@ -531,6 +531,8 @@ The preserved Vaghdir feed lists the following candidate rows. The event type is
 | 2012-02-20 | 1390/12/01 | No same-date share-change row in the preserved list | Approximately 0.890370 | Cash-distribution candidate only; DPS and ex-date not verified |
 | 2013-02-27 | 1391/12/09 | No same-date share-change row in the preserved list | Approximately 0.892311 | Cash-distribution candidate only; DPS and ex-date not verified |
 
+The 2013-02-27 / 1391/12/09 candidate has a secondary lead: a contemporaneous source reports Vaghdir's AGM for 1391/12/08 and a proposal to distribute 400 Rial per share. The final AGM resolution has not yet been found. The secondary rounded price history shows approximately 464 to 414 Toman around the next-day adjustment, a roughly 500-Rial difference. This discrepancy makes the sample valuable for investigation, but it must not be called a dividend-only event until the original AGM resolution, precise provider reference prices and any linked corporate action are verified.
+
 No same-date share-change row does not prove an event is a dividend or prove there was no related corporate action nearby. Search the full neighborhood and original documents before choosing the cleanest cash-distribution sample.
 
 ### 12.6 Next actions and exit criteria
