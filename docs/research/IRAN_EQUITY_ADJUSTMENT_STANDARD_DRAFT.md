@@ -313,6 +313,8 @@ BourseEye lists the share-count changes and price-adjust observations, but does 
 | 2012-02-20 | 1390/12/01 | Ratio approximately 0.890370 | None identified on same date | Candidate cash-distribution-only test | DPS and ex-date not yet verified |
 | 2013-02-27 | 1391/12/09 | Ratio approximately 0.892311 | None identified on same date | Candidate cash-distribution-only test | DPS and ex-date not yet verified |
 
+The 2013-02-27 / 1391/12/09 candidate has a useful secondary lead: a contemporary source reports Vaghdir's AGM for 1391/12/08 and a board proposal to distribute 400 Rial per share. This is not the final AGM decision. The secondary rounded price history displays approximately 464 to 414 Toman around the 1391/12/09 adjustment, a roughly 500-Rial difference; this discrepancy must be resolved from the original AGM resolution and exact provider reference prices. Prioritize this date for the first cash-distribution document search, but do not classify it as a confirmed dividend-only event yet.
+
 Absence of a same-date share-change row does not prove a dividend or prove no related capital event nearby. Verify all original notices and neighboring provider rows before selecting the cleanest example.
 
 ### 11.3 Completion conditions for standalone tests
