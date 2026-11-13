@@ -1,6 +1,6 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-08  
+**Snapshot date:** 2026-11-13  
 **Repository:** yarsalam/marketsage (Public per live GitHub API; owner decision recorded in Issue #53)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** #6, feat/tindex-free-data-connector  
@@ -188,3 +188,46 @@ This section supersedes older infrastructure snapshots in this file where they c
 - Issue #63 records the active main ruleset and the still-impractical 10-approval configuration. Owner action remains necessary to set the intended approval count and verify bypass semantics.
 
 **Current infrastructure verdict: NOT COMPLETE / NOT 24/7 ACCEPTED.** Preserve research-only posture. No data-source approval, production scoring, ranking, calibrated probability, backtest approval, broker, trading, deployment or capital allocation is enabled.
+
+
+## Live infrastructure checkpoint — 2026-11-13 14:49 UTC
+
+This checkpoint supersedes older status statements above where they conflict with the live GitHub API. It is a repository-only audit; no workflow was dispatched or rerun, no local runner was used, and no merge, deployment, provider registration, secret, billing, plan, or visibility change was made.
+
+### Repository, default branch and protection
+
+- Default branch: `main`.
+- Main HEAD: `4c4b032196137af4658ea2c28e38a21605ee923b`, committed `2026-11-07T19:55:51Z`. Main has not advanced in this audit.
+- GitHub repository metadata reports `visibility=public` and `private=false`. This conflicts with the latest owner request describing the repository as private. Issue #53 records the earlier explicit public/zero-additional-spend decision. No visibility change was made; treat all repository contents and history as public until the owner resolves the mismatch.
+- Active ruleset [#26789479](https://github.com/yarsalam/marketsage/rules/26789479) targets main and requires a PR, one approval, and seven named status contexts; deletion and non-fast-forward updates are blocked; no bypass actors are configured and the connected integration reports `current_user_can_bypass=never`.
+- The ruleset has `strict_required_status_checks_policy=false` and `dismiss_stale_reviews_on_push=false`. The branch API reports `protected=true`, while the legacy protection subobject reports `enabled=false` and no enforced legacy status contexts. The active ruleset is the available enforcement evidence; do not describe strict freshness or stale-review dismissal as enabled.
+- Required contexts are `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, and `Test CI automation helpers`. Main's current `.github/workflows/ci.yml` does not define `Test provider-neutral control plane`; the required-check mismatch remains.
+
+### Main CI and scheduled execution
+
+- Main workflow blob: `3b0bc36ae8f95c6b34c4afe6a1535716b421a864`. It has push, pull_request, daily schedule `17 3 * * *`, and workflow_dispatch triggers; workflow permissions are `contents: read`; same-ref concurrency cancels superseded runs; jobs have bounded timeouts.
+- The three local TSETMC workflows on main are manual-only. No local workflow was dispatched.
+- Latest confirmed main schedule: [run #43414337932](https://github.com/yarsalam/marketsage/actions/runs/43414337932), event `schedule`, exact main SHA `4c4b032...`, completed successfully on 2026-11-13. It ran `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, and CI helper tests successfully. This is CI/test/build activity, not a worker canary.
+- The run started at 11:06:20 UTC against the configured 03:17 UTC cron, approximately 7h49m20s late. GitHub Schedule is not a precise timer; no independent lateness alarm is active.
+- Main's schedule still executes the product/research test suite and production-image build. This conflicts with the current infrastructure-first freeze. The freeze exists on PR #74's branch only and is not active on main.
+- Latest observed workflow history also includes superseded Push/PR runs cancelled by concurrency and newer exact-head runs. Cancellation of superseded commits is not a test pass; only completed successful runs on the exact SHA count.
+
+### Infrastructure PR evidence
+
+- PR #74 is Draft/open on exact head `24b95c204749b74ba2f382f4dd528d6463173dc9`, based on main. It is currently mergeable but is not approved for merge. Exact Push run [#43379843888](https://github.com/yarsalam/marketsage/actions/runs/43379843888) and exact Pull Request run [#43379849607](https://github.com/yarsalam/marketsage/actions/runs/43379849607) both succeeded on that SHA. The two runs produced 20 check-run records in total: scope classification, provider-neutral control-plane tests, and CI helper tests passed; application/research/admin/production jobs were scope-skipped. This is exact-head GitHub-hosted CI evidence for PR #74 only.
+- PR #74's CI workflow blob is `27c7378d9e4e64456403a98d9e3fe57029b808eb`. Its fail-closed classifier treats schedule as infrastructure-only and blocks unknown/mixed/product changes rather than executing product commands. This freeze is not on main.
+- PR #71 is Draft/open on exact head `e630517c7e2916ed58b7568b0ebbbf1d390b86ce`, based on PR #74. Current branch comparison: 117 commits ahead and 2 behind the current PR #74 head `24b95c204749b74ba2f382f4dd528d6463173dc9`; GitHub reports mergeable, but the branch is stale. Its exact current head has **0 check runs and 0 workflow runs**. Do not merge; reconcile the base and obtain separately authorized exact-head validation before review or merge.
+- PR #54 is **closed, Draft, unmerged** at `e8f7d8add3df577120b92b8927c590aece001509`. Issue #55 records the owner's exact-current-head result of 16/16 tests, exit code 0. The earlier 11/11 result belongs only to the prior head. Against current PR #74 base, the SQLite branch is diverged: 8 commits ahead, 46 behind, merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`. Keep it closed/unmerged; no current GitHub checks exist for that SHA.
+- PR #82 is a new Draft research notebook and is outside Goal 1. A scope-hold comment already instructs no further research work. Nevertheless, its exact head `880a1b1d683b4c3992743c5f046be2c80920c7cf` received successful Push [#43445772521](https://github.com/yarsalam/marketsage/actions/runs/43445772521) and Pull Request [#43445786681](https://github.com/yarsalam/marketsage/actions/runs/43445786681) runs from the old main CI; analysis and production-image checks ran. This is evidence that the freeze is not enforced on main, not authorization to continue research.
+
+### Owner-action and safety state
+
+- [Issue #49](https://github.com/yarsalam/marketsage/issues/49) remains open and is the hard gate. Existing owner actions remain: resolve the public/private visibility mismatch and explicitly authorize one bounded exact-head hosted validation only when ready. This audit did not dispatch or rerun any hosted workflow.
+- [Issue #52](https://github.com/yarsalam/marketsage/issues/52) remains open for five Chabokan wheel SHA-256 values. The prior 30/30 install/test evidence is not repeated.
+- [Issue #53](https://github.com/yarsalam/marketsage/issues/53) is closed on the public-repository zero-additional-spend decision; no spending-cap increase or paid resource is authorized.
+- [Issue #55](https://github.com/yarsalam/marketsage/issues/55) is closed for exact-head 16/16 SQLite unit tests only; it does not resolve branch divergence or operational acceptance.
+- [Issue #59](https://github.com/yarsalam/marketsage/issues/59) remains open for event/schedule orchestration acceptance.
+- PR #6 remains open/non-mergeable and must never be merged without separate explicit owner approval. PR #14 is already integrated into #6. PR #8 remains parked after its known TSETMC ConnectTimeout; do not repeat that request from the same environment.
+- No independent persistent server runner, second live backend, external observer/alert failure domain, real host-loss/restart drill, off-host restore drill, worker-loss recovery proof, end-to-end canary, or 24-hour observation window is established.
+
+**Goal 1 verdict: OPEN / NOT COMPLETE / NOT 24/7 READY.** Ordinary product, data, research, investment-analysis, backtest, and source-expansion work remains paused.
