@@ -554,3 +554,18 @@ https://bourseeye.com/stocks/137/وغدیر-سرمایه‌گذاری-غدیر-�
 A contemporaneous secondary blog reports an EGM on 1391/09/14 approving a 33.3% increase from retained earnings. Treat this only as a search lead until the original CODAL resolution is obtained:
 https://secretgroup.blogfa.com/1391/09/3
 
+
+
+## 13. CODAL candidate-search run and correction
+
+**Owner run:** 2026-11-13. Three CODAL date windows were queried for symbol وغدیر. The script produced 20 records for each window and wrote three raw response files plus a manifest. It used `PageSize=100` and stopped when a page had fewer than 100 records. CODAL search uses a 20-record default page and `PageSize` is not the page-size parameter; the script therefore stopped after page 1 in all three windows. The 60 headers are not complete window inventories.
+
+The parser did not print or verify the issuer `Symbol` / company name. Several titles mention other investment companies; this is a warning to inspect metadata, not enough by itself to classify every row as unrelated. No result is assigned to وغدیر until exact issuer metadata is checked.
+
+High-priority TracingNos returned by this first-page-only run:
+- 64699, 64727, 66202, 66259;
+- 105144, 105243, 107226, 108468, 108280, 109609, 110016, 118368.
+
+The most relevant exact-ID lookups are 66202 and 66259 around the 2012-02-20 candidate; 107226 and 108468 around the 2013-02-27 candidate; and 108280, 109609, 110016 and 118368 for possible capital-increase chronology around the 2013-04-09 candidate. These are candidate headers only; issuer identity and original document contents remain unverified.
+
+**Next retrieval must:** query by exact TracingNo; explicitly inspect Symbol/company, title, letter code, publication date, URL/serial and attachment references; then rerun symbol/date searches with pagination derived from the API's `Total` field and 20-record default. Preserve raw responses and hashes. Do not classify an event or compute an accepted factor from this header-only output.
