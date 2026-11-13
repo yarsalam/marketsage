@@ -385,3 +385,28 @@ Original PDFs/text extracts and TSETMC snapshots are in the owner's local audit 
 ---
 
 **Draft decision:** proceed with the two capital-increase samples and two cash-distribution candidates in §11. Do not close the Vaghdir method study until original issuer terms and first affected sessions are verified for at least one clean capital-increase-only event and one clean cash-distribution-only event.
+
+
+
+## 16. CODAL search-pagination and issuer-identity correction
+
+**Observed owner run:** 2026-11-13. Three requested date windows each returned exactly 20 records. The script included a `PageSize=100` query parameter, but the CODAL search endpoint uses a default 20-record page; `PageSize` is not the pagination control. Its loop stopped when the number of records was below 100, so it read only page 1 in each window. Therefore the 60 collected headers are not a complete search of those windows.
+
+The initial parser also did not print or assert the issuer symbol/company identity for each result. Titles mentioning another investment company are not enough to conclude whether the filing is unrelated, but no TracingNo may be assigned to وغدیر until its response metadata confirms the symbol/company.
+
+**Correction required before using this search result:**
+1. Fetch each high-priority candidate directly by exact `TracingNo` and preserve the raw response.
+2. Print and verify `TracingNo`, `Symbol`, issuer/company name, title, LetterCode, PublishDateTime, Url/LetterSerial and attachment metadata.
+3. For symbol/date-window discovery, parse top-level `Total` and `Letters`; paginate using the endpoint's 20-record default and continue until all pages implied by `Total` have been retrieved (with a safe request cap and rate spacing).
+4. Send `Accept: application/json` explicitly when parsing JSON; retain XML parsing only as an explicitly handled fallback.
+5. Deduplicate by TracingNo only after preserving the individual query/page provenance; do not discard alternate snapshots or revisions.
+6. Preserve every response hash and report pages requested, pages completed, Total, rows returned, symbol-matched rows and any errors.
+
+**High-priority candidate TracingNos seen in the first-page-only run (issuer identity not yet verified):**
+
+- Earlier window: 64699, 64727, 66202, 66259.
+- Later window: 105144, 105243, 107226, 108468, 108280, 109609, 110016, 118368.
+
+For the 2012-02-20 candidate, 66202 (AGM resolutions, published 1390/11/30) and 66259 (AGM decisions, published 1390/12/11) are useful exact-ID lookups. For the 2013-02-27 candidate, 107226 (AGM decision summary, published 1391/12/08) and 108468 (AGM decisions, published 1391/12/19) are useful exact-ID lookups. The 108280, 109609, 110016 and 118368 records may help establish a later capital-increase chronology around 1391/12–1392/03, but must first be identity-checked and then linked to the 2013-04-09 provider event by terms and chronology.
+
+**Current status:** discovery leads only. No issuer assignment, event classification, DPS, capital terms or effective date is accepted from these headers until exact-ID retrieval and original-document inspection are complete.
