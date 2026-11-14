@@ -1,0 +1,8 @@
+source_id,source_class,local_relative_path,description,authority,status,sha256,retrieved_at_utc,notes
+PAR-TSE-PRICE,provider,raw_provider_snapshots/parsian_price_adjust_raw.json,TSETMC price-adjust event payload,discovery_only,local_file_reported_not_imported,,,Preserve original payload
+PAR-TSE-SHARES,provider,raw_provider_snapshots/parsian_share_change_raw.json,TSETMC share-change payload,discovery_only,local_file_reported_not_imported,,,Do not infer funding source
+PAR-TSE-DAILY,market,raw_provider_snapshots/parsian_daily_raw.json,Raw daily market history,market_observations,local_file_reported_not_imported,,,Raw series immutable
+PAR-TSECLIENT,independent_provider,tse_client_validation/tse_client_adjust_info_events.json,TSE Client event diagnostics,diagnostic_only,local_file_reported_not_imported,,,±7-day is discovery only
+PAR-CHART,independent_chart,official_chart_validation/,Official raw/adjusted chart captures,comparison_only,local_folder_reported_not_imported,,,Resolve old-history scale and field differences
+PAR-DIAGNOSTICS,calculation,adjustment_factor_diagnostics/,Factor diagnostics,diagnostic_only,local_folder_reported_not_imported,,,Not accepted factors
+PAR-AUDIT,validation,three_symbol_audit_runs/20261112T194429Z/,Three-symbol audit run,diagnostic_only,local_folder_reported_not_imported,,,Re-run after source files are staged
