@@ -1,0 +1,2 @@
+event_id,symbol,provider_date,event_family,issuer_terms_status,effective_session_status,provider_factor,independent_factor,relationship_status,series_status,notes
+PAR-2019-PRICE-ONLY,parsian,2019,price_adjust_candidate,not_verified,not_verified,,,UNRESOLVED,QUARANTINED,"Prior diagnostic identified a price-adjust-only candidate in 2019; exact date and event terms must be recovered from raw payload"
