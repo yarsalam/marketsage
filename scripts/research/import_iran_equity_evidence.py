@@ -91,14 +91,23 @@ def walk_inscode_paths(value: Any, primary: str, path: str = "$") -> list[str]:
 
 
 class Importer:
-    def __init__(self, source_root: Path, review_root: Path, repo_root: Path, max_file_bytes: int):
+    def __init__(self, source_root: Path, evidence_root: Path, review_root: Path, repo_root: Path, max_file_bytes: int):
         self.source_root = source_root.resolve()
+        self.evidence_root = evidence_root.resolve()
         self.review_root = review_root.resolve()
         self.repo_root = repo_root.resolve()
         self.destination = self.repo_root / DEST_REL
         self.max_file_bytes = max_file_bytes
         self.entries: list[dict[str, Any]] = []
         self.skipped: list[dict[str, Any]] = []
+
+    def source_relative(self, source: Path) -> str:
+        for root in (self.source_root, self.evidence_root, self.review_root):
+            try:
+                return str(source.relative_to(root))
+            except ValueError:
+                continue
+        return source.name
 
     def add_file(self, source: Path, relative_dest: Path, *, compress: bool = False) -> None:
         if source.is_symlink() or not source.is_file() or excluded(source):
@@ -108,10 +117,7 @@ class Importer:
         payload = gzip.compress(source.read_bytes(), compresslevel=9, mtime=0) if compress else None
         stored_candidate_size = len(payload) if payload is not None else size
         if stored_candidate_size > self.max_file_bytes:
-            try:
-                source_rel = str(source.relative_to(self.source_root))
-            except ValueError:
-                source_rel = str(source.relative_to(self.review_root))
+            source_rel = self.source_relative(source)
             self.skipped.append({
                 "source_relative": source_rel,
                 "destination_relative": str(relative_dest),
@@ -147,10 +153,7 @@ class Importer:
             output_hash = source_hash
             output_size = target.stat().st_size
 
-        try:
-            source_rel = str(source.relative_to(self.source_root))
-        except ValueError:
-            source_rel = str(source.relative_to(self.review_root))
+        source_rel = self.source_relative(source)
 
         self.entries.append({
             "source_relative": source_rel,
@@ -287,7 +290,11 @@ class Importer:
             if len(self.entries) == copied_before:
                 raise RuntimeError(f"{symbol}: no raw provider files were imported")
 
-            for codal_dir in sorted(self.source_root.glob(f"codal_{symbol}_*")):
+            codal_candidates = {
+                *self.source_root.glob(f"codal_{symbol}_*"),
+                *self.evidence_root.glob(f"codal_{symbol}_*"),
+            }
+            for codal_dir in sorted(codal_candidates):
                 if codal_dir.is_dir():
                     self.copy_tree(codal_dir, Path(symbol) / "codal" / codal_dir.name)
 
@@ -297,7 +304,10 @@ class Importer:
                     self.extract_review(review_csv, symbol)
 
         for shared_name in SHARED_DIRS:
-            self.copy_tree(self.source_root / shared_name, Path("_shared") / shared_name)
+            shared_source = self.source_root / shared_name
+            if not shared_source.is_dir():
+                shared_source = self.evidence_root / shared_name
+            self.copy_tree(shared_source, Path("_shared") / shared_name)
 
         for review_name in REVIEW_FILES:
             source = self.review_root / review_name
@@ -313,6 +323,7 @@ class Importer:
             "generated_at_utc": utc_now(),
             "repository_visibility_note": "This repository is public; commit only material approved for public redistribution.",
             "source_root_label": "marketsage-data/tsetmc-three-adjusted",
+            "evidence_root_label": "marketsage-data",
             "acceptance_review_label": "marketsage-data/acceptance-review/20261023T193750Z",
             "source_files_mutated": False,
             "matching_policy": "primary InsCode only; related InsCode2-4 are preserved but never used as aliases",
@@ -396,6 +407,11 @@ def main() -> int:
         default=Path.home() / "marketsage-data" / "tsetmc-three-adjusted",
     )
     parser.add_argument(
+        "--evidence-root", type=Path,
+        default=Path.home() / "marketsage-data",
+        help="Parent folder containing CODAL/shared audit folders that may sit outside source-root.",
+    )
+    parser.add_argument(
         "--acceptance-review-root", type=Path,
         default=Path.home() / "marketsage-data" / "acceptance-review" / "20261023T193750Z",
     )
@@ -413,6 +429,7 @@ def main() -> int:
         )
     importer = Importer(
         args.source_root,
+        args.evidence_root,
         args.acceptance_review_root,
         args.repo_root,
         args.max_file_mib * 1024 * 1024,
