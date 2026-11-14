@@ -1,0 +1,7 @@
+event_id,symbol,provider_date,event_family,issuer_terms_status,effective_session_status,provider_factor,independent_factor,relationship_status,series_status,notes
+VAGH-2026-04-18,vaghdir,2026-04-18,cash_distribution_candidate,primary_resolution_not_verified,first_affected_session_not_verified,0.900464499004645,,,UNRESOLVED,QUARANTINED,"TSETMC price reference 15070 -> 13570; 1500 Rial difference; not accepted as final DPS/factor"
+VAGH-2011-MIXED,vaghdir,2011,mixed_corporate_action,partial_primary_evidence,chronology_conflict,,,"UNRESOLVED",QUARANTINED,"23-Apr stale/no-trade observation 3820 vs 26-Apr traded close 3569; provider tuple relationship unresolved"
+VAGH-2012-02-20,vaghdir,2012-02-20,cash_distribution_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; locate original CODAL terms"
+VAGH-2012-12-08,vaghdir,2012-12-08,capital_increase_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; original EGM terms required"
+VAGH-2013-02-27,vaghdir,2013-02-27,cash_distribution_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; secondary locator is not primary proof"
+VAGH-2013-04-09,vaghdir,2013-04-09,capital_increase_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; original EGM terms required"
