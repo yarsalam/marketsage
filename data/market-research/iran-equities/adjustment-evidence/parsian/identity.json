@@ -1,0 +1,35 @@
+{
+  "symbol": "parsian",
+  "ticker": "پارسیان",
+  "issuer_or_instrument_name": "بيمه پارسيان",
+  "primary_insCode": "9481703061634967",
+  "cIsin": null,
+  "instrumentID": null,
+  "related_ids": {
+    "insCode2": "47581393692926162",
+    "insCode3": "26748728514541238",
+    "insCode4": "41368943333312933"
+  },
+  "related_id_status": "unverified_aliases_not_used_for_matching",
+  "identity_source": "raw_provider_snapshots/parsian_instrument_search.json",
+  "exact_ticker_record": {
+    "insCode2": "47581393692926162",
+    "insCode3": "26748728514541238",
+    "insCode4": "41368943333312933",
+    "insCode": "9481703061634967",
+    "lVal30": "بيمه پارسيان",
+    "lVal18AFC": "پارسيان",
+    "flow": 1,
+    "cIsin": null,
+    "zTitad": 0.0,
+    "baseVol": 0,
+    "instrumentID": null,
+    "cgrValCot": "N1",
+    "cComVal": null,
+    "lastDate": 1,
+    "sourceID": 1,
+    "flowTitle": "بازار بورس",
+    "cgrValCotTitle": ""
+  },
+  "identity_checked_at_utc": "2026-11-14T20:22:53+00:00"
+}

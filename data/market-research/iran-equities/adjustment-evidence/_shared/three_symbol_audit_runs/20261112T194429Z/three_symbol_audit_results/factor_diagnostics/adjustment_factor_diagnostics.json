@@ -1,0 +1,286 @@
+{
+  "created_at": "2026-11-12T19:44:30.572388+00:00",
+  "status": "diagnostic_only_not_acceptance",
+  "purpose": "Compare candidate event-factor variants with official TSETMC a=1 chart, normalized at latest common trading day.",
+  "normalization": "Each variant is scaled by one constant so its latest common close equals the official chart. Shape errors then measure event-factor differences, not a fixed unit/base mismatch.",
+  "event_convention": "An event affects price rows whose calendar date is strictly before event_date.",
+  "symbols": {
+    "فولاد": {
+      "status": "ok",
+      "candidate_rows": 4680,
+      "official_adjusted_chart_rows": 4266,
+      "raw_event_stats": {
+        "price_adjust_source_rows": 23,
+        "price_adjust_valid_unique_events": 23,
+        "price_adjust_exact_duplicates_removed": 0,
+        "price_adjust_invalid_rows": 0,
+        "share_change_source_rows": 12,
+        "share_change_valid_unique_events": 12,
+        "share_change_exact_duplicates_removed": 0,
+        "share_change_invalid_rows": 0,
+        "share_change_placeholder_rows_old_shares_lt_1000": 0
+      },
+      "price_adjust_events": 23,
+      "share_change_events": 12,
+      "variants": {
+        "current_candidate_factor": {
+          "common_dates": 4266,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 80.48219976707861,
+          "factor_shape_error_p95_pct": 91.01794855324103,
+          "factor_shape_error_max_pct": 110.89567637607888,
+          "normalized_price_error_median_pct": 80.48219976707861,
+          "normalized_price_error_p95_pct": 91.01794855324103,
+          "normalized_price_error_max_pct": 110.89567637607888
+        },
+        "price_adjust_only": {
+          "common_dates": 4266,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 1370.7869227942767,
+          "factor_shape_error_p95_pct": 1471.8226563425656,
+          "factor_shape_error_max_pct": 1635.3898142206067,
+          "normalized_price_error_median_pct": 1370.7869227942767,
+          "normalized_price_error_p95_pct": 1471.8226563425656,
+          "normalized_price_error_max_pct": 1635.3898142206067
+        },
+        "share_change_only": {
+          "common_dates": 4266,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 102.96583405110538,
+          "factor_shape_error_p95_pct": 408.2492104507608,
+          "factor_shape_error_max_pct": 469.67097329888026,
+          "normalized_price_error_median_pct": 102.96583405110538,
+          "normalized_price_error_p95_pct": 408.2492104507608,
+          "normalized_price_error_max_pct": 469.67097329888026
+        },
+        "price_plus_all_share_no_dedupe": {
+          "common_dates": 4266,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 42.53243569290109,
+          "factor_shape_error_p95_pct": 88.21703191410666,
+          "factor_shape_error_max_pct": 89.3699331516722,
+          "normalized_price_error_median_pct": 42.53243569290109,
+          "normalized_price_error_p95_pct": 88.21703191410666,
+          "normalized_price_error_max_pct": 89.3699331516722
+        },
+        "price_plus_share_exact_date_suppressed": {
+          "common_dates": 4266,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 0.4062514513619446,
+          "factor_shape_error_p95_pct": 7.341215140349135,
+          "factor_shape_error_max_pct": 16.58949656262474,
+          "normalized_price_error_median_pct": 0.4062514513619446,
+          "normalized_price_error_p95_pct": 7.341215140349135,
+          "normalized_price_error_max_pct": 16.58949656262474
+        },
+        "price_plus_share_7_calendar_day_suppressed": {
+          "common_dates": 4266,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 80.48219976707861,
+          "factor_shape_error_p95_pct": 91.01794855324103,
+          "factor_shape_error_max_pct": 110.89567637607888,
+          "normalized_price_error_median_pct": 80.48219976707861,
+          "normalized_price_error_p95_pct": 91.01794855324103,
+          "normalized_price_error_max_pct": 110.89567637607888
+        }
+      },
+      "event_step_diagnostics_count": 35,
+      "closest_variant_diagnostic_only": {
+        "name": "price_plus_share_exact_date_suppressed",
+        "p95_factor_shape_error_pct": 7.341215140349135,
+        "not_an_acceptance_decision": true
+      }
+    },
+    "وغدیر": {
+      "status": "ok",
+      "candidate_rows": 5688,
+      "official_adjusted_chart_rows": 5383,
+      "raw_event_stats": {
+        "price_adjust_source_rows": 25,
+        "price_adjust_valid_unique_events": 25,
+        "price_adjust_exact_duplicates_removed": 0,
+        "price_adjust_invalid_rows": 0,
+        "share_change_source_rows": 7,
+        "share_change_valid_unique_events": 7,
+        "share_change_exact_duplicates_removed": 0,
+        "share_change_invalid_rows": 0,
+        "share_change_placeholder_rows_old_shares_lt_1000": 0
+      },
+      "price_adjust_events": 25,
+      "share_change_events": 7,
+      "variants": {
+        "current_candidate_factor": {
+          "common_dates": 5383,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 6.606297134316058,
+          "factor_shape_error_p95_pct": 30.988812400094712,
+          "factor_shape_error_max_pct": 33.433685279687026,
+          "normalized_price_error_median_pct": 6.606297134316058,
+          "normalized_price_error_p95_pct": 30.988812400094712,
+          "normalized_price_error_max_pct": 33.433685279687026
+        },
+        "price_adjust_only": {
+          "common_dates": 5383,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 154.70550766019312,
+          "factor_shape_error_p95_pct": 220.00496397602424,
+          "factor_shape_error_max_pct": 221.08782670860748,
+          "normalized_price_error_median_pct": 154.70550766019312,
+          "normalized_price_error_p95_pct": 220.00496397602424,
+          "normalized_price_error_max_pct": 221.08782670860748
+        },
+        "share_change_only": {
+          "common_dates": 5383,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 214.35897435897436,
+          "factor_shape_error_p95_pct": 313.6029411764706,
+          "factor_shape_error_max_pct": 331.5625,
+          "normalized_price_error_median_pct": 214.35897435897436,
+          "normalized_price_error_p95_pct": 313.6029411764706,
+          "normalized_price_error_max_pct": 331.5625
+        },
+        "price_plus_all_share_no_dedupe": {
+          "common_dates": 5383,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 46.86839135375966,
+          "factor_shape_error_p95_pct": 94.17718104625799,
+          "factor_shape_error_max_pct": 94.3834671954736,
+          "normalized_price_error_median_pct": 46.86839135375966,
+          "normalized_price_error_p95_pct": 94.17718104625799,
+          "normalized_price_error_max_pct": 94.3834671954736
+        },
+        "price_plus_share_exact_date_suppressed": {
+          "common_dates": 5383,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 6.606297134316058,
+          "factor_shape_error_p95_pct": 30.988812400094712,
+          "factor_shape_error_max_pct": 33.433685279687026,
+          "normalized_price_error_median_pct": 6.606297134316058,
+          "normalized_price_error_p95_pct": 30.988812400094712,
+          "normalized_price_error_max_pct": 33.433685279687026
+        },
+        "price_plus_share_7_calendar_day_suppressed": {
+          "common_dates": 5383,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 6.606297134316058,
+          "factor_shape_error_p95_pct": 30.988812400094712,
+          "factor_shape_error_max_pct": 33.433685279687026,
+          "normalized_price_error_median_pct": 6.606297134316058,
+          "normalized_price_error_p95_pct": 30.988812400094712,
+          "normalized_price_error_max_pct": 33.433685279687026
+        }
+      },
+      "event_step_diagnostics_count": 32,
+      "closest_variant_diagnostic_only": {
+        "name": "current_candidate_factor",
+        "p95_factor_shape_error_pct": 30.988812400094712,
+        "not_an_acceptance_decision": true
+      }
+    },
+    "پارسیان": {
+      "status": "ok",
+      "candidate_rows": 3866,
+      "official_adjusted_chart_rows": 3539,
+      "raw_event_stats": {
+        "price_adjust_source_rows": 18,
+        "price_adjust_valid_unique_events": 18,
+        "price_adjust_exact_duplicates_removed": 0,
+        "price_adjust_invalid_rows": 0,
+        "share_change_source_rows": 9,
+        "share_change_valid_unique_events": 9,
+        "share_change_exact_duplicates_removed": 0,
+        "share_change_invalid_rows": 0,
+        "share_change_placeholder_rows_old_shares_lt_1000": 0
+      },
+      "price_adjust_events": 18,
+      "share_change_events": 9,
+      "variants": {
+        "current_candidate_factor": {
+          "common_dates": 3539,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 2.4008081636022505,
+          "factor_shape_error_p95_pct": 4.806722580383646,
+          "factor_shape_error_max_pct": 14.967890893377616,
+          "normalized_price_error_median_pct": 2.4008081636022505,
+          "normalized_price_error_p95_pct": 4.806722580383646,
+          "normalized_price_error_max_pct": 14.967890893377616
+        },
+        "price_adjust_only": {
+          "common_dates": 3539,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 1103.4205519901172,
+          "factor_shape_error_p95_pct": 1128.2265896532892,
+          "factor_shape_error_max_pct": 1158.7855914916277,
+          "normalized_price_error_median_pct": 1103.4205519901172,
+          "normalized_price_error_p95_pct": 1128.2265896532892,
+          "normalized_price_error_max_pct": 1158.7855914916277
+        },
+        "share_change_only": {
+          "common_dates": 3539,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 61.21739130434783,
+          "factor_shape_error_p95_pct": 182.38571428571427,
+          "factor_shape_error_max_pct": 191.81428571428572,
+          "normalized_price_error_median_pct": 61.21739130434783,
+          "normalized_price_error_p95_pct": 182.38571428571427,
+          "normalized_price_error_max_pct": 191.81428571428572
+        },
+        "price_plus_all_share_no_dedupe": {
+          "common_dates": 3539,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 26.850087846277525,
+          "factor_shape_error_p95_pct": 73.8218487096055,
+          "factor_shape_error_max_pct": 76.61616999567885,
+          "normalized_price_error_median_pct": 26.850087846277525,
+          "normalized_price_error_p95_pct": 73.8218487096055,
+          "normalized_price_error_max_pct": 76.61616999567885
+        },
+        "price_plus_share_exact_date_suppressed": {
+          "common_dates": 3539,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 2.4008081636022505,
+          "factor_shape_error_p95_pct": 4.806722580383646,
+          "factor_shape_error_max_pct": 14.967890893377616,
+          "normalized_price_error_median_pct": 2.4008081636022505,
+          "normalized_price_error_p95_pct": 4.806722580383646,
+          "normalized_price_error_max_pct": 14.967890893377616
+        },
+        "price_plus_share_7_calendar_day_suppressed": {
+          "common_dates": 3539,
+          "anchor_date": "2026-11-11",
+          "anchor_multiplier_to_official_chart": "1",
+          "factor_shape_error_median_pct": 2.4008081636022505,
+          "factor_shape_error_p95_pct": 4.806722580383646,
+          "factor_shape_error_max_pct": 14.967890893377616,
+          "normalized_price_error_median_pct": 2.4008081636022505,
+          "normalized_price_error_p95_pct": 4.806722580383646,
+          "normalized_price_error_max_pct": 14.967890893377616
+        }
+      },
+      "event_step_diagnostics_count": 27,
+      "closest_variant_diagnostic_only": {
+        "name": "current_candidate_factor",
+        "p95_factor_shape_error_pct": 4.806722580383646,
+        "not_an_acceptance_decision": true
+      }
+    }
+  },
+  "failures": []
+}

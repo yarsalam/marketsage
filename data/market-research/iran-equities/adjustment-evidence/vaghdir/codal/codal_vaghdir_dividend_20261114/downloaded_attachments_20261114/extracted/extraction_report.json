@@ -1,0 +1,19 @@
+{
+  "155153": {
+    "pages": "1",
+    "text_extracted": true,
+    "rendered": true,
+    "text_file": "/home/nima/marketsage-data/tsetmc-three-adjusted/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155153.txt"
+  },
+  "155748": {
+    "pages": "14",
+    "text_extracted": true,
+    "rendered": true,
+    "text_file": "/home/nima/marketsage-data/tsetmc-three-adjusted/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748.txt"
+  },
+  "156803": {
+    "text_extracted": true,
+    "method": "libreoffice",
+    "text_file": "/home/nima/marketsage-data/tsetmc-three-adjusted/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/156803.txt"
+  }
+}

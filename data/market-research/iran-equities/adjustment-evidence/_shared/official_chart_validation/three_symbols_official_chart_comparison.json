@@ -1,0 +1,450 @@
+{
+  "run_started_at": "2026-11-12T09:10:23.027489+00:00",
+  "manifest_created_at": "2026-11-12T07:47:52.469201+00:00",
+  "method": "compare candidate raw/adjusted values with TSETMC members chart Financial.aspx a=0/a=1",
+  "status": "diagnostic_only_not_acceptance",
+  "source_url_template": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i={insCode}&t=ph&a={0|1}",
+  "symbols": {
+    "فولاد": {
+      "instrument_code": "46348559193224090",
+      "candidate_rows": 4680,
+      "modes": {
+        "raw": {
+          "status": "ok",
+          "transport": {
+            "http_status": 200,
+            "content_type": "text/csv; charset=utf-8",
+            "content_encoding": "gzip",
+            "content_length_header": "70680",
+            "response_bytes": 70680,
+            "response_prefix_hex": "1f8b0800b7b3f56a00ff749d578e64bbae6d3b541ff206b7",
+            "response_sha256": "8109755bdfb227c1448ec707b8f1f7ab79b1c6a7085e74a240229a385e71dc00",
+            "decoder_used": "gzip",
+            "decoded_bytes": 185123
+          },
+          "candidate_dates": 4680,
+          "chart_dates": 4266,
+          "common_dates": 4266,
+          "candidate_only_dates": 414,
+          "chart_only_dates": 0,
+          "metrics": {
+            "open": {
+              "compared": 4266,
+              "exact_matches": 4266,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "high": {
+              "compared": 4266,
+              "exact_matches": 4266,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "low": {
+              "compared": 4266,
+              "exact_matches": 4266,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "last": {
+              "compared": 4266,
+              "exact_matches": 4266,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "close": {
+              "compared": 4266,
+              "exact_matches": 4266,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "volume": {
+              "compared": 4266,
+              "exact_matches": 4266,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            }
+          }
+        },
+        "adjusted": {
+          "status": "ok",
+          "transport": {
+            "http_status": 200,
+            "content_type": "text/csv; charset=utf-8",
+            "content_encoding": "gzip",
+            "content_length_header": "51039",
+            "response_bytes": 51039,
+            "response_prefix_hex": "1f8b0800bab3f56a00ff645d5796243908bc507d48c8bfb9",
+            "response_sha256": "c1f77c887483fcc7c82340e5defc36bd3374b26604ac49daf56c554fbc32850e",
+            "decoder_used": "gzip",
+            "decoded_bytes": 150529
+          },
+          "candidate_dates": 4680,
+          "chart_dates": 4266,
+          "common_dates": 4266,
+          "candidate_only_dates": 414,
+          "chart_only_dates": 0,
+          "metrics": {
+            "open": {
+              "compared": 4266,
+              "exact_matches": 68,
+              "exact_match_rate": 0.015939990623534926,
+              "skipped_blank": 0,
+              "median_relative_error": 0.8054951611360701,
+              "p95_relative_error": 0.9139151762245074,
+              "max_relative_error": 1.0832832113024706
+            },
+            "high": {
+              "compared": 4266,
+              "exact_matches": 68,
+              "exact_match_rate": 0.015939990623534926,
+              "skipped_blank": 0,
+              "median_relative_error": 0.8059108430079311,
+              "p95_relative_error": 0.9166205543982731,
+              "max_relative_error": 1.0842896283127617
+            },
+            "low": {
+              "compared": 4266,
+              "exact_matches": 68,
+              "exact_match_rate": 0.015939990623534926,
+              "skipped_blank": 0,
+              "median_relative_error": 0.8061272536659678,
+              "p95_relative_error": 0.9142051535735746,
+              "max_relative_error": 1.1889569973830305
+            },
+            "last": {
+              "compared": 4266,
+              "exact_matches": 68,
+              "exact_match_rate": 0.015939990623534926,
+              "skipped_blank": 0,
+              "median_relative_error": 0.8058798604960196,
+              "p95_relative_error": 0.9111859025427014,
+              "max_relative_error": 1.1064308025391647
+            },
+            "close": {
+              "compared": 4266,
+              "exact_matches": 68,
+              "exact_match_rate": 0.015939990623534926,
+              "skipped_blank": 0,
+              "median_relative_error": 0.8048219976707861,
+              "p95_relative_error": 0.9101794855324101,
+              "max_relative_error": 1.1089567637607889
+            }
+          }
+        }
+      }
+    },
+    "وغدیر": {
+      "instrument_code": "26014913469567886",
+      "candidate_rows": 5688,
+      "modes": {
+        "raw": {
+          "status": "ok",
+          "transport": {
+            "http_status": 200,
+            "content_type": "text/csv; charset=utf-8",
+            "content_encoding": "gzip",
+            "content_length_header": "84990",
+            "response_bytes": 84990,
+            "response_prefix_hex": "1f8b0800bdb3f56a00ff8c9d69ae2c29cfad27747ed037ba",
+            "response_sha256": "3b2331fe5aba7dc111c104288b37f20499d3c22d05821cf33fe0cd255a2d1a72",
+            "decoder_used": "gzip",
+            "decoded_bytes": 232872
+          },
+          "candidate_dates": 5688,
+          "chart_dates": 5383,
+          "common_dates": 5383,
+          "candidate_only_dates": 305,
+          "chart_only_dates": 0,
+          "metrics": {
+            "open": {
+              "compared": 5383,
+              "exact_matches": 5383,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "high": {
+              "compared": 5383,
+              "exact_matches": 5383,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "low": {
+              "compared": 5383,
+              "exact_matches": 5383,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "last": {
+              "compared": 5383,
+              "exact_matches": 5383,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "close": {
+              "compared": 5383,
+              "exact_matches": 5383,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "volume": {
+              "compared": 5383,
+              "exact_matches": 5383,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            }
+          }
+        },
+        "adjusted": {
+          "status": "ok",
+          "transport": {
+            "http_status": 200,
+            "content_type": "text/csv; charset=utf-8",
+            "content_encoding": "gzip",
+            "content_length_header": "66300",
+            "response_bytes": 66300,
+            "response_prefix_hex": "1f8b0800bfb3f56a00ff7c5d6b9a6c2baa9c50fe58e2fbbb",
+            "response_sha256": "3e8d4c8c51583efe26abe5f9905d6fdf641d944061ebbc4b88309bde8c15d1a4",
+            "decoder_used": "gzip",
+            "decoded_bytes": 196293
+          },
+          "candidate_dates": 5688,
+          "chart_dates": 5383,
+          "common_dates": 5383,
+          "candidate_only_dates": 305,
+          "chart_only_dates": 0,
+          "metrics": {
+            "open": {
+              "compared": 5383,
+              "exact_matches": 105,
+              "exact_match_rate": 0.01950585175552666,
+              "skipped_blank": 0,
+              "median_relative_error": 0.06620576994624715,
+              "p95_relative_error": 0.30972203209336613,
+              "max_relative_error": 0.33337351973290047
+            },
+            "high": {
+              "compared": 5383,
+              "exact_matches": 105,
+              "exact_match_rate": 0.01950585175552666,
+              "skipped_blank": 0,
+              "median_relative_error": 0.06613384564983955,
+              "p95_relative_error": 0.3095559401857852,
+              "max_relative_error": 0.33337351973290047
+            },
+            "low": {
+              "compared": 5383,
+              "exact_matches": 105,
+              "exact_match_rate": 0.01950585175552666,
+              "skipped_blank": 0,
+              "median_relative_error": 0.06624166768463331,
+              "p95_relative_error": 0.3098881240009472,
+              "max_relative_error": 0.33337351973290047
+            },
+            "last": {
+              "compared": 5383,
+              "exact_matches": 105,
+              "exact_match_rate": 0.01950585175552666,
+              "skipped_blank": 0,
+              "median_relative_error": 0.06620576994624715,
+              "p95_relative_error": 0.3098881240009472,
+              "max_relative_error": 0.33337351973290047
+            },
+            "close": {
+              "compared": 5383,
+              "exact_matches": 106,
+              "exact_match_rate": 0.01969162177224596,
+              "skipped_blank": 0,
+              "median_relative_error": 0.06606297134316054,
+              "p95_relative_error": 0.3098881240009472,
+              "max_relative_error": 0.33433685279687025
+            }
+          }
+        }
+      }
+    },
+    "پارسیان": {
+      "instrument_code": "9481703061634967",
+      "candidate_rows": 3866,
+      "modes": {
+        "raw": {
+          "status": "ok",
+          "transport": {
+            "http_status": 200,
+            "content_type": "text/csv; charset=utf-8",
+            "content_encoding": "gzip",
+            "content_length_header": "54566",
+            "response_bytes": 54566,
+            "response_prefix_hex": "1f8b0800c2b3f56a00ff747d5bb22da9ae6b87d647f286b8",
+            "response_sha256": "3ff4e801d6927f7a16c22557cfab3c130e280b63af984af635d4027f4bc8e518",
+            "decoder_used": "gzip",
+            "decoded_bytes": 148318
+          },
+          "candidate_dates": 3866,
+          "chart_dates": 3539,
+          "common_dates": 3539,
+          "candidate_only_dates": 327,
+          "chart_only_dates": 0,
+          "metrics": {
+            "open": {
+              "compared": 3539,
+              "exact_matches": 3539,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "high": {
+              "compared": 3539,
+              "exact_matches": 3539,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "low": {
+              "compared": 3539,
+              "exact_matches": 3539,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "last": {
+              "compared": 3539,
+              "exact_matches": 3539,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "close": {
+              "compared": 3539,
+              "exact_matches": 3539,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            },
+            "volume": {
+              "compared": 3539,
+              "exact_matches": 3539,
+              "exact_match_rate": 1.0,
+              "skipped_blank": 0,
+              "median_relative_error": 0.0,
+              "p95_relative_error": 0.0,
+              "max_relative_error": 0.0
+            }
+          }
+        },
+        "adjusted": {
+          "status": "ok",
+          "transport": {
+            "http_status": 200,
+            "content_type": "text/csv; charset=utf-8",
+            "content_encoding": "gzip",
+            "content_length_header": "40976",
+            "response_bytes": 40976,
+            "response_prefix_hex": "1f8b0800c4b3f56a00ff745d599624290ebc507c80d8dfdc",
+            "response_sha256": "9e5c6454228c02f3128638248000988f436e25ebd2b3022fd20c4bf0ecf32381",
+            "decoder_used": "gzip",
+            "decoded_bytes": 121537
+          },
+          "candidate_dates": 3866,
+          "chart_dates": 3539,
+          "common_dates": 3539,
+          "candidate_only_dates": 327,
+          "chart_only_dates": 0,
+          "metrics": {
+            "open": {
+              "compared": 3539,
+              "exact_matches": 113,
+              "exact_match_rate": 0.031929923707261935,
+              "skipped_blank": 0,
+              "median_relative_error": 0.023929812643633634,
+              "p95_relative_error": 0.05064762514246581,
+              "max_relative_error": 0.14978731018451769
+            },
+            "high": {
+              "compared": 3539,
+              "exact_matches": 114,
+              "exact_match_rate": 0.03221248940378638,
+              "skipped_blank": 0,
+              "median_relative_error": 0.023881932284359732,
+              "p95_relative_error": 0.04916194067477012,
+              "max_relative_error": 0.1495271471827381
+            },
+            "low": {
+              "compared": 3539,
+              "exact_matches": 115,
+              "exact_match_rate": 0.032495055100310824,
+              "skipped_blank": 0,
+              "median_relative_error": 0.023914926228346088,
+              "p95_relative_error": 0.05064762514246581,
+              "max_relative_error": 0.15165181169727093
+            },
+            "last": {
+              "compared": 3539,
+              "exact_matches": 116,
+              "exact_match_rate": 0.032777620796835265,
+              "skipped_blank": 0,
+              "median_relative_error": 0.023905304723943744,
+              "p95_relative_error": 0.05020191980215714,
+              "max_relative_error": 0.1487882842576843
+            },
+            "close": {
+              "compared": 3539,
+              "exact_matches": 114,
+              "exact_match_rate": 0.03221248940378638,
+              "skipped_blank": 0,
+              "median_relative_error": 0.02400808163602248,
+              "p95_relative_error": 0.048067225803836364,
+              "max_relative_error": 0.14967890893377614
+            }
+          }
+        }
+      }
+    }
+  }
+}

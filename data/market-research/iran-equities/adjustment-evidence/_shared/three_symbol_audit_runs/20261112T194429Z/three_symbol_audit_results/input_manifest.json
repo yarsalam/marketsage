@@ -1,0 +1,106 @@
+{
+  "base": "/home/nima/marketsage-data/tsetmc-three-adjusted",
+  "run_id": "20261112T194429Z",
+  "network_access": false,
+  "inputs": [
+    {
+      "path_relative_to_base": "tse_client_validation/tse_client_adjust_info_events.json",
+      "size_bytes": 21118,
+      "sha256_before": "01451ca2ae65d9e19e57745acb0c7852647668acbb1ee43e9a331df39b152ba2",
+      "sha256_after": "01451ca2ae65d9e19e57745acb0c7852647668acbb1ee43e9a331df39b152ba2",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "tse_client_validation/tse_client_adjusted_close_comparison.csv",
+      "size_bytes": 4058724,
+      "sha256_before": "f28897a74194043cc30c43866144aec8d9af8d72e8d87eaead33e26ba97686b7",
+      "sha256_after": "f28897a74194043cc30c43866144aec8d9af8d72e8d87eaead33e26ba97686b7",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "raw_provider_snapshots/foolad_price_adjust_raw.json",
+      "size_bytes": 3173,
+      "sha256_before": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+      "sha256_after": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "raw_provider_snapshots/foolad_share_change_raw.json",
+      "size_bytes": 1895,
+      "sha256_before": "1b389841c646f4c7f03dc9a953280b476453dd0918d273f0c13d13fa716de063",
+      "sha256_after": "1b389841c646f4c7f03dc9a953280b476453dd0918d273f0c13d13fa716de063",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "official_chart_validation/foolad_official_chart_adjusted.decoded.csv",
+      "size_bytes": 150529,
+      "sha256_before": "6779a9e137edfb049c859adafb981165fb6065e9ca8eb78f978edd5f1b05b28e",
+      "sha256_after": "6779a9e137edfb049c859adafb981165fb6065e9ca8eb78f978edd5f1b05b28e",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "foolad_combined_total_return_adjusted_candidate.csv",
+      "size_bytes": 2494109,
+      "sha256_before": "97c600e4470de55a23d0df3691c274d911c020bdf0dfcedaf443bfc300554d41",
+      "sha256_after": "97c600e4470de55a23d0df3691c274d911c020bdf0dfcedaf443bfc300554d41",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "raw_provider_snapshots/vaghdir_price_adjust_raw.json",
+      "size_bytes": 3454,
+      "sha256_before": "1fadcc07e1a4b1da95f2a687aba527d1a1bc50e265d0c465543afeb8cd086a3d",
+      "sha256_after": "1fadcc07e1a4b1da95f2a687aba527d1a1bc50e265d0c465543afeb8cd086a3d",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "raw_provider_snapshots/vaghdir_share_change_raw.json",
+      "size_bytes": 1105,
+      "sha256_before": "a3c3c94a0f53b7bd8cc369b1d71c2d8b47df3f8efb1c4474c42ff96d8cc9729f",
+      "sha256_after": "a3c3c94a0f53b7bd8cc369b1d71c2d8b47df3f8efb1c4474c42ff96d8cc9729f",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "official_chart_validation/vaghdir_official_chart_adjusted.decoded.csv",
+      "size_bytes": 196293,
+      "sha256_before": "86d560d0f858a5d30e0ffebf7bfa4c87cd125407c773594c6942e4f9b01863b8",
+      "sha256_after": "86d560d0f858a5d30e0ffebf7bfa4c87cd125407c773594c6942e4f9b01863b8",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "vaghdir_combined_total_return_adjusted_candidate.csv",
+      "size_bytes": 3054039,
+      "sha256_before": "a9e3dff04fc38cb78738388544c5e1ff5c76da0d199227e81f1c6e64bcf590f7",
+      "sha256_after": "a9e3dff04fc38cb78738388544c5e1ff5c76da0d199227e81f1c6e64bcf590f7",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "raw_provider_snapshots/parsian_price_adjust_raw.json",
+      "size_bytes": 2465,
+      "sha256_before": "66160ec454c4f077fae7ba308118f24fb7fc615c79a11343362365d310a55118",
+      "sha256_after": "66160ec454c4f077fae7ba308118f24fb7fc615c79a11343362365d310a55118",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "raw_provider_snapshots/parsian_share_change_raw.json",
+      "size_bytes": 1393,
+      "sha256_before": "01b8ca99d5fa84cb9d71c28429ce7b9961b603361b3250a6e622151811bcc8f4",
+      "sha256_after": "01b8ca99d5fa84cb9d71c28429ce7b9961b603361b3250a6e622151811bcc8f4",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "official_chart_validation/parsian_official_chart_adjusted.decoded.csv",
+      "size_bytes": 121537,
+      "sha256_before": "9f4ebf4bd84641fc5baf40745675c44c842be5f0377b5339e3566bd963258876",
+      "sha256_after": "9f4ebf4bd84641fc5baf40745675c44c842be5f0377b5339e3566bd963258876",
+      "unchanged": true
+    },
+    {
+      "path_relative_to_base": "parsian_combined_total_return_adjusted_candidate.csv",
+      "size_bytes": 2051403,
+      "sha256_before": "b4656967296e655eba6eab1078d8e39c02d92ba77d4abd133c867bf407f78cdb",
+      "sha256_after": "b4656967296e655eba6eab1078d8e39c02d92ba77d4abd133c867bf407f78cdb",
+      "unchanged": true
+    }
+  ],
+  "changed_inputs": []
+}

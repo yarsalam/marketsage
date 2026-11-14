@@ -1,0 +1,3156 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-11-14T20:23:01+00:00",
+  "repository_visibility_note": "This repository is public; commit only material approved for public redistribution.",
+  "source_root_label": "marketsage-data/tsetmc-three-adjusted",
+  "evidence_root_label": "marketsage-data",
+  "acceptance_review_label": "marketsage-data/acceptance-review/20261023T193750Z",
+  "source_files_mutated": false,
+  "matching_policy": "primary InsCode only; related InsCode2-4 are preserved but never used as aliases",
+  "symbols": {
+    "vaghdir": {
+      "ticker": "وغدیر",
+      "primary_inscode": "26014913469567886"
+    },
+    "foolad": {
+      "ticker": "فولاد",
+      "primary_inscode": "46348559193224090"
+    },
+    "parsian": {
+      "ticker": "پارسیان",
+      "primary_inscode": "9481703061634967"
+    }
+  },
+  "files": [
+    {
+      "source_relative": "adjustment_factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "destination_relative": "_shared/adjustment_factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "source_bytes": 30420,
+      "stored_bytes": 30420,
+      "source_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "stored_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "compression": "none"
+    },
+    {
+      "source_relative": "adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "destination_relative": "_shared/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "source_bytes": 32028260,
+      "stored_bytes": 32028260,
+      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
+      "destination_relative": "_shared/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
+      "source_bytes": 13236,
+      "stored_bytes": 13236,
+      "source_sha256": "9bfd1e695206655aea1b2322ce432b91d5ac212e7c6dd80dce56c3f037ce93e3",
+      "stored_sha256": "9bfd1e695206655aea1b2322ce432b91d5ac212e7c6dd80dce56c3f037ce93e3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "acceptance-review/20261023T193750Z/corporate_action_evidence_review.csv",
+      "destination_relative": "_shared/archive/acceptance-review/corporate_action_evidence_review.csv.gz",
+      "source_bytes": 54500775,
+      "stored_bytes": 2561599,
+      "source_sha256": "33f5715dcdf183fe6132b97aeb5f14f861b1cf1151e6c75bb18fa988530f947b",
+      "stored_sha256": "375615afab7141260d8bcbeb2f416ad179998d35252f87601e222ca500a45024",
+      "compression": "gzip"
+    },
+    {
+      "source_relative": "acceptance-review/20261023T193750Z/date_gap_evidence_review.csv",
+      "destination_relative": "_shared/archive/acceptance-review/date_gap_evidence_review.csv.gz",
+      "source_bytes": 54091279,
+      "stored_bytes": 2544517,
+      "source_sha256": "dcdcc8acf90587d2bebdee28d15200e66091cf4c143f73d4c51b3a538642a4ac",
+      "stored_sha256": "9a03c0e79e3fdcb96806037d99b3a1a8d9951b1a461a99e70d2d32f97238374a",
+      "compression": "gzip"
+    },
+    {
+      "source_relative": "official_chart_validation/foolad_official_chart_adjusted.decoded.csv",
+      "destination_relative": "_shared/official_chart_validation/foolad_official_chart_adjusted.decoded.csv",
+      "source_bytes": 150529,
+      "stored_bytes": 150529,
+      "source_sha256": "6779a9e137edfb049c859adafb981165fb6065e9ca8eb78f978edd5f1b05b28e",
+      "stored_sha256": "6779a9e137edfb049c859adafb981165fb6065e9ca8eb78f978edd5f1b05b28e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/foolad_official_chart_adjusted.response.bin",
+      "destination_relative": "_shared/official_chart_validation/foolad_official_chart_adjusted.response.bin",
+      "source_bytes": 51039,
+      "stored_bytes": 51039,
+      "source_sha256": "c1f77c887483fcc7c82340e5defc36bd3374b26604ac49daf56c554fbc32850e",
+      "stored_sha256": "c1f77c887483fcc7c82340e5defc36bd3374b26604ac49daf56c554fbc32850e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/foolad_official_chart_adjusted.transport.json",
+      "destination_relative": "_shared/official_chart_validation/foolad_official_chart_adjusted.transport.json",
+      "source_bytes": 381,
+      "stored_bytes": 381,
+      "source_sha256": "5c9d555a28759e8c3f6cb92f94d04afc640fa6bfc18446b32bda2c44a6d0f461",
+      "stored_sha256": "5c9d555a28759e8c3f6cb92f94d04afc640fa6bfc18446b32bda2c44a6d0f461",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/foolad_official_chart_raw.decoded.csv",
+      "destination_relative": "_shared/official_chart_validation/foolad_official_chart_raw.decoded.csv",
+      "source_bytes": 185123,
+      "stored_bytes": 185123,
+      "source_sha256": "b5913e8f78f9ad0ac6f8ddf023835ec81cbee4d32690e3c2d99d2191426e9a11",
+      "stored_sha256": "b5913e8f78f9ad0ac6f8ddf023835ec81cbee4d32690e3c2d99d2191426e9a11",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/foolad_official_chart_raw.response.bin",
+      "destination_relative": "_shared/official_chart_validation/foolad_official_chart_raw.response.bin",
+      "source_bytes": 70680,
+      "stored_bytes": 70680,
+      "source_sha256": "8109755bdfb227c1448ec707b8f1f7ab79b1c6a7085e74a240229a385e71dc00",
+      "stored_sha256": "8109755bdfb227c1448ec707b8f1f7ab79b1c6a7085e74a240229a385e71dc00",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/foolad_official_chart_raw.transport.json",
+      "destination_relative": "_shared/official_chart_validation/foolad_official_chart_raw.transport.json",
+      "source_bytes": 381,
+      "stored_bytes": 381,
+      "source_sha256": "0ad8acdc1bee0b92950b386b73326743c5cd63d8d7cb99bbd1c967961fe7aa01",
+      "stored_sha256": "0ad8acdc1bee0b92950b386b73326743c5cd63d8d7cb99bbd1c967961fe7aa01",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/parsian_official_chart_adjusted.decoded.csv",
+      "destination_relative": "_shared/official_chart_validation/parsian_official_chart_adjusted.decoded.csv",
+      "source_bytes": 121537,
+      "stored_bytes": 121537,
+      "source_sha256": "9f4ebf4bd84641fc5baf40745675c44c842be5f0377b5339e3566bd963258876",
+      "stored_sha256": "9f4ebf4bd84641fc5baf40745675c44c842be5f0377b5339e3566bd963258876",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/parsian_official_chart_adjusted.response.bin",
+      "destination_relative": "_shared/official_chart_validation/parsian_official_chart_adjusted.response.bin",
+      "source_bytes": 40976,
+      "stored_bytes": 40976,
+      "source_sha256": "9e5c6454228c02f3128638248000988f436e25ebd2b3022fd20c4bf0ecf32381",
+      "stored_sha256": "9e5c6454228c02f3128638248000988f436e25ebd2b3022fd20c4bf0ecf32381",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/parsian_official_chart_adjusted.transport.json",
+      "destination_relative": "_shared/official_chart_validation/parsian_official_chart_adjusted.transport.json",
+      "source_bytes": 381,
+      "stored_bytes": 381,
+      "source_sha256": "060cb971a428d02827ba239dbb8b9b863e40b5b362e54bf08f667b91ae96318a",
+      "stored_sha256": "060cb971a428d02827ba239dbb8b9b863e40b5b362e54bf08f667b91ae96318a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/parsian_official_chart_raw.decoded.csv",
+      "destination_relative": "_shared/official_chart_validation/parsian_official_chart_raw.decoded.csv",
+      "source_bytes": 148318,
+      "stored_bytes": 148318,
+      "source_sha256": "5c51e5d0110b76a3880c3adb9b8722f4e618f07db392b433d7492f491b7725a0",
+      "stored_sha256": "5c51e5d0110b76a3880c3adb9b8722f4e618f07db392b433d7492f491b7725a0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/parsian_official_chart_raw.response.bin",
+      "destination_relative": "_shared/official_chart_validation/parsian_official_chart_raw.response.bin",
+      "source_bytes": 54566,
+      "stored_bytes": 54566,
+      "source_sha256": "3ff4e801d6927f7a16c22557cfab3c130e280b63af984af635d4027f4bc8e518",
+      "stored_sha256": "3ff4e801d6927f7a16c22557cfab3c130e280b63af984af635d4027f4bc8e518",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/parsian_official_chart_raw.transport.json",
+      "destination_relative": "_shared/official_chart_validation/parsian_official_chart_raw.transport.json",
+      "source_bytes": 381,
+      "stored_bytes": 381,
+      "source_sha256": "26335152b8b3c11e874bd4dca0d91ad7fd57cd521b57f6dd85330009f40b5217",
+      "stored_sha256": "26335152b8b3c11e874bd4dca0d91ad7fd57cd521b57f6dd85330009f40b5217",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/three_symbols_official_chart_comparison.csv",
+      "destination_relative": "_shared/official_chart_validation/three_symbols_official_chart_comparison.csv",
+      "source_bytes": 11874773,
+      "stored_bytes": 11874773,
+      "source_sha256": "dbd7c4bde7d303a2dbd04ce8e25e186c8c10d58bfacc45ce056566b5628fc8c4",
+      "stored_sha256": "dbd7c4bde7d303a2dbd04ce8e25e186c8c10d58bfacc45ce056566b5628fc8c4",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/three_symbols_official_chart_comparison.json",
+      "destination_relative": "_shared/official_chart_validation/three_symbols_official_chart_comparison.json",
+      "source_bytes": 16351,
+      "stored_bytes": 16351,
+      "source_sha256": "9522e4da32e9cf818fa5586092919c216ab3539d3a2cd895613f455ed8099d7b",
+      "stored_sha256": "9522e4da32e9cf818fa5586092919c216ab3539d3a2cd895613f455ed8099d7b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/vaghdir_official_chart_adjusted.decoded.csv",
+      "destination_relative": "_shared/official_chart_validation/vaghdir_official_chart_adjusted.decoded.csv",
+      "source_bytes": 196293,
+      "stored_bytes": 196293,
+      "source_sha256": "86d560d0f858a5d30e0ffebf7bfa4c87cd125407c773594c6942e4f9b01863b8",
+      "stored_sha256": "86d560d0f858a5d30e0ffebf7bfa4c87cd125407c773594c6942e4f9b01863b8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/vaghdir_official_chart_adjusted.response.bin",
+      "destination_relative": "_shared/official_chart_validation/vaghdir_official_chart_adjusted.response.bin",
+      "source_bytes": 66300,
+      "stored_bytes": 66300,
+      "source_sha256": "3e8d4c8c51583efe26abe5f9905d6fdf641d944061ebbc4b88309bde8c15d1a4",
+      "stored_sha256": "3e8d4c8c51583efe26abe5f9905d6fdf641d944061ebbc4b88309bde8c15d1a4",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/vaghdir_official_chart_adjusted.transport.json",
+      "destination_relative": "_shared/official_chart_validation/vaghdir_official_chart_adjusted.transport.json",
+      "source_bytes": 381,
+      "stored_bytes": 381,
+      "source_sha256": "51672e222c612678072f411ea2ac0737a3534fd61bef678810ac17a94c2160b3",
+      "stored_sha256": "51672e222c612678072f411ea2ac0737a3534fd61bef678810ac17a94c2160b3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/vaghdir_official_chart_raw.decoded.csv",
+      "destination_relative": "_shared/official_chart_validation/vaghdir_official_chart_raw.decoded.csv",
+      "source_bytes": 232872,
+      "stored_bytes": 232872,
+      "source_sha256": "763cc268719bdda15708024cd2dafed9905b41564be0481f04918c12fc8be9b6",
+      "stored_sha256": "763cc268719bdda15708024cd2dafed9905b41564be0481f04918c12fc8be9b6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/vaghdir_official_chart_raw.response.bin",
+      "destination_relative": "_shared/official_chart_validation/vaghdir_official_chart_raw.response.bin",
+      "source_bytes": 84990,
+      "stored_bytes": 84990,
+      "source_sha256": "3b2331fe5aba7dc111c104288b37f20499d3c22d05821cf33fe0cd255a2d1a72",
+      "stored_sha256": "3b2331fe5aba7dc111c104288b37f20499d3c22d05821cf33fe0cd255a2d1a72",
+      "compression": "none"
+    },
+    {
+      "source_relative": "official_chart_validation/vaghdir_official_chart_raw.transport.json",
+      "destination_relative": "_shared/official_chart_validation/vaghdir_official_chart_raw.transport.json",
+      "source_bytes": 381,
+      "stored_bytes": 381,
+      "source_sha256": "c057f2ed5b009e59fa7d73fb0cd07e98e82dcbe5fae9111d9e8f01cb91cc201d",
+      "stored_sha256": "c057f2ed5b009e59fa7d73fb0cd07e98e82dcbe5fae9111d9e8f01cb91cc201d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_metadata_index.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_metadata_index.json",
+      "source_bytes": 135367,
+      "stored_bytes": 135367,
+      "source_sha256": "5dce6c485833925116ab2051090475f4f13041e44c5bbd136501f9b4d680328c",
+      "stored_sha256": "5dce6c485833925116ab2051090475f4f13041e44c5bbd136501f9b4d680328c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38803_agm_decisions.pdf",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38803_agm_decisions.pdf",
+      "source_bytes": 59449,
+      "stored_bytes": 59449,
+      "source_sha256": "9b965c487492d6303c17632c096178235faa1e89cb948650ec28a609f509b387",
+      "stored_sha256": "9b965c487492d6303c17632c096178235faa1e89cb948650ec28a609f509b387",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38803_agm_decisions.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38803_agm_decisions.txt",
+      "source_bytes": 21377,
+      "stored_bytes": 21377,
+      "source_sha256": "fb8329efe1368344f8efbb4be0eb796bf279d5f998f7b62e203457af4722097f",
+      "stored_sha256": "fb8329efe1368344f8efbb4be0eb796bf279d5f998f7b62e203457af4722097f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38805_egm_decisions.pdf",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38805_egm_decisions.pdf",
+      "source_bytes": 52189,
+      "stored_bytes": 52189,
+      "source_sha256": "ca3113e7431fed747345e12ac362dedbb9bba68b5e817f94432dc24ce08ecbe2",
+      "stored_sha256": "ca3113e7431fed747345e12ac362dedbb9bba68b5e817f94432dc24ce08ecbe2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38805_egm_decisions.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/38805_egm_decisions.txt",
+      "source_bytes": 7514,
+      "stored_bytes": 7514,
+      "source_sha256": "cffe67f898b7077bd09864bff8ce744cdbb5eba0546d068c4cda2d064bbd0f80",
+      "stored_sha256": "cffe67f898b7077bd09864bff8ce744cdbb5eba0546d068c4cda2d064bbd0f80",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/46666_rights_deadline.pdf",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/46666_rights_deadline.pdf",
+      "source_bytes": 54638,
+      "stored_bytes": 54638,
+      "source_sha256": "96161fe0259d7fc0abe8e242a0ebf15b70fd08c4f2203e000434825c44f2d47a",
+      "stored_sha256": "96161fe0259d7fc0abe8e242a0ebf15b70fd08c4f2203e000434825c44f2d47a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/46666_rights_deadline.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/46666_rights_deadline.txt",
+      "source_bytes": 1586,
+      "stored_bytes": 1586,
+      "source_sha256": "16ef91c5a81f04a700fafccbe5b7896f3a34ca9b79afb7012c4f79e37a9c5130",
+      "stored_sha256": "16ef91c5a81f04a700fafccbe5b7896f3a34ca9b79afb7012c4f79e37a9c5130",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/59965_public_subscription.pdf",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/59965_public_subscription.pdf",
+      "source_bytes": 39519,
+      "stored_bytes": 39519,
+      "source_sha256": "33cb4d2e6056673ea66349002f4cfd6b1ccd5927435219f29ac786fe0e291609",
+      "stored_sha256": "33cb4d2e6056673ea66349002f4cfd6b1ccd5927435219f29ac786fe0e291609",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/59965_public_subscription.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/59965_public_subscription.txt",
+      "source_bytes": 2350,
+      "stored_bytes": 2350,
+      "source_sha256": "88141008fddb923a031cae3165392c11bf3887968dccc2b09907992ec845080d",
+      "stored_sha256": "88141008fddb923a031cae3165392c11bf3887968dccc2b09907992ec845080d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/61220_capital_registration.pdf",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/61220_capital_registration.pdf",
+      "source_bytes": 38443,
+      "stored_bytes": 38443,
+      "source_sha256": "0332992e6ae33be224253ad447c88b1096b52ace28c7fe800cd02da343fdd283",
+      "stored_sha256": "0332992e6ae33be224253ad447c88b1096b52ace28c7fe800cd02da343fdd283",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/61220_capital_registration.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/codal_primary_docs/61220_capital_registration.txt",
+      "source_bytes": 1447,
+      "stored_bytes": 1447,
+      "source_sha256": "d89ffa2b923f173fb679b4a5b622e6df5b0fc2cb8118d1331dd48d3657269c6a",
+      "stored_sha256": "d89ffa2b923f173fb679b4a5b622e6df5b0fc2cb8118d1331dd48d3657269c6a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/event_coverage_and_precision_audit.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/event_coverage_and_precision_audit.txt",
+      "source_bytes": 32945,
+      "stored_bytes": 32945,
+      "source_sha256": "fd65a141fb6458f640d9d7ffa5c2f6d39a3387c044e9e6b1bc550f446c36fcd8",
+      "stored_sha256": "fd65a141fb6458f640d9d7ffa5c2f6d39a3387c044e9e6b1bc550f446c36fcd8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics.zip",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics.zip",
+      "source_bytes": 5947629,
+      "stored_bytes": 5947629,
+      "source_sha256": "020c5f22fa341f57ef1a27d04fffb7792b95d50dcac91dd8cc7861b3bd00bb23",
+      "stored_sha256": "020c5f22fa341f57ef1a27d04fffb7792b95d50dcac91dd8cc7861b3bd00bb23",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "source_bytes": 30420,
+      "stored_bytes": 30420,
+      "source_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "stored_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "source_bytes": 32028260,
+      "stored_bytes": 32028260,
+      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
+      "source_bytes": 13236,
+      "stored_bytes": 13236,
+      "source_sha256": "e7914f3586de99ada5cde791a6b06ccc0799e5b9385640480f165894070631e5",
+      "stored_sha256": "e7914f3586de99ada5cde791a6b06ccc0799e5b9385640480f165894070631e5",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/input_manifest.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/input_manifest.json",
+      "source_bytes": 4879,
+      "stored_bytes": 4879,
+      "source_sha256": "b704ea737dce22102655d9a75df0d980d8fdc92438f7350fe0026be6c9e6f03f",
+      "stored_sha256": "b704ea737dce22102655d9a75df0d980d8fdc92438f7350fe0026be6c9e6f03f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/summary.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/summary.json",
+      "source_bytes": 564,
+      "stored_bytes": 564,
+      "source_sha256": "e3c4c582e0ae77326914cce794095208c2cfc35e402dac675ad48b9ca2d9acf6",
+      "stored_sha256": "e3c4c582e0ae77326914cce794095208c2cfc35e402dac675ad48b9ca2d9acf6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results.zip",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results.zip",
+      "source_bytes": 17794480,
+      "stored_bytes": 17794480,
+      "source_sha256": "ecf7c31273a1a5b87b9a3639f6a86dc57504b35e8fcd1b8d96e0a700b7d27aae",
+      "stored_sha256": "ecf7c31273a1a5b87b9a3639f6a86dc57504b35e8fcd1b8d96e0a700b7d27aae",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/event_coverage_and_precision_audit.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/event_coverage_and_precision_audit.txt",
+      "source_bytes": 32945,
+      "stored_bytes": 32945,
+      "source_sha256": "fd65a141fb6458f640d9d7ffa5c2f6d39a3387c044e9e6b1bc550f446c36fcd8",
+      "stored_sha256": "fd65a141fb6458f640d9d7ffa5c2f6d39a3387c044e9e6b1bc550f446c36fcd8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "source_bytes": 30420,
+      "stored_bytes": 30420,
+      "source_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "stored_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "source_bytes": 32028260,
+      "stored_bytes": 32028260,
+      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_factor_diagnostics.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_factor_diagnostics.json",
+      "source_bytes": 13236,
+      "stored_bytes": 13236,
+      "source_sha256": "e7914f3586de99ada5cde791a6b06ccc0799e5b9385640480f165894070631e5",
+      "stored_sha256": "e7914f3586de99ada5cde791a6b06ccc0799e5b9385640480f165894070631e5",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics.zip",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics.zip",
+      "source_bytes": 5947629,
+      "stored_bytes": 5947629,
+      "source_sha256": "020c5f22fa341f57ef1a27d04fffb7792b95d50dcac91dd8cc7861b3bd00bb23",
+      "stored_sha256": "020c5f22fa341f57ef1a27d04fffb7792b95d50dcac91dd8cc7861b3bd00bb23",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_event_step_diagnostics.csv",
+      "source_bytes": 30420,
+      "stored_bytes": 30420,
+      "source_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "stored_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
+      "source_bytes": 32028260,
+      "stored_bytes": 32028260,
+      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
+      "source_bytes": 13236,
+      "stored_bytes": 13236,
+      "source_sha256": "e7914f3586de99ada5cde791a6b06ccc0799e5b9385640480f165894070631e5",
+      "stored_sha256": "e7914f3586de99ada5cde791a6b06ccc0799e5b9385640480f165894070631e5",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/input_manifest.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/input_manifest.json",
+      "source_bytes": 4879,
+      "stored_bytes": 4879,
+      "source_sha256": "b704ea737dce22102655d9a75df0d980d8fdc92438f7350fe0026be6c9e6f03f",
+      "stored_sha256": "b704ea737dce22102655d9a75df0d980d8fdc92438f7350fe0026be6c9e6f03f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/summary.json",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/summary.json",
+      "source_bytes": 564,
+      "stored_bytes": 564,
+      "source_sha256": "e3c4c582e0ae77326914cce794095208c2cfc35e402dac675ad48b9ca2d9acf6",
+      "stored_sha256": "e3c4c582e0ae77326914cce794095208c2cfc35e402dac675ad48b9ca2d9acf6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/tse_client_outlier_review.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/tse_client_outlier_review.txt",
+      "source_bytes": 12629,
+      "stored_bytes": 12629,
+      "source_sha256": "a63b7fb20d74b3e336af8a2b386299bb424ab4dc58889920240f6acaf8bee6c3",
+      "stored_sha256": "a63b7fb20d74b3e336af8a2b386299bb424ab4dc58889920240f6acaf8bee6c3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "three_symbol_audit_runs/20261112T194429Z/tse_client_outlier_review.txt",
+      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/tse_client_outlier_review.txt",
+      "source_bytes": 12629,
+      "stored_bytes": 12629,
+      "source_sha256": "a63b7fb20d74b3e336af8a2b386299bb424ab4dc58889920240f6acaf8bee6c3",
+      "stored_sha256": "a63b7fb20d74b3e336af8a2b386299bb424ab4dc58889920240f6acaf8bee6c3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/marketsage_tse_client_validation.js",
+      "destination_relative": "_shared/tse_client_validation/marketsage_tse_client_validation.js",
+      "source_bytes": 19711,
+      "stored_bytes": 19711,
+      "source_sha256": "e19d3899b4cda5a855bc234fdf4a97eb85c2fa00c3085d94a67e6977df7f9b5f",
+      "stored_sha256": "e19d3899b4cda5a855bc234fdf4a97eb85c2fa00c3085d94a67e6977df7f9b5f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/node-cache/inscode_lastdeven.csv",
+      "destination_relative": "_shared/tse_client_validation/node-cache/inscode_lastdeven.csv",
+      "source_bytes": 0,
+      "stored_bytes": 0,
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/node-cache/instruments.csv",
+      "destination_relative": "_shared/tse_client_validation/node-cache/instruments.csv",
+      "source_bytes": 860649,
+      "stored_bytes": 860649,
+      "source_sha256": "da0beccb8f059703f2ca14b58238f3c65e1e14f37e9368036d4fcbbb0c58d336",
+      "stored_sha256": "da0beccb8f059703f2ca14b58238f3c65e1e14f37e9368036d4fcbbb0c58d336",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/node-cache/lastInstrumentUpdate.csv",
+      "destination_relative": "_shared/tse_client_validation/node-cache/lastInstrumentUpdate.csv",
+      "source_bytes": 8,
+      "stored_bytes": 8,
+      "source_sha256": "d723684b2d34deeaf84742110b1344ef423ef0605cc6b091fef624c49ff20d3b",
+      "stored_sha256": "d723684b2d34deeaf84742110b1344ef423ef0605cc6b091fef624c49ff20d3b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/node-cache/lastLPDUpdate.csv",
+      "destination_relative": "_shared/tse_client_validation/node-cache/lastLPDUpdate.csv",
+      "source_bytes": 8,
+      "stored_bytes": 8,
+      "source_sha256": "d723684b2d34deeaf84742110b1344ef423ef0605cc6b091fef624c49ff20d3b",
+      "stored_sha256": "d723684b2d34deeaf84742110b1344ef423ef0605cc6b091fef624c49ff20d3b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/node-cache/lastPossibleDevens.csv",
+      "destination_relative": "_shared/tse_client_validation/node-cache/lastPossibleDevens.csv",
+      "source_bytes": 17,
+      "stored_bytes": 17,
+      "source_sha256": "3d1155588c364c7c9d90dc9fb7dcc51d1e9fe1f3c5ef8a31b300030d3a1dae3b",
+      "stored_sha256": "3d1155588c364c7c9d90dc9fb7dcc51d1e9fe1f3c5ef8a31b300030d3a1dae3b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/node-cache/shares.csv",
+      "destination_relative": "_shared/tse_client_validation/node-cache/shares.csv",
+      "source_bytes": 216621,
+      "stored_bytes": 216621,
+      "source_sha256": "e24da6e5b902136808c38e883854b1e5aa6eb9c610bfc2dd6237752a101619a5",
+      "stored_sha256": "e24da6e5b902136808c38e883854b1e5aa6eb9c610bfc2dd6237752a101619a5",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/LICENSE",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/LICENSE",
+      "source_bytes": 1098,
+      "stored_bytes": 1098,
+      "source_sha256": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
+      "stored_sha256": "04512a63dce4d2d506ad612dc0bd7681ccf6e3655f7b6eaef7dfac8323d1ec0b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/Readme.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/Readme.md",
+      "source_bytes": 36404,
+      "stored_bytes": 36404,
+      "source_sha256": "9ee7c537cb5e335e2e9c383b3b08ee7361fd227fb83c86ffa35eedc9c7f92877",
+      "stored_sha256": "9ee7c537cb5e335e2e9c383b3b08ee7361fd227fb83c86ffa35eedc9c7f92877",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/esm.mjs",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/esm.mjs",
+      "source_bytes": 256,
+      "stored_bytes": 256,
+      "source_sha256": "d590f9c55c9f8bfec81fdc4170b3e7653226a39956055aec657b52ae45495d88",
+      "stored_sha256": "d590f9c55c9f8bfec81fdc4170b3e7653226a39956055aec657b52ae45495d88",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/index.js",
+      "source_bytes": 798,
+      "stored_bytes": 798,
+      "source_sha256": "d4f8af488a7a08cd71df8503fcc3e5f2fd61e9b26eb368ecd5cc8159862cde3f",
+      "stored_sha256": "d4f8af488a7a08cd71df8503fcc3e5f2fd61e9b26eb368ecd5cc8159862cde3f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/lib/argument.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/lib/argument.js",
+      "source_bytes": 3164,
+      "stored_bytes": 3164,
+      "source_sha256": "7859398cfac1869df6cbba646e7e437875185866b79ac70a5a3cd802fd4df96b",
+      "stored_sha256": "7859398cfac1869df6cbba646e7e437875185866b79ac70a5a3cd802fd4df96b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/lib/command.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/lib/command.js",
+      "source_bytes": 62360,
+      "stored_bytes": 62360,
+      "source_sha256": "69047076c77593471bbf1aa2ba5f01f0565bffa187d415a600d8ec5998d2056b",
+      "stored_sha256": "69047076c77593471bbf1aa2ba5f01f0565bffa187d415a600d8ec5998d2056b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/lib/error.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/lib/error.js",
+      "source_bytes": 1240,
+      "stored_bytes": 1240,
+      "source_sha256": "c69bbc276b3c7fec052f930b9de091db2206646761f765a2077d5731f763dc55",
+      "stored_sha256": "c69bbc276b3c7fec052f930b9de091db2206646761f765a2077d5731f763dc55",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/lib/help.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/lib/help.js",
+      "source_bytes": 11889,
+      "stored_bytes": 11889,
+      "source_sha256": "f07a902508e463968826dd36b567640a563f0192989355c6559723415951bcf2",
+      "stored_sha256": "f07a902508e463968826dd36b567640a563f0192989355c6559723415951bcf2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/lib/option.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/lib/option.js",
+      "source_bytes": 4869,
+      "stored_bytes": 4869,
+      "source_sha256": "9dfc7ae4b048435196cbdd888819bb84253d2693460adfa262cffcbb31d6cf98",
+      "stored_sha256": "9dfc7ae4b048435196cbdd888819bb84253d2693460adfa262cffcbb31d6cf98",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/lib/suggestSimilar.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/lib/suggestSimilar.js",
+      "source_bytes": 2765,
+      "stored_bytes": 2765,
+      "source_sha256": "2f96448988ab89b4acd941d298e51bb103544bf65b60eb0a4260a26a8b39bb57",
+      "stored_sha256": "2f96448988ab89b4acd941d298e51bb103544bf65b60eb0a4260a26a8b39bb57",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/package-support.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/package-support.json",
+      "source_bytes": 231,
+      "stored_bytes": 231,
+      "source_sha256": "b07a441d1dbc88588a2e7f219d43a5ea9b7c429a44f119caa49229da86bb0063",
+      "stored_sha256": "b07a441d1dbc88588a2e7f219d43a5ea9b7c429a44f119caa49229da86bb0063",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/package.json",
+      "source_bytes": 1804,
+      "stored_bytes": 1804,
+      "source_sha256": "5f5944b2fa479bf68003ca239940f8ad9cae893ddfc3662272a1855dfb9ce4db",
+      "stored_sha256": "5f5944b2fa479bf68003ca239940f8ad9cae893ddfc3662272a1855dfb9ce4db",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/commander/typings/index.d.ts",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/commander/typings/index.d.ts",
+      "source_bytes": 24389,
+      "stored_bytes": 24389,
+      "source_sha256": "051ae0b0bda811703875e6f2e466b9344cfe320b39087676327dc0c109f26d32",
+      "stored_sha256": "051ae0b0bda811703875e6f2e466b9344cfe320b39087676327dc0c109f26d32",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/decimal.js/LICENCE.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/decimal.js/LICENCE.md",
+      "source_bytes": 1104,
+      "stored_bytes": 1104,
+      "source_sha256": "3108b546bcff5d346923a82f48b2d252ca722f9088076db6d145f6b67757ad6c",
+      "stored_sha256": "3108b546bcff5d346923a82f48b2d252ca722f9088076db6d145f6b67757ad6c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/decimal.js/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/decimal.js/README.md",
+      "source_bytes": 8574,
+      "stored_bytes": 8574,
+      "source_sha256": "c562022b4b739ca41647724f81ff909ce3c7fac54ea4aa369730de3d309c2397",
+      "stored_sha256": "c562022b4b739ca41647724f81ff909ce3c7fac54ea4aa369730de3d309c2397",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/decimal.js/decimal.d.ts",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/decimal.js/decimal.d.ts",
+      "source_bytes": 9019,
+      "stored_bytes": 9019,
+      "source_sha256": "e6cfcf171b5f7ec0cb620eee4669739ad2711597d0ff7fdb79298dfc1118e66a",
+      "stored_sha256": "e6cfcf171b5f7ec0cb620eee4669739ad2711597d0ff7fdb79298dfc1118e66a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/decimal.js/decimal.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/decimal.js/decimal.js",
+      "source_bytes": 136673,
+      "stored_bytes": 136673,
+      "source_sha256": "6e99821f8204c5f611b56077e3fce056a1562d22bc341a1f4af01afe7e527d83",
+      "stored_sha256": "6e99821f8204c5f611b56077e3fce056a1562d22bc341a1f4af01afe7e527d83",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/decimal.js/decimal.mjs",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/decimal.js/decimal.mjs",
+      "source_bytes": 127787,
+      "stored_bytes": 127787,
+      "source_sha256": "45e6ecc0a500fee6439acdf67ee2e9322aab57e6ea0409ef52993dedbba8cf19",
+      "stored_sha256": "45e6ecc0a500fee6439acdf67ee2e9322aab57e6ea0409ef52993dedbba8cf19",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/decimal.js/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/decimal.js/package.json",
+      "source_bytes": 1190,
+      "stored_bytes": 1190,
+      "source_sha256": "d7e3794828ee8bc94818613c9d901a9e7c857e6ffcf027245e661ddfc63d9b72",
+      "stored_sha256": "d7e3794828ee8bc94818613c9d901a9e7c857e6ffcf027245e661ddfc63d9b72",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/LICENSE.txt",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/LICENSE.txt",
+      "source_bytes": 1115,
+      "stored_bytes": 1115,
+      "source_sha256": "809e66de579fb7d92503848bbe6d1f348f4f6521a71e5d294fe7cc0c87a3b4ff",
+      "stored_sha256": "809e66de579fb7d92503848bbe6d1f348f4f6521a71e5d294fe7cc0c87a3b4ff",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/README.md",
+      "source_bytes": 3697,
+      "stored_bytes": 3697,
+      "source_sha256": "f8ba840a9e01f16ccab189fc52191a42324153ad376b8ade110db8af9300ffe1",
+      "stored_sha256": "f8ba840a9e01f16ccab189fc52191a42324153ad376b8ade110db8af9300ffe1",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/dist/immediate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/dist/immediate.js",
+      "source_bytes": 2911,
+      "stored_bytes": 2911,
+      "source_sha256": "f7d30178cb60471a7e90378c20453634b2ffb5f8ade5c8f584ae0ee0845fb3ac",
+      "stored_sha256": "f7d30178cb60471a7e90378c20453634b2ffb5f8ade5c8f584ae0ee0845fb3ac",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/dist/immediate.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/dist/immediate.min.js",
+      "source_bytes": 1686,
+      "stored_bytes": 1686,
+      "source_sha256": "de5e482a8b02c65c727c105b42888da53e25b9fe5d815afbadc03f4d193df7d4",
+      "stored_sha256": "de5e482a8b02c65c727c105b42888da53e25b9fe5d815afbadc03f4d193df7d4",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/lib/browser.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/lib/browser.js",
+      "source_bytes": 1883,
+      "stored_bytes": 1883,
+      "source_sha256": "a736ab3e296a0637d040603df55a5943d1f850e51c94f8595965c4875e307512",
+      "stored_sha256": "a736ab3e296a0637d040603df55a5943d1f850e51c94f8595965c4875e307512",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/lib/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/lib/index.js",
+      "source_bytes": 1982,
+      "stored_bytes": 1982,
+      "source_sha256": "285c9e2ca232f5d298816680d9f5a29c455daa56356ee3566b556e5dafeb9427",
+      "stored_sha256": "285c9e2ca232f5d298816680d9f5a29c455daa56356ee3566b556e5dafeb9427",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/immediate/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/immediate/package.json",
+      "source_bytes": 1372,
+      "stored_bytes": 1372,
+      "source_sha256": "1e40d711ce5348d237f7a2093d1707ca7c34fc56369f6be10c8e2dc9bcae0a96",
+      "stored_sha256": "1e40d711ce5348d237f7a2093d1707ca7c34fc56369f6be10c8e2dc9bcae0a96",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/jalaali-js/LICENSE",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/jalaali-js/LICENSE",
+      "source_bytes": 1075,
+      "stored_bytes": 1075,
+      "source_sha256": "6f7f18170e01f7913b0aff73d536ba3779cffc37629673a584ffbe00f4ee0a77",
+      "stored_sha256": "6f7f18170e01f7913b0aff73d536ba3779cffc37629673a584ffbe00f4ee0a77",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/jalaali-js/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/jalaali-js/README.md",
+      "source_bytes": 6056,
+      "stored_bytes": 6056,
+      "source_sha256": "4dbbbcf1cbcbc3e880e6d6bc01f526b164d992fc55e9f0f3bf4fe5aac2e59381",
+      "stored_sha256": "4dbbbcf1cbcbc3e880e6d6bc01f526b164d992fc55e9f0f3bf4fe5aac2e59381",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/jalaali-js/dist/jalaali.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/jalaali-js/dist/jalaali.js",
+      "source_bytes": 9339,
+      "stored_bytes": 9339,
+      "source_sha256": "77a046d1a2dec8b4551edf0fe2c09686ac1cae4bf9e7bd8214fb33fad07124c5",
+      "stored_sha256": "77a046d1a2dec8b4551edf0fe2c09686ac1cae4bf9e7bd8214fb33fad07124c5",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/jalaali-js/dist/jalaali.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/jalaali-js/dist/jalaali.min.js",
+      "source_bytes": 2931,
+      "stored_bytes": 2931,
+      "source_sha256": "c718335a6cc61ddeb1431768cae43c8b375423cfcc1cfdd1977249faa79e4e3d",
+      "stored_sha256": "c718335a6cc61ddeb1431768cae43c8b375423cfcc1cfdd1977249faa79e4e3d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/jalaali-js/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/jalaali-js/index.js",
+      "source_bytes": 8354,
+      "stored_bytes": 8354,
+      "source_sha256": "09da9ae91489550917d105cd9098a18a7216b3e96cc90281f3f69205f7277bd7",
+      "stored_sha256": "09da9ae91489550917d105cd9098a18a7216b3e96cc90281f3f69205f7277bd7",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/jalaali-js/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/jalaali-js/package.json",
+      "source_bytes": 791,
+      "stored_bytes": 791,
+      "source_sha256": "46adaf71234ef589b748516bc9e11ab2f9f0a2227cbba852b9c64702236238b8",
+      "stored_sha256": "46adaf71234ef589b748516bc9e11ab2f9f0a2227cbba852b9c64702236238b8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/README.md",
+      "source_bytes": 2185,
+      "stored_bytes": 2185,
+      "source_sha256": "1e38c909f02620b745c09e691c7135363c02b188e1ed52c807c6c9aece764115",
+      "stored_sha256": "1e38c909f02620b745c09e691c7135363c02b188e1ed52c807c6c9aece764115",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/dist/lie.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/dist/lie.js",
+      "source_bytes": 8882,
+      "stored_bytes": 8882,
+      "source_sha256": "7590ece4d1eb1cd4f40b3fc968c46bee10453f0a312660e9f1f1da5a7f958859",
+      "stored_sha256": "7590ece4d1eb1cd4f40b3fc968c46bee10453f0a312660e9f1f1da5a7f958859",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/dist/lie.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/dist/lie.min.js",
+      "source_bytes": 4560,
+      "stored_bytes": 4560,
+      "source_sha256": "2c38738cba256333cff2654e97d886e5caa76a8781d4dcad1614e10d8197a61d",
+      "stored_sha256": "2c38738cba256333cff2654e97d886e5caa76a8781d4dcad1614e10d8197a61d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/dist/lie.polyfill.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/dist/lie.polyfill.js",
+      "source_bytes": 8806,
+      "stored_bytes": 8806,
+      "source_sha256": "69a44ad16dc883e408994bdbd7958b426d3e1459827bf486811cdeda02323361",
+      "stored_sha256": "69a44ad16dc883e408994bdbd7958b426d3e1459827bf486811cdeda02323361",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/dist/lie.polyfill.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/dist/lie.polyfill.min.js",
+      "source_bytes": 4473,
+      "stored_bytes": 4473,
+      "source_sha256": "e794ad8d9506fc931c88c9f1952815a236e227ee0a66d0437c70a83e1fc4a811",
+      "stored_sha256": "e794ad8d9506fc931c88c9f1952815a236e227ee0a66d0437c70a83e1fc4a811",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/lib/browser.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/lib/browser.js",
+      "source_bytes": 5933,
+      "stored_bytes": 5933,
+      "source_sha256": "f2b36c02e4fb8f30b7aa467dd3364cec9c75a0f13144201454709360890f2a0b",
+      "stored_sha256": "f2b36c02e4fb8f30b7aa467dd3364cec9c75a0f13144201454709360890f2a0b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/lib/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/lib/index.js",
+      "source_bytes": 6544,
+      "stored_bytes": 6544,
+      "source_sha256": "ddf0536d8eaa03c07820267e84ce0fccc2c2ff68b7b6774960f2bac22f001c35",
+      "stored_sha256": "ddf0536d8eaa03c07820267e84ce0fccc2c2ff68b7b6774960f2bac22f001c35",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/license.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/license.md",
+      "source_bytes": 1063,
+      "stored_bytes": 1063,
+      "source_sha256": "2a714679422aa639925ee1f9382e7fc4f9883c8f4b1452a21efe6ba589028484",
+      "stored_sha256": "2a714679422aa639925ee1f9382e7fc4f9883c8f4b1452a21efe6ba589028484",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/package.json",
+      "source_bytes": 2333,
+      "stored_bytes": 2333,
+      "source_sha256": "21ee7d381cd5f4ee00ec0a017b206bc390904b3a2ccca65b8e4c1a43f6b893fb",
+      "stored_sha256": "21ee7d381cd5f4ee00ec0a017b206bc390904b3a2ccca65b8e4c1a43f6b893fb",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/lie/polyfill.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/lie/polyfill.js",
+      "source_bytes": 97,
+      "stored_bytes": 97,
+      "source_sha256": "9fdfb4a0bb2e0ed1fb340bbfcc6fc42fbab1dc8420e3ca217fbedaf2c82c1230",
+      "stored_sha256": "9fdfb4a0bb2e0ed1fb340bbfcc6fc42fbab1dc8420e3ca217fbedaf2c82c1230",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/CHANGELOG.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/CHANGELOG.md",
+      "source_bytes": 8754,
+      "stored_bytes": 8754,
+      "source_sha256": "fa706944cbc73822ed3a431fea3738d64f0f90e3bd2b35b2b6f83b423be548cd",
+      "stored_sha256": "fa706944cbc73822ed3a431fea3738d64f0f90e3bd2b35b2b6f83b423be548cd",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/CONTRIBUTING.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/CONTRIBUTING.md",
+      "source_bytes": 3039,
+      "stored_bytes": 3039,
+      "source_sha256": "f108175e10e69f34932194544c4198b5ec6438d6d4531555733bf902222800af",
+      "stored_sha256": "f108175e10e69f34932194544c4198b5ec6438d6d4531555733bf902222800af",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/LICENSE",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/LICENSE",
+      "source_bytes": 11337,
+      "stored_bytes": 11337,
+      "source_sha256": "8c3c0576866d6c22f56cbe65b8ef20e63c8aa75ec58f8cd139a242edb42bf8f1",
+      "stored_sha256": "8c3c0576866d6c22f56cbe65b8ef20e63c8aa75ec58f8cd139a242edb42bf8f1",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/README.md",
+      "source_bytes": 9223,
+      "stored_bytes": 9223,
+      "source_sha256": "210afa26d3ca5d9a4de03d3ed0619d6a15c6ef7b263a223323b7a9b2e142860c",
+      "stored_sha256": "210afa26d3ca5d9a4de03d3ed0619d6a15c6ef7b263a223323b7a9b2e142860c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/bower.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/bower.json",
+      "source_bytes": 573,
+      "stored_bytes": 573,
+      "source_sha256": "ae74f765869c326d393384db66996f323813648e5499cc466cfc91d4051924db",
+      "stored_sha256": "ae74f765869c326d393384db66996f323813648e5499cc466cfc91d4051924db",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/build/es5src/drivers/indexeddb.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/build/es5src/drivers/indexeddb.js",
+      "source_bytes": 38291,
+      "stored_bytes": 38291,
+      "source_sha256": "0a8f3303462d604a6e6c2c528c170cbb51a10fcb1cffa13fd4fde74bfcbfccf6",
+      "stored_sha256": "0a8f3303462d604a6e6c2c528c170cbb51a10fcb1cffa13fd4fde74bfcbfccf6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/build/es5src/drivers/localstorage.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/build/es5src/drivers/localstorage.js",
+      "source_bytes": 12385,
+      "stored_bytes": 12385,
+      "source_sha256": "020cfb88313a46dfd2da54d32f86e1ed2b2bcfededaebc771f2dd93abd14106d",
+      "stored_sha256": "020cfb88313a46dfd2da54d32f86e1ed2b2bcfededaebc771f2dd93abd14106d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/build/es5src/drivers/websql.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/build/es5src/drivers/websql.js",
+      "source_bytes": 18473,
+      "stored_bytes": 18473,
+      "source_sha256": "0099cffa9d8f92f4b3d73efce8e8e137fa455b033eb6682d6bbdc9a1c03525da",
+      "stored_sha256": "0099cffa9d8f92f4b3d73efce8e8e137fa455b033eb6682d6bbdc9a1c03525da",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/build/es5src/localforage.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/build/es5src/localforage.js",
+      "source_bytes": 17011,
+      "stored_bytes": 17011,
+      "source_sha256": "2dddf7823691bd53ecbf080e8fe0171c95ac85bfcdc8e70b1074537b164daf86",
+      "stored_sha256": "2dddf7823691bd53ecbf080e8fe0171c95ac85bfcdc8e70b1074537b164daf86",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/build/es5src/utils/serializer.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/build/es5src/utils/serializer.js",
+      "source_bytes": 10250,
+      "stored_bytes": 10250,
+      "source_sha256": "c9b9923484da5bf084a82f7124b5c0034cae4cd19feb29d408151abb05e0b3ac",
+      "stored_sha256": "c9b9923484da5bf084a82f7124b5c0034cae4cd19feb29d408151abb05e0b3ac",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/component.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/component.json",
+      "source_bytes": 400,
+      "stored_bytes": 400,
+      "source_sha256": "198e9255408330ec60bd7dcc62ecd78d2cf1a99f3749715c684dbc28bd30ec13",
+      "stored_sha256": "198e9255408330ec60bd7dcc62ecd78d2cf1a99f3749715c684dbc28bd30ec13",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/contribute.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/contribute.json",
+      "source_bytes": 969,
+      "stored_bytes": 969,
+      "source_sha256": "498c7ab1a6c4f3d460194ef0c8892bcaae6c7b30f85134f21d69821f3da761e8",
+      "stored_sha256": "498c7ab1a6c4f3d460194ef0c8892bcaae6c7b30f85134f21d69821f3da761e8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.js",
+      "source_bytes": 93750,
+      "stored_bytes": 93750,
+      "source_sha256": "e9f100dee1745c2b62b08705672e474d3e7c5e871763b2d7ec951f1222ba5b96",
+      "stored_sha256": "e9f100dee1745c2b62b08705672e474d3e7c5e871763b2d7ec951f1222ba5b96",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.min.js",
+      "source_bytes": 29703,
+      "stored_bytes": 29703,
+      "source_sha256": "cc168d95fb927d46b1043726cfe13998e08902ff63f24330e2bb2290109ed145",
+      "stored_sha256": "cc168d95fb927d46b1043726cfe13998e08902ff63f24330e2bb2290109ed145",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.nopromises.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.nopromises.js",
+      "source_bytes": 85428,
+      "stored_bytes": 85428,
+      "source_sha256": "0e6e16869f86045e76a1b41dac21a2cc9441815de0d46a668f1b5d55321666e9",
+      "stored_sha256": "0e6e16869f86045e76a1b41dac21a2cc9441815de0d46a668f1b5d55321666e9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.nopromises.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/dist/localforage.nopromises.min.js",
+      "source_bytes": 25724,
+      "stored_bytes": 25724,
+      "source_sha256": "68c37b41fe7025bdcabd211d77b696ea9858400c6f54721bdfb9e5e4a0f548fd",
+      "stored_sha256": "68c37b41fe7025bdcabd211d77b696ea9858400c6f54721bdfb9e5e4a0f548fd",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/package.json",
+      "source_bytes": 2484,
+      "stored_bytes": 2484,
+      "source_sha256": "e5a426e722f3f0102707e265921ff82e41a850136659e21faba48f1dba27026a",
+      "stored_sha256": "e5a426e722f3f0102707e265921ff82e41a850136659e21faba48f1dba27026a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/drivers/indexeddb.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/drivers/indexeddb.js",
+      "source_bytes": 36908,
+      "stored_bytes": 36908,
+      "source_sha256": "d7399dfef69905e99594dd4465c2fd5ca9151051f6871b0a0f4c3c66ba7567a4",
+      "stored_sha256": "d7399dfef69905e99594dd4465c2fd5ca9151051f6871b0a0f4c3c66ba7567a4",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/drivers/localstorage.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/drivers/localstorage.js",
+      "source_bytes": 9824,
+      "stored_bytes": 9824,
+      "source_sha256": "db599139d74c0157e09c266930712263fbef048691038413891034daf71a8088",
+      "stored_sha256": "db599139d74c0157e09c266930712263fbef048691038413891034daf71a8088",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/drivers/websql.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/drivers/websql.js",
+      "source_bytes": 20309,
+      "stored_bytes": 20309,
+      "source_sha256": "3c327b1656ebd5b72d594c0f5c5277ea0f991f0e3759f044444aab4b32507ae8",
+      "stored_sha256": "3c327b1656ebd5b72d594c0f5c5277ea0f991f0e3759f044444aab4b32507ae8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/localforage.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/localforage.js",
+      "source_bytes": 14063,
+      "stored_bytes": 14063,
+      "source_sha256": "0a10ab25cbac7f92c4ecad2158c1e444960923f4e82c0502763ed27e31363ec9",
+      "stored_sha256": "0a10ab25cbac7f92c4ecad2158c1e444960923f4e82c0502763ed27e31363ec9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/createBlob.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/createBlob.js",
+      "source_bytes": 1204,
+      "stored_bytes": 1204,
+      "source_sha256": "14dd379f079966554b93c6982f6a57b6334d39d500d14592a90a25f057ffb1a0",
+      "stored_sha256": "14dd379f079966554b93c6982f6a57b6334d39d500d14592a90a25f057ffb1a0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/executeCallback.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/executeCallback.js",
+      "source_bytes": 303,
+      "stored_bytes": 303,
+      "source_sha256": "385bde0bcbeb7bb0916a18f9fa13e087bef6e8c73322c6cea921a7d2a9faaf76",
+      "stored_sha256": "385bde0bcbeb7bb0916a18f9fa13e087bef6e8c73322c6cea921a7d2a9faaf76",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/executeTwoCallbacks.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/executeTwoCallbacks.js",
+      "source_bytes": 276,
+      "stored_bytes": 276,
+      "source_sha256": "0ab6f19a2645c8af6657c55faba1760de0510706d5f0ad7c433a9a28a8f22b8b",
+      "stored_sha256": "0ab6f19a2645c8af6657c55faba1760de0510706d5f0ad7c433a9a28a8f22b8b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/getCallback.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/getCallback.js",
+      "source_bytes": 203,
+      "stored_bytes": 203,
+      "source_sha256": "7c6d36433132aa416fce88915f004fa4a5520a70bb6c3cc775b1da9373bba25b",
+      "stored_sha256": "7c6d36433132aa416fce88915f004fa4a5520a70bb6c3cc775b1da9373bba25b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/idb.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/idb.js",
+      "source_bytes": 656,
+      "stored_bytes": 656,
+      "source_sha256": "1e7f31e75cab1bd86f475db87faa3b469b07b24503d60840a4902b7b4c38f768",
+      "stored_sha256": "1e7f31e75cab1bd86f475db87faa3b469b07b24503d60840a4902b7b4c38f768",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/includes.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/includes.js",
+      "source_bytes": 386,
+      "stored_bytes": 386,
+      "source_sha256": "6a2598464f6b0ada6d9442b86c6339aa307a155b9be15eaea38c5d343da8c5ce",
+      "stored_sha256": "6a2598464f6b0ada6d9442b86c6339aa307a155b9be15eaea38c5d343da8c5ce",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/isArray.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/isArray.js",
+      "source_bytes": 162,
+      "stored_bytes": 162,
+      "source_sha256": "33b7af80a36b73e20fb8464e91d4a398477d4ea47a7f8f077dafd99e53d647fb",
+      "stored_sha256": "33b7af80a36b73e20fb8464e91d4a398477d4ea47a7f8f077dafd99e53d647fb",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/isIndexedDBValid.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/isIndexedDBValid.js",
+      "source_bytes": 1657,
+      "stored_bytes": 1657,
+      "source_sha256": "9d87daefe45ef629676859370d2cfef7ed91a2b1e30fb4a0b925e9b6df06bd43",
+      "stored_sha256": "9d87daefe45ef629676859370d2cfef7ed91a2b1e30fb4a0b925e9b6df06bd43",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/isLocalStorageValid.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/isLocalStorageValid.js",
+      "source_bytes": 346,
+      "stored_bytes": 346,
+      "source_sha256": "64e1fa95986ff2dc2aa66b6f064ac72bc06cc56fa28d3c3dd0ea18cc5aa0df7c",
+      "stored_sha256": "64e1fa95986ff2dc2aa66b6f064ac72bc06cc56fa28d3c3dd0ea18cc5aa0df7c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/isWebSQLValid.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/isWebSQLValid.js",
+      "source_bytes": 107,
+      "stored_bytes": 107,
+      "source_sha256": "a2cb2bc344ad4fc3d9bd66e59b03765d15e5695896be5ef43ddf7c00c8005090",
+      "stored_sha256": "a2cb2bc344ad4fc3d9bd66e59b03765d15e5695896be5ef43ddf7c00c8005090",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/normalizeKey.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/normalizeKey.js",
+      "source_bytes": 270,
+      "stored_bytes": 270,
+      "source_sha256": "57ed80a6f574511682e1575ebcb8cfe57652bddb36252642372168312d054082",
+      "stored_sha256": "57ed80a6f574511682e1575ebcb8cfe57652bddb36252642372168312d054082",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/promise.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/promise.js",
+      "source_bytes": 322,
+      "stored_bytes": 322,
+      "source_sha256": "553a6e73bfe59e43390c7f88514574d4284eef5e34ce7cdbf93c3d9c6347c559",
+      "stored_sha256": "553a6e73bfe59e43390c7f88514574d4284eef5e34ce7cdbf93c3d9c6347c559",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/src/utils/serializer.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/src/utils/serializer.js",
+      "source_bytes": 8818,
+      "stored_bytes": 8818,
+      "source_sha256": "32bb89ce35b2d3f474a65c14a6589e9836fb207423ed59ee9507b4965d481132",
+      "stored_sha256": "32bb89ce35b2d3f474a65c14a6589e9836fb207423ed59ee9507b4965d481132",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/localforage/typings/localforage.d.ts",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/localforage/typings/localforage.d.ts",
+      "source_bytes": 3937,
+      "stored_bytes": 3937,
+      "source_sha256": "5321a876abac5aae52929091fd23b94639c45c5308c650052664b63ea87f7eb6",
+      "stored_sha256": "5321a876abac5aae52929091fd23b94639c45c5308c650052664b63ea87f7eb6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/LICENSE.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/LICENSE.md",
+      "source_bytes": 1079,
+      "stored_bytes": 1079,
+      "source_sha256": "84eaa985e1ef71b8c630e8aba73404c219ff425c6fdb45c62e998b58d4fbdc8e",
+      "stored_sha256": "84eaa985e1ef71b8c630e8aba73404c219ff425c6fdb45c62e998b58d4fbdc8e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/README.md",
+      "source_bytes": 21332,
+      "stored_bytes": 21332,
+      "source_sha256": "53ca2fdf67a57f9b26b19cb198f62aeaa2de9371992b2b54845aac5b6dc0f65d",
+      "stored_sha256": "53ca2fdf67a57f9b26b19cb198f62aeaa2de9371992b2b54845aac5b6dc0f65d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/browser.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/browser.js",
+      "source_bytes": 781,
+      "stored_bytes": 781,
+      "source_sha256": "2f59898f0efeaf430d2277e2519819e8e4fd365cb27f9d88d275cf43e1b1344f",
+      "stored_sha256": "2f59898f0efeaf430d2277e2519819e8e4fd365cb27f9d88d275cf43e1b1344f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/lib/index.es.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/lib/index.es.js",
+      "source_bytes": 45346,
+      "stored_bytes": 45346,
+      "source_sha256": "f786ccb522a08d5296a808bd0aef4bcfb8d9c9b4347e874fbbf6a64c6c1f8b97",
+      "stored_sha256": "f786ccb522a08d5296a808bd0aef4bcfb8d9c9b4347e874fbbf6a64c6c1f8b97",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/lib/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/lib/index.js",
+      "source_bytes": 45775,
+      "stored_bytes": 45775,
+      "source_sha256": "79541f01338e70f4ff6f8a1d12f5c2914d4c6ab2ba96b7ddf48d2add01c13813",
+      "stored_sha256": "79541f01338e70f4ff6f8a1d12f5c2914d4c6ab2ba96b7ddf48d2add01c13813",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/lib/index.mjs",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/lib/index.mjs",
+      "source_bytes": 45272,
+      "stored_bytes": 45272,
+      "source_sha256": "751ad19bb1be0a02e9d453eedd4a034e68b433bfbf4789c1645ab058882d11f6",
+      "stored_sha256": "751ad19bb1be0a02e9d453eedd4a034e68b433bfbf4789c1645ab058882d11f6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/node-fetch/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/node-fetch/package.json",
+      "source_bytes": 2668,
+      "stored_bytes": 2668,
+      "source_sha256": "000a0b3b037d4e3e211e7b7ca559a5a62a39b96ca2c6bcdaed3aba0a545eedba",
+      "stored_sha256": "000a0b3b037d4e3e211e7b7ca559a5a62a39b96ca2c6bcdaed3aba0a545eedba",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/LICENSE",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/LICENSE",
+      "source_bytes": 1104,
+      "stored_bytes": 1104,
+      "source_sha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539",
+      "stored_sha256": "a04665b3b2de56c66730c1f720f528175739e4104f79073614aa611da1e85539",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/README.md",
+      "source_bytes": 4092,
+      "stored_bytes": 4092,
+      "source_sha256": "706c43aab3ec2b6e84077f5458567c0299207af3df9e6d1752482c52ac68ab93",
+      "stored_sha256": "706c43aab3ec2b6e84077f5458567c0299207af3df9e6d1752482c52ac68ab93",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako.es5.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako.es5.js",
+      "source_bytes": 241626,
+      "stored_bytes": 241626,
+      "source_sha256": "d4ed12ae60a6106be4e65661810a9371c3dde93d539b726f5897308c828f999e",
+      "stored_sha256": "d4ed12ae60a6106be4e65661810a9371c3dde93d539b726f5897308c828f999e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako.es5.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako.es5.min.js",
+      "source_bytes": 47425,
+      "stored_bytes": 47425,
+      "source_sha256": "7420457ec218cafec3515b75adf7dcbc8c3e46b020fa81c3c7c9f0a89973e370",
+      "stored_sha256": "7420457ec218cafec3515b75adf7dcbc8c3e46b020fa81c3c7c9f0a89973e370",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako.esm.mjs",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako.esm.mjs",
+      "source_bytes": 229698,
+      "stored_bytes": 229698,
+      "source_sha256": "c704f219caa9c3ddbaa23b925c078cc4390ea8c7db105c3aed8acb18c5fb248a",
+      "stored_sha256": "c704f219caa9c3ddbaa23b925c078cc4390ea8c7db105c3aed8acb18c5fb248a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako.js",
+      "source_bytes": 242291,
+      "stored_bytes": 242291,
+      "source_sha256": "8e59383452bdd910bd25acfe3ad4a59670dadae054a3759eb177704c4a8b4c53",
+      "stored_sha256": "8e59383452bdd910bd25acfe3ad4a59670dadae054a3759eb177704c4a8b4c53",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako.min.js",
+      "source_bytes": 47016,
+      "stored_bytes": 47016,
+      "source_sha256": "a5e3214ae5cfabc01b3fddbaa635b78a4f766a938b64c20d57271a297edebe92",
+      "stored_sha256": "a5e3214ae5cfabc01b3fddbaa635b78a4f766a938b64c20d57271a297edebe92",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.es5.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.es5.js",
+      "source_bytes": 143010,
+      "stored_bytes": 143010,
+      "source_sha256": "dda18cd09a11b725ba40ce7a6f2ba41c71178d955f7ffa2e8cf2033fdbd8e31f",
+      "stored_sha256": "dda18cd09a11b725ba40ce7a6f2ba41c71178d955f7ffa2e8cf2033fdbd8e31f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.es5.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.es5.min.js",
+      "source_bytes": 28295,
+      "stored_bytes": 28295,
+      "source_sha256": "854cb03914c54b855a24c76493f980c25ecaa7ca78554a490e0fbc94224c6d9e",
+      "stored_sha256": "854cb03914c54b855a24c76493f980c25ecaa7ca78554a490e0fbc94224c6d9e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.js",
+      "source_bytes": 143384,
+      "stored_bytes": 143384,
+      "source_sha256": "51fbde7814a982223f89d272402e39b06b1a445657a7e7ac6f56506c5c2b5d23",
+      "stored_sha256": "51fbde7814a982223f89d272402e39b06b1a445657a7e7ac6f56506c5c2b5d23",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_deflate.min.js",
+      "source_bytes": 27835,
+      "stored_bytes": 27835,
+      "source_sha256": "767e9e5a5de31904646f81e068ccc080d6a298201896d3c699ce88414c9d0d05",
+      "stored_sha256": "767e9e5a5de31904646f81e068ccc080d6a298201896d3c699ce88414c9d0d05",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.es5.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.es5.js",
+      "source_bytes": 114369,
+      "stored_bytes": 114369,
+      "source_sha256": "ff9295813da328dda4fd236cd0f6efd336481c84e9e5ba75576989ede1b07f08",
+      "stored_sha256": "ff9295813da328dda4fd236cd0f6efd336481c84e9e5ba75576989ede1b07f08",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.es5.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.es5.min.js",
+      "source_bytes": 21895,
+      "stored_bytes": 21895,
+      "source_sha256": "9fbdec3706bb739d174448a0a8c6e870f9d51255a00a39be410e4eb6fbf5e297",
+      "stored_sha256": "9fbdec3706bb739d174448a0a8c6e870f9d51255a00a39be410e4eb6fbf5e297",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.js",
+      "source_bytes": 114490,
+      "stored_bytes": 114490,
+      "source_sha256": "2c00d4d790b08fd5d7dabdce1e28d9ee6f0df67d3f1461965f9cb00fb7b333d0",
+      "stored_sha256": "2c00d4d790b08fd5d7dabdce1e28d9ee6f0df67d3f1461965f9cb00fb7b333d0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/dist/pako_inflate.min.js",
+      "source_bytes": 21676,
+      "stored_bytes": 21676,
+      "source_sha256": "bbcaa5e569e289b4904c7e12c45b6785bc41745977091d105086a6cbb0faf832",
+      "stored_sha256": "bbcaa5e569e289b4904c7e12c45b6785bc41745977091d105086a6cbb0faf832",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/index.js",
+      "source_bytes": 591,
+      "stored_bytes": 591,
+      "source_sha256": "518602de70af58543bed79cc472fbbc07fb10a3033fe4f0eee7df25f2b84aa04",
+      "stored_sha256": "518602de70af58543bed79cc472fbbc07fb10a3033fe4f0eee7df25f2b84aa04",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/deflate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/deflate.js",
+      "source_bytes": 10407,
+      "stored_bytes": 10407,
+      "source_sha256": "7312e9b13436d0a7f7b99e002903caa5847f82f8e643e3938200602c113bff39",
+      "stored_sha256": "7312e9b13436d0a7f7b99e002903caa5847f82f8e643e3938200602c113bff39",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/inflate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/inflate.js",
+      "source_bytes": 14296,
+      "stored_bytes": 14296,
+      "source_sha256": "196a1c128fcc00c8a6341a2b4b57f1d47592af18fe7f2683290bc23d6cc84494",
+      "stored_sha256": "196a1c128fcc00c8a6341a2b4b57f1d47592af18fe7f2683290bc23d6cc84494",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/utils/common.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/utils/common.js",
+      "source_bytes": 994,
+      "stored_bytes": 994,
+      "source_sha256": "830c22b5a7bba24d4ed7c0e5a7538d922f30bae7aad05e16b3a20728f187bc47",
+      "stored_sha256": "830c22b5a7bba24d4ed7c0e5a7538d922f30bae7aad05e16b3a20728f187bc47",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/utils/strings.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/utils/strings.js",
+      "source_bytes": 5018,
+      "stored_bytes": 5018,
+      "source_sha256": "ccd3cbec537634369d9ad8ed1a791c9df100b2ea13826afd8915fa117cfa3997",
+      "stored_sha256": "ccd3cbec537634369d9ad8ed1a791c9df100b2ea13826afd8915fa117cfa3997",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/README",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/README",
+      "source_bytes": 2180,
+      "stored_bytes": 2180,
+      "source_sha256": "20356aece8f36fda34645e97af3b163da0a88e253b78ffba298590d5b9121ebb",
+      "stored_sha256": "20356aece8f36fda34645e97af3b163da0a88e253b78ffba298590d5b9121ebb",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/adler32.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/adler32.js",
+      "source_bytes": 1660,
+      "stored_bytes": 1660,
+      "source_sha256": "1f181b4365677dcad5bd8fcc4594707171b7317875c50e88054b75d4fa285930",
+      "stored_sha256": "1f181b4365677dcad5bd8fcc4594707171b7317875c50e88054b75d4fa285930",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/constants.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/constants.js",
+      "source_bytes": 2312,
+      "stored_bytes": 2312,
+      "source_sha256": "37c65f82b9bacde2bbccc9c980a20dee7e2b7f3658304a30abe1023e02ec407b",
+      "stored_sha256": "37c65f82b9bacde2bbccc9c980a20dee7e2b7f3658304a30abe1023e02ec407b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/crc32.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/crc32.js",
+      "source_bytes": 1781,
+      "stored_bytes": 1781,
+      "source_sha256": "5452655b14329267c4c3fc58c43df53f4e6f5196fde9d2d431b1ad089e5f3742",
+      "stored_sha256": "5452655b14329267c4c3fc58c43df53f4e6f5196fde9d2d431b1ad089e5f3742",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/deflate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/deflate.js",
+      "source_bytes": 71193,
+      "stored_bytes": 71193,
+      "source_sha256": "54a36e5377a62ce36f4b5a2307f7e55962cc036d7dbc4a355f702f9de069e012",
+      "stored_sha256": "54a36e5377a62ce36f4b5a2307f7e55962cc036d7dbc4a355f702f9de069e012",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/gzheader.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/gzheader.js",
+      "source_bytes": 2240,
+      "stored_bytes": 2240,
+      "source_sha256": "8fa0b4995cea477be96b8783a7d6c7cf5fec96765c2108c3bd52e77104bfdbd3",
+      "stored_sha256": "8fa0b4995cea477be96b8783a7d6c7cf5fec96765c2108c3bd52e77104bfdbd3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/inffast.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/inffast.js",
+      "source_bytes": 12671,
+      "stored_bytes": 12671,
+      "source_sha256": "694b23b4d2c00c9d274274ecf092dc7c0c0c64125d54bda5286baf2711822d00",
+      "stored_sha256": "694b23b4d2c00c9d274274ecf092dc7c0c0c64125d54bda5286baf2711822d00",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/inflate.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/inflate.js",
+      "source_bytes": 51254,
+      "stored_bytes": 51254,
+      "source_sha256": "644ba56a87938835c844bb5fe13924b124db932780eb61b2a77f3b88dbad78fd",
+      "stored_sha256": "644ba56a87938835c844bb5fe13924b124db932780eb61b2a77f3b88dbad78fd",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/inftrees.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/inftrees.js",
+      "source_bytes": 12488,
+      "stored_bytes": 12488,
+      "source_sha256": "d5f36d0cff9fd70ba29408a5d42ff40fbb66955df50bd4e98ab4a4b65ed06c7d",
+      "stored_sha256": "d5f36d0cff9fd70ba29408a5d42ff40fbb66955df50bd4e98ab4a4b65ed06c7d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/messages.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/messages.js",
+      "source_bytes": 1538,
+      "stored_bytes": 1538,
+      "source_sha256": "eec5f5d6b8120ada9cd48a3ca0a253c64777906e835477b090e053434d38cf6c",
+      "stored_sha256": "eec5f5d6b8120ada9cd48a3ca0a253c64777906e835477b090e053434d38cf6c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/trees.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/trees.js",
+      "source_bytes": 38586,
+      "stored_bytes": 38586,
+      "source_sha256": "8cebc535d46743de70530f0ac263179154e7297f42d6c8c64b5d25fee22493dd",
+      "stored_sha256": "8cebc535d46743de70530f0ac263179154e7297f42d6c8c64b5d25fee22493dd",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/lib/zlib/zstream.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/lib/zlib/zstream.js",
+      "source_bytes": 1811,
+      "stored_bytes": 1811,
+      "source_sha256": "5fa10c7a59ca99113cf92d1260e56cbd6282e15afa85dc8a0eb8e8d6d2321298",
+      "stored_sha256": "5fa10c7a59ca99113cf92d1260e56cbd6282e15afa85dc8a0eb8e8d6d2321298",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/pako/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/pako/package.json",
+      "source_bytes": 1891,
+      "stored_bytes": 1891,
+      "source_sha256": "d9c254197b7c7a1b00eaffb0196f10c3f48061e61d8b6c41dccd3d5d0ab3f1ea",
+      "stored_sha256": "d9c254197b7c7a1b00eaffb0196f10c3f48061e61d8b6c41dccd3d5d0ab3f1ea",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/CHANGELOG.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/CHANGELOG.md",
+      "source_bytes": 3388,
+      "stored_bytes": 3388,
+      "source_sha256": "bcf3244ed8224fd1ccceb1d1652beb3d22ed7ca141e1638ebf2f45d601ce790e",
+      "stored_sha256": "bcf3244ed8224fd1ccceb1d1652beb3d22ed7ca141e1638ebf2f45d601ce790e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/LICENSE",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/LICENSE",
+      "source_bytes": 1098,
+      "stored_bytes": 1098,
+      "source_sha256": "d7d2a7786de7c7cfd96f920c6f12927d74e1d2a861ca4498bf465c3bc3f4c21c",
+      "stored_sha256": "d7d2a7786de7c7cfd96f920c6f12927d74e1d2a861ca4498bf465c3bc3f4c21c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/Makefile",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/Makefile",
+      "source_bytes": 154,
+      "stored_bytes": 154,
+      "source_sha256": "2753b32742115f0d46ef28894da759350b66ed2c4763d71848c63d1414a22426",
+      "stored_sha256": "2753b32742115f0d46ef28894da759350b66ed2c4763d71848c63d1414a22426",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/Readme.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/Readme.md",
+      "source_bytes": 3516,
+      "stored_bytes": 3516,
+      "source_sha256": "490d3d64df0347084fe37b00dc11bb93aa4084a24afe5b39e14a5762e7870e09",
+      "stored_sha256": "490d3d64df0347084fe37b00dc11bb93aa4084a24afe5b39e14a5762e7870e09",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/index.js",
+      "source_bytes": 49,
+      "stored_bytes": 49,
+      "source_sha256": "bad8eafc784a18555566c1c52a6e03ba72dd58ccd6d71ba06244994be87aa7d9",
+      "stored_sha256": "bad8eafc784a18555566c1c52a6e03ba72dd58ccd6d71ba06244994be87aa7d9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/lib/node-progress.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/lib/node-progress.js",
+      "source_bytes": 6678,
+      "stored_bytes": 6678,
+      "source_sha256": "cba973ff80a57d60fde143bb2b7e913862a58fb978c57ab53fab1e84dc749312",
+      "stored_sha256": "cba973ff80a57d60fde143bb2b7e913862a58fb978c57ab53fab1e84dc749312",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/progress/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/progress/package.json",
+      "source_bytes": 616,
+      "stored_bytes": 616,
+      "source_sha256": "3f58cfd421f075cda1017006c3cd287d0ad925466cb04af14caf0ee55c1ac54d",
+      "stored_sha256": "3f58cfd421f075cda1017006c3cd287d0ad925466cb04af14caf0ee55c1ac54d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tr46/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tr46/index.js",
+      "source_bytes": 7567,
+      "stored_bytes": 7567,
+      "source_sha256": "8194f9425ce9ab06ea9aebcd64a85ec064d95d61bb349f8f1c98762ad256638e",
+      "stored_sha256": "8194f9425ce9ab06ea9aebcd64a85ec064d95d61bb349f8f1c98762ad256638e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tr46/lib/mappingTable.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tr46/lib/mappingTable.json",
+      "source_bytes": 260049,
+      "stored_bytes": 260049,
+      "source_sha256": "b6b39724dca9011113a08d9d6910204062b58169e98952acdfbd19bf2c31bbff",
+      "stored_sha256": "b6b39724dca9011113a08d9d6910204062b58169e98952acdfbd19bf2c31bbff",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tr46/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tr46/package.json",
+      "source_bytes": 732,
+      "stored_bytes": 732,
+      "source_sha256": "615087f58ee138fd35c2b414c355b72e36e5919725b8aecc1c34f6a5585b9779",
+      "stored_sha256": "615087f58ee138fd35c2b414c355b72e36e5919725b8aecc1c34f6a5585b9779",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/LICENSE",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/LICENSE",
+      "source_bytes": 1093,
+      "stored_bytes": 1093,
+      "source_sha256": "dc0f454b6e56c05c9ce7cf03b0b174e2be1d08776a12f0831eac25dc8452be91",
+      "stored_sha256": "dc0f454b6e56c05c9ce7cf03b0b174e2be1d08776a12f0831eac25dc8452be91",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/README.md",
+      "source_bytes": 33892,
+      "stored_bytes": 33892,
+      "source_sha256": "eab764965a4e8b88eb8a09bd5d5b5939642a8dbdcf1eb84e280b4e7dbba45477",
+      "stored_sha256": "eab764965a4e8b88eb8a09bd5d5b5939642a8dbdcf1eb84e280b4e7dbba45477",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/dist/tse.bundle.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/dist/tse.bundle.min.js",
+      "source_bytes": 140815,
+      "stored_bytes": 140815,
+      "source_sha256": "c52f20a0d664825417355940323727a9c808ad212489e3431cc282a0f51285e8",
+      "stored_sha256": "c52f20a0d664825417355940323727a9c808ad212489e3431cc282a0f51285e8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/dist/tse.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/dist/tse.js",
+      "source_bytes": 61505,
+      "stored_bytes": 61505,
+      "source_sha256": "1eace185e444da462e1c35c8cdd35d3d0d8659c305d4733e8f18cc8150440a4b",
+      "stored_sha256": "1eace185e444da462e1c35c8cdd35d3d0d8659c305d4733e8f18cc8150440a4b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/dist/tse.min.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/dist/tse.min.js",
+      "source_bytes": 28989,
+      "stored_bytes": 28989,
+      "source_sha256": "1b5396811b2206edbe97628890abaec2356442b5e7f62b87bd67212593e35726",
+      "stored_sha256": "1b5396811b2206edbe97628890abaec2356442b5e7f62b87bd67212593e35726",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/index.js",
+      "source_bytes": 38908,
+      "stored_bytes": 38908,
+      "source_sha256": "e468e39acb61bc28af71750ecc37fccdc65d502e57d0ace0f8629e92ea9ad35b",
+      "stored_sha256": "e468e39acb61bc28af71750ecc37fccdc65d502e57d0ace0f8629e92ea9ad35b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/info.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/info.json",
+      "source_bytes": 7153,
+      "stored_bytes": 7153,
+      "source_sha256": "03ed52c239e72a34320ba1d041fff66099494c433205dcef4bc200c6ef04844c",
+      "stored_sha256": "03ed52c239e72a34320ba1d041fff66099494c433205dcef4bc200c6ef04844c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/lib/colors.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/lib/colors.js",
+      "source_bytes": 317,
+      "stored_bytes": 317,
+      "source_sha256": "a53cd2e4ae3ff1af33e8ee559d44e88b9f69cb07cca8ba7e8a253a1b51d6912b",
+      "stored_sha256": "a53cd2e4ae3ff1af33e8ee559d44e88b9f69cb07cca8ba7e8a253a1b51d6912b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/package.json",
+      "source_bytes": 1627,
+      "stored_bytes": 1627,
+      "source_sha256": "cc04522bffe95ed3800980bd911b974774a17914b54dad9af160169fe2d31cf9",
+      "stored_sha256": "cc04522bffe95ed3800980bd911b974774a17914b54dad9af160169fe2d31cf9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/tse-client/tse.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/tse-client/tse.js",
+      "source_bytes": 61505,
+      "stored_bytes": 61505,
+      "source_sha256": "1eace185e444da462e1c35c8cdd35d3d0d8659c305d4733e8f18cc8150440a4b",
+      "stored_sha256": "1eace185e444da462e1c35c8cdd35d3d0d8659c305d4733e8f18cc8150440a4b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/webidl-conversions/LICENSE.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/webidl-conversions/LICENSE.md",
+      "source_bytes": 1323,
+      "stored_bytes": 1323,
+      "source_sha256": "a889cc4dbee2ae172c179856b25d75b0b7a5a136e1b97109b9b590b2ff1a879c",
+      "stored_sha256": "a889cc4dbee2ae172c179856b25d75b0b7a5a136e1b97109b9b590b2ff1a879c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/webidl-conversions/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/webidl-conversions/README.md",
+      "source_bytes": 5480,
+      "stored_bytes": 5480,
+      "source_sha256": "fd9075b4186b3167c44b00eb92d95971b3d36ed6cf10ace990afcadf5f52f08a",
+      "stored_sha256": "fd9075b4186b3167c44b00eb92d95971b3d36ed6cf10ace990afcadf5f52f08a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/webidl-conversions/lib/index.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/webidl-conversions/lib/index.js",
+      "source_bytes": 5056,
+      "stored_bytes": 5056,
+      "source_sha256": "0b29621626c38ddda2a8e20787c32d09db10dd031ea743c5e270b59d46754a84",
+      "stored_sha256": "0b29621626c38ddda2a8e20787c32d09db10dd031ea743c5e270b59d46754a84",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/webidl-conversions/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/webidl-conversions/package.json",
+      "source_bytes": 511,
+      "stored_bytes": 511,
+      "source_sha256": "e26568c06b82596d754c7490fd568b4b3f970b3b97c55020d42f65990d0c86af",
+      "stored_sha256": "e26568c06b82596d754c7490fd568b4b3f970b3b97c55020d42f65990d0c86af",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/LICENSE.txt",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/LICENSE.txt",
+      "source_bytes": 1088,
+      "stored_bytes": 1088,
+      "source_sha256": "6b7a1792144374d84dc5ed3655b8bbe2754d06f4f1f64a9fb8b9de2d6f448b85",
+      "stored_sha256": "6b7a1792144374d84dc5ed3655b8bbe2754d06f4f1f64a9fb8b9de2d6f448b85",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/README.md",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/README.md",
+      "source_bytes": 5136,
+      "stored_bytes": 5136,
+      "source_sha256": "f60e4cb8275e281590d826da8a1a3134367c5a8fa6c514d4440075f6b00a0b19",
+      "stored_sha256": "f60e4cb8275e281590d826da8a1a3134367c5a8fa6c514d4440075f6b00a0b19",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/lib/URL-impl.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/lib/URL-impl.js",
+      "source_bytes": 3804,
+      "stored_bytes": 3804,
+      "source_sha256": "e60103ff74b8bfc4001f5c05eea482f554de610cb5fc4e7ccbfc5aef9e443706",
+      "stored_sha256": "e60103ff74b8bfc4001f5c05eea482f554de610cb5fc4e7ccbfc5aef9e443706",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/lib/URL.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/lib/URL.js",
+      "source_bytes": 4212,
+      "stored_bytes": 4212,
+      "source_sha256": "3bd67335fc72b50924fa35523c2b0b73dce9cb814f6bae82644ccb1f22560706",
+      "stored_sha256": "3bd67335fc72b50924fa35523c2b0b73dce9cb814f6bae82644ccb1f22560706",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/lib/public-api.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/lib/public-api.js",
+      "source_bytes": 625,
+      "stored_bytes": 625,
+      "source_sha256": "0cbda6401c6179c4fb2ef0cebeccfb127485fee6f0ed5c129a8a539d4cd29018",
+      "stored_sha256": "0cbda6401c6179c4fb2ef0cebeccfb127485fee6f0ed5c129a8a539d4cd29018",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/lib/url-state-machine.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/lib/url-state-machine.js",
+      "source_bytes": 33573,
+      "stored_bytes": 33573,
+      "source_sha256": "e038db71d8a2313d7d20ad6dd1116a2fcb34b41e39f7a2364c70ff1aff548850",
+      "stored_sha256": "e038db71d8a2313d7d20ad6dd1116a2fcb34b41e39f7a2364c70ff1aff548850",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/lib/utils.js",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/lib/utils.js",
+      "source_bytes": 562,
+      "stored_bytes": 562,
+      "source_sha256": "96b941934b9050815f9397bc6796ea8611bfa00c5886587d81da64a23841e3b9",
+      "stored_sha256": "96b941934b9050815f9397bc6796ea8611bfa00c5886587d81da64a23841e3b9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/node_modules/whatwg-url/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/node_modules/whatwg-url/package.json",
+      "source_bytes": 886,
+      "stored_bytes": 886,
+      "source_sha256": "05a015c4176246f051bbaa3a543ed82480a4a4d85360283e049f159ba014b008",
+      "stored_sha256": "05a015c4176246f051bbaa3a543ed82480a4a4d85360283e049f159ba014b008",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/package-lock.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/package-lock.json",
+      "source_bytes": 5063,
+      "stored_bytes": 5063,
+      "source_sha256": "0aaa867f9d59bf76f284ab137dd454fce9805f85e7ec5a0ad9cc4393739dd61c",
+      "stored_sha256": "0aaa867f9d59bf76f284ab137dd454fce9805f85e7ec5a0ad9cc4393739dd61c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/nodeenv/package.json",
+      "destination_relative": "_shared/tse_client_validation/nodeenv/package.json",
+      "source_bytes": 55,
+      "stored_bytes": 55,
+      "source_sha256": "58b5e49d2f7a840d6c45801673a3b01d7f4269cb3b19590f7e99e55c914b14e1",
+      "stored_sha256": "58b5e49d2f7a840d6c45801673a3b01d7f4269cb3b19590f7e99e55c914b14e1",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/tse_client_adjust_info_events.json",
+      "destination_relative": "_shared/tse_client_validation/tse_client_adjust_info_events.json",
+      "source_bytes": 21118,
+      "stored_bytes": 21118,
+      "source_sha256": "01451ca2ae65d9e19e57745acb0c7852647668acbb1ee43e9a331df39b152ba2",
+      "stored_sha256": "01451ca2ae65d9e19e57745acb0c7852647668acbb1ee43e9a331df39b152ba2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/tse_client_adjusted_close_comparison.csv",
+      "destination_relative": "_shared/tse_client_validation/tse_client_adjusted_close_comparison.csv",
+      "source_bytes": 4058724,
+      "stored_bytes": 4058724,
+      "source_sha256": "f28897a74194043cc30c43866144aec8d9af8d72e8d87eaead33e26ba97686b7",
+      "stored_sha256": "f28897a74194043cc30c43866144aec8d9af8d72e8d87eaead33e26ba97686b7",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/tse_client_outlier_review.txt",
+      "destination_relative": "_shared/tse_client_validation/tse_client_outlier_review.txt",
+      "source_bytes": 12629,
+      "stored_bytes": 12629,
+      "source_sha256": "a63b7fb20d74b3e336af8a2b386299bb424ab4dc58889920240f6acaf8bee6c3",
+      "stored_sha256": "a63b7fb20d74b3e336af8a2b386299bb424ab4dc58889920240f6acaf8bee6c3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/tse_client_validation.json",
+      "destination_relative": "_shared/tse_client_validation/tse_client_validation.json",
+      "source_bytes": 37262,
+      "stored_bytes": 37262,
+      "source_sha256": "1973bca2718b8decdf9b79c65d589e8ea790497bfdc4652b02f9546066a02faa",
+      "stored_sha256": "1973bca2718b8decdf9b79c65d589e8ea790497bfdc4652b02f9546066a02faa",
+      "compression": "none"
+    },
+    {
+      "source_relative": "tse_client_validation/tse_client_validation.zip",
+      "destination_relative": "_shared/tse_client_validation/tse_client_validation.zip",
+      "source_bytes": 817818,
+      "stored_bytes": 817818,
+      "source_sha256": "aeae09e3421646169cfb57f465284b95d8d895755ee731c2097e098cfcb4ffaa",
+      "stored_sha256": "aeae09e3421646169cfb57f465284b95d8d895755ee731c2097e098cfcb4ffaa",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/foolad_daily_raw.json",
+      "destination_relative": "foolad/raw/tsetmc/foolad_daily_raw.json",
+      "source_bytes": 1504108,
+      "stored_bytes": 1504108,
+      "source_sha256": "4275877342d6483bbaf122f82e47f5fcd86e996ec140090b53a08dc477c5ee11",
+      "stored_sha256": "4275877342d6483bbaf122f82e47f5fcd86e996ec140090b53a08dc477c5ee11",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/foolad_instrument_search.json",
+      "destination_relative": "foolad/raw/tsetmc/foolad_instrument_search.json",
+      "source_bytes": 16206,
+      "stored_bytes": 16206,
+      "source_sha256": "39c5b42166570c75cd7a19439f571c8a513a46ce21d0fe592a8d2136f4193db2",
+      "stored_sha256": "39c5b42166570c75cd7a19439f571c8a513a46ce21d0fe592a8d2136f4193db2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/foolad_price_adjust_raw.json",
+      "destination_relative": "foolad/raw/tsetmc/foolad_price_adjust_raw.json",
+      "source_bytes": 3173,
+      "stored_bytes": 3173,
+      "source_sha256": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+      "stored_sha256": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/foolad_share_change_raw.json",
+      "destination_relative": "foolad/raw/tsetmc/foolad_share_change_raw.json",
+      "source_bytes": 1895,
+      "stored_bytes": 1895,
+      "source_sha256": "1b389841c646f4c7f03dc9a953280b476453dd0918d273f0c13d13fa716de063",
+      "stored_sha256": "1b389841c646f4c7f03dc9a953280b476453dd0918d273f0c13d13fa716de063",
+      "compression": "none"
+    },
+    {
+      "source_relative": "corporate_action_evidence_review.csv",
+      "destination_relative": "foolad/validation/acceptance-review/corporate_action_deduplicated.csv",
+      "source_bytes": 54500775,
+      "stored_bytes": 225846,
+      "source_sha256": "33f5715dcdf183fe6132b97aeb5f14f861b1cf1151e6c75bb18fa988530f947b",
+      "stored_sha256": "d84d7fe946813c5b1d25afe67a59becfca264dcadeb8e15c1cc9516fcd3b4ddb",
+      "compression": "deduplicated_primary_inscode_extract",
+      "unique_records": 149
+    },
+    {
+      "source_relative": "date_gap_evidence_review.csv",
+      "destination_relative": "foolad/validation/acceptance-review/date_gap_deduplicated.csv",
+      "source_bytes": 54091279,
+      "stored_bytes": 218694,
+      "source_sha256": "dcdcc8acf90587d2bebdee28d15200e66091cf4c143f73d4c51b3a538642a4ac",
+      "stored_sha256": "09f7930833084175f25913baa99b235a53dacd78b042b2a818e82b563c002dcf",
+      "compression": "deduplicated_primary_inscode_extract",
+      "unique_records": 143
+    },
+    {
+      "source_relative": "raw_provider_snapshots/parsian_daily_raw.json",
+      "destination_relative": "parsian/raw/tsetmc/parsian_daily_raw.json",
+      "source_bytes": 1224840,
+      "stored_bytes": 1224840,
+      "source_sha256": "81aef0837a52306374837efb32fb42a99efacc16161381e054bd307faa7d4cda",
+      "stored_sha256": "81aef0837a52306374837efb32fb42a99efacc16161381e054bd307faa7d4cda",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/parsian_instrument_search.json",
+      "destination_relative": "parsian/raw/tsetmc/parsian_instrument_search.json",
+      "source_bytes": 16560,
+      "stored_bytes": 16560,
+      "source_sha256": "69c4b3f76024f2ba5b0b49f777c674dfa569ba61057e3cdaef6914809b9be8ad",
+      "stored_sha256": "69c4b3f76024f2ba5b0b49f777c674dfa569ba61057e3cdaef6914809b9be8ad",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/parsian_price_adjust_raw.json",
+      "destination_relative": "parsian/raw/tsetmc/parsian_price_adjust_raw.json",
+      "source_bytes": 2465,
+      "stored_bytes": 2465,
+      "source_sha256": "66160ec454c4f077fae7ba308118f24fb7fc615c79a11343362365d310a55118",
+      "stored_sha256": "66160ec454c4f077fae7ba308118f24fb7fc615c79a11343362365d310a55118",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/parsian_share_change_raw.json",
+      "destination_relative": "parsian/raw/tsetmc/parsian_share_change_raw.json",
+      "source_bytes": 1393,
+      "stored_bytes": 1393,
+      "source_sha256": "01b8ca99d5fa84cb9d71c28429ce7b9961b603361b3250a6e622151811bcc8f4",
+      "stored_sha256": "01b8ca99d5fa84cb9d71c28429ce7b9961b603361b3250a6e622151811bcc8f4",
+      "compression": "none"
+    },
+    {
+      "source_relative": "corporate_action_evidence_review.csv",
+      "destination_relative": "parsian/validation/acceptance-review/corporate_action_deduplicated.csv",
+      "source_bytes": 54500775,
+      "stored_bytes": 192455,
+      "source_sha256": "33f5715dcdf183fe6132b97aeb5f14f861b1cf1151e6c75bb18fa988530f947b",
+      "stored_sha256": "bfecd34267138eb20ffff6a113fd1a28d17cb42bbecdb72f2d7464e1a9d12af9",
+      "compression": "deduplicated_primary_inscode_extract",
+      "unique_records": 128
+    },
+    {
+      "source_relative": "date_gap_evidence_review.csv",
+      "destination_relative": "parsian/validation/acceptance-review/date_gap_deduplicated.csv",
+      "source_bytes": 54091279,
+      "stored_bytes": 189443,
+      "source_sha256": "dcdcc8acf90587d2bebdee28d15200e66091cf4c143f73d4c51b3a538642a4ac",
+      "stored_sha256": "5bbd48ede585121208c08b2ad883c4668403cfb55708d2f7aa386d0a250cf273",
+      "compression": "deduplicated_primary_inscode_extract",
+      "unique_records": 126
+    },
+    {
+      "source_relative": "codal_vaghdir_candidates_20261113/agm_and_capital_1391_12_to_1392_02_page_1.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_candidates_20261113/agm_and_capital_1391_12_to_1392_02_page_1.raw",
+      "source_bytes": 16922,
+      "stored_bytes": 16922,
+      "source_sha256": "790a25eefc233e1ce59c6987895f08d0d79589952f2590a55f04261fced2059e",
+      "stored_sha256": "790a25eefc233e1ce59c6987895f08d0d79589952f2590a55f04261fced2059e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_candidates_20261113/candidate_letters.csv",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_candidates_20261113/candidate_letters.csv",
+      "source_bytes": 17360,
+      "stored_bytes": 17360,
+      "source_sha256": "fe25e5cb08bdee71b29ca9fb9157f2261b2a7ecbb63404dab084c3eb11e5a8d3",
+      "stored_sha256": "fe25e5cb08bdee71b29ca9fb9157f2261b2a7ecbb63404dab084c3eb11e5a8d3",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_candidates_20261113/candidate_letters.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_candidates_20261113/candidate_letters.json",
+      "source_bytes": 32403,
+      "stored_bytes": 32403,
+      "source_sha256": "897a8768efea06e4621b9a2fd0dae7afcbc8a575aacac68220aa2a91de3f641a",
+      "stored_sha256": "897a8768efea06e4621b9a2fd0dae7afcbc8a575aacac68220aa2a91de3f641a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_candidates_20261113/capital_1391_azar_page_1.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_candidates_20261113/capital_1391_azar_page_1.raw",
+      "source_bytes": 18761,
+      "stored_bytes": 18761,
+      "source_sha256": "d5901443b7455bf4408659887a140dea62a4295f5434ece857b404c5db9d154d",
+      "stored_sha256": "d5901443b7455bf4408659887a140dea62a4295f5434ece857b404c5db9d154d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_candidates_20261113/dividend_1390_esfand_page_1.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_candidates_20261113/dividend_1390_esfand_page_1.raw",
+      "source_bytes": 17322,
+      "stored_bytes": 17322,
+      "source_sha256": "48ce266464b640a758ed96d98ad72d5852b27f96d1929b6807fcbd79b048ac95",
+      "stored_sha256": "48ce266464b640a758ed96d98ad72d5852b27f96d1929b6807fcbd79b048ac95",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_candidates_20261113/manifest.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_candidates_20261113/manifest.json",
+      "source_bytes": 574,
+      "stored_bytes": 574,
+      "source_sha256": "8b77792b6ee4265271a3e91ab4ea9d41b915eef4460b2e235e3abeeab899c165",
+      "stored_sha256": "8b77792b6ee4265271a3e91ab4ea9d41b915eef4460b2e235e3abeeab899c165",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/155153_dividend_schedule_amended.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/155153_dividend_schedule_amended.html",
+      "source_bytes": 6634,
+      "stored_bytes": 6634,
+      "source_sha256": "e06b1b657d389e3d93baf7df048c70913462eb69a9d9c8cc60a21cec9bae0b6b",
+      "stored_sha256": "e06b1b657d389e3d93baf7df048c70913462eb69a9d9c8cc60a21cec9bae0b6b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/155748_agm_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/155748_agm_attachment.html",
+      "source_bytes": 6640,
+      "stored_bytes": 6640,
+      "source_sha256": "57776d6646db520986d482fec4ff84055c27ed9dc3e568fe5d105d6f1ca7e993",
+      "stored_sha256": "57776d6646db520986d482fec4ff84055c27ed9dc3e568fe5d105d6f1ca7e993",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/156803_agm_summary.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/156803_agm_summary.html",
+      "source_bytes": 6629,
+      "stored_bytes": 6629,
+      "source_sha256": "efbaacb63cf0a938fda74640001a16db2a1bd912ec377ed3b248892393c58826",
+      "stored_sha256": "efbaacb63cf0a938fda74640001a16db2a1bd912ec377ed3b248892393c58826",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/155153.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/155153.pdf",
+      "source_bytes": 71697,
+      "stored_bytes": 71697,
+      "source_sha256": "2ce75eedf51194ce9cf558170a7ecd9b62030b2f20fa7871b92674592bd89a56",
+      "stored_sha256": "2ce75eedf51194ce9cf558170a7ecd9b62030b2f20fa7871b92674592bd89a56",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/155748.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/155748.pdf",
+      "source_bytes": 421148,
+      "stored_bytes": 421148,
+      "source_sha256": "c42e88df58cf71c8fbe20509573b86d61df8dd94c516f14ea7ad402df67d6a84",
+      "stored_sha256": "c42e88df58cf71c8fbe20509573b86d61df8dd94c516f14ea7ad402df67d6a84",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/156803.doc",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/156803.doc",
+      "source_bytes": 146432,
+      "stored_bytes": 146432,
+      "source_sha256": "1b46a7607f7b00cc5397221fd49e67e1d15b0261c87f2c8def58babbfef81aae",
+      "stored_sha256": "1b46a7607f7b00cc5397221fd49e67e1d15b0261c87f2c8def58babbfef81aae",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/download_report.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/download_report.json",
+      "source_bytes": 1659,
+      "stored_bytes": 1659,
+      "source_sha256": "7340c7c2c62733b9d994113accf1aed872722ee98c7f239a5addc0823aa405be",
+      "stored_sha256": "7340c7c2c62733b9d994113accf1aed872722ee98c7f239a5addc0823aa405be",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155153.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155153.txt",
+      "source_bytes": 2036,
+      "stored_bytes": 2036,
+      "source_sha256": "8de814a626b46c2d85c1a434f53508e328b297883e4644c98348a6b94bd34306",
+      "stored_sha256": "8de814a626b46c2d85c1a434f53508e328b297883e4644c98348a6b94bd34306",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155153_pages/page-1.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155153_pages/page-1.png",
+      "source_bytes": 762990,
+      "stored_bytes": 762990,
+      "source_sha256": "c6562a183b755ac23aeb5b152162192da8d1302148202fa6e4853e02268d3625",
+      "stored_sha256": "c6562a183b755ac23aeb5b152162192da8d1302148202fa6e4853e02268d3625",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748.txt",
+      "source_bytes": 94174,
+      "stored_bytes": 94174,
+      "source_sha256": "2617e9d73145d26eac58978849ee9376c1d4379059e58bd71daddf3936316f4c",
+      "stored_sha256": "2617e9d73145d26eac58978849ee9376c1d4379059e58bd71daddf3936316f4c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-01.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-01.png",
+      "source_bytes": 152475,
+      "stored_bytes": 152475,
+      "source_sha256": "4811e791608d449d4d78757e7ed425b75687f01d3c477153162367af13c3ff95",
+      "stored_sha256": "4811e791608d449d4d78757e7ed425b75687f01d3c477153162367af13c3ff95",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-02.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-02.png",
+      "source_bytes": 188663,
+      "stored_bytes": 188663,
+      "source_sha256": "e03799e5f2877b64c70f14573710d2617ef176aa05aebe91ba8499cc745deb6e",
+      "stored_sha256": "e03799e5f2877b64c70f14573710d2617ef176aa05aebe91ba8499cc745deb6e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-03.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-03.png",
+      "source_bytes": 144326,
+      "stored_bytes": 144326,
+      "source_sha256": "aba7aeea493d68683ce9904c844787ab023eeeca97de191ae4bff357d96f23a0",
+      "stored_sha256": "aba7aeea493d68683ce9904c844787ab023eeeca97de191ae4bff357d96f23a0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-04.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-04.png",
+      "source_bytes": 97083,
+      "stored_bytes": 97083,
+      "source_sha256": "a0ca9010e6cd3714ea8c71571aa1846d0c8a035921514bea7b0475a42193f9d6",
+      "stored_sha256": "a0ca9010e6cd3714ea8c71571aa1846d0c8a035921514bea7b0475a42193f9d6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-05.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-05.png",
+      "source_bytes": 186128,
+      "stored_bytes": 186128,
+      "source_sha256": "7b90b5089a31ee18ba5a042647731d52bc73fc9aaf029a005afc12322be865e6",
+      "stored_sha256": "7b90b5089a31ee18ba5a042647731d52bc73fc9aaf029a005afc12322be865e6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-06.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-06.png",
+      "source_bytes": 173866,
+      "stored_bytes": 173866,
+      "source_sha256": "54046df035bd092a0d0948cd2a2c0c9a0cef71bedc6cd06d80e974b6b989eff5",
+      "stored_sha256": "54046df035bd092a0d0948cd2a2c0c9a0cef71bedc6cd06d80e974b6b989eff5",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-07.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-07.png",
+      "source_bytes": 171256,
+      "stored_bytes": 171256,
+      "source_sha256": "cc164e67b49929b2cd1868fe6fe3f72694e8fd67aa174bfcc7171dfeea302424",
+      "stored_sha256": "cc164e67b49929b2cd1868fe6fe3f72694e8fd67aa174bfcc7171dfeea302424",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-08.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-08.png",
+      "source_bytes": 153744,
+      "stored_bytes": 153744,
+      "source_sha256": "70afeb6dd326b0ad0d1e6b3e1d34cae3f434ab71911f0cd90d1f679e42b37e0a",
+      "stored_sha256": "70afeb6dd326b0ad0d1e6b3e1d34cae3f434ab71911f0cd90d1f679e42b37e0a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-09.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-09.png",
+      "source_bytes": 163568,
+      "stored_bytes": 163568,
+      "source_sha256": "1a78e170bb564337043ca74fa0e1a8ec8f0c2fd62baced4069de6e6a50488478",
+      "stored_sha256": "1a78e170bb564337043ca74fa0e1a8ec8f0c2fd62baced4069de6e6a50488478",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-10.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-10.png",
+      "source_bytes": 128453,
+      "stored_bytes": 128453,
+      "source_sha256": "e7cf5f5597e6136c3c349ec11f6ca21cf4a1c3088a085a53176dd106094d2627",
+      "stored_sha256": "e7cf5f5597e6136c3c349ec11f6ca21cf4a1c3088a085a53176dd106094d2627",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-11.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-11.png",
+      "source_bytes": 125465,
+      "stored_bytes": 125465,
+      "source_sha256": "3464b48ed40875105887dd3702c754651c9d4a338f1ede8583a6949d04844a2f",
+      "stored_sha256": "3464b48ed40875105887dd3702c754651c9d4a338f1ede8583a6949d04844a2f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-12.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-12.png",
+      "source_bytes": 150171,
+      "stored_bytes": 150171,
+      "source_sha256": "3a3b3532aef984b14837e5cc065ffd66872f6ad6a5ea9de03192cbefcffaec64",
+      "stored_sha256": "3a3b3532aef984b14837e5cc065ffd66872f6ad6a5ea9de03192cbefcffaec64",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-13.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-13.png",
+      "source_bytes": 125361,
+      "stored_bytes": 125361,
+      "source_sha256": "470bea209b2eba31f7c7c8e274ff4b15775a4e95bb25f0d46ed35c26da0a260f",
+      "stored_sha256": "470bea209b2eba31f7c7c8e274ff4b15775a4e95bb25f0d46ed35c26da0a260f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-14.png",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/155748_pages/page-14.png",
+      "source_bytes": 141144,
+      "stored_bytes": 141144,
+      "source_sha256": "2f9a9744587cc5626ffb795f564836dd2a15a85be54bf2975ac4a905b1adbcb6",
+      "stored_sha256": "2f9a9744587cc5626ffb795f564836dd2a15a85be54bf2975ac4a905b1adbcb6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/156803.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/156803.txt",
+      "source_bytes": 1848,
+      "stored_bytes": 1848,
+      "source_sha256": "58b45e616cd3d37f5942c110f09234cefeb295582fb3b9c274df3f2dbc2352b2",
+      "stored_sha256": "58b45e616cd3d37f5942c110f09234cefeb295582fb3b9c274df3f2dbc2352b2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/extraction_report.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/extracted/extraction_report.json",
+      "source_bytes": 712,
+      "stored_bytes": 712,
+      "source_sha256": "4967f6ed80855cbc119c14e096d2ad9342719217502a622f83bc7a0a4d8f861f",
+      "stored_sha256": "4967f6ed80855cbc119c14e096d2ad9342719217502a622f83bc7a0a4d8f861f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105144_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105144_attachment.html",
+      "source_bytes": 6598,
+      "stored_bytes": 6598,
+      "source_sha256": "b41a2f53f16c08316cdb2c1a5a0a5275c47abcbde4d7f099136a2705d3f02564",
+      "stored_sha256": "b41a2f53f16c08316cdb2c1a5a0a5275c47abcbde4d7f099136a2705d3f02564",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105144_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105144_attachment.txt",
+      "source_bytes": 76,
+      "stored_bytes": 76,
+      "source_sha256": "c8cffdd792f939839a025acdecaf2a5133d638c063ac3b3d4db2660e41eccfde",
+      "stored_sha256": "c8cffdd792f939839a025acdecaf2a5133d638c063ac3b3d4db2660e41eccfde",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105144_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105144_pdf.pdf",
+      "source_bytes": 36922,
+      "stored_bytes": 36922,
+      "source_sha256": "255a3ff8941a2a47de2e794b0c90e7f751c3ff1587a5d89eb91f1057c24e0474",
+      "stored_sha256": "255a3ff8941a2a47de2e794b0c90e7f751c3ff1587a5d89eb91f1057c24e0474",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105144_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105144_pdf.txt",
+      "source_bytes": 3462,
+      "stored_bytes": 3462,
+      "source_sha256": "b966aefea2775b8224963717b29bdd9cdeae23d97b944259e768172e7bf6548e",
+      "stored_sha256": "b966aefea2775b8224963717b29bdd9cdeae23d97b944259e768172e7bf6548e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105144_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105144_report.html",
+      "source_bytes": 21789,
+      "stored_bytes": 21789,
+      "source_sha256": "cbd32daff9f19a15a6ee9d9d8e35811b95584067728763cfefc3c620d7e3a11e",
+      "stored_sha256": "cbd32daff9f19a15a6ee9d9d8e35811b95584067728763cfefc3c620d7e3a11e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105144_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105144_report.txt",
+      "source_bytes": 2361,
+      "stored_bytes": 2361,
+      "source_sha256": "deeb318a1fff325ecd918f4e0d06dc084904089301886ebf571f4ebf53f38ae8",
+      "stored_sha256": "deeb318a1fff325ecd918f4e0d06dc084904089301886ebf571f4ebf53f38ae8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105243_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105243_report.html",
+      "source_bytes": 6591,
+      "stored_bytes": 6591,
+      "source_sha256": "9abdc9cf225c7740185720f8b31dc07a8ed9bb9937d34be16cf1e66ab3022020",
+      "stored_sha256": "9abdc9cf225c7740185720f8b31dc07a8ed9bb9937d34be16cf1e66ab3022020",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/105243_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/105243_report.txt",
+      "source_bytes": 75,
+      "stored_bytes": 75,
+      "source_sha256": "2d2cfbd998dacc272433d0804654397461b21e72c1abd793177070de5e89f7c2",
+      "stored_sha256": "2d2cfbd998dacc272433d0804654397461b21e72c1abd793177070de5e89f7c2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/107226_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/107226_report.html",
+      "source_bytes": 6663,
+      "stored_bytes": 6663,
+      "source_sha256": "b0dab2677b295aedd1122d49cbd27b60017dbed8e95cac6f0bf51093c5569e3c",
+      "stored_sha256": "b0dab2677b295aedd1122d49cbd27b60017dbed8e95cac6f0bf51093c5569e3c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/107226_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/107226_report.txt",
+      "source_bytes": 98,
+      "stored_bytes": 98,
+      "source_sha256": "ee8b89efe32fa3d8ffe3a861ef813db19d935a22160a98fa1929f75a17608be9",
+      "stored_sha256": "ee8b89efe32fa3d8ffe3a861ef813db19d935a22160a98fa1929f75a17608be9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108280_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108280_attachment.html",
+      "source_bytes": 10611,
+      "stored_bytes": 10611,
+      "source_sha256": "774b4045a0b7870a32413b7d6f05db72d885b4667e72e8ffd34b391c2d104e63",
+      "stored_sha256": "774b4045a0b7870a32413b7d6f05db72d885b4667e72e8ffd34b391c2d104e63",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108280_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108280_attachment.txt",
+      "source_bytes": 451,
+      "stored_bytes": 451,
+      "source_sha256": "eb608198f85cf424d9d4c866f6e3406dd95be0efaef0f93fae32cf89d0bf4c62",
+      "stored_sha256": "eb608198f85cf424d9d4c866f6e3406dd95be0efaef0f93fae32cf89d0bf4c62",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108280_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108280_pdf.pdf",
+      "source_bytes": 42428,
+      "stored_bytes": 42428,
+      "source_sha256": "8761c35c8e371266b541218f8348377657503de8803c33a52b3dfc0615d23da9",
+      "stored_sha256": "8761c35c8e371266b541218f8348377657503de8803c33a52b3dfc0615d23da9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108280_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108280_pdf.txt",
+      "source_bytes": 3131,
+      "stored_bytes": 3131,
+      "source_sha256": "b7677f634561822827d3bc014f422bf0e93d40412cf8319f7ca0877482e81982",
+      "stored_sha256": "b7677f634561822827d3bc014f422bf0e93d40412cf8319f7ca0877482e81982",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108280_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108280_report.html",
+      "source_bytes": 29506,
+      "stored_bytes": 29506,
+      "source_sha256": "8cb4f25bae9cd44bf0a753e5342c8e11ba53990d553e12737f685de4a2c14d0c",
+      "stored_sha256": "8cb4f25bae9cd44bf0a753e5342c8e11ba53990d553e12737f685de4a2c14d0c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108280_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108280_report.txt",
+      "source_bytes": 4622,
+      "stored_bytes": 4622,
+      "source_sha256": "2053dc55662aadc2dbb33f9ba386e967d2dfa132abf008e07b79331a482ccbad",
+      "stored_sha256": "2053dc55662aadc2dbb33f9ba386e967d2dfa132abf008e07b79331a482ccbad",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108468_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108468_attachment.html",
+      "source_bytes": 6673,
+      "stored_bytes": 6673,
+      "source_sha256": "b2e38ee37ef3b9c1312c9e611643a584dd13ddd36deb3c6b3156db0bf99ea26e",
+      "stored_sha256": "b2e38ee37ef3b9c1312c9e611643a584dd13ddd36deb3c6b3156db0bf99ea26e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108468_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108468_attachment.txt",
+      "source_bytes": 108,
+      "stored_bytes": 108,
+      "source_sha256": "a4ee7e8a26a1281ff77e5198a9f009ae47f6898291806c3e4f6e0a925fff7461",
+      "stored_sha256": "a4ee7e8a26a1281ff77e5198a9f009ae47f6898291806c3e4f6e0a925fff7461",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108468_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108468_pdf.pdf",
+      "source_bytes": 52280,
+      "stored_bytes": 52280,
+      "source_sha256": "d6973e66469e399c4cd156cd81f94f91119363ee352ed52ad7c785f303d586c0",
+      "stored_sha256": "d6973e66469e399c4cd156cd81f94f91119363ee352ed52ad7c785f303d586c0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108468_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108468_pdf.txt",
+      "source_bytes": 20040,
+      "stored_bytes": 20040,
+      "source_sha256": "8fa453e841fb49233c4d8ccf8250af6c25c7a15405b076f0269900cfa8af1b49",
+      "stored_sha256": "8fa453e841fb49233c4d8ccf8250af6c25c7a15405b076f0269900cfa8af1b49",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108468_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108468_report.html",
+      "source_bytes": 162205,
+      "stored_bytes": 162205,
+      "source_sha256": "7c747810bc07ac4321bfcec32ffc30588ffab3e1b940c24b184510ca8eaf0e24",
+      "stored_sha256": "7c747810bc07ac4321bfcec32ffc30588ffab3e1b940c24b184510ca8eaf0e24",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/108468_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/108468_report.txt",
+      "source_bytes": 11418,
+      "stored_bytes": 11418,
+      "source_sha256": "668146b2047d32dd65f34086ae080c6f2d67b694bef2e45a52cfdf18ad81274c",
+      "stored_sha256": "668146b2047d32dd65f34086ae080c6f2d67b694bef2e45a52cfdf18ad81274c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/109609_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/109609_pdf.pdf",
+      "source_bytes": 33690,
+      "stored_bytes": 33690,
+      "source_sha256": "a36aa1fceea7e423a057bc277fc0a7bda656bad021b486b2e72d5c75917fb0df",
+      "stored_sha256": "a36aa1fceea7e423a057bc277fc0a7bda656bad021b486b2e72d5c75917fb0df",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/109609_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/109609_pdf.txt",
+      "source_bytes": 1396,
+      "stored_bytes": 1396,
+      "source_sha256": "7e1300b14e62215f07b9b41058bc1978a3506a4bcce42ca8b8a581a352603ab1",
+      "stored_sha256": "7e1300b14e62215f07b9b41058bc1978a3506a4bcce42ca8b8a581a352603ab1",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/109609_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/109609_report.html",
+      "source_bytes": 9423,
+      "stored_bytes": 9423,
+      "source_sha256": "5c1c4792504dac16b9885b71b81f7401114be2eba89cd6f85a8457b50c58c5f1",
+      "stored_sha256": "5c1c4792504dac16b9885b71b81f7401114be2eba89cd6f85a8457b50c58c5f1",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/109609_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/109609_report.txt",
+      "source_bytes": 1352,
+      "stored_bytes": 1352,
+      "source_sha256": "6a6f5fc07e65ea216d04b70ef5c0672a95a2671f17dcd1dbeec033f6faaeab83",
+      "stored_sha256": "6a6f5fc07e65ea216d04b70ef5c0672a95a2671f17dcd1dbeec033f6faaeab83",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/110016_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/110016_attachment.html",
+      "source_bytes": 6598,
+      "stored_bytes": 6598,
+      "source_sha256": "05791f4d5849e412078419290b680577e8ac10fbd1b30357af68978a45cd55e0",
+      "stored_sha256": "05791f4d5849e412078419290b680577e8ac10fbd1b30357af68978a45cd55e0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/110016_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/110016_attachment.txt",
+      "source_bytes": 76,
+      "stored_bytes": 76,
+      "source_sha256": "d5bb1d5ab99e11876e4f9bcaf2980efa5abf5633868bed97008a1a671b3955ba",
+      "stored_sha256": "d5bb1d5ab99e11876e4f9bcaf2980efa5abf5633868bed97008a1a671b3955ba",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/110016_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/110016_pdf.pdf",
+      "source_bytes": 36300,
+      "stored_bytes": 36300,
+      "source_sha256": "436c0c7a7841108600c4c18a8e5a72b6158398d9a182b09cc02afe1b04b7f014",
+      "stored_sha256": "436c0c7a7841108600c4c18a8e5a72b6158398d9a182b09cc02afe1b04b7f014",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/110016_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/110016_pdf.txt",
+      "source_bytes": 2643,
+      "stored_bytes": 2643,
+      "source_sha256": "529365b4f5d40e8c0db2c36ad8e6d808203c80b2f4d53bf874e70ea20fbc84d9",
+      "stored_sha256": "529365b4f5d40e8c0db2c36ad8e6d808203c80b2f4d53bf874e70ea20fbc84d9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/110016_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/110016_report.html",
+      "source_bytes": 22004,
+      "stored_bytes": 22004,
+      "source_sha256": "7e00c3d9d10db029954af819d01caff2c76c7ce52e06331e1ebbc1b1be6dd5fe",
+      "stored_sha256": "7e00c3d9d10db029954af819d01caff2c76c7ce52e06331e1ebbc1b1be6dd5fe",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/110016_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/110016_report.txt",
+      "source_bytes": 1956,
+      "stored_bytes": 1956,
+      "source_sha256": "1ca76a88bebbb496ba8b657fa26d0fd936c2780c27213a51ef20d56706f2892f",
+      "stored_sha256": "1ca76a88bebbb496ba8b657fa26d0fd936c2780c27213a51ef20d56706f2892f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/118368_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/118368_attachment.html",
+      "source_bytes": 6598,
+      "stored_bytes": 6598,
+      "source_sha256": "cd9f05f5ef60e7d715d94140c38511e7dc75b208dc087b48d936dd242640c2bb",
+      "stored_sha256": "cd9f05f5ef60e7d715d94140c38511e7dc75b208dc087b48d936dd242640c2bb",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/118368_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/118368_attachment.txt",
+      "source_bytes": 76,
+      "stored_bytes": 76,
+      "source_sha256": "85a7b51b6823aa9ab44c5e1ca7e092e47a0327624e40840d9bfa59bb0343959a",
+      "stored_sha256": "85a7b51b6823aa9ab44c5e1ca7e092e47a0327624e40840d9bfa59bb0343959a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/118368_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/118368_pdf.pdf",
+      "source_bytes": 30868,
+      "stored_bytes": 30868,
+      "source_sha256": "9c8dd1345201728c6f28a30758c2d26a3bdbc2fa69bf3ee75d12bd873b8c9d39",
+      "stored_sha256": "9c8dd1345201728c6f28a30758c2d26a3bdbc2fa69bf3ee75d12bd873b8c9d39",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/118368_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/118368_pdf.txt",
+      "source_bytes": 1344,
+      "stored_bytes": 1344,
+      "source_sha256": "c2b4862fd2862eeebe173bf67c3c32afa1b9acabef099d4a82afbb22ba9bc5b0",
+      "stored_sha256": "c2b4862fd2862eeebe173bf67c3c32afa1b9acabef099d4a82afbb22ba9bc5b0",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/118368_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/118368_report.html",
+      "source_bytes": 11035,
+      "stored_bytes": 11035,
+      "source_sha256": "9c9ab07157fdd28735ec6ca53a6a763554cbf99ab9dd1b0ecdf67949f604bc9e",
+      "stored_sha256": "9c9ab07157fdd28735ec6ca53a6a763554cbf99ab9dd1b0ecdf67949f604bc9e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/118368_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/118368_report.txt",
+      "source_bytes": 1133,
+      "stored_bytes": 1133,
+      "source_sha256": "43e1ea6cdb21afabee62181e201cf045e98fcf9dfe1d903923a883ea657f31e8",
+      "stored_sha256": "43e1ea6cdb21afabee62181e201cf045e98fcf9dfe1d903923a883ea657f31e8",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64699_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64699_report.html",
+      "source_bytes": 6622,
+      "stored_bytes": 6622,
+      "source_sha256": "9dcef13ec164e0e776493385a545a8c99f3dcafb4ce2c63b6277a00a3b9ca629",
+      "stored_sha256": "9dcef13ec164e0e776493385a545a8c99f3dcafb4ce2c63b6277a00a3b9ca629",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64699_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64699_report.txt",
+      "source_bytes": 76,
+      "stored_bytes": 76,
+      "source_sha256": "c9306c78119f68baa7067e8090adf16f023aa2e511ea48eed78ef072bc5a693e",
+      "stored_sha256": "c9306c78119f68baa7067e8090adf16f023aa2e511ea48eed78ef072bc5a693e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64727_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64727_attachment.html",
+      "source_bytes": 6628,
+      "stored_bytes": 6628,
+      "source_sha256": "56aca39c7cd17c05a0d72a3f0230e517c275b0398bb2553bcf5f5f43d6793748",
+      "stored_sha256": "56aca39c7cd17c05a0d72a3f0230e517c275b0398bb2553bcf5f5f43d6793748",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64727_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64727_attachment.txt",
+      "source_bytes": 76,
+      "stored_bytes": 76,
+      "source_sha256": "2b84815abd4119b94ad3590ed8451ee17abb924937bc7f508411802b4e0b9989",
+      "stored_sha256": "2b84815abd4119b94ad3590ed8451ee17abb924937bc7f508411802b4e0b9989",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64727_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64727_pdf.pdf",
+      "source_bytes": 36591,
+      "stored_bytes": 36591,
+      "source_sha256": "8405b55231cc92def889a11e560bb8cb678588e2cd9a14a4d00819dc00085e48",
+      "stored_sha256": "8405b55231cc92def889a11e560bb8cb678588e2cd9a14a4d00819dc00085e48",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64727_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64727_pdf.txt",
+      "source_bytes": 2801,
+      "stored_bytes": 2801,
+      "source_sha256": "23d1f1de800c5b783f362da4b35b913835e091e62ef3f8c65454231cb1772680",
+      "stored_sha256": "23d1f1de800c5b783f362da4b35b913835e091e62ef3f8c65454231cb1772680",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64727_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64727_report.html",
+      "source_bytes": 21377,
+      "stored_bytes": 21377,
+      "source_sha256": "7685c14bbcd9b7651b6dbeb85ded166202744e943a1ac349a578db3c8c05aff2",
+      "stored_sha256": "7685c14bbcd9b7651b6dbeb85ded166202744e943a1ac349a578db3c8c05aff2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/64727_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/64727_report.txt",
+      "source_bytes": 2086,
+      "stored_bytes": 2086,
+      "source_sha256": "78c494e324fc0f8b3e2d3696fb1e102c78cd7022e970c1740d2021466cdeb140",
+      "stored_sha256": "78c494e324fc0f8b3e2d3696fb1e102c78cd7022e970c1740d2021466cdeb140",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66202_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66202_report.html",
+      "source_bytes": 6651,
+      "stored_bytes": 6651,
+      "source_sha256": "2bdd86a58fd1a7bbfd1a04c8c30e1b7f3fb564f17e7d063a6dd4a20337d82a1e",
+      "stored_sha256": "2bdd86a58fd1a7bbfd1a04c8c30e1b7f3fb564f17e7d063a6dd4a20337d82a1e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66202_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66202_report.txt",
+      "source_bytes": 98,
+      "stored_bytes": 98,
+      "source_sha256": "73e29806a3d0c59e704b1f59e1538b617fb0497e2f4809da53586ff7e5da5073",
+      "stored_sha256": "73e29806a3d0c59e704b1f59e1538b617fb0497e2f4809da53586ff7e5da5073",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66259_attachment.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66259_attachment.html",
+      "source_bytes": 6598,
+      "stored_bytes": 6598,
+      "source_sha256": "c91330348e11634f369e2cf17a7d79041c634cc82bb187daca31e7493c017e39",
+      "stored_sha256": "c91330348e11634f369e2cf17a7d79041c634cc82bb187daca31e7493c017e39",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66259_attachment.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66259_attachment.txt",
+      "source_bytes": 76,
+      "stored_bytes": 76,
+      "source_sha256": "7a3faab0f65c66ba758fcc2c948685a8ba416d0dd3d1ee7366b897df61bee4bb",
+      "stored_sha256": "7a3faab0f65c66ba758fcc2c948685a8ba416d0dd3d1ee7366b897df61bee4bb",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66259_pdf.pdf",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66259_pdf.pdf",
+      "source_bytes": 57973,
+      "stored_bytes": 57973,
+      "source_sha256": "b7f2b496083a30c1ca771fbbe44f78fc5bba83f34386cfcdf2741977374678ed",
+      "stored_sha256": "b7f2b496083a30c1ca771fbbe44f78fc5bba83f34386cfcdf2741977374678ed",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66259_pdf.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66259_pdf.txt",
+      "source_bytes": 19015,
+      "stored_bytes": 19015,
+      "source_sha256": "82ac1600c25ce8dd60fa081bec175a2e97389ca8feeb69884f41366722732203",
+      "stored_sha256": "82ac1600c25ce8dd60fa081bec175a2e97389ca8feeb69884f41366722732203",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66259_report.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66259_report.html",
+      "source_bytes": 154395,
+      "stored_bytes": 154395,
+      "source_sha256": "592071ff978488433cef79db3344182fbd10a9c6d06bb96a1476c9b7e903220c",
+      "stored_sha256": "592071ff978488433cef79db3344182fbd10a9c6d06bb96a1476c9b7e903220c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/66259_report.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/66259_report.txt",
+      "source_bytes": 10186,
+      "stored_bytes": 10186,
+      "source_sha256": "7a88aa03d76bcbebac2c923741121d5c789fccb7b708de7571bae8e3f2ba86ba",
+      "stored_sha256": "7a88aa03d76bcbebac2c923741121d5c789fccb7b708de7571bae8e3f2ba86ba",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/all_extracted_text.txt",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/all_extracted_text.txt",
+      "source_bytes": 91296,
+      "stored_bytes": 91296,
+      "source_sha256": "d9f7fedcd7ff89c7f5edaed20a0e245afe4d5889243eb14ff75e9bb38bc1482a",
+      "stored_sha256": "d9f7fedcd7ff89c7f5edaed20a0e245afe4d5889243eb14ff75e9bb38bc1482a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_documents_20261113/manifest.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_documents_20261113/manifest.json",
+      "source_bytes": 15190,
+      "stored_bytes": 15190,
+      "source_sha256": "3c616b23d739ecc085d6e851011f71af891f226362148edc92a2eed1d56a0945",
+      "stored_sha256": "3c616b23d739ecc085d6e851011f71af891f226362148edc92a2eed1d56a0945",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/exact_lookup_results.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/exact_lookup_results.json",
+      "source_bytes": 13880,
+      "stored_bytes": 13880,
+      "source_sha256": "5d33575b4db003a6385bfb1fb4ce0c58dbf632abc21e0a0036e2f8f2159ab69e",
+      "stored_sha256": "5d33575b4db003a6385bfb1fb4ce0c58dbf632abc21e0a0036e2f8f2159ab69e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/manifest.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/manifest.json",
+      "source_bytes": 2674,
+      "stored_bytes": 2674,
+      "source_sha256": "c448555ca72ede66b39b9c9c4a847f61124e472a0ac0b30a48674ec0c831d279",
+      "stored_sha256": "c448555ca72ede66b39b9c9c4a847f61124e472a0ac0b30a48674ec0c831d279",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_105144.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_105144.raw",
+      "source_bytes": 905,
+      "stored_bytes": 905,
+      "source_sha256": "737e450d330a0c9bc03389899db25db4cd5e23be3d42c7cb8b29be37ea3ba253",
+      "stored_sha256": "737e450d330a0c9bc03389899db25db4cd5e23be3d42c7cb8b29be37ea3ba253",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_105243.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_105243.raw",
+      "source_bytes": 803,
+      "stored_bytes": 803,
+      "source_sha256": "0b4a3d23901d482b1bf1075acc0653fb837938a7e0359144cc3c3f910fb867b4",
+      "stored_sha256": "0b4a3d23901d482b1bf1075acc0653fb837938a7e0359144cc3c3f910fb867b4",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_107226.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_107226.raw",
+      "source_bytes": 802,
+      "stored_bytes": 802,
+      "source_sha256": "3c4c29d42dbe0adfb6dd3d0f67d8dad20299505b6aad5087b39976334ab3ff1b",
+      "stored_sha256": "3c4c29d42dbe0adfb6dd3d0f67d8dad20299505b6aad5087b39976334ab3ff1b",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_108280.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_108280.raw",
+      "source_bytes": 853,
+      "stored_bytes": 853,
+      "source_sha256": "a31f58a5886721a826994846b13a0eb6e50a17223f8eb626d585fac22fa6268f",
+      "stored_sha256": "a31f58a5886721a826994846b13a0eb6e50a17223f8eb626d585fac22fa6268f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_108468.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_108468.raw",
+      "source_bytes": 911,
+      "stored_bytes": 911,
+      "source_sha256": "1786d36744d6fecc4dc48dc1b45b55570a5d38e8f8ed2cb69fe98bee5ce6795e",
+      "stored_sha256": "1786d36744d6fecc4dc48dc1b45b55570a5d38e8f8ed2cb69fe98bee5ce6795e",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_109609.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_109609.raw",
+      "source_bytes": 814,
+      "stored_bytes": 814,
+      "source_sha256": "5da6d77c9301aa635527c870d125dba42b52cd05e6dbfb82423747c872932d7f",
+      "stored_sha256": "5da6d77c9301aa635527c870d125dba42b52cd05e6dbfb82423747c872932d7f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_110016.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_110016.raw",
+      "source_bytes": 871,
+      "stored_bytes": 871,
+      "source_sha256": "317836da0ed5b653352a47cb91c51957b635291612ec16c38120b3c5e8b29ab9",
+      "stored_sha256": "317836da0ed5b653352a47cb91c51957b635291612ec16c38120b3c5e8b29ab9",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_118368.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_118368.raw",
+      "source_bytes": 822,
+      "stored_bytes": 822,
+      "source_sha256": "c650ce0b7ad17f3fae2a99129e5f16dbcea4aaec916b60ce9965597777187ad7",
+      "stored_sha256": "c650ce0b7ad17f3fae2a99129e5f16dbcea4aaec916b60ce9965597777187ad7",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_64699.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_64699.raw",
+      "source_bytes": 802,
+      "stored_bytes": 802,
+      "source_sha256": "2cff872aec4114e503cfbcf2957bf477292f96a25c727b25e17e2ba63b3bbd92",
+      "stored_sha256": "2cff872aec4114e503cfbcf2957bf477292f96a25c727b25e17e2ba63b3bbd92",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_64727.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_64727.raw",
+      "source_bytes": 918,
+      "stored_bytes": 918,
+      "source_sha256": "e896b8754975eded8afb68f1a6e9ae5e1b877b71017b5005d87c59821ddd6b11",
+      "stored_sha256": "e896b8754975eded8afb68f1a6e9ae5e1b877b71017b5005d87c59821ddd6b11",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_66202.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_66202.raw",
+      "source_bytes": 823,
+      "stored_bytes": 823,
+      "source_sha256": "679415abc0da2bede5c87b8a0f6b1fb791958bf9e70fe7364f2777fa8b443696",
+      "stored_sha256": "679415abc0da2bede5c87b8a0f6b1fb791958bf9e70fe7364f2777fa8b443696",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_exact_lookup_20261113/tracing_66259.raw",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_exact_lookup_20261113/tracing_66259.raw",
+      "source_bytes": 910,
+      "stored_bytes": 910,
+      "source_sha256": "af41d64219a043c07b93ff5218de989261514621ccc6f7653af997eddb50f8ee",
+      "stored_sha256": "af41d64219a043c07b93ff5218de989261514621ccc6f7653af997eddb50f8ee",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/100404.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/100404.html",
+      "source_bytes": 10877,
+      "stored_bytes": 10877,
+      "source_sha256": "be7dd28b8337d3015b99deaba46d0ec9873f9c12076699595527b2b92e56b8e6",
+      "stored_sha256": "be7dd28b8337d3015b99deaba46d0ec9873f9c12076699595527b2b92e56b8e6",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/155748.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/155748.html",
+      "source_bytes": 154544,
+      "stored_bytes": 154544,
+      "source_sha256": "fccf4eb50493d716eb49f82c3211a2d7258d71aefd475bbc3bd87fd5ce4755f2",
+      "stored_sha256": "fccf4eb50493d716eb49f82c3211a2d7258d71aefd475bbc3bd87fd5ce4755f2",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/161035.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/161035.html",
+      "source_bytes": 26960,
+      "stored_bytes": 26960,
+      "source_sha256": "b8d72313826436a44e34e1b9110adbb116ef3adc6f142cde52f95b916bafa934",
+      "stored_sha256": "b8d72313826436a44e34e1b9110adbb116ef3adc6f142cde52f95b916bafa934",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/183361.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/183361.html",
+      "source_bytes": 104233,
+      "stored_bytes": 104233,
+      "source_sha256": "1d03a2f5ae98cb6fa6eae2a85547a9e3c496f5454b4c0887edecee6533761187",
+      "stored_sha256": "1d03a2f5ae98cb6fa6eae2a85547a9e3c496f5454b4c0887edecee6533761187",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/183910.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/183910.html",
+      "source_bytes": 14468,
+      "stored_bytes": 14468,
+      "source_sha256": "6871ec925db759e4c516b7fe0f40e9a4eb42c1fd94c54a84f561e7a175bd4528",
+      "stored_sha256": "6871ec925db759e4c516b7fe0f40e9a4eb42c1fd94c54a84f561e7a175bd4528",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/96715.html",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/96715.html",
+      "source_bytes": 102865,
+      "stored_bytes": 102865,
+      "source_sha256": "96e468980c9e47b111393d0372acc31ff625ee64560c7b12b9b46b29b571d37c",
+      "stored_sha256": "96e468980c9e47b111393d0372acc31ff625ee64560c7b12b9b46b29b571d37c",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/document_extraction_report.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/document_extraction_report.json",
+      "source_bytes": 44620,
+      "stored_bytes": 44620,
+      "source_sha256": "9506d6974d69b58d065663fbb4e8afc09e7f3ef999c76bc79f23374bd640f525",
+      "stored_sha256": "9506d6974d69b58d065663fbb4e8afc09e7f3ef999c76bc79f23374bd640f525",
+      "compression": "none"
+    },
+    {
+      "source_relative": "codal_vaghdir_primary_docs_20261114/manifest.json",
+      "destination_relative": "vaghdir/codal/codal_vaghdir_primary_docs_20261114/manifest.json",
+      "source_bytes": 56686,
+      "stored_bytes": 56686,
+      "source_sha256": "01daa21c1a7890351ab352e60fd3def956a39bd77d6b83854d8b7e5e86f38e4a",
+      "stored_sha256": "01daa21c1a7890351ab352e60fd3def956a39bd77d6b83854d8b7e5e86f38e4a",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/vaghdir_daily_raw.json",
+      "destination_relative": "vaghdir/raw/tsetmc/vaghdir_daily_raw.json",
+      "source_bytes": 1828449,
+      "stored_bytes": 1828449,
+      "source_sha256": "d19345663eec5958307aded34b203126c137fe9ac4fec05ae67d9f66cc78b65f",
+      "stored_sha256": "d19345663eec5958307aded34b203126c137fe9ac4fec05ae67d9f66cc78b65f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/vaghdir_instrument_search.json",
+      "destination_relative": "vaghdir/raw/tsetmc/vaghdir_instrument_search.json",
+      "source_bytes": 15991,
+      "stored_bytes": 15991,
+      "source_sha256": "36874856886ce22dc2808e40145facf5a51a537b82b660ca8ac8e7ea185d8f06",
+      "stored_sha256": "36874856886ce22dc2808e40145facf5a51a537b82b660ca8ac8e7ea185d8f06",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/vaghdir_price_adjust_raw.json",
+      "destination_relative": "vaghdir/raw/tsetmc/vaghdir_price_adjust_raw.json",
+      "source_bytes": 3454,
+      "stored_bytes": 3454,
+      "source_sha256": "1fadcc07e1a4b1da95f2a687aba527d1a1bc50e265d0c465543afeb8cd086a3d",
+      "stored_sha256": "1fadcc07e1a4b1da95f2a687aba527d1a1bc50e265d0c465543afeb8cd086a3d",
+      "compression": "none"
+    },
+    {
+      "source_relative": "raw_provider_snapshots/vaghdir_share_change_raw.json",
+      "destination_relative": "vaghdir/raw/tsetmc/vaghdir_share_change_raw.json",
+      "source_bytes": 1105,
+      "stored_bytes": 1105,
+      "source_sha256": "a3c3c94a0f53b7bd8cc369b1d71c2d8b47df3f8efb1c4474c42ff96d8cc9729f",
+      "stored_sha256": "a3c3c94a0f53b7bd8cc369b1d71c2d8b47df3f8efb1c4474c42ff96d8cc9729f",
+      "compression": "none"
+    },
+    {
+      "source_relative": "corporate_action_evidence_review.csv",
+      "destination_relative": "vaghdir/validation/acceptance-review/corporate_action_deduplicated.csv",
+      "source_bytes": 54500775,
+      "stored_bytes": 236156,
+      "source_sha256": "33f5715dcdf183fe6132b97aeb5f14f861b1cf1151e6c75bb18fa988530f947b",
+      "stored_sha256": "4a95cba6e83bb8b45016e7f2a1a5e2ad5d8ea530577c449b912ada8e836679f1",
+      "compression": "deduplicated_primary_inscode_extract",
+      "unique_records": 154
+    },
+    {
+      "source_relative": "date_gap_evidence_review.csv",
+      "destination_relative": "vaghdir/validation/acceptance-review/date_gap_deduplicated.csv",
+      "source_bytes": 54091279,
+      "stored_bytes": 224702,
+      "source_sha256": "dcdcc8acf90587d2bebdee28d15200e66091cf4c143f73d4c51b3a538642a4ac",
+      "stored_sha256": "164733c637aa7f7c5bdaf79aa0db2bca3f505baac46181cb2268e4b03d763146",
+      "compression": "deduplicated_primary_inscode_extract",
+      "unique_records": 144
+    }
+  ],
+  "skipped": []
+}

@@ -1,0 +1,374 @@
+[
+  {
+    "requested_tracing_no": 64699,
+    "sha256": "2cff872aec4114e503cfbcf2957bf477292f96a25c727b25e17e2ba63b3bbd92",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 64699,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "زمانبندی پرداخت سود دوره ۱۲ ماهه منتهی به ۱۳۹۰/۰۹/۳۰",
+      "LetterCode": "ن-۱۳",
+      "SentDateTime": "۱۳۹۰/۱۱/۲۰ ۱۱:۴۷:۵۷",
+      "PublishDateTime": "۱۳۹۰/۱۱/۲۰ ۱۱:۴۷:۵۷",
+      "HasHtml": false,
+      "IsEstimate": false,
+      "Url": "/Reports/Attachment.aspx?LetterSerial=1KFs031IPSZj1UD6ljHnPA%3d%3d",
+      "HasExcel": false,
+      "HasPdf": false,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=1KFs031IPSZj1UD6ljHnPA%3d%3d",
+      "PdfUrl": "",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 64727,
+    "sha256": "e896b8754975eded8afb68f1a6e9ae5e1b877b71017b5005d87c59821ddd6b11",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 64727,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "آگهی دعوت به مجمع عمومی عادی سالیانه دوره ۱۲ ماهه منتهی به ۱۳۹۰/۰۹/۳۰",
+      "LetterCode": "ن-۵۰",
+      "SentDateTime": "۱۳۹۰/۱۱/۲۰ ۱۱:۵۶:۳۷",
+      "PublishDateTime": "۱۳۹۰/۱۱/۲۰ ۱۱:۵۶:۳۷",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=UFM6P87oSFMH4e%2bMi4FXUw%3d%3d&rt=2&let=16",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=UFM6P87oSFMH4eOOObOOOMi4FXUw%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=UFM6P87oSFMH4eOOObOOOMi4FXUw%3d%3d&ft=1005&let=16",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 66202,
+    "sha256": "679415abc0da2bede5c87b8a0f6b1fb791958bf9e70fe7364f2777fa8b443696",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 66202,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "مصوبات مجمع عمومی عادی سالیانه سال مالی منتهی به ۳۰/۰۹/۹۰ (به پیوست) ",
+      "LetterCode": "",
+      "SentDateTime": "۱۳۹۰/۱۱/۳۰ ۱۷:۴۰:۰۴",
+      "PublishDateTime": "۱۳۹۰/۱۱/۳۰ ۱۷:۴۰:۰۴",
+      "HasHtml": false,
+      "IsEstimate": false,
+      "Url": "/Reports/Attachment.aspx?LetterSerial=NN5McwUikIlKcE4D5gFMXA%3d%3d",
+      "HasExcel": false,
+      "HasPdf": false,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=NN5McwUikIlKcE4D5gFMXA%3d%3d",
+      "PdfUrl": "",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 66259,
+    "sha256": "af41d64219a043c07b93ff5218de989261514621ccc6f7653af997eddb50f8ee",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 66259,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "تصمیمات مجمع عمومی عادی سالیانه دوره ۱۲ ماهه منتهی به ۱۳۹۰/۰۹/۳۰",
+      "LetterCode": "ن-۵۲",
+      "SentDateTime": "۱۳۹۰/۱۲/۱۰ ۱۸:۱۲:۵۵",
+      "PublishDateTime": "۱۳۹۰/۱۲/۱۱ ۱۱:۰۵:۵۱",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=L9sSkzXS%2bYYK0mRUqeOXbw%3d%3d&rt=2&let=20",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=L9sSkzXSOOObOOOYYK0mRUqeOXbw%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=L9sSkzXSOOObOOOYYK0mRUqeOXbw%3d%3d&ft=1005&let=20",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 105144,
+    "sha256": "737e450d330a0c9bc03389899db25db4cd5e23be3d42c7cb8b29be37ea3ba253",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 105144,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "آگهی دعوت به مجمع عمومی عادی سالیانه دوره ۱۲ ماهه منتهی به ۱۳۹۱/۰۹/۳۰",
+      "LetterCode": "ن-۵۰",
+      "SentDateTime": "۱۳۹۱/۱۱/۲۶ ۱۰:۳۹:۴۱",
+      "PublishDateTime": "۱۳۹۱/۱۱/۲۶ ۱۰:۳۹:۴۱",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=UFAeuUAGjThvX3TRm5xnpQ%3d%3d&rt=2&let=16",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=UFAeuUAGjThvX3TRm5xnpQ%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=UFAeuUAGjThvX3TRm5xnpQ%3d%3d&ft=1005&let=16",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 105243,
+    "sha256": "0b4a3d23901d482b1bf1075acc0653fb837938a7e0359144cc3c3f910fb867b4",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 105243,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "زمانبندی پرداخت سود دوره ۱۲ ماهه منتهی به ۱۳۹۱/۰۹/۳۰",
+      "LetterCode": "ن-۱۳",
+      "SentDateTime": "۱۳۹۱/۱۱/۲۸ ۱۸:۰۳:۵۹",
+      "PublishDateTime": "۱۳۹۱/۱۱/۲۸ ۱۸:۰۳:۵۹",
+      "HasHtml": false,
+      "IsEstimate": false,
+      "Url": "/Reports/Attachment.aspx?LetterSerial=gVeEUk0DCcRyJNQo7iXW0g%3d%3d",
+      "HasExcel": false,
+      "HasPdf": false,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=gVeEUk0DCcRyJNQo7iXW0g%3d%3d",
+      "PdfUrl": "",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 107226,
+    "sha256": "3c4c29d42dbe0adfb6dd3d0f67d8dad20299505b6aad5087b39976334ab3ff1b",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 107226,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "خلاصه تصمیمات مجمع عمومی عادی سالیانه (به پیوست) ",
+      "LetterCode": "",
+      "SentDateTime": "۱۳۹۱/۱۲/۰۸ ۱۴:۴۶:۵۰",
+      "PublishDateTime": "۱۳۹۱/۱۲/۰۸ ۱۴:۴۶:۵۰",
+      "HasHtml": false,
+      "IsEstimate": false,
+      "Url": "/Reports/Attachment.aspx?LetterSerial=bdYfn7UFZeyQgYKGOOObOOObw9GQ%3d%3d",
+      "HasExcel": false,
+      "HasPdf": false,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=bdYfn7UFZeyQgYKGOOObOOObw9GQ%3d%3d",
+      "PdfUrl": "",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 108468,
+    "sha256": "1786d36744d6fecc4dc48dc1b45b55570a5d38e8f8ed2cb69fe98bee5ce6795e",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 108468,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "تصمیمات مجمع عمومی عادی سالیانه دوره ۱۲ ماهه منتهی به ۱۳۹۱/۰۹/۳۰",
+      "LetterCode": "ن-۵۲",
+      "SentDateTime": "۱۳۹۱/۱۲/۱۹ ۱۱:۵۱:۱۱",
+      "PublishDateTime": "۱۳۹۱/۱۲/۱۹ ۱۴:۳۹:۱۰",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=Wvz%2b7GA5yDqnUKZZPHJvXg%3d%3d&rt=2&let=20",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=WvzOOObOOO7GA5yDqnUKZZPHJvXg%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=WvzOOObOOO7GA5yDqnUKZZPHJvXg%3d%3d&ft=1005&let=20",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 108280,
+    "sha256": "a31f58a5886721a826994846b13a0eb6e50a17223f8eb626d585fac22fa6268f",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 108280,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": " مدارک و مستندات درخواست افزایش سرمایه  ",
+      "LetterCode": "ن-۶۲",
+      "SentDateTime": "۱۳۹۱/۱۲/۲۰ ۱۲:۱۴:۰۱",
+      "PublishDateTime": "۱۳۹۱/۱۲/۲۶ ۱۳:۳۱:۴۱",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=1s7AL9UpeJ0Pyo3wJt008g%3d%3d&rt=2&let=45",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=1s7AL9UpeJ0Pyo3wJt008g%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=1s7AL9UpeJ0Pyo3wJt008g%3d%3d&ft=1005&let=45",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 109609,
+    "sha256": "5da6d77c9301aa635527c870d125dba42b52cd05e6dbfb82423747c872932d7f",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 109609,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "زمان تشکیل جلسه هیئت‌مدیره در خصوص افزایش سرمایه",
+      "LetterCode": "ن-۷۱",
+      "SentDateTime": "۱۳۹۱/۱۲/۲۷ ۱۶:۳۷:۰۳",
+      "PublishDateTime": "۱۳۹۱/۱۲/۲۷ ۱۶:۳۷:۰۳",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=WgYQ72rCdTDA%2bmx2ceO7kQ%3d%3d&rt=2&let=23",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": false,
+      "AttachmentUrl": "",
+      "PdfUrl": "DownloadFile.aspx?hs=WgYQ72rCdTDAOOObOOOmx2ceO7kQ%3d%3d&ft=1005&let=23",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 110016,
+    "sha256": "317836da0ed5b653352a47cb91c51957b635291612ec16c38120b3c5e8b29ab9",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 110016,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "تصمیمات هیئت‌مدیره در خصوص افزایش سرمایه",
+      "LetterCode": "ن-۷۳",
+      "SentDateTime": "۱۳۹۲/۰۱/۱۰ ۱۰:۱۲:۳۲",
+      "PublishDateTime": "۱۳۹۲/۰۱/۱۰ ۱۰:۵۳:۰۷",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=Vj2iJq%2bMIIawphyeMlcp0A%3d%3d&rt=2&let=24",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=Vj2iJqOOObOOOMIIawphyeMlcp0A%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=Vj2iJqOOObOOOMIIawphyeMlcp0A%3d%3d&ft=1005&let=24",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  },
+  {
+    "requested_tracing_no": 118368,
+    "sha256": "c650ce0b7ad17f3fae2a99129e5f16dbcea4aaec916b60ce9965597777187ad7",
+    "raw_record": {
+      "SuperVision": {
+        "UnderSupervision": 0,
+        "AdditionalInfo": "",
+        "Reasons": []
+      },
+      "TracingNo": 118368,
+      "Symbol": "وغدیر",
+      "CompanyName": "سرمایه گذاری غدیر",
+      "UnderSupervision": 0,
+      "Title": "آگهی ثبت افزایش سرمایه",
+      "LetterCode": "ن-۶۷",
+      "SentDateTime": "۱۳۹۲/۰۳/۱۳ ۱۷:۱۹:۳۷",
+      "PublishDateTime": "۱۳۹۲/۰۳/۱۳ ۱۷:۱۹:۳۷",
+      "HasHtml": true,
+      "IsEstimate": false,
+      "Url": "/Reports/Decision.aspx?LetterSerial=ATs1lNem5EWxZBf7qf6SZA%3d%3d&rt=2&let=28",
+      "HasExcel": false,
+      "HasPdf": true,
+      "HasXbrl": false,
+      "HasAttachment": true,
+      "AttachmentUrl": "/Reports/Attachment.aspx?LetterSerial=ATs1lNem5EWxZBf7qf6SZA%3d%3d",
+      "PdfUrl": "DownloadFile.aspx?hs=ATs1lNem5EWxZBf7qf6SZA%3d%3d&ft=1005&let=28",
+      "ExcelUrl": "",
+      "XbrlUrl": "",
+      "TedanUrl": "http://www.tedan.ir"
+    }
+  }
+]

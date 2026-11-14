@@ -1,0 +1,244 @@
+MARKETSAGE TSE CLIENT OUTLIER REVIEW
+READ_ONLY: no source/candidate data modified; no network access
+CSV_ROWS: 52752 | EVENT_ROWS: 64
+CSV_FIELDS: symbol,mode,date,source_close,chart_close,anchor_scale,normalized_source_close,relative_error_pct
+
+====================================================================================
+SYMBOL: فولاد
+EVENT_COUNTS: {'dividend': 19, 'capital increase': 12}
+
+ADJUST1 ERROR DISTRIBUTION
+error >=   0.25%:  2351/4266 (55.11%)
+error >=    0.5%:  1990/4266 (46.65%)
+error >=      1%:  1552/4266 (36.38%)
+error >=      2%:   877/4266 (20.56%)
+error >=      5%:   402/4266 (9.42%)
+error >=     10%:    54/4266 (1.27%)
+error >=     25%:     0/4266 (0.00%)
+error >=     50%:     0/4266 (0.00%)
+error >=    100%:     0/4266 (0.00%)
+
+ADJUST1 TOP 12 DATES
+2007-06-26 | error=16.66667% | source=3.5 | chart=3 | anchored_source=3.5 | anchor_scale=1
+2009-07-13 | error=16.66667% | source=3.5 | chart=3 | anchored_source=3.5 | anchor_scale=1
+2009-07-14 | error=16.33333% | source=3.49 | chart=3 | anchored_source=3.49 | anchor_scale=1
+2008-12-08 | error=15.33333% | source=3.46 | chart=3 | anchored_source=3.46 | anchor_scale=1
+2009-06-07 | error=15.00000% | source=3.45 | chart=3 | anchored_source=3.45 | anchor_scale=1
+2007-06-27 | error=14.66667% | source=3.44 | chart=3 | anchored_source=3.44 | anchor_scale=1
+2007-06-24 | error=14.33333% | source=3.43 | chart=3 | anchored_source=3.43 | anchor_scale=1
+2009-06-06 | error=14.00000% | source=3.42 | chart=3 | anchored_source=3.42 | anchor_scale=1
+2007-06-23 | error=13.00000% | source=3.39 | chart=3 | anchored_source=3.39 | anchor_scale=1
+2009-01-24 | error=13.00000% | source=3.39 | chart=3 | anchored_source=3.39 | anchor_scale=1
+2009-01-25 | error=12.66667% | source=3.38 | chart=3 | anchored_source=3.38 | anchor_scale=1
+2009-01-31 | error=12.66667% | source=3.38 | chart=3 | anchored_source=3.38 | anchor_scale=1
+
+CANDIDATE_ADJUSTED ERROR DISTRIBUTION
+error >=   0.25%:  3391/4266 (79.49%)
+error >=    0.5%:  3391/4266 (79.49%)
+error >=      1%:  3391/4266 (79.49%)
+error >=      2%:  3391/4266 (79.49%)
+error >=      5%:  3391/4266 (79.49%)
+error >=     10%:  3391/4266 (79.49%)
+error >=     25%:  3391/4266 (79.49%)
+error >=     50%:  3391/4266 (79.49%)
+error >=    100%:    35/4266 (0.82%)
+
+CANDIDATE_ADJUSTED TOP 12 DATES
+2009-07-13 | error=110.89568% | source=6.3268703 | chart=3 | anchored_source=6.3268703 | anchor_scale=1
+2007-06-26 | error=110.64308% | source=6.3192924 | chart=3 | anchored_source=6.3192924 | anchor_scale=1
+2009-07-14 | error=110.05378% | source=6.3016133 | chart=3 | anchored_source=6.3016133 | anchor_scale=1
+2008-12-08 | error=108.32832% | source=6.2498496 | chart=3 | anchored_source=6.2498496 | anchor_scale=1
+2009-06-07 | error=108.12704% | source=6.2438111 | chart=3 | anchored_source=6.2438111 | anchor_scale=1
+2007-06-27 | error=107.42255% | source=6.2226764 | chart=3 | anchored_source=6.2226764 | anchor_scale=1
+2007-06-24 | error=106.91934% | source=6.2075801 | chart=3 | anchored_source=6.2075801 | anchor_scale=1
+2009-06-06 | error=105.81228% | source=6.1743684 | chart=3 | anchored_source=6.1743684 | anchor_scale=1
+2009-01-24 | error=104.30265% | source=6.1290796 | chart=3 | anchored_source=6.1290796 | anchor_scale=1
+2007-06-23 | error=104.10137% | source=6.1230411 | chart=3 | anchored_source=6.1230411 | anchor_scale=1
+2009-01-31 | error=103.49752% | source=6.1049256 | chart=3 | anchored_source=6.1049256 | anchor_scale=1
+2009-01-25 | error=103.39688% | source=6.1019063 | chart=3 | anchored_source=6.1019063 | anchor_scale=1
+
+NEARBY TSE CLIENT CORPORATE-ACTION EVENTS (within +/- 14 calendar days of major outliers)
+
+OUTLIER_ANCHOR 2009-07-13 mode=candidate_adjusted error=110.89568%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2007-06-26 mode=candidate_adjusted error=110.64308%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2008-12-08 mode=candidate_adjusted error=108.32832%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2009-06-07 mode=candidate_adjusted error=108.12704%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2009-01-24 mode=candidate_adjusted error=104.30265%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2009-08-18 mode=candidate_adjusted error=103.31859%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2010-01-13 mode=candidate_adjusted error=103.10811%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2010-02-06 mode=candidate_adjusted error=102.16098%
+  NO_EVENT_WITHIN_WINDOW
+
+====================================================================================
+SYMBOL: وغدیر
+EVENT_COUNTS: {'dividend': 12, 'capital increase': 3}
+
+ADJUST1 ERROR DISTRIBUTION
+error >=   0.25%:  2886/5383 (53.61%)
+error >=    0.5%:  2649/5383 (49.21%)
+error >=      1%:  2649/5383 (49.21%)
+error >=      2%:  2649/5383 (49.21%)
+error >=      5%:  2649/5383 (49.21%)
+error >=     10%:  2649/5383 (49.21%)
+error >=     25%:  2649/5383 (49.21%)
+error >=     50%:  2649/5383 (49.21%)
+error >=    100%:  2518/5383 (46.78%)
+
+ADJUST1 TOP 12 DATES
+2009-03-11 | error=629.00000% | source=65.61 | chart=9 | anchored_source=65.61 | anchor_scale=1
+2009-03-14 | error=629.00000% | source=65.61 | chart=9 | anchored_source=65.61 | anchor_scale=1
+2009-03-16 | error=627.44444% | source=65.47 | chart=9 | anchored_source=65.47 | anchor_scale=1
+2009-03-17 | error=625.88889% | source=65.33 | chart=9 | anchored_source=65.33 | anchor_scale=1
+2009-03-29 | error=624.77778% | source=65.23 | chart=9 | anchored_source=65.23 | anchor_scale=1
+2009-02-15 | error=623.10000% | source=72.31 | chart=10 | anchored_source=72.31 | anchor_scale=1
+2009-03-18 | error=622.66667% | source=65.04 | chart=9 | anchored_source=65.04 | anchor_scale=1
+2009-03-28 | error=622.66667% | source=65.04 | chart=9 | anchored_source=65.04 | anchor_scale=1
+2009-02-02 | error=621.27273% | source=79.34 | chart=11 | anchored_source=79.34 | anchor_scale=1
+2008-05-28 | error=621.20000% | source=72.12 | chart=10 | anchored_source=72.12 | anchor_scale=1
+2008-05-31 | error=619.80000% | source=71.98 | chart=10 | anchored_source=71.98 | anchor_scale=1
+2008-06-02 | error=619.80000% | source=71.98 | chart=10 | anchored_source=71.98 | anchor_scale=1
+
+CANDIDATE_ADJUSTED ERROR DISTRIBUTION
+error >=   0.25%:  3935/5383 (73.10%)
+error >=    0.5%:  3935/5383 (73.10%)
+error >=      1%:  3935/5383 (73.10%)
+error >=      2%:  3935/5383 (73.10%)
+error >=      5%:  3933/5383 (73.06%)
+error >=     10%:  2288/5383 (42.50%)
+error >=     25%:  1630/5383 (30.28%)
+error >=     50%:     0/5383 (0.00%)
+error >=    100%:     0/5383 (0.00%)
+
+CANDIDATE_ADJUSTED TOP 12 DATES
+2009-03-10 | error=33.43369% | source=6.6566315 | chart=10 | anchored_source=6.6566315 | anchor_scale=1
+2009-03-30 | error=33.43369% | source=6.6566315 | chart=10 | anchored_source=6.6566315 | anchor_scale=1
+2009-03-09 | error=33.33735% | source=6.6662648 | chart=10 | anchored_source=6.6662648 | anchor_scale=1
+2009-03-08 | error=33.19285% | source=6.6807148 | chart=10 | anchored_source=6.6807148 | anchor_scale=1
+2009-03-07 | error=33.04835% | source=6.6951648 | chart=10 | anchored_source=6.6951648 | anchor_scale=1
+2009-03-31 | error=33.04835% | source=6.6951648 | chart=10 | anchored_source=6.6951648 | anchor_scale=1
+2009-02-07 | error=33.00456% | source=7.3694979 | chart=11 | anchored_source=7.3694979 | anchor_scale=1
+2008-05-27 | error=32.91699% | source=7.3791313 | chart=11 | anchored_source=7.3791313 | anchor_scale=1
+2008-01-14 | error=32.68710% | source=8.0775477 | chart=12 | anchored_source=8.0775477 | anchor_scale=1
+2008-01-15 | error=32.68710% | source=8.0775477 | chart=12 | anchored_source=8.0775477 | anchor_scale=1
+2008-01-16 | error=32.68710% | source=8.0775477 | chart=12 | anchored_source=8.0775477 | anchor_scale=1
+2008-01-20 | error=32.68710% | source=8.0775477 | chart=12 | anchored_source=8.0775477 | anchor_scale=1
+
+NEARBY TSE CLIENT CORPORATE-ACTION EVENTS (within +/- 14 calendar days of major outliers)
+
+OUTLIER_ANCHOR 2009-03-11 mode=adjust1 error=629.00000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2009-03-29 mode=adjust1 error=624.77778%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2009-02-15 mode=adjust1 error=623.10000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2009-02-02 mode=adjust1 error=621.27273%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2008-05-28 mode=adjust1 error=621.20000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2008-11-08 mode=adjust1 error=616.30769%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2007-11-28 mode=adjust1 error=615.00000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2008-06-11 mode=adjust1 error=614.81818%
+  NO_EVENT_WITHIN_WINDOW
+
+====================================================================================
+SYMBOL: پارسیان
+EVENT_COUNTS: {'dividend': 11, 'capital increase': 7}
+
+ADJUST1 ERROR DISTRIBUTION
+error >=   0.25%:  1716/3539 (48.49%)
+error >=    0.5%:  1440/3539 (40.69%)
+error >=      1%:   967/3539 (27.32%)
+error >=      2%:   895/3539 (25.29%)
+error >=      5%:   895/3539 (25.29%)
+error >=     10%:   895/3539 (25.29%)
+error >=     25%:   785/3539 (22.18%)
+error >=     50%:   572/3539 (16.16%)
+error >=    100%:   372/3539 (10.51%)
+
+ADJUST1 TOP 12 DATES
+2012-02-14 | error=137.78571% | source=33.29 | chart=14 | anchored_source=33.29 | anchor_scale=1
+2012-02-15 | error=137.78571% | source=33.29 | chart=14 | anchored_source=33.29 | anchor_scale=1
+2011-12-07 | error=136.75000% | source=37.88 | chart=16 | anchored_source=37.88 | anchor_scale=1
+2012-01-03 | error=136.75000% | source=37.88 | chart=16 | anchored_source=37.88 | anchor_scale=1
+2011-11-21 | error=136.11765% | source=40.14 | chart=17 | anchored_source=40.14 | anchor_scale=1
+2012-02-18 | error=136.00000% | source=33.04 | chart=14 | anchored_source=33.04 | anchor_scale=1
+2012-02-29 | error=135.58824% | source=40.05 | chart=17 | anchored_source=40.05 | anchor_scale=1
+2011-11-09 | error=135.55556% | source=42.4 | chart=18 | anchored_source=42.4 | anchor_scale=1
+2011-12-25 | error=135.50000% | source=37.68 | chart=16 | anchored_source=37.68 | anchor_scale=1
+2011-07-27 | error=135.30000% | source=47.06 | chart=20 | anchored_source=47.06 | anchor_scale=1
+2011-12-26 | error=135.18750% | source=37.63 | chart=16 | anchored_source=37.63 | anchor_scale=1
+2011-11-12 | error=135.11111% | source=42.32 | chart=18 | anchored_source=42.32 | anchor_scale=1
+
+CANDIDATE_ADJUSTED ERROR DISTRIBUTION
+error >=   0.25%:  2661/3539 (75.19%)
+error >=    0.5%:  2639/3539 (74.57%)
+error >=      1%:  2611/3539 (73.78%)
+error >=      2%:  2362/3539 (66.74%)
+error >=      5%:   170/3539 (4.80%)
+error >=     10%:   154/3539 (4.35%)
+error >=     25%:     0/3539 (0.00%)
+error >=     50%:     0/3539 (0.00%)
+error >=    100%:     0/3539 (0.00%)
+
+CANDIDATE_ADJUSTED TOP 12 DATES
+2011-06-26 | error=14.96789% | source=20.407706 | chart=24 | anchored_source=20.407706 | anchor_scale=1
+2011-04-25 | error=14.95271% | source=22.112294 | chart=26 | anchored_source=22.112294 | anchor_scale=1
+2011-05-10 | error=14.93294% | source=21.266764 | chart=25 | anchored_source=21.266764 | anchor_scale=1
+2011-03-27 | error=14.82071% | source=22.998409 | chart=27 | anchored_source=22.998409 | anchor_scale=1
+2011-02-22 | error=14.79565% | source=23.005174 | chart=27 | anchored_source=23.005174 | anchor_scale=1
+2011-05-16 | error=14.77060% | source=23.011938 | chart=27 | anchored_source=23.011938 | anchor_scale=1
+2010-12-20 | error=14.74728% | source=24.72329 | chart=29 | anchored_source=24.72329 | anchor_scale=1
+2011-01-26 | error=14.74728% | source=24.72329 | chart=29 | anchored_source=24.72329 | anchor_scale=1
+2010-11-20 | error=14.74644% | source=23.870996 | chart=28 | anchored_source=23.870996 | anchor_scale=1
+2011-05-02 | error=14.74242% | source=20.46182 | chart=24 | anchored_source=20.46182 | anchor_scale=1
+2011-02-19 | error=14.69544% | source=23.032231 | chart=27 | anchored_source=23.032231 | anchor_scale=1
+2011-04-16 | error=14.67039% | source=23.038995 | chart=27 | anchored_source=23.038995 | anchor_scale=1
+
+NEARBY TSE CLIENT CORPORATE-ACTION EVENTS (within +/- 14 calendar days of major outliers)
+
+OUTLIER_ANCHOR 2012-02-14 mode=adjust1 error=137.78571%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2011-12-07 mode=adjust1 error=136.75000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2012-01-03 mode=adjust1 error=136.75000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2011-11-21 mode=adjust1 error=136.11765%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2012-02-29 mode=adjust1 error=135.58824%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2011-11-09 mode=adjust1 error=135.55556%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2011-07-27 mode=adjust1 error=135.30000%
+  NO_EVENT_WITHIN_WINDOW
+
+OUTLIER_ANCHOR 2011-09-20 mode=adjust1 error=135.10000%
+  NO_EVENT_WITHIN_WINDOW
