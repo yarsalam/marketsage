@@ -104,7 +104,10 @@ class Importer:
         if source.is_symlink() or not source.is_file() or excluded(source):
             return
         size = source.stat().st_size
-        if size > self.max_file_bytes:
+        source_hash = sha256_file(source)
+        payload = gzip.compress(source.read_bytes(), compresslevel=9, mtime=0) if compress else None
+        stored_candidate_size = len(payload) if payload is not None else size
+        if stored_candidate_size > self.max_file_bytes:
             try:
                 source_rel = str(source.relative_to(self.source_root))
             except ValueError:
@@ -113,18 +116,18 @@ class Importer:
                 "source_relative": source_rel,
                 "destination_relative": str(relative_dest),
                 "bytes": size,
-                "reason": f"single file exceeds configured limit ({self.max_file_bytes} bytes)",
-                "source_sha256": sha256_file(source),
+                "stored_candidate_bytes": stored_candidate_size,
+                "reason": f"stored file exceeds configured limit ({self.max_file_bytes} bytes)",
+                "source_sha256": source_hash,
             })
             return
 
-        source_hash = sha256_file(source)
         final_rel = Path(str(relative_dest) + ".gz") if compress else relative_dest
         target = self.destination / final_rel
         target.parent.mkdir(parents=True, exist_ok=True)
 
         if compress:
-            payload = gzip.compress(source.read_bytes(), compresslevel=9, mtime=0)
+            assert payload is not None
             if target.exists() and target.read_bytes() != payload:
                 raise RuntimeError(f"Refusing to replace existing immutable archive: {target}")
             if not target.exists():
@@ -350,6 +353,23 @@ def verify_existing(repo_root: Path) -> int:
             continue
         if sha256_file(target) != entry["stored_sha256"]:
             errors.append(f"hash mismatch: {entry['destination_relative']}")
+    sums_path = bundle / "SHA256SUMS.txt"
+    if sums_path.is_file():
+        for line_number, line in enumerate(sums_path.read_text(encoding="utf-8").splitlines(), start=1):
+            if not line.strip():
+                continue
+            try:
+                expected_hash, relative_path = line.split("  ", 1)
+            except ValueError:
+                errors.append(f"malformed SHA256SUMS.txt line {line_number}")
+                continue
+            target = bundle / relative_path
+            if not target.is_file():
+                errors.append(f"checksum target missing: {relative_path}")
+            elif sha256_file(target) != expected_hash:
+                errors.append(f"checksum mismatch: {relative_path}")
+    else:
+        errors.append("missing SHA256SUMS.txt")
     for symbol, expected in SYMBOLS.items():
         identity_path = bundle / symbol / "identity.json"
         if identity_path.is_file():
