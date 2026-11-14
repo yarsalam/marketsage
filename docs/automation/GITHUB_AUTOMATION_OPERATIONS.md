@@ -1,89 +1,120 @@
 # MarketSage GitHub automation operations
 
-This document describes the repository automation boundary. It does not authorize automatic merges, releases, deployments, data collection, investment scoring, backtesting approval, broker access, trading, or capital allocation.
+This document describes the repository automation boundary. It does not authorize automatic merges, releases, deployments, provider registration, private-data collection, investment scoring, backtesting approval, broker access, trading, or capital allocation.
 
-## Current cloud CI design
+## 1. Triggers and execution boundary
 
-The `.github/workflows/ci.yml` workflow is intended to run on:
+The `.github/workflows/ci.yml` workflow runs on:
 
 - Pushes to `main`, `deploy/**`, `research/**`, `ci/**`, and `infra/**`.
-- Pull requests targeting `main`, `deploy/**`, or `infra/**`.
-- A daily scheduled run at 03:17 UTC.
+- Pull requests targeting `main`, `deploy/**`, and `infra/**`.
+- Daily scheduled infrastructure-only validation at **03:17 UTC**.
 - Manual `workflow_dispatch`.
 
-Scheduled workflows execute from the repository default branch. The daily schedule therefore becomes active only after this workflow change is merged into `main`. GitHub may delay scheduled events during periods of Actions load; this is a recurring health check, not a real-time uptime guarantee.
+Scheduled workflows run from the default branch. A schedule added on a feature branch is not operational until the workflow reaches `main`. GitHub can delay scheduled events; a daily schedule is a recurring health signal, not a real-time SLA or an always-on worker.
 
-The workflow uses GitHub-hosted `ubuntu-latest` runners for cloud-native tests and builds. It does not use the owner's laptop runner. The job timeouts are:
-
-| Job | Timeout |
-| --- | ---: |
-| analysis | 25 minutes |
-| user-backend | 30 minutes |
-| user-frontend | 30 minutes |
-| admin-workspace | 30 minutes |
-| production-images | 40 minutes |
-| ci-infra-tests | 5 minutes |
-| notify-failure | 5 minutes |
-
-The concurrency group is keyed by pull-request number when available, otherwise by Git ref. A newer run for the same PR/ref cancels its superseded run. Separate PRs remain independent. A cancelled run is not evidence of a test failure; inspect the newest run for that PR/ref.
-
-The CI action references are pinned to full immutable commit SHAs, with the upstream release tag retained as a comment. Dependabot checks GitHub Actions weekly in one grouped PR. Review those PRs through CI before accepting an action update.
-
-A separate **Detect direct main updates** job runs only for push events to main. It compares the before/after SHAs and checks that each pushed commit is associated with a merged PR targeting main. A forced/non-fast-forward push, unassociated commit, oversized range, or unverifiable API response produces a sanitized warning on Issue #49 and a failed check. This is detection only; it does not prevent or revert a push and is not a substitute for a native ruleset/branch-protection rule. The check uses only read access to commit/PR metadata and issue-comment permission; it reports commit identifiers and fixed reason codes, not diffs, logs, or secrets.
-
-The build/test jobs and the CI-helper unit-test job use only `contents: read` and do not require repository secrets. A separate failure-notification job uses `contents: read` to check out the small reporter script and `issues: write` to add a sanitized comment to Issue #49; it reports the run link and failed job names only. It does not read logs or artifacts, write repository contents, or expose credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
-
-## Manual-only local workflows
-
-The TSETMC integrated acceptance and sanitized diagnostics workflows are deliberately manual-only. They require the dedicated self-hosted runner labels and explicit confirmation inputs. They must not be placed on a schedule or triggered by ordinary pushes/PRs. The laptop runner is not an always-on service and must never be assumed available.
-
-Do not use the local runner for untrusted PR code. Any future server runner must be a separately managed, least-privilege environment with restricted network access, isolated workspaces, bounded concurrency, health monitoring, safe patching, and a documented recovery path. Keep private input data off GitHub and out of artifacts.
-
-## Daily operations and failure recovery
-
-On a failed CI run, the notification job attempts to add a sanitized comment to Issue #49. A missing comment means notification delivery may have failed; the Actions run remains the source of truth. GitHub Mobile push delivery still depends on the user's notification settings and is not guaranteed by this workflow.
+Cloud CI uses standard GitHub-hosted `ubuntu-latest` runners. It does not use the owner's laptop Runner. The repository is public by the recorded owner decision; no paid/larger runner or increase to the additional-spend limit is authorized by this workflow.
 
 
-1. Open the Actions tab and select **MarketSage CI**.
-2. For each PR, inspect the newest run for its exact head commit. Do not infer current success from an older run.
-3. If a run is queued or in progress, inspect its job list. If it is cancelled, check whether a newer run superseded it.
-4. For a failed job, inspect only the failing step needed to identify the cause. Redact credentials, paths, raw market values, and private source payloads before sharing any diagnostic output.
-5. Rerun failed jobs only after identifying a transient failure. Do not create unbounded retries or rerun expensive workflows repeatedly.
-6. A missing daily run is not proof of a healthy system. Check the latest successful run timestamp and the Actions workflow's enabled state.
-7. After a workflow change, validate the exact PR head before considering the change complete.
+## 1A. Temporary infrastructure-only execution freeze (Goal 1)
 
-GitHub's scheduled events can be delayed or dropped under heavy load. The schedule is intentionally not placed at the start of an hour; it is not an SLA or an always-on worker.
+Until the owner explicitly accepts the 24/7 infrastructure evidence, CI is intentionally restricted to infrastructure work:
 
-## Automation capabilities not yet enabled
+- `schedule` runs the provider-neutral control-plane tests and CI-helper tests only. It does not run analysis/backtests, product builds, admin builds, or production image builds.
+- Pushes and pull requests on `infra/**` are classified from the actual Git diff. Only the explicit infrastructure allowlist is eligible for the infrastructure-only path. A mixed, unknown, empty, or unclassifiable diff is not eligible.
+- The existing required status-check context names are preserved. For an allowlisted infrastructure-only change, the five product/analysis/production jobs are skipped. For any other scope, those same required contexts fail immediately with a fixed freeze notice; they do not execute product or production commands. This deliberately prevents product changes from being merged during the freeze.
+- The classifier prints only a fixed aggregate scope label; it never prints changed paths, file contents, private values, or environment data. A classifier error resolves to the non-infrastructure path and therefore blocks the PR.
+- `workflow_dispatch` is not an approval to run product validation; during the freeze it follows the fail-closed path.
 
-CI validates code; by itself it does not autonomously plan and write new engineering changes. A coding agent must be explicitly enabled and assigned bounded issues before this repository can have an unattended code-authoring loop.
+This is a temporary engineering freeze, not evidence that product checks passed. Skipped product checks on an infrastructure-only PR do not validate product code. Do not merge product/data/analysis/production changes while this freeze is active. The native `main-protection` ruleset and its seven required check contexts are not modified by this change.
 
-GitHub Copilot cloud agent is one possible option for a personal repository, subject to a paid Copilot plan and the account's cloud-agent feature being enabled. Before using it:
+The live ruleset currently requires **one approving review**, not ten. Its stale-review dismissal and strict up-to-date settings are disabled; changing those native rules is a separate governance change and is not part of this CI-path patch.
 
-- Confirm the account is eligible and cloud agent is enabled for this repository.
-- Keep its work issue-scoped and PR-based.
-- Require human review and checks; do not grant merge, release, deployment, secrets, or production permissions.
-- Do not assign data/research issues while the infrastructure-first priority is active.
+## 2. CI jobs and bounded runtime
 
-If cloud agent is unavailable, evaluate a separately budgeted coding-agent integration rather than placing an unbounded API key or a broad personal token in CI.
+| Job | Timeout | Purpose |
+| --- | ---: | --- |
+| `classify-change-scope` | 5 min | Fail-closed classification of infrastructure-only diffs; emits only an aggregate label |
+| `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images` | 2 min each | Preserved required-check contexts; skipped for allowlisted infrastructure-only changes and otherwise fail immediately during the Goal 1 freeze (no product/build commands) |
+| `infra-control-plane-tests` | 15 min | Discover and run every `test_*.py` module under `infra/control_plane` |
+| `ci-infra-tests` | 5 min | Offline regression tests for scope classification, failure notice, and direct-main provenance helpers |
+| `detect-direct-main-update` | 5 min | Main-push-only provenance detection |
+| `notify-failure` | 5 min | Failure-only sanitized Issue #49 handoff |
 
-## Cost and account controls
+All external Actions are pinned to immutable 40-character commit SHAs. Dependabot checks GitHub Actions weekly in one grouped PR; its updates must pass review and CI before acceptance.
 
-GitHub-hosted runner usage is free for standard runners in public repositories and consumes the account's included Actions minutes in private repositories; usage beyond the applicable allowance may be billed. The account plan, remaining quota, and billing budget are not visible to this workflow. Before increasing run frequency or adding agent jobs, inspect GitHub Actions usage and configure a hard spending limit that stops additional usage. Prefer bounded daily validation plus event-driven PR checks over minute-level polling.
+Workflow-level permissions default to `contents: read`. The two narrow jobs with issue-comment duties receive job-scoped `issues: write`: the direct-main provenance detector and the failure notifier. The failure notifier is disabled on `pull_request` events, so untrusted PR code does not receive an issue-write token. The detector also receives `pull-requests: read`. The control-plane/application validation jobs do not need repository secrets or contents-write access.
 
-## Protection and release boundary
+## 3. Concurrency, cancellation, and retries
 
-The current `main` branch must be protected before enabling any bot or workflow that can write repository contents. Require PR-based changes and the relevant CI checks; disable force-push and branch deletion. Keep merge/release/deploy authority with the repository owner. PR #6 remains subject to separate explicit owner approval.
+The CI concurrency group is keyed by pull-request number when available, otherwise by Git ref. A newer validation for the same PR/ref cancels the superseded CI run; separate PRs remain independent. A cancellation caused by a newer commit is not a test failure—inspect the newest exact-head run.
 
-## Acceptance evidence still required
+This cancellation policy is for replaceable CI validation only. Stateful task execution must use the durable coordinator/lease/outbox controls and must not be treated as interchangeable with CI concurrency. A cancel request is not proof that an external execution has stopped; the provider must confirm a terminal state before a retry/failover is considered safe.
 
-- Daily schedule is merged to the default branch and at least one scheduled run succeeds.
-- Exact-head CI passes after the schedule/concurrency/timeout changes.
-- Concurrency cancellation and timeout behavior have been verified with controlled runs.
-- Direct-main-update detection has unit coverage for merged-PR commits, unassociated commits, forced/non-fast-forward pushes, and bounded range handling; the live job must be confirmed on a post-merge main push.
-- Failure notification and stuck-run detection are observable and tested.
-- Branch protection and spending limits are verified in repository/account settings.
-- A coding agent is enabled with least privilege and demonstrates a bounded issue-to-PR cycle.
-- Any persistent server runner has a tested health/recovery process and is independent of the owner's laptop.
+Retries must remain bounded and limited to classified transient, idempotent operations. Do not retry permanent 4xx/permission/data-validation failures or rerun whole workflows repeatedly without identifying a transient cause. No unbounded polling or automatic retry loop is authorized.
 
-Do not claim 24/7 readiness until these checks have evidence.
+## 4. Main-branch provenance and protection
+
+The separate **Detect direct main updates** job runs only on a push to `main`. It compares the before/after SHAs and verifies that each pushed commit is associated with a merged PR targeting `main`. A forced/non-fast-forward update, unassociated commit, oversized range, or unverifiable API response produces a sanitized warning on Issue #49 and a failed check.
+
+This is **detection, not prevention**. It does not block or revert a push and is not a replacement for a native ruleset/branch-protection rule. It is intentionally not a required PR check because it is skipped for pull-request events.
+
+The live main ruleset is `main-protection` (ID `26789479`), targeting `refs/heads/main`. It requires PRs and seven status checks: `analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, and `Test CI automation helpers`; it blocks branch deletion and non-fast-forward updates. The current ruleset asks for **10 approving reviews**, which is likely impractical for the current single-owner operating model. The owner must set an achievable human approval count without weakening the seven required checks. The ruleset payload has no bypass actors; administrator bypass behavior must still be understood from the repository settings.
+
+## 5. Failure reporting and its blind spots
+
+After a failed dependency job on a trusted non-PR event, `notify-failure` attempts to add a sanitized comment to Issue #49. It deliberately does not run on `pull_request` events, so an untrusted PR cannot receive an `issues: write` token; PR failures remain visible in their required check results. It reports the run link and safe job identifiers only. It does not upload logs/artifacts, serialize exception details, or expose credentials, raw market data, prices, private paths, or environment values.
+
+The **failure notifier shares the same GitHub-hosted runner pool as the CI jobs**. It cannot independently report a pool-wide allocation outage if that runner pool itself is unavailable. A missing Issue comment may indicate notification failure; the Actions run remains the source of truth. GitHub Mobile push delivery depends on the owner's notification settings and is not guaranteed by this workflow.
+
+The direct-main detector also posts only fixed reason codes and commit identifiers when it detects an unexpected main update. Neither job is an independent 24/7 observer of the persistent worker/control plane.
+
+## 6. Manual-only local workflows and persistent workers
+
+The TSETMC integrated acceptance, offline dataset validation, and sanitized local diagnostics workflows are deliberately **manual-only**. They require the dedicated self-hosted Runner labels and explicit owner confirmation. They must not be put on a schedule or triggered by ordinary pushes/PRs. Do not dispatch them automatically.
+
+The laptop Runner `marketsage-local-01` is an owner-operated resource, not an always-on host. Its service and local proxy may be healthy while the laptop is running, but this does not establish continuous availability. Do not run untrusted PR code or general coding-agent tasks on it. Private staged datasets remain local, read-only to the Runner, and must not be uploaded to GitHub artifacts or logs.
+
+Any persistent Worker required for unattended task execution must run on a separately managed host or equivalent independently available environment. It needs a dedicated least-privilege account, restricted egress, isolated workspaces, no untrusted-PR execution, immutable worker image, bounded CPU/memory/PIDs/time/output, process supervision, heartbeat, watchdog, disk/backup/restore checks, safe patching, and an independently observable recovery path. No new paid server or service is provisioned by this document.
+
+## 7. Daily operations and recovery
+
+1. Open Actions and select **MarketSage CI**.
+2. For each PR, inspect the newest run for its exact head commit; older green runs do not validate a newer SHA.
+3. For queued/in-progress jobs, inspect the job list and queue age. For cancelled runs, check whether a newer run superseded them.
+4. For a failed job, inspect only the failing step needed to identify the cause. Redact credentials, environment values, host paths, raw market values, and private source payloads before sharing diagnostics.
+5. Rerun only after identifying a transient, retry-safe failure. Never use unbounded retries.
+6. Check the latest successful scheduled run timestamp and confirm the workflow remains enabled. A missing schedule run is not a healthy signal.
+7. After any workflow change, validate the exact PR head and inspect all required checks; skipped, cancelled, queued, and stale checks are not successes.
+8. For a local-only workflow, review the immutable source SHA and workflow file first, then dispatch manually with the required owner confirmation. Automation must not do this on the owner's behalf.
+
+## 8. Coding-agent boundary
+
+CI validates code; it does not autonomously plan, author, review, and deliver engineering changes. A coding agent must be explicitly enabled and tested before claiming an unattended issue-to-PR loop.
+
+Any permitted agent must be issue-scoped and branch/PR-only, with no merge, auto-merge, release, deployment, production, secrets, billing, or local-only dispatch permission. Human review and exact-head CI remain mandatory. While Issue #49 is open, do not assign ordinary MarketSage product, data-source, or investment-research issues to an agent.
+
+If a cloud coding agent is unavailable or requires a paid plan, do not substitute a broad personal token or unbounded API key in Actions. Evaluate a separately approved and budget-bounded option instead.
+
+## 9. Cost and account controls
+
+Standard GitHub-hosted runners are free for public repositories; private-repository included-minute and billing rules differ by plan. This workflow does not read the owner's billing configuration. Before changing repository visibility, increasing schedule frequency, adding agent execution, or enabling extra runners, verify the current account usage and cost boundary in GitHub settings. Do not increase the USD 0 additional-spending limit or activate paid resources without separate owner approval.
+
+Prefer event-driven push/PR validation plus the bounded daily schedule. Minute-level polling and unbounded job fan-out are prohibited.
+
+## 10. Acceptance status and completion boundary
+
+The following facts are established:
+
+- Main has a real successful daily `schedule` run: [run #42471588681](https://github.com/yarsalam/marketsage/actions/runs/42471588681).
+- The direct-main detector has unit coverage and a post-merge main-push execution record.
+- The current provider-neutral PR #71 head has green exact-head push/PR CI, including **164/164** control-plane tests, and a successful hosted Docker worker canary.
+- The two-backend fake-adapter/outbox tests cover duplicate delivery, lost/ambiguous response reconciliation, crash boundaries, safe failover, and one simulated shared side effect.
+
+The full infrastructure acceptance is **not complete**. Remaining evidence includes controlled concurrency/timeout/cancellation drills, operational task-registry-to-dispatch integration, a process-level independent observer/recovery drill, persistent Worker operation independent of the laptop, a clean end-to-end worker acceptance on the intended host, backup/restore and resource-exhaustion recovery, an issue-to-PR agent test if permitted, owner confirmation of the practical main approval count, and a full 24-hour observation window. The schedule is not an uptime SLA.
+
+A successful CI run validates code in its runner environment only. It does not prove provider availability, local Runner availability, a legal/eligible data source, an investment strategy, or 24/7 service. Do not claim readiness until the remaining acceptance items have exact evidence.
+
+## 11. Non-authorized actions
+
+No automatic merge, auto-merge, release, publish, deployment, production change, secret creation/rotation/access, billing change, provider account activation, raw market data collection, investment scoring/ranking/probability calibration, backtest approval, broker access, trading, or capital allocation is authorized.
