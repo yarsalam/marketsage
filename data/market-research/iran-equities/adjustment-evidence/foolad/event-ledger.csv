@@ -1,0 +1,2 @@
+event_id,symbol,provider_date,event_family,issuer_terms_status,effective_session_status,provider_factor,independent_factor,relationship_status,series_status,notes
+FOO-2026-03-30,foolad,2026-03-30,share_change_candidate,not_verified,not_verified,,,UNRESOLVED,QUARANTINED,"1.5T -> 1.935T shares cited by public extractor; terms-based classification and factor not verified"
