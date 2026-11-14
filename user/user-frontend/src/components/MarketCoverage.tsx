@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { CorporateActionEvidence } from "./CorporateActionEvidence";
 
 type ScopeFilter = "all" | "iran" | "global";
 
@@ -434,6 +435,8 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
       {filteredSources.length === 0 && (
         <div className="rounded-xl border border-border bg-surface p-4 text-sm text-text-secondary">برای این فیلتر منبعی در رجیستری ثبت نشده است.</div>
       )}
+
+      {(scope === "all" || scope === "iran") && <CorporateActionEvidence />}
 
       {(scope === "all" || scope === "iran") && (
         <section className="space-y-4">
