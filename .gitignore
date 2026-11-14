@@ -35,5 +35,14 @@ env/
 *.pt
 *.pth
 *.onnx
-data/
+# Keep data excluded by default. Only the reviewed Iran-equity evidence bundle is trackable.
+data/*
+!data/market-research/
+data/market-research/*
+!data/market-research/iran-equities/
+data/market-research/iran-equities/*
+!data/market-research/iran-equities/adjustment-evidence/
+data/market-research/iran-equities/adjustment-evidence/*
+!data/market-research/iran-equities/adjustment-evidence/**
+
 logs/
