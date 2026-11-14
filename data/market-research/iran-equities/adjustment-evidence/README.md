@@ -36,3 +36,34 @@ This local path is not automatically available to GitHub or this remote session.
 
 ## Acceptance
 An interval can be considered only after security identity, event terms, chronology/effective session, independent calculation, provider reconciliation and official-chart comparison have all passed. This directory does not itself approve investment use, scoring, ranking, backtesting or production.
+
+
+## Controlled import and repository visibility
+
+This repository is **public**. Commit only source material that is approved for public redistribution. Never copy credentials, private keys, local configuration, personal files or unrelated Downloads into this evidence store.
+
+Use \`scripts/research/import_iran_equity_evidence.py\` from a local clone of this branch to copy the selected owner-side evidence into this directory. The importer:
+- copies rather than moves the source files;
+- preserves the three exact TSETMC instrument-search records and raw snapshots;
+- preserves \`insCode2\`–\`insCode4\` as unverified related identifiers and does not use them for matching;
+- archives the two original acceptance-review CSVs as deterministic \`.csv.gz\` files;
+- emits per-symbol primary-InsCode-only, deduplicated evidence extracts with source CSV row references;
+- copies the selected shared chart, diagnostic, audit and TSE Client folders under \`_shared/\`;
+- writes an import manifest and SHA-256 checksums;
+- refuses to overwrite an existing raw file with different bytes and flags single files over the configured 95 MiB limit.
+
+Example, from the repository root after checking out the research branch:
+
+\`\`\`bash
+python3 scripts/research/import_iran_equity_evidence.py \\
+  --repo-root . \\
+  --source-root "\${HOME}/marketsage-data/tsetmc-three-adjusted" \\
+  --acceptance-review-root "\${HOME}/marketsage-data/acceptance-review/20261023T193750Z" \\
+  --confirm-public-repo
+\`\`\`
+
+The importer does not alter the source store. Review oversized-file reports before choosing Git LFS or another storage method; do not silently omit them.
+
+## Codespaces and automated checks
+
+The \`.devcontainer/devcontainer.json\` environment provides Python 3.12 for this research branch. No forwarded service port is needed for data-processing tests. The \`Iran Equity Evidence Integrity\` workflow verifies the importer and checks every imported file against its manifest on branch pushes and pull requests.
