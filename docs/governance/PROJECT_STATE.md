@@ -1,6 +1,6 @@
 # MarketSage — Current Project State
 
-**Snapshot date:** 2026-11-13  
+**Snapshot date:** 2026-11-14 14:19 UTC  
 **Repository:** yarsalam/marketsage (Public per live GitHub API; owner decision recorded in Issue #53)  
 **Main HEAD:** 4c4b032196137af4658ea2c28e38a21605ee923b  
 **Integration PR:** #6, feat/tindex-free-data-connector  
@@ -8,13 +8,17 @@
 **Pinned integration code commit:** 819f8b4028469cb0d498098fec88545a18ebacc6  
 **Release posture:** research-only. No data source has passed the complete investment-source gate; no representative strategy has passed empirical validation; production ranking/scoring, broker access and trading remain disabled.
 
+## Current execution gate — 2026-11-14
+
+Issue #49 is the hard execution gate under the owner's latest instruction. Ordinary product, feature, data-source screening, investment research, backtesting and analysis work remain paused. Goal 2 remains paused until Issue #49 is accepted. Historical sections below are retained as context only and do not authorize those workstreams.
+
 ## Executive state
 
 - PR #6 remains open and **must not be merged to main without explicit owner approval**. Its current integration code is used by the new local workflow only through the immutable commit SHA above.
 - PR #8 remains parked after the GitHub-hosted TSETMC connection timeout. Do not repeat the same request from the same environment.
 - PR #27 (manual-only staged-dataset validator), PR #31 (clean governance adoption), PR #32 (manual integrated TSETMC workflow) and PR #34 (memory-bounded local analysis) are merged to main. PR #15 was closed as superseded; its divergent branch was not merged.
 - PRs #7, #9, #13, #14, #16–#24, and #28–#30 are integrated into PR #6 in dependency order. Their CI results do not approve data sources or the strategy.
-- The governance constitution is adopted on main via PR #31. An active repository ruleset (#26789479) protects main with PR and seven required-check rules and blocks deletion/non-fast-forward updates. It currently requires 10 approving reviews; the approval count still needs owner correction. The laptop Runner remains manual-only and is not a server.
+- The governance constitution is adopted on main via PR #31. The latest branch snapshot records ruleset #26789479 as active with PR/seven-check/deletion/non-fast-forward controls, but reports 10 required approvals; an earlier live audit reported one. This run could not re-read the live ruleset or branch-protection API through the connected GitHub surface. The approval count and current enforcement are therefore BLOCKED for fresh verification; do not treat either recorded count as current until verified. The laptop Runner remains manual-only and is not a server.
 
 ## Local Runner and first dataset gate
 
@@ -231,3 +235,43 @@ This checkpoint supersedes older status statements above where they conflict wit
 - No independent persistent server runner, second live backend, external observer/alert failure domain, real host-loss/restart drill, off-host restore drill, worker-loss recovery proof, end-to-end canary, or 24-hour observation window is established.
 
 **Goal 1 verdict: OPEN / NOT COMPLETE / NOT 24/7 READY.** Ordinary product, data, research, investment-analysis, backtest, and source-expansion work remains paused.
+
+
+## Live infrastructure audit — 2026-11-14 14:19 UTC
+
+This section supersedes earlier status snapshots where they conflict with the live GitHub reads and the current owner instruction.
+
+### Repository and default branch
+- GitHub repository metadata reports `visibility=public`; the request describes it as private. No visibility change was made. Treat all repository history, issues, PRs and committed documents as public.
+- Default branch: `main`.
+- Main HEAD: `4c4b032196137af4658ea2c28e38a21605ee923b`, commit time `2026-11-07T19:55:51Z`. The repository commit search found no newer main commit.
+- Issue #49 remains open. Issue #52 remains open for five Chabokan wheel hashes. Issue #53 is closed (public-repository / zero-additional-spend decision). Issue #55 is closed (16/16 exact-head SQLite unit tests). Issue #59 remains open for schedule/orchestration acceptance.
+
+### Active infrastructure PRs
+- PR #74 is Draft/open, base `main`, head `b7ec545b83e370faaeeaf8960f4bf4ea70d43018`, API mergeable=true, and 77 commits ahead / 0 behind main. Its exact current head has no PR workflow runs and no combined-status entries. The preceding code/configuration head `24b95c204749b74ba2f382f4dd528d6463173dc9` passed Push run [#43379843888](https://github.com/yarsalam/marketsage/actions/runs/43379843888) and PR run [#43379849607](https://github.com/yarsalam/marketsage/actions/runs/43379849607); those results do not validate the current documentation head.
+- PR #71 is Draft/open, base `infra/provider-neutral-control-plane-2026-11`, head `e630517c7e2916ed58b7568b0ebbbf1d390b86ce`, API mergeable=false. Comparing it with the current #74 head reports 117 ahead / 4 behind, merge base `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`. Its exact current head has no PR workflow runs and no combined-status entries. Prior 174-control-plane + 36-helper test evidence on `9b8bb01e0e2d2c81aebb014d8124c761bdf5219a` is not transferable.
+- PR #54 is closed, Draft and unmerged at `e8f7d8add3df577120b92b8927c590aece001509`. Issue #55 records 16/16 owner-run tests, exit 0, on that exact head. Comparing that SHA with current PR #74 head reports 8 ahead / 48 behind, merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`. The separate `infra/sqlite-durable-coordinator-reconciled-2026-11` branch compares 3 ahead / 23 behind PR #74, status diverged, merge base `a02946bd1fa524dbf1bd6e104b15bad224345b1b`. Neither is merge-ready evidence.
+
+### Workflow and operational audit
+- Main `.github/workflows/ci.yml` has push and pull_request triggers, daily schedule `17 3 * * *`, and workflow_dispatch. It uses `ubuntu-latest`, workflow-level `contents: read`, per-ref concurrency with `cancel-in-progress: true`, and bounded job timeouts (25/30/30/30/40/5/5 minutes). Job-scoped issue write is used for sanitized failure/provenance comments. Third-party Actions are pinned to immutable SHAs.
+- Main's current workflow still runs Analysis/research-backtest, backend, frontend, admin and production-image jobs. The Goal 1 infrastructure-only freeze is present on PR #74's branch, not on main.
+- The last confirmed main schedule is [run #43414337932](https://github.com/yarsalam/marketsage/actions/runs/43414337932), 2026-11-13, success. Its job summary shows the five product/research/build jobs completed successfully. The prior recorded start was about 7h49m after the 03:17 UTC cron. This is scheduled CI, not a worker canary or punctuality guarantee.
+- The connected GitHub surface exposes PR-triggered runs for a supplied SHA and job summaries for a known run, but not a complete repository workflow-run listing. The 2026-11-14 scheduled run is therefore not independently confirmed in this audit.
+- No explicit workflow retry policy, independent stale/queued-run observer, external alert path, or custom artifact/log retention was found in the inspected main/infra CI workflows. Failure-notification jobs execute on GitHub-hosted runners, within the same hosted failure domain as cloud CI.
+- PR #71's Docker worker canary is not on main. It is configured for main push, daily 04:43 UTC schedule and manual dispatch; it uses `ubuntu-latest`, a 15-minute timeout, per-ref cancellation, a no-network sandbox, and a same-hosted-pool failure notifier. Its schedule is not active from the default branch until the workflow reaches main.
+- PR #71's self-hosted worker acceptance remains manual-only, exact-branch/owner/confirmation guarded, and requires `[self-hosted, linux, x64, marketsage-server-worker]`; it has a 20-minute timeout and serializes without cancelling an active run. No independent server runner registration or run is verified. Its failure notifier uses `ubuntu-latest`, not an external alert service.
+- The health observer documentation explicitly describes deterministic read-only assessment primitives, not a running monitor. It does not poll APIs or create heartbeats. Deployment, external polling, alert delivery, observer HA and recovery remain unproven.
+- CircleCI configuration exists on PR #71, but no connected project, OAuth activation or real second-provider run is evidenced. The SQLite coordinator remains single-host; no multi-host HA/split-brain guarantee is claimed.
+- `requirements-infra.txt` is not yet hash-locked. Issue #52 already contains the exact owner action for five Chabokan wheel hashes; do not repeat the prior 30/30 install/test.
+
+### Protection and access limitations
+- The latest branch document reports 10 required approvals on ruleset #26789479; an earlier live audit reported one. The current connected GitHub tools expose no ruleset or branch-protection read action, so current settings, required contexts, bypass behavior and the human merge gate are BLOCKED for live verification.
+- Runner inventory/online status, complete Actions quota/billing metadata, and secret metadata are not exposed. No secret values were requested or read.
+- The complete run list is unavailable through the connected tool surface; no claim is made about a 2026-11-14 schedule run.
+- No hosted workflow was dispatched or rerun, no local/manual-only workflow was dispatched, and no merge, provider registration, secret, spending, deployment, release or visibility change occurred.
+
+### Acceptance of this documentation increment
+- Scope: repository-only governance refresh on the existing PR #74 infrastructure branch.
+- Acceptance test: re-fetch both governance files after writing and verify the new audit marker, exact main/PR heads, issue states and owner-gate links.
+- Stop condition: do not dispatch/rerun any workflow or claim exact-head CI success for the documentation commits. The new PR #74 head remains unvalidated until the owner separately authorizes one bounded hosted run.
+- Issue #49 remains OPEN / NOT COMPLETE / NOT 24/7 READY. Independent persistent host, independent observer/alert, worker-loss/restart recovery, backup/restore drill, second real provider, end-to-end canary and a 24-hour observation window remain unproven.
