@@ -85,6 +85,8 @@ The Market Coverage/source page and Corporate Action Evidence page are **foundat
 Every response should include:
 as_of, published_at if known, retrieved_at, source_ids, canonical_instrument_id, price_basis, currency, unit, method_version, coverage_status, quality_status, research_gate and warnings.
 
+All provider security identifiers such as TSETMC `insCode`, `insCode2`–`insCode4`, `ISIN` and issuer IDs must be JSON strings. Do not expose them as JSON numbers or TypeScript `number`: JavaScript's safe integer limit is 2^53−1, below the magnitude of the TSETMC IDs in this pilot. Keep identifier comparisons string-exact end-to-end; parse numeric *market measurements* separately with declared units.
+
 For forecasts additionally include horizon, target definition, model version, training window, evaluation window, quantile/distribution definition, calibration status and benchmark. Do not overload a field called confidence with a Sharpe transformation.
 
 For events additionally include source-document IDs, exact event dates, relationship state, formula ID, factor direction, factor inputs and acceptance decision.
