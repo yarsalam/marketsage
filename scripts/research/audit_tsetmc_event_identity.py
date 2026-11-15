@@ -23,6 +23,11 @@ BASE = Path("data/market-research/iran-equities/adjustment-evidence")
 
 
 def norm(value: Any) -> str:
+    if isinstance(value, float):
+        raise ValueError(
+            "InsCode was decoded as float; precision may already be lost. "
+            "Read the raw decimal JSON token or parse it as an arbitrary-precision integer."
+        )
     return str(value or "").strip().replace("ي", "ی").replace("ك", "ک")
 
 
@@ -123,6 +128,7 @@ def audit_symbol(repo_root: Path, symbol: str) -> dict[str, Any]:
         "share_change": shares,
         "overall_status": overall,
         "policy": "Only exact ticker record primary InsCode is accepted automatically; insCode2/3/4 are never assumed aliases.",
+        "numeric_precision_note": "Python json integer parsing preserves arbitrary-precision InsCode values. JavaScript Number cannot exactly represent integers above 2^53-1; use decimal strings or BigInt and never coerce InsCode to Number.",
     }
 
 
@@ -131,6 +137,7 @@ def audit_all(repo_root: Path) -> dict[str, Any]:
         "audit_version": "1.0.0",
         "repository_path": str(BASE),
         "symbol_count": len(SYMBOLS),
+        "numeric_precision_note": "InsCode is a decimal identifier, not a quantity. Values above 2^53-1 must be carried as strings or BigInt in JavaScript and as text/64-bit exact integers in storage.",
         "symbols": {symbol: audit_symbol(repo_root, symbol) for symbol in SYMBOLS},
         "summary": {
             "matched_primary_symbols": 0,
