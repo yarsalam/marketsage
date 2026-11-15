@@ -275,3 +275,61 @@ This section supersedes earlier status snapshots where they conflict with the li
 - Acceptance test: re-fetch both governance files after writing and verify the new audit marker, exact main/PR heads, issue states and owner-gate links.
 - Stop condition: do not dispatch/rerun any workflow or claim exact-head CI success for the documentation commits. The new PR #74 head remains unvalidated until the owner separately authorizes one bounded hosted run.
 - Issue #49 remains OPEN / NOT COMPLETE / NOT 24/7 READY. Independent persistent host, independent observer/alert, worker-loss/restart recovery, backup/restore drill, second real provider, end-to-end canary and a 24-hour observation window remain unproven.
+
+
+## Live infrastructure audit — 2026-11-15 14:47 UTC
+
+This section supersedes prior audit snapshots for live GitHub facts. Historical entries are retained as history, not as current evidence.
+
+### Repository, main, and protection
+- Live repository metadata: default branch `main`; visibility `public` (`private=false`). Issue #53 records the earlier zero-additional-spend public-repository decision, while the current owner request calls the repository private. No visibility change was made. Treat all repository contents and history as public.
+- Main HEAD remains `4c4b032196137af4658ea2c28e38a21605ee923b`, commit time `2026-11-07T19:55:51Z`.
+- Active ruleset #26789479 targets `refs/heads/main`: PR required, **one approving review**, seven required contexts (`analysis`, `user-backend`, `user-frontend`, `admin-workspace`, `production-images`, `Test provider-neutral control plane`, `Test CI automation helpers`), deletion and non-fast-forward blocked, strict status freshness disabled, stale approvals not dismissed, no bypass actors; the API reports `current_user_can_bypass=never`. The legacy branch-protection endpoint returned 403, so this is a live ruleset read, not a branch-protection read.
+- The main `.github/workflows/ci.yml` remains the pre-freeze workflow: push on main/deploy/research/ci/infra branches, PR targets main/deploy/infra, daily schedule `17 3 * * *`, and workflow_dispatch. Workflow permissions default to `contents: read`; issue-write and pull-request-read permissions are job-scoped. Same-ref concurrency cancels superseded CI; jobs have bounded timeouts; no workflow retry policy is defined. The failure notifier runs on the same GitHub-hosted runner pool and cannot report a pool-wide outage independently.
+- Latest observed default-branch scheduled run: [#43706919338](https://github.com/yarsalam/marketsage/actions/runs/43706919338), event `schedule`, main SHA above, created `2026-11-15T11:01:57Z`, completed `11:03:41Z`, success. It ran analysis/research-backtest, backend, frontend, admin, and production-image jobs successfully. It started 7h44m57s after the configured 03:17 UTC cron. This is ordinary scheduled CI, not a worker canary, and proves the product/research freeze is **not active on main**.
+- Main contains four workflow files: `ci.yml` and three manual-only local TSETMC workflows. The local workflows remain workflow_dispatch-only, owner-confirmed, and were not dispatched.
+
+### Active infrastructure branches
+- PR #74 remains Draft/open, base main, head `52e8191e58306c15a0073da0148cf155c0fcf384`, API mergeable=true, but its exact HEAD has **zero check runs**. Its `.github/workflows/ci.yml` blob is `27c7378d9e4e64456403a98d9e3fe57029b808eb`; it classifies scope fail-closed, preserves required context names, makes the scheduled path infrastructure-only, skips product jobs for allowlisted infrastructure changes, and fails closed for other scopes. This freeze exists only on PR #74's branch and is not active on main.
+- PR #71 remains Draft/open, base PR #74, head `e630517c7e2916ed58b7568b0ebbbf1d390b86ce`, API mergeable=false, with **zero exact-head check runs**. Compare against current PR #74 base: 117 ahead / 6 behind, diverged, merge base `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`. PR #71 contains the worker/outbox/watchdog implementation, so no duplicate implementation was started. Reconciliation and exact-head validation remain blocked; do not merge.
+- PR #54 is closed, Draft, unmerged at `e8f7d8add3df577120b92b8927c590aece001509`. Issue #55 records 16/16 owner-run SQLite tests on that exact SHA; the earlier 11/11 result applies only to its prior head. Compared with current PR #74 base, the SQLite branch is diverged: 8 ahead / 50 behind, merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`. No GitHub checks exist for that SHA. Keep it closed/unmerged; do not transfer the owner-run result to another commit.
+
+### Scope-hold and current queued run
+- PR #82 is Draft/open, research-only, current head `1cdeb07f10d1b5bbc56ff519d50835cff8c0aa6e`. It advanced after the existing Goal 1 scope-hold comment. Its current exact head has successful MarketSage CI Push run [#43715142643](https://github.com/yarsalam/marketsage/actions/runs/43715142643) and PR run [#43715149785](https://github.com/yarsalam/marketsage/actions/runs/43715149785); both ran analysis, backend, frontend, admin, and production-image jobs. This is out-of-scope activity, not approval. The existing hold remains in force; no research work was performed by this audit.
+- Separate Iran Equity Evidence Integrity run [#43715149800](https://github.com/yarsalam/marketsage/actions/runs/43715149800) is still queued for job `historical-market-state`; its job record has no steps, while the independent `integrity` job completed successfully. At this audit time the queued run is over two hours old. Record it as a stale/queued-run observation only; it is **not** a code failure, and no runner-loss conclusion can be drawn from the available job record.
+
+### Open PR inventory and exact-head checks
+The 15 open PRs were read from GitHub. Check counts below are GitHub Check Runs on each exact current head (duplicate contexts from separate push/PR events are counted separately):
+
+| PR | State | Draft | Base | Exact head | Mergeable | Exact-head checks |
+|---|---|---:|---|---|---:|---|
+| #82 | open | yes | main | `1cdeb07f10d1b5bbc56ff519d50835cff8c0aa6e` | yes | 20: 14 success, 4 skipped, 1 queued, 1 cancelled |
+| #81 | open | yes | main | `8d49042b520b78a877a5032bb9cf2e6f45e6169e` | yes | 17; success/skipped only |
+| #80 | open | yes | main | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | yes | 8: 6 success, 2 skipped |
+| #79 | open | yes | main | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | yes | 8: 6 success, 2 skipped |
+| #78 | open | yes | main | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | yes | 10: 8 success, 2 skipped |
+| #77 | open | yes | main | `67356939f65224a580c915fd2caa0ea52d8d09a9` | yes | 8: 6 success, 2 skipped |
+| #74 | open | yes | main | `52e8191e58306c15a0073da0148cf155c0fcf384` | yes | 0 |
+| #73 | open | yes | main | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | yes | 16: 12 success, 4 skipped |
+| #71 | open | yes | PR #74 | `e630517c7e2916ed58b7568b0ebbbf1d390b86ce` | no | 0 |
+| #62 | open | no | main | `54fbf4a364a91b4e8d834fdcec0245d079440982` | yes | 8: 6 success, 2 skipped |
+| #61 | open | yes | PR #74 | `25ce24283e35dd7e55eb8545c590a047606643ee` | no | 0 |
+| #51 | open | no | PR #6 | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | yes | 10: all success |
+| #41 | open | no | main | `162692f1a377ec8445ed958db4cc1171d4cafc47` | yes | 5: all success |
+| #8 | open | no | PR #? (fix/gdelt-fred-tindex-current-docs) | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | yes | 6: 5 success, 1 failed (`tsetmc-smoke`); remains parked |
+| #6 | open | no | main | `1d90726c593b0818982407c309ff13301798f5b3` | no | 15: all success; **never merge without separate explicit owner approval** |
+
+PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known TSETMC ConnectTimeout must not be repeated from the same environment.
+
+### Owner gates, limitations, and stop condition
+- Issue #49 remains open and is the hard gate. Existing owner action: confirm the public/private visibility intent; existing owner action: explicitly authorize one bounded exact-head hosted validation only when ready. No hosted workflow was dispatched or rerun.
+- Issue #52 remains open for the five Chabokan wheel hashes; prior Chabokan-only 30/30 install/test evidence is not repeated.
+- Issue #53 is closed on the public/zero-additional-spend decision. No spending-cap increase or paid resource is authorized.
+- Issue #55 is closed with 16/16 SQLite tests on the exact SHA above; this does not resolve branch divergence or operational acceptance.
+- Issue #59 remains open for orchestration acceptance.
+- Branch-protection API access returned 403; the live Ruleset API was readable. No secret inventory, billing metadata, or runner inventory was accessed.
+- No independent persistent server runner, second live backend, off-host observer/alert failure domain, real worker-loss/restart drill, off-host restore drill, end-to-end canary, or 24-hour observation is established. No 24/7 claim is permitted.
+- **BLOCKED:** exact-head hosted validation of PR #74/#71 requires explicit owner authorization. PR #71 base reconciliation has no safe repository-only operation available through the current connected surface; no local checkout or local execution is claimed. Continue only independent repository-only infrastructure work.
+- No hosted/local dispatch or rerun, merge, auto-merge, release, deployment, provider registration, secret creation, spending, visibility change, or product/data/investment work occurred.
+
+**Goal 1 / Issue #49: OPEN / NOT COMPLETE / NOT 24/7 READY.**
