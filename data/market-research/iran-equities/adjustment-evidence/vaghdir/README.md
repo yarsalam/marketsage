@@ -23,6 +23,6 @@ Local evidence root: `/home/nima/marketsage-data/tsetmc-three-adjusted`
 ## Rule
 No historical series is approved for this symbol by this folder. Keep each event's provider ratio, terms-based ratio, effective date and relationship status in separate fields.
 
-## Newly verified event-feed identity issue
+## Event-feed identity verification — 2026-11-15
 
-The exact ticker record has primary InsCode 26014913469567886. Its 25 price-adjust rows use InsCode 26014913469567890, which is not present in the exact record's primary or insCode2/3/4 fields. Those price-adjust rows are retained but identity-quarantined. The 7 share-change rows use the primary InsCode. No alias is inferred and no provider price-adjust factor is accepted from this match alone.
+The exact ticker record has primary InsCode 26014913469567886. All 25 raw JSON price-adjust rows and all 7 share-change rows contain this exact decimal token. A prior apparent mismatch was caused by parsing the large InsCode as a JavaScript Number, which rounded it. The raw source file was correct; no price-adjust rows require identity quarantine. Keep InsCode values as strings or BigInt in JavaScript clients.
