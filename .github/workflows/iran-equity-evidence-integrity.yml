@@ -6,6 +6,10 @@ on:
     paths:
       - "data/market-research/iran-equities/adjustment-evidence/**"
       - "scripts/research/import_iran_equity_evidence.py"
+      - "scripts/research/audit_tsetmc_event_identity.py"
+      - "scripts/research/test_audit_tsetmc_event_identity.py"
+      - "scripts/research/audit_tsetmc_daily_history.py"
+      - "scripts/research/test_audit_tsetmc_daily_history.py"
       - ".github/workflows/iran-equity-evidence-integrity.yml"
   push:
     branches: ["research/**"]
