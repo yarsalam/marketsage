@@ -86,7 +86,4 @@ The event-feed InsCode is checked against the exact ticker record's primary InsC
 
 ## Instrument identity audit update — 2026-11-15
 
-The feed-level identifier audit found unresolved price-adjust InsCode mismatches for وغدیر and پارسیان. Their event rows remain quarantined; related/legacy identifiers are not assumed aliases. فولاد's two TSETMC event feeds match its exact ticker record primary InsCode. See _shared/identity_integrity/tsetmc_event_feed_identity_audit_2026-11-15.json and the per-symbol source-register/README updates.
-
-
-**Checksum scope:** `SHA256SUMS.txt` contains exactly the immutable imported payloads in `import_manifest.json`. Editable README, identity and source-register metadata are reviewed through Git commits and are not part of that immutable source-payload checksum list. The CI verifier requires the checksum list to match the manifest exactly.
+The exact decimal InsCode tokens in all six event feeds (price-adjust and share-change for three pilots) match the exact primary InsCode in each symbol's instrument-search record: 25+7 rows for وغدیر, 23+12 for فولاد, and 18+9 for پارسیان. An earlier apparent mismatch was caused by JavaScript Number precision loss, not a different instrument ID. Preserve all InsCode values as strings or BigInt in JavaScript and API contracts. See _shared/identity_integrity/tsetmc_event_feed_identity_audit_2026-11-15.json.
