@@ -191,19 +191,28 @@ class Importer:
             raise RuntimeError(
                 f"{symbol}: primary InsCode mismatch; expected {expected}, found {primary}"
             )
+        # JSON numeric identifiers are exact in Python, but may be rounded by
+        # JavaScript consumers. Store every InsCode in identity.json as a decimal string.
+        exact_record = dict(record)
+        for identifier_field in ("insCode", "insCode2", "insCode3", "insCode4", "instrumentID"):
+            if exact_record.get(identifier_field) is not None:
+                exact_record[identifier_field] = str(exact_record[identifier_field])
+        related_ids = {
+            key: str(record[key]) for key in ("insCode2", "insCode3", "insCode4")
+            if record.get(key) is not None
+        }
         return {
             "symbol": symbol,
             "ticker": ticker,
             "issuer_or_instrument_name": record.get("lVal30"),
             "primary_insCode": primary,
             "cIsin": record.get("cIsin"),
-            "instrumentID": record.get("instrumentID"),
-            "related_ids": {
-                key: record.get(key) for key in ("insCode2", "insCode3", "insCode4")
-            },
+            "instrumentID": str(record["instrumentID"]) if record.get("instrumentID") is not None else None,
+            "related_ids": related_ids,
             "related_id_status": "unverified_aliases_not_used_for_matching",
+            "numeric_identifier_policy": "All InsCode values are decimal strings; never coerce to JavaScript Number because precision can be lost above 2^53-1.",
             "identity_source": f"raw_provider_snapshots/{symbol}_instrument_search.json",
-            "exact_ticker_record": record,
+            "exact_ticker_record": exact_record,
             "identity_checked_at_utc": utc_now(),
         }
 
