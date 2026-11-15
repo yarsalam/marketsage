@@ -22,6 +22,6 @@ Local evidence root: `/home/nima/marketsage-data/tsetmc-three-adjusted`
 
 No factor or adjusted interval is accepted. Reconcile raw hashes, exact row identifiers, original CODAL terms and official chart fields before calculation.
 
-## Newly verified event-feed identity status
+## Event-feed identity verification — 2026-11-15
 
-The exact ticker record has primary InsCode 46348559193224090. All 23 price-adjust rows and 12 share-change rows use this primary InsCode. This resolves this feed-level identifier check only; it does not prove event terms, first affected sessions or adjustment factors.
+The exact ticker record has primary InsCode 46348559193224090. All 23 raw JSON price-adjust rows and all 12 share-change rows contain this exact decimal token. This verifies feed-level identity only; issuer terms, first affected sessions and adjustment factors still require independent evidence. Keep InsCode values as strings or BigInt in JavaScript clients.
