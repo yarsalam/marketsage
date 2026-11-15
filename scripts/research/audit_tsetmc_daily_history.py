@@ -139,13 +139,39 @@ def summarize_symbol(repo_root: Path, symbol: str) -> dict[str, Any]:
     date_counts = Counter(date for date, _ in parsed_dates)
     duplicate_date_rows = sum(count - 1 for count in date_counts.values() if count > 1)
     unique_dates = sorted(date_counts)
-    gaps = [
-        (unique_dates[index] - unique_dates[index - 1]).days
-        for index in range(1, len(unique_dates))
-    ]
+    gap_intervals = []
+    gaps = []
+    for index in range(1, len(unique_dates)):
+        delta = (unique_dates[index] - unique_dates[index - 1]).days
+        gaps.append(delta)
+        if delta >= 5:
+            gap_intervals.append({
+                "previous_observation": unique_dates[index - 1].strftime("%Y-%m-%d"),
+                "next_observation": unique_dates[index].strftime("%Y-%m-%d"),
+                "calendar_days_between_observations": delta,
+                "calendar_days_without_observation": max(0, delta - 1),
+            })
+    gap_intervals.sort(key=lambda item: item["calendar_days_between_observations"], reverse=True)
     largest_gaps = sorted(gaps, reverse=True)[:10]
 
     fields = {field: summarize_field(rows, field) for field in FIELDS if any(field in row for row in rows)}
+    zero_activity_samples = []
+    for row in rows:
+        volume = str(row.get("qTotTran5J") or "").strip()
+        trade_count = str(row.get("zTotTran") or "").strip()
+        if volume in {"0", "0.0"} or trade_count in {"0", "0.0"}:
+            zero_activity_samples.append({
+                "dEven": row.get("dEven"),
+                "pClosing": row.get("pClosing"),
+                "pDrCotVal": row.get("pDrCotVal"),
+                "priceYesterday": row.get("priceYesterday"),
+                "qTotTran5J": row.get("qTotTran5J"),
+                "zTotTran": row.get("zTotTran"),
+                "qTotCap": row.get("qTotCap"),
+            })
+            if len(zero_activity_samples) >= 20:
+                break
+
     zero_volume_rows = sum(
         1 for row in rows
         if row.get("qTotTran5J") is not None and str(row.get("qTotTran5J")).strip() in {"0", "0.0"}
@@ -176,6 +202,8 @@ def summarize_symbol(repo_root: Path, symbol: str) -> dict[str, Any]:
             for index in range(len(parsed_dates) - 1)
         ),
         "largest_calendar_day_gaps_diagnostic_only": largest_gaps,
+        "gap_intervals_ge_5_calendar_days": gap_intervals[:30],
+        "zero_activity_sample_records_first_20": zero_activity_samples,
         "primary_insCode": expected["primary_inscode"],
         "insCode_row_counts": dict(id_counts),
         "primary_id_match_rows": id_counts.get(expected["primary_inscode"], 0),
