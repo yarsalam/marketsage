@@ -55,7 +55,7 @@ The secondary BourseEye annual history for 1385 describes 86 recorded trading da
 
 The start row corresponds to 30 Dey 1386 and the first post-gap row to 31 Ordibehesht 1387. BourseEye's secondary yearly history says its Vaghdir page has 106 recorded trading days from 18 Farvardin to 30 Dey 1386 and 150 from 31 Ordibehesht to 28 Esfand 1387. The secondary source therefore independently shows the same broad coverage boundary. It still does not establish why Vaghdir has no archived observations in between.
 
-The same closing value (1,644) on the two endpoints must not be interpreted as proof that the security was continuously tradable or that the period had zero economic return. It is only the equality of two observed endpoint fields separated by 121 calendar days.
+A cross-symbol check shows 73 non-zero-volume Foolad chart observations inside this exact Vaghdir gap, from 2008-01-29 through 2008-05-20. This rules out a blanket Tehran market closure as an explanation for the entire Vaghdir non-observation. It does not distinguish a Vaghdir-specific suspension from an illiquid/no-execution interval or a provider-coverage omission.\n\nThe same closing value (1,644) on the two endpoints must not be interpreted as proof that the security was continuously tradable or that the period had zero economic return. It is only the equality of two observed endpoint fields separated by 121 calendar days.
 
 **Classification:** `UNRESOLVED_SYMBOL_LEVEL_NON_OBSERVATION_OR_SOURCE_COVERAGE`  
 **Not established:** suspension/reopening chronology, official reason, issuer disclosure, market-wide closure or war-related cause.
