@@ -53,7 +53,9 @@ jobs:
         run: python -m unittest -v test_audit_tsetmc_event_identity.py
 
   historical-market-state:
-    runs-on: ubuntu-latest
+    # TSETMC/CODAL legacy endpoints may be network-restricted outside Iran.
+    # This job performs only read-only GET requests from the repository's registered local runner.
+    runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 4
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
