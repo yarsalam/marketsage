@@ -157,8 +157,10 @@ def summarize_symbol(repo_root: Path, symbol: str) -> dict[str, Any]:
     fields = {field: summarize_field(rows, field) for field in FIELDS if any(field in row for row in rows)}
     zero_activity_samples = []
     for row in rows:
-        volume = str(row.get("qTotTran5J") or "").strip()
-        trade_count = str(row.get("zTotTran") or "").strip()
+        volume_value = row.get("qTotTran5J")
+        trade_count_value = row.get("zTotTran")
+        volume = str(volume_value).strip() if volume_value is not None else ""
+        trade_count = str(trade_count_value).strip() if trade_count_value is not None else ""
         if volume in {"0", "0.0"} or trade_count in {"0", "0.0"}:
             zero_activity_samples.append({
                 "dEven": row.get("dEven"),
