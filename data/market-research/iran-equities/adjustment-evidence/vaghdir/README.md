@@ -22,3 +22,7 @@ Local evidence root: `/home/nima/marketsage-data/tsetmc-three-adjusted`
 
 ## Rule
 No historical series is approved for this symbol by this folder. Keep each event's provider ratio, terms-based ratio, effective date and relationship status in separate fields.
+
+## Newly verified event-feed identity issue
+
+The exact ticker record has primary InsCode 26014913469567886. Its 25 price-adjust rows use InsCode 26014913469567890, which is not present in the exact record's primary or insCode2/3/4 fields. Those price-adjust rows are retained but identity-quarantined. The 7 share-change rows use the primary InsCode. No alias is inferred and no provider price-adjust factor is accepted from this match alone.
