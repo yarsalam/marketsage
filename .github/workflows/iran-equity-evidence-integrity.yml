@@ -35,3 +35,8 @@ jobs:
         run: python -m py_compile scripts/research/import_iran_equity_evidence.py
       - name: Verify imported evidence and SHA-256 manifest
         run: python scripts/research/import_iran_equity_evidence.py --verify-existing --repo-root .
+      - name: Audit TSETMC event-feed instrument identities
+        run: python scripts/research/audit_tsetmc_event_identity.py --repo-root .
+      - name: Test TSETMC event-feed identity audit
+        working-directory: scripts/research
+        run: python -m unittest -v test_audit_tsetmc_event_identity.py
