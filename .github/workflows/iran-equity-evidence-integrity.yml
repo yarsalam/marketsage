@@ -37,6 +37,11 @@ jobs:
         run: python scripts/research/import_iran_equity_evidence.py --verify-existing --repo-root .
       - name: Audit TSETMC event-feed instrument identities
         run: python scripts/research/audit_tsetmc_event_identity.py --repo-root .
+      - name: Audit imported TSETMC daily history
+        run: python scripts/research/audit_tsetmc_daily_history.py --repo-root .
+      - name: Test TSETMC daily history audit helpers
+        working-directory: scripts/research
+        run: python -m unittest -v test_audit_tsetmc_daily_history.py
       - name: Test TSETMC event-feed identity audit
         working-directory: scripts/research
         run: python -m unittest -v test_audit_tsetmc_event_identity.py
