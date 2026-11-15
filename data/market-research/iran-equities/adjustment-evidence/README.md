@@ -79,6 +79,8 @@ The research branch now defines the cross-symbol workflow and ten-tab release ga
 
 The full Iranian instrument count remains unknown until a complete, permissioned, as-of instrument-master snapshot has been imported and deduplicated by canonical instrument identity. The three folders here are pilot instruments, not the full market universe.
 
+The imported daily-history audit is implemented in `scripts/research/audit_tsetmc_daily_history.py` and runs in the evidence-integrity workflow. It is read-only and reports raw row/date/field quality; it does not fill gaps or adjust prices. Its date-gap outputs are diagnostic until joined to an authoritative session/closure calendar.
+
 ## TSETMC event-feed identity audit
 
 The event-feed InsCode is checked against the exact ticker record's primary InsCode. Related fields insCode2/3/4 are reported but are not automatically treated as aliases. A mismatched feed ID remains unresolved until source/identity history proves the relationship.
