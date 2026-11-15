@@ -82,3 +82,8 @@ The full Iranian instrument count remains unknown until a complete, permissioned
 ## TSETMC event-feed identity audit
 
 The event-feed InsCode is checked against the exact ticker record's primary InsCode. Related fields insCode2/3/4 are reported but are not automatically treated as aliases. A mismatched feed ID remains unresolved until source/identity history proves the relationship.
+
+
+## Instrument identity audit update — 2026-11-15
+
+The feed-level identifier audit found unresolved price-adjust InsCode mismatches for وغدیر and پارسیان. Their event rows remain quarantined; related/legacy identifiers are not assumed aliases. فولاد's two TSETMC event feeds match its exact ticker record primary InsCode. See _shared/identity_integrity/tsetmc_event_feed_identity_audit_2026-11-15.json and the per-symbol source-register/README updates.
