@@ -120,9 +120,9 @@ The imported daily raw files' SHA-256 digests are recorded in each symbol's `sou
 
 ### External historical locators (secondary; not status authority)
 
-- BourseEye, Vaghdir 1385 history: https://bourseeye.com/stocks/137/%D9%88%D8%BA%D8%AF%DB%8C%D8%B1-%D8%B3%D8%B1%D9%85%D8%A7%DB%8C%D9%87-%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D9%87%D9%84%D8%AF%DB%8C%D9%86%DA%AF/history?year=1385
-- BourseEye, Vaghdir 1386 history: https://bourseeye.com/stocks/137/%D9%88%D8%BA%D8%AF%DB%8C%D8%B1-%D8%B3%D8%B1%D9%85%D8%A7%DB%8C%D9%87-%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D9%87%D9%84%D8%AF%DB%8C%D9%86%DA%AF/history?year=1386
-- BourseEye, Vaghdir 1387 history: https://bourseeye.com/stocks/137/%D9%88%D8%BA%D8%AF%DB%8C%D8%B1-%D8%B3%D8%B1%D9%85%D8%A7%DB%8C%D9%87-%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D9%87%D9%84%D8%AF%DB%8C%D9%86%DA%AF/history?year=1387
+- BourseEye, Vaghdir 1385 history: https://bourseeye.com/stocks/137/%D9%88%D8%BA%D8%AF%DB%8C%D8%B1-%D8%B3%D8%B1%D9%85%D8%A7%DB%8C%D9%87-%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D8%BA%D8%AF%DB%8C%D8%B1-%D9%87%D9%84%D8%AF%DB%8C%D9%86%DA%AF/history?year=1385
+- BourseEye, Vaghdir 1386 history: https://bourseeye.com/stocks/137/%D9%88%D8%BA%D8%AF%DB%8C%D8%B1-%D8%B3%D8%B1%D9%85%D8%A7%DB%8C%D9%87-%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D8%BA%D8%AF%DB%8C%D8%B1-%D9%87%D9%84%D8%AF%DB%8C%D9%86%DA%AF/history?year=1386
+- BourseEye, Vaghdir 1387 history: https://bourseeye.com/stocks/137/%D9%88%D8%BA%D8%AF%DB%8C%D8%B1-%D8%B3%D8%B1%D9%85%D8%A7%DB%8C%D9%87-%DA%AF%D8%B0%D8%A7%D8%B1%DB%8C-%D8%BA%D8%AF%DB%8C%D8%B1-%D9%87%D9%84%D8%AF%DB%8C%D9%86%DA%AF/history?year=1387
 - Contemporary secondary page, 28 Shahrivar 1387: https://tseblog.blogfa.com/1387/06 (contains the Foolad stop-date statement; contradicted by the later 13 September raw-chart trade row).
 
 ## 7. Required next evidence and processing steps
