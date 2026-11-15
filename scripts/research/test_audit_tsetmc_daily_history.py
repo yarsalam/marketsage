@@ -35,6 +35,7 @@ class DailyHistoryHelpersTests(unittest.TestCase):
             self.assertEqual(report["symbols"]["vaghdir"]["duplicate_date_extra_rows"], 1)
             self.assertEqual(report["symbols"]["vaghdir"]["zero_volume_rows_qTotTran5J"], 2)
             self.assertEqual(report["symbols"]["vaghdir"]["zero_trade_count_rows_zTotTran"], 2)
+            self.assertEqual(len(report["symbols"]["vaghdir"]["zero_activity_sample_records_first_20"]), 2)
             self.assertEqual(
                 report["symbols"]["vaghdir"]["fields"]["qTotCap"]["max"],
                 "100000000000000001"
