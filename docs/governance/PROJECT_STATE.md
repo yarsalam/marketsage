@@ -316,7 +316,7 @@ The 15 open PRs were read from GitHub. Check counts below are GitHub Check Runs 
 | #61 | open | yes | PR #74 | `25ce24283e35dd7e55eb8545c590a047606643ee` | no | 0 |
 | #51 | open | no | PR #6 | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | yes | 10: all success |
 | #41 | open | no | main | `162692f1a377ec8445ed958db4cc1171d4cafc47` | yes | 5: all success |
-| #8 | open | no | PR #? (fix/gdelt-fred-tindex-current-docs) | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | yes | 6: 5 success, 1 failed (`tsetmc-smoke`); remains parked |
+| #8 | open | no | fix/gdelt-fred-tindex-current-docs | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | yes | 6: 5 success, 1 failed (`tsetmc-smoke`); remains parked |
 | #6 | open | no | main | `1d90726c593b0818982407c309ff13301798f5b3` | no | 15: all success; **never merge without separate explicit owner approval** |
 
 PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known TSETMC ConnectTimeout must not be repeated from the same environment.
