@@ -333,10 +333,12 @@ class Importer:
         }
         write_json(self.destination / "import_manifest.json", manifest)
 
-        sums = []
-        for item in sorted(self.destination.rglob("*")):
-            if item.is_file() and item.name != "SHA256SUMS.txt":
-                sums.append(f"{sha256_file(item)}  {item.relative_to(self.destination)}")
+        # SHA256SUMS tracks only immutable imported payloads listed in the manifest.
+        # Editable README/source-register/identity metadata is versioned by Git itself.
+        sums = [
+            f"{entry['stored_sha256']}  {entry['destination_relative']}"
+            for entry in sorted(self.entries, key=lambda entry: entry["destination_relative"])
+        ]
         (self.destination / "SHA256SUMS.txt").write_text("\n".join(sums) + "\n", encoding="utf-8")
 
         print("IMPORT COMPLETE")
@@ -365,7 +367,12 @@ def verify_existing(repo_root: Path) -> int:
         if sha256_file(target) != entry["stored_sha256"]:
             errors.append(f"hash mismatch: {entry['destination_relative']}")
     sums_path = bundle / "SHA256SUMS.txt"
+    manifest_hashes = {
+        entry["destination_relative"]: entry["stored_sha256"]
+        for entry in manifest.get("files", [])
+    }
     if sums_path.is_file():
+        checksum_hashes = {}
         for line_number, line in enumerate(sums_path.read_text(encoding="utf-8").splitlines(), start=1):
             if not line.strip():
                 continue
@@ -374,11 +381,11 @@ def verify_existing(repo_root: Path) -> int:
             except ValueError:
                 errors.append(f"malformed SHA256SUMS.txt line {line_number}")
                 continue
-            target = bundle / relative_path
-            if not target.is_file():
-                errors.append(f"checksum target missing: {relative_path}")
-            elif sha256_file(target) != expected_hash:
-                errors.append(f"checksum mismatch: {relative_path}")
+            if relative_path in checksum_hashes:
+                errors.append(f"duplicate checksum path: {relative_path}")
+            checksum_hashes[relative_path] = expected_hash
+        if checksum_hashes != manifest_hashes:
+            errors.append("SHA256SUMS.txt does not exactly match immutable manifest entries")
     else:
         errors.append("missing SHA256SUMS.txt")
     for symbol, expected in SYMBOLS.items():
