@@ -93,6 +93,8 @@ For every instrument and ingestion run, record:
 
 Resolve identity continuity before matching events. Do not treat insCode2/3/4 as aliases unless their historical continuity is demonstrated by source records, ISIN/issuer evidence and date-valid security-master history.
 
+**Identifier precision:** TSETMC InsCode is an opaque identifier, not a numeric quantity. Preserve it as a decimal string in JSON/API/CSV and as `TEXT`/string in TypeScript and database access layers. JavaScript `Number` is exact only through 2^53−1 (9,007,199,254,740,991); larger integer JSON tokens can be rounded by `JSON.parse`. Use strings or `BigInt` and never compare InsCodes after coercing them to `Number`. Python's JSON integer parsing preserves arbitrary-precision integers, but serialized cross-language contracts should still use strings. See MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER and https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt.
+
 ### Stage 1 — Search for existing adjusted histories and documented methodologies
 
 For every symbol:
