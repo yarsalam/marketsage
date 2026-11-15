@@ -1,8 +1,12 @@
 {
-  "audit_version": "1.0.0",
-  "observed_from": "transferred raw TSETMC snapshots and exact instrument_search records",
-  "date": "2026-11-15",
-  "policy": "No related InsCode is assumed to be an alias. Event rows not matching the exact ticker record primary InsCode remain unresolved until source/identity history proves the link.",
+  "audit_version": "1.1.0",
+  "observed_from": "literal decimal tokens in the imported raw TSETMC JSON files; checked without JavaScript Number parsing",
+  "audit_date": "2026-11-15",
+  "method": {
+    "raw_token_match": "Compare the exact decimal token after the JSON key insCode with the exact primary InsCode string in the instrument identity record.",
+    "numeric_precision": "All InsCode values in this pilot exceed JavaScript Number.MAX_SAFE_INTEGER (2^53-1). JavaScript Number parsing can round them. Preserve IDs as decimal strings or BigInt. Python json.loads parses JSON integer tokens into arbitrary-precision int and preserves these values.",
+    "aliases": "insCode2/3/4 are retained as related identifiers and are not needed to explain these three feed matches."
+  },
   "symbols": {
     "vaghdir": {
       "ticker": "وغدیر",
@@ -16,23 +20,23 @@
       "instrument_search_total_records": 41,
       "price_adjust": {
         "rows": 25,
-        "unique_insCodes": [
-          "26014913469567890"
+        "unique_raw_insCode_tokens": [
+          "26014913469567886"
         ],
-        "primary_match_rows": 0,
-        "unresolved_rows": 25,
-        "related_field_matches": 0,
-        "status": "unresolved_identifier_mismatch"
+        "primary_match_rows": 25,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
       },
       "share_change": {
         "rows": 7,
-        "unique_insCodes": [
+        "unique_raw_insCode_tokens": [
           "26014913469567886"
         ],
         "primary_match_rows": 7,
         "unresolved_rows": 0,
         "status": "matched_primary"
-      }
+      },
+      "previous_false_mismatch_explanation": "A JavaScript JSON.parse/Number inspection rounded 26014913469567886 to 26014913469567890. The raw GitHub file contains the exact primary decimal token in all 25 price-adjust rows."
     },
     "foolad": {
       "ticker": "فولاد",
@@ -46,7 +50,7 @@
       "instrument_search_total_records": 41,
       "price_adjust": {
         "rows": 23,
-        "unique_insCodes": [
+        "unique_raw_insCode_tokens": [
           "46348559193224090"
         ],
         "primary_match_rows": 23,
@@ -55,7 +59,7 @@
       },
       "share_change": {
         "rows": 12,
-        "unique_insCodes": [
+        "unique_raw_insCode_tokens": [
           "46348559193224090"
         ],
         "primary_match_rows": 12,
@@ -75,30 +79,38 @@
       "instrument_search_total_records": 41,
       "price_adjust": {
         "rows": 18,
-        "unique_insCodes": [
-          "9481703061634968"
+        "unique_raw_insCode_tokens": [
+          "9481703061634967"
         ],
-        "primary_match_rows": 0,
-        "unresolved_rows": 18,
-        "related_field_matches": 0,
-        "status": "unresolved_identifier_mismatch"
+        "primary_match_rows": 18,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
       },
       "share_change": {
         "rows": 9,
-        "unique_insCodes": [
+        "unique_raw_insCode_tokens": [
           "9481703061634967"
         ],
         "primary_match_rows": 9,
         "unresolved_rows": 0,
         "status": "matched_primary"
-      }
+      },
+      "previous_false_mismatch_explanation": "A JavaScript JSON.parse/Number inspection rounded 9481703061634967 to 9481703061634968. The raw GitHub file contains the exact primary decimal token in all 18 price-adjust rows."
     }
   },
+  "summary": {
+    "symbol_count": 3,
+    "symbols_with_price_adjust_feed_primary_match": 3,
+    "symbols_with_share_change_feed_primary_match": 3,
+    "unresolved_feed_identity_mismatches": 0,
+    "total_price_adjust_rows": 66,
+    "total_share_change_rows": 28,
+    "event_unique_count": "not assessed by this identity audit"
+  },
   "limitations": [
-    "Counts are source rows, not unique economic events.",
-    "This audit does not establish whether mismatching IDs are valid historical aliases.",
-    "Price-adjust rows for Vaghdir and Parsian must not yet be joined to their primary instrument identity.",
-    "No adjustment factor is approved by this identity audit."
+    "Counts are provider feed rows, not unique economic events.",
+    "Identity matching does not prove event terms, economic classification, first affected trading session, formula or factor.",
+    "This does not authorize use of an external adjusted series or approval of any adjusted interval."
   ],
   "source_hashes_sha256": {
     "vaghdir_instrument_search": "36874856886ce22dc2808e40145facf5a51a537b82b660ca8ac8e7ea185d8f06",
