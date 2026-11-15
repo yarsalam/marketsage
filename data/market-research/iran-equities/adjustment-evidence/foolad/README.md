@@ -21,3 +21,7 @@ Local evidence root: `/home/nima/marketsage-data/tsetmc-three-adjusted`
 - A public extractor notes a 2026-03-30 share-count change from 1.5T to 1.935T and suggests price-discontinuity inference. This is a discovery lead only; CODAL terms and effective session are required.
 
 No factor or adjusted interval is accepted. Reconcile raw hashes, exact row identifiers, original CODAL terms and official chart fields before calculation.
+
+## Newly verified event-feed identity status
+
+The exact ticker record has primary InsCode 46348559193224090. All 23 price-adjust rows and 12 share-change rows use this primary InsCode. This resolves this feed-level identifier check only; it does not prove event terms, first affected sessions or adjustment factors.
