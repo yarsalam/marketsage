@@ -19,3 +19,7 @@ Local evidence root: `/home/nima/marketsage-data/tsetmc-three-adjusted`
 - A prior diagnostic isolated at least one price-adjust-only candidate dated 2019, but the exact event terms, effective session and final factor must be read from the original raw payload and issuer documents before it is added as an event.
 
 No factor or adjusted interval is accepted. Preserve unresolved events and quarantine affected intervals.
+
+## Newly verified event-feed identity issue
+
+The exact ticker record has primary InsCode 9481703061634967. Its 18 price-adjust rows use InsCode 9481703061634968, which is not present in the exact record's primary or insCode2/3/4 fields. Those price-adjust rows are retained but identity-quarantined. The 9 share-change rows use the primary InsCode. No alias is inferred and no provider price-adjust factor is accepted from this match alone.
