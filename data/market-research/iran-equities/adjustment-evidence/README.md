@@ -69,3 +69,16 @@ The importer does not alter the source store. Review oversized-file reports befo
 ## Codespaces and automated checks
 
 The `.devcontainer/devcontainer.json` environment provides Python 3.12 for this research branch. No forwarded service port is needed for data-processing tests. The `Iran Equity Evidence Integrity` workflow verifies the importer and checks every imported file against its manifest on branch pushes and pull requests.
+
+
+## Research operating standards
+
+The research branch now defines the cross-symbol workflow and ten-tab release gates:
+- \`docs/research/MARKETSAGE_RESEARCH_OPERATING_STANDARD.md\`
+- \`docs/research/MARKETSAGE_TEN_TAB_PRODUCT_AND_API_ROADMAP.md\`
+
+The full Iranian instrument count remains unknown until a complete, permissioned, as-of instrument-master snapshot has been imported and deduplicated by canonical instrument identity. The three folders here are pilot instruments, not the full market universe.
+
+## TSETMC event-feed identity audit
+
+The event-feed InsCode is checked against the exact ticker record's primary InsCode. Related fields insCode2/3/4 are reported but are not automatically treated as aliases. A mismatched feed ID remains unresolved until source/identity history proves the relationship.
