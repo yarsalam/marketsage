@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from audit_tsetmc_event_identity import audit_symbol, feed_summary
+from audit_tsetmc_event_identity import audit_symbol, feed_summary, norm
 
 
 class FeedSummaryTests(unittest.TestCase):
@@ -26,6 +26,15 @@ class FeedSummaryTests(unittest.TestCase):
         self.assertEqual(result["status"], "unresolved_identifier_mismatch")
         self.assertEqual(result["related_field_match_counts_unverified"]["insCode2"], 1)
         self.assertFalse(result["related_ids_used_as_aliases"])
+
+    def test_python_json_preserves_large_inscode_integer(self):
+        parsed = json.loads('{"insCode": 9481703061634967}')
+        self.assertIsInstance(parsed["insCode"], int)
+        self.assertEqual(norm(parsed["insCode"]), "9481703061634967")
+
+    def test_float_inscode_is_rejected_as_potentially_lossy(self):
+        with self.assertRaisesRegex(ValueError, "decoded as float"):
+            norm(9481703061634968.0)
 
 
 class InstrumentAuditTests(unittest.TestCase):
