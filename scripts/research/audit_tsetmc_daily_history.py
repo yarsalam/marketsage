@@ -13,6 +13,7 @@ import json
 import statistics
 from collections import Counter
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -78,24 +79,24 @@ def date_value(row: dict[str, Any]) -> tuple[str | None, Any]:
 def summarize_field(rows: list[dict[str, Any]], field: str) -> dict[str, Any]:
     values = [row.get(field) for row in rows]
     present = [value for value in values if value is not None]
-    numeric: list[float] = []
+    numeric: list[Decimal] = []
     invalid_numeric = 0
     for value in present:
         try:
-            number = float(value)
-            if number != number or number in (float("inf"), float("-inf")):
+            number = Decimal(str(value).strip())
+            if not number.is_finite():
                 invalid_numeric += 1
             else:
                 numeric.append(number)
-        except (TypeError, ValueError, OverflowError):
+        except (TypeError, ValueError, InvalidOperation):
             invalid_numeric += 1
     return {
         "present": len(present),
         "missing": len(values) - len(present),
         "zero": sum(1 for value in present if str(value).strip() in {"0", "0.0"}),
         "invalid_numeric": invalid_numeric,
-        "min": min(numeric) if numeric else None,
-        "max": max(numeric) if numeric else None,
+        "min": str(min(numeric)) if numeric else None,
+        "max": str(max(numeric)) if numeric else None,
     }
 
 
@@ -145,11 +146,11 @@ def summarize_symbol(repo_root: Path, symbol: str) -> dict[str, Any]:
     largest_gaps = sorted(gaps, reverse=True)[:10]
 
     fields = {field: summarize_field(rows, field) for field in FIELDS if any(field in row for row in rows)}
-    trade_count_zero = sum(
+    zero_volume_rows = sum(
         1 for row in rows
         if row.get("qTotTran5J") is not None and str(row.get("qTotTran5J")).strip() in {"0", "0.0"}
     )
-    volume_zero = sum(
+    zero_trade_count_rows = sum(
         1 for row in rows
         if row.get("zTotTran") is not None and str(row.get("zTotTran")).strip() in {"0", "0.0"}
     )
@@ -180,8 +181,8 @@ def summarize_symbol(repo_root: Path, symbol: str) -> dict[str, Any]:
         "primary_id_match_rows": id_counts.get(expected["primary_inscode"], 0),
         "unmatched_id_rows": sum(count for code, count in id_counts.items() if code != expected["primary_inscode"]),
         "missing_id_rows": id_missing,
-        "zero_volume_rows_qTotTran5J": trade_count_zero,
-        "zero_trade_count_rows_zTotTran": volume_zero,
+        "zero_volume_rows_qTotTran5J": zero_volume_rows,
+        "zero_trade_count_rows_zTotTran": zero_trade_count_rows,
         "fields": fields,
         "first_record": first_record,
         "last_record": last_record,
