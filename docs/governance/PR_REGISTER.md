@@ -241,3 +241,46 @@ This inventory supersedes the 2026-11-13 inventory above. GitHub currently repor
 - No local dispatch, hosted dispatch/rerun, merge, auto-merge, release, deployment, provider registration, secret creation, spending, visibility change or product/data/investment work occurred.
 - This register is a live snapshot from the connected surfaces, not a complete Actions run-history export. Empty combined-status responses are not proof of success.
 
+
+
+## Live PR audit — 2026-11-15 14:47 UTC
+
+This snapshot supersedes older PR status rows above for current open/closed state, base/head, mergeability and exact-head checks. GitHub Check Run counts refer to the exact HEAD SHA and count duplicate contexts from separate events.
+
+| PR | State | Draft | Base | Head SHA | Mergeable | Exact-head Check Runs |
+|---|---|---:|---|---|---:|---|
+| [#82](https://github.com/yarsalam/marketsage/pull/82) | open | yes | main | `1cdeb07f10d1b5bbc56ff519d50835cff8c0aa6e` | yes | 20: 14 success, 4 skipped, 1 queued, 1 cancelled |
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | open | yes | main | `8d49042b520b78a877a5032bb9cf2e6f45e6169e` | yes | 17; success/skipped only |
+| [#80](https://github.com/yarsalam/marketsage/pull/80) | open | yes | main | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | yes | 8: 6 success, 2 skipped |
+| [#79](https://github.com/yarsalam/marketsage/pull/79) | open | yes | main | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | yes | 8: 6 success, 2 skipped |
+| [#78](https://github.com/yarsalam/marketsage/pull/78) | open | yes | main | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | yes | 10: 8 success, 2 skipped |
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | open | yes | main | `67356939f65224a580c915fd2caa0ea52d8d09a9` | yes | 8: 6 success, 2 skipped |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | open | yes | main | `52e8191e58306c15a0073da0148cf155c0fcf384` | yes | 0; no exact-head validation |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | open | yes | main | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | yes | 16: 12 success, 4 skipped |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | open | yes | PR #74 | `e630517c7e2916ed58b7568b0ebbbf1d390b86ce` | no | 0; 117 ahead / 6 behind current base |
+| [#62](https://github.com/yarsalam/marketsage/pull/62) | open | no | main | `54fbf4a364a91b4e8d834fdcec0245d079440982` | yes | 8: 6 success, 2 skipped |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | open | yes | PR #74 | `25ce24283e35dd7e55eb8545c590a047606643ee` | no | 0 |
+| [#51](https://github.com/yarsalam/marketsage/pull/51) | open | no | PR #6 | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | yes | 10: all success |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | open | no | main | `162692f1a377ec8445ed958db4cc1171d4cafc47` | yes | 5: all success |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | open | no | `fix/gdelt-fred-tindex-current-docs` | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | yes | 6: 5 success, 1 failed (`tsetmc-smoke`); parked |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | open | no | main | `1d90726c593b0818982407c309ff13301798f5b3` | no | 15: all success; do not merge without separate explicit owner approval |
+
+### Infrastructure PRs and related closed PR
+- [PR #74](https://github.com/yarsalam/marketsage/pull/74) is the existing infrastructure integration path. Its current head has no checks; the previous code-head results do not transfer.
+- [PR #71](https://github.com/yarsalam/marketsage/pull/71) contains the existing durable outbox/worker/watchdog work. It is based on #74 but diverged (117 ahead / 6 behind; merge base `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`) and has no exact-head checks. Do not create a duplicate worker/observer PR; do not merge.
+- [PR #54](https://github.com/yarsalam/marketsage/pull/54) is **closed, Draft, unmerged** at `e8f7d8add3df577120b92b8927c590aece001509`. Issue #55 records 16/16 owner-run tests on this exact SHA; prior 11/11 belongs to an earlier commit. The SQLite branch is 8 ahead / 50 behind #74, diverged from merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`; it has zero GitHub check runs. Keep closed/unmerged.
+- PR #14 is already integrated into #6; no repeat merge. PR #8 remains parked; do not repeat the known TSETMC timeout request.
+
+### Current run evidence relevant to Goal 1
+- Default-branch scheduled CI: [#43706919338](https://github.com/yarsalam/marketsage/actions/runs/43706919338), 2026-11-15, success on main `4c4b032196137af4658ea2c28e38a21605ee923b`; it executed analysis/research-backtest, backend, frontend, admin, and production-image jobs. It is not an infrastructure-only schedule.
+- PR #82 exact head `1cdeb07f10d1b5bbc56ff519d50835cff8c0aa6e`: MarketSage CI Push [#43715142643](https://github.com/yarsalam/marketsage/actions/runs/43715142643) and PR [#43715149785](https://github.com/yarsalam/marketsage/actions/runs/43715149785) succeeded, but ran out-of-scope product/research jobs. Separate Iran Equity Evidence Integrity run [#43715149800](https://github.com/yarsalam/marketsage/actions/runs/43715149800) remains queued for `historical-market-state` with no steps; record as queued/stale observation, not code failure.
+- The PR #82 Goal 1 scope hold was reaffirmed in comment [#6890753010](https://github.com/yarsalam/marketsage/pull/82#issuecomment-6890753010), but the branch advanced again afterwards. It remains Draft/open/unmerged; no research approval is implied.
+- Active main ruleset #26789479 currently reports one required approving review and seven required checks, no bypass actors, strict status freshness disabled, and stale-approval dismissal disabled. Legacy branch-protection read returned 403.
+
+### Owner actions and stop conditions
+- Issue #49 remains open. Existing owner actions: confirm the public/private visibility intent and separately authorize one bounded exact-head hosted validation when ready. No dispatch or rerun occurred.
+- Issue #52 remains open for five Chabokan wheel SHA-256 values; no repeated install/test.
+- Issue #53 is closed (public/zero-additional-spend decision). Issue #55 is closed (16/16 exact-head SQLite test only). Issue #59 remains open for orchestration acceptance.
+- No local/hosted dispatch or rerun, merge, auto-merge, release, deployment, provider registration, secret creation, spending, visibility change, or product/data/investment work occurred.
+
+**Issue #49: OPEN / NOT COMPLETE / NOT 24/7 READY.**
