@@ -10,6 +10,9 @@ from pathlib import PurePosixPath
 
 ALLOWED_EXACT = {
     ".github/workflows/ci.yml",
+    ".github/workflows/local-tsetmc-offline-acceptance.yml",
+    ".github/workflows/local-tsetmc-integrated-acceptance.yml",
+    ".github/workflows/local-tsetmc-sanitized-diagnostics.yml",
     ".github/scripts/classify_ci_scope.py",
     ".github/scripts/test_classify_ci_scope.py",
     "requirements-infra.txt",
