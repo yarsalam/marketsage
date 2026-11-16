@@ -421,3 +421,38 @@ Continue repository-only infrastructure work: audit the remaining execution entr
 
 - The canonical work item is now `IN_PROGRESS` (not merely `AUTHORIZED`); its status-note explicitly says the validator and tests are authored but not executed.
 - Work-item update commit: `b687b34b97dab8c472f67590be9bd81f08b6b4cf`.
+
+
+---
+
+## Fail-closed workflow preflight checkpoint — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Implementation head before this state update:** `c2ea4d03c02bbf8ea16879a0f9399f7236a0f060`  
+**Status:** IN PROGRESS / NOT ACCEPTED / NOT RUNTIME-VERIFIED
+
+### Changes authored and read back
+
+- Corrected `safety_gate.py` to accept the real 40-character Git commit SHA, permit the canonical work item while `IN_PROGRESS`, validate the execution policy's required fields/action allowlist, reject symlinked immutable artifact paths, and reject output paths that overlap immutable artifact paths in either direction.
+- Added `verify_immutable_artifact`; registered immutable inputs are re-hashed and size-checked immediately before use.
+- Added `infra/control_plane/preflight_cli.py`, a side-effect-free workflow adapter that fails closed before research/data steps.
+- Added synthetic tests for valid active infrastructure preflight, missing/corrupt canonical records, immutable raw-file tampering, and workflow CLI behavior.
+- Added preflight steps before data/output access in all three existing local TSETMC workflows: offline acceptance, integrated acceptance and sanitized diagnostics.
+- Added exact workflow paths to the infrastructure-only CI allowlist and regression tests asserting each workflow's preflight precedes its data/output action.
+- Updated the canonical protocol, work item and CI job to include the new adapter and test command.
+
+### Validation boundary
+
+- Modified files were fetched back from GitHub after writes.
+- No Python tests or workflow were executed. All commits use `[skip ci]`; exact-head hosted checks remain zero/not available pending separate owner authorization.
+- The workflow gates become effective only when this branch is integrated into the default branch. PR #74 remains Draft/open/unmerged.
+- The CLI gate blocks current research actions under `INFRA_ONLY`; it is not a substitute for durable run reservation/append at future unlocked execution time.
+- The Run Ledger remains empty; no historic run evidence was fabricated or backfilled.
+- The three unresolved candidate CSV records remain unchanged. No provider, dataset, local Runner or research operation was accessed.
+
+### Next permitted action
+
+Continue repository-only work: add an explicit run-ledger reservation/finalization interface with concurrency-safe idempotency, and a contract test that proves failed runs remain reserved against identical retries. Then inspect backup/restore implementation gaps. Do not dispatch or rerun CI without separate owner authorization.
+
+**Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
