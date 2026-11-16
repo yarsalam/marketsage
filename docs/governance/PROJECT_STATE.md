@@ -587,3 +587,17 @@ Perform a repository-only integrity audit of the complete governance toolchain: 
 Complete the final static integrity audit, update the active PR/Issue checkpoint and preserve the research lock. Exact-head runtime validation, host backup/restore, and any merge remain separately gated.
 
 **Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
+
+---
+
+## Live continuity audit — 2026-11-16 (Work ID: MS-20261116-CONTINUITY-001)
+
+- Re-read the active branch protocol, execution constitution, policy, active work item, artifact registry and run ledger before further work.
+- Current policy remains `INFRA_ONLY`; `research_locked=true`. Allowed actions are infrastructure, governance and synthetic tests only. No provider request, dataset read, research calculation, workflow dispatch/rerun, local Runner job, merge or deploy was performed.
+- Existing artifact registry contains the three known adjusted-candidate CSV identities and expected SHA-256 values. All remain `PATH_UNRESOLVED`; no archive recovery scan or replacement acquisition was attempted. `RUN_LEDGER.jsonl` remains empty; no historic run was fabricated.
+- Inspected the exact-head CI evidence referenced by Issue #49. Run [#43794311916](https://github.com/yarsalam/marketsage/actions/runs/43794311916) completed scope classification and CI-helper tests successfully, then failed in the workflow-preflight CLI test. Later steps in that job were skipped. This is an observed CI failure, not a successful acceptance run.
+- Static comparison identified a deterministic error-order mismatch: the locked-scope test expects `project_scope_locked`, but preflight previously returned the allowlist error first. Corrected the check order in `infra/control_plane/safety_gate.py` in commit `c8c1b1c87c75f7425e6a3c2b6b952d661230546c`. The correction is authored/read-back only; it has not been tested and must not inherit the failed run's evidence.
+- Static audit also found material acceptance gaps that remain blockers: the workflow CLI supplies no registered input artifacts, uses a synthetic `/tmp` output path rather than the workflow's real output boundary, and does not reserve/finalize a durable run-ledger event. The runtime preflight does not itself perform the full JSON-Schema/cross-record validation used by the CI validator. Therefore the current CLI is only a lock gate and must not be treated as a complete research authorization mechanism, even if policy is later changed.
+- Backup/restore code and manifest validation are authored, but no real copies, independent media/failure-domain evidence, physical offline verification or host restore drill exist. Synthetic tests are authored but not executed.
+- Exact current branch-head workflow/status evidence must be re-read after this checkpoint; prior green checks do not transfer to the new commit. PR #74 remains Draft/open/unmerged; PR #82 remains held and untouched.
+- **Status:** `IN_PROGRESS`; no acceptance claim. **Next permitted action:** continue repository-only hardening of the preflight/ledger integration and static review; do not run tests or workflows until the owner separately authorizes a bounded exact-head validation. Research remains locked.
