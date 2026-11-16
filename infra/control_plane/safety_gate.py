@@ -10,6 +10,8 @@ import hashlib
 import json
 import os
 import re
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -83,6 +85,116 @@ def append_jsonl(path: str | Path, record: Mapping[str, Any]) -> None:
             fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
     finally:
         os.close(descriptor)
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _read_locked_ledger(stream: Any) -> list[dict[str, Any]]:
+    stream.seek(0)
+    records: list[dict[str, Any]] = []
+    for line_number, line in enumerate(stream, 1):
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise SafetyGateError(f"ledger_invalid_jsonl_line:{line_number}") from exc
+        if not isinstance(record, dict):
+            raise SafetyGateError(f"ledger_record_not_object:{line_number}")
+        records.append(record)
+    return records
+
+
+def _append_locked(stream: Any, record: Mapping[str, Any]) -> None:
+    stream.seek(0, os.SEEK_END)
+    stream.write(json.dumps(dict(record), sort_keys=True, separators=(",", ":")) + "\\n")
+    stream.flush()
+    os.fsync(stream.fileno())
+
+
+def reserve_run(
+    ledger_path: str | Path, *, run_id: str, work_id: str, action: str,
+    run_fingerprint: str, code_sha: str, input_hashes: Mapping[str, str],
+    parameters: Mapping[str, Any], environment: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Atomically reserve a run; every prior fingerprint, including failures, blocks retry."""
+    if not run_id or not _WORK.fullmatch(work_id) or not _GIT_SHA.fullmatch(code_sha):
+        raise SafetyGateError("run_reservation_identity_invalid")
+    if not _SHA.fullmatch(run_fingerprint) or any(not _SHA.fullmatch(v) for v in input_hashes.values()):
+        raise SafetyGateError("run_reservation_hash_invalid")
+    target = Path(ledger_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("a+", encoding="utf-8") as stream:
+        fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+        try:
+            records = _read_locked_ledger(stream)
+            if any(item.get("run_fingerprint") == run_fingerprint for item in records):
+                raise DuplicateRun("identical_run_already_reserved_or_recorded_no_retry")
+            if any(item.get("run_id") == run_id for item in records):
+                raise SafetyGateError("run_id_already_used")
+            reservation = {
+                "event_id": str(uuid.uuid4()),
+                "event_type": "RESERVED",
+                "run_id": run_id,
+                "work_id": work_id,
+                "action": action,
+                "run_fingerprint": run_fingerprint,
+                "code_sha": code_sha,
+                "input_hashes": dict(sorted(input_hashes.items())),
+                "parameters": dict(parameters),
+                "environment": dict(environment),
+                "started_at_utc": _utc_now(),
+                "recorded_at_utc": _utc_now(),
+                "status": "RUNNING",
+                "exit_code": None,
+                "result_artifact_ids": [],
+                "reason": None,
+            }
+            _append_locked(stream, reservation)
+            return reservation
+        finally:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+
+def finalize_run(
+    ledger_path: str | Path, *, run_id: str, status: str,
+    exit_code: int | None, result_artifact_ids: Iterable[str] = (),
+    reason: str | None = None,
+) -> dict[str, Any]:
+    """Append one terminal event for a previously reserved run; never edits history."""
+    if status not in {"SUCCESS", "FAILED", "BLOCKED", "REJECTED"}:
+        raise SafetyGateError("run_terminal_status_invalid")
+    target = Path(ledger_path)
+    if not target.is_file():
+        raise SafetyGateError("run_reservation_missing")
+    with target.open("a+", encoding="utf-8") as stream:
+        fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+        try:
+            records = _read_locked_ledger(stream)
+            reservations = [item for item in records if item.get("run_id") == run_id and item.get("event_type") == "RESERVED"]
+            terminals = [item for item in records if item.get("run_id") == run_id and item.get("event_type") == "FINALIZED"]
+            if len(reservations) != 1:
+                raise SafetyGateError("run_reservation_missing_or_ambiguous")
+            if terminals:
+                raise SafetyGateError("run_already_finalized")
+            reservation = reservations[0]
+            terminal = {
+                "event_id": str(uuid.uuid4()),
+                "event_type": "FINALIZED",
+                "run_id": run_id,
+                "run_fingerprint": reservation["run_fingerprint"],
+                "recorded_at_utc": _utc_now(),
+                "status": status,
+                "exit_code": exit_code,
+                "result_artifact_ids": sorted(set(result_artifact_ids)),
+                "reason": reason,
+            }
+            _append_locked(stream, terminal)
+            return terminal
+        finally:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
 
 def verify_immutable_artifact(record: Mapping[str, Any]) -> tuple[str, int]:
