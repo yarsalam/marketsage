@@ -158,6 +158,32 @@ def reserve_run(
             fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
 
+def preflight_and_reserve_run(
+    ledger_path: str | Path, *,
+    policy_path: str | Path, work_item_path: str | Path,
+    artifact_registry_path: str | Path, work_id: str, action: str,
+    run_id: str, code_sha: str, input_artifacts: Mapping[str, str],
+    parameters: Mapping[str, Any], environment: Mapping[str, Any],
+    output_path: str | Path, request_fingerprint: str | None = None,
+) -> dict[str, Any]:
+    """Run the fail-closed preflight and atomically reserve its fingerprint."""
+    result = preflight(
+        policy_path=policy_path, work_item_path=work_item_path,
+        artifact_registry_path=artifact_registry_path, run_ledger_path=ledger_path,
+        work_id=work_id, action=action, code_sha=code_sha,
+        input_artifacts=input_artifacts, parameters=parameters,
+        environment=environment, output_path=output_path,
+        request_fingerprint=request_fingerprint,
+    )
+    reservation = reserve_run(
+        ledger_path, run_id=run_id, work_id=work_id, action=action,
+        run_fingerprint=result["run_fingerprint"], code_sha=code_sha,
+        input_hashes=result["verified_input_hashes"],
+        parameters=parameters, environment=environment,
+    )
+    return {**result, "reservation": reservation}
+
+
 def finalize_run(
     ledger_path: str | Path, *, run_id: str, status: str,
     exit_code: int | None, result_artifact_ids: Iterable[str] = (),
