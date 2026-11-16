@@ -491,3 +491,35 @@ Continue repository-only work: add an explicit run-ledger reservation/finalizati
 Inspect and design the durable storage/restore layer for the canonical registry and ledger: define independent backup locations, append-only evidence export, integrity checks and a synthetic restore drill. Do not access local private paths or perform real backups until the owner authorizes that host-specific operation.
 
 **Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
+
+
+---
+
+## Backup/restore primitives checkpoint — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Implementation head before this state update:** `5834b9d44504167148aa4ac09fcd2b3485a4666b`  
+**Status:** IN PROGRESS / NOT ACCEPTED / NOT RUNTIME-VERIFIED
+
+### Changes authored and read back
+
+- Added `infra/control_plane/backup_restore.py` with exclusive-create backup copies, source-before/after consistency checks, SHA-256/size verification, 3-2-1 metadata validation, and non-overwriting restore with post-restore verification.
+- The 3-2-1 validator requires at least three distinct locations, two media, two failure domains and an offline attestation. The attestation is explicitly not treated as proof of physical disconnection.
+- Added synthetic tests for valid topology, missing offline attestation, tampered copies, exact restore and no-overwrite behavior.
+- Added the backup/restore test to the infrastructure CI job and documented the operator/host verification boundary.
+- The previous checkpoint's append-only reservation/finalization and preflight integration remain in place.
+
+### Validation boundary
+
+- Source, tests and workflow changes were read back from GitHub.
+- No backup or restore was run against real MarketSage data or private host paths.
+- No Python test was executed. The latest commit query currently shows zero workflow runs and zero combined status entries; no manual dispatch/rerun was made.
+- One documentation commit was created without the `[skip ci]` suffix; its current commit query also shows zero runs/statuses. All subsequent commits must continue to use `[skip ci]` unless separately authorized.
+- No evidence yet proves three physical copies, two independent media, an offline device, a successful host restore, or durable automatic export of the registry/ledger.
+
+### Next permitted action
+
+Add a versioned backup-manifest schema and integrity validator for backup-copy records, then extend synthetic tests for manifest corruption and restore-set completeness. A real host backup/restore drill remains separately owner-authorized.
+
+**Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
