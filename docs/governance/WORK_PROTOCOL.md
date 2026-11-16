@@ -45,11 +45,13 @@
 
 ## Mandatory technical preflight
 
-All acquisition/research entry points must call `infra.control_plane.safety_gate.preflight` before network access or computation. It checks scope lock, work-item authorization, registered input identity and hashes, request idempotency, run idempotency, and a new output path. Missing/corrupt policy, work item, registry or ledger fails closed. The preflight has no side effects and never performs acquisition.
+All acquisition/research entry points must be gated before network access, dataset reads, output inspection or computation. Python entry points call `infra.control_plane.safety_gate.preflight` directly. GitHub Actions entry points use `python -m infra.control_plane.preflight_cli --action research` from the checked-out workflow source before any research/data step. The CLI is a side-effect-free adapter; a locked scope exits non-zero. The three existing local TSETMC workflows (offline acceptance, integrated acceptance and sanitized diagnostics) now place this gate before their data/output step. New acquisition/research workflows must add the same gate and a contract test; they must not bypass it through an alternate wrapper.
+
+The common preflight checks policy validity and scope, active work-item authorization (including `IN_PROGRESS`), registered input identity and hashes, request idempotency, run idempotency, and output-path separation. It accepts the actual 40-character Git commit SHA and computes a separate SHA-256 run fingerprint. Immutable registered inputs are re-hashed immediately before use; missing/corrupt policy, work item, registry or ledger fails closed. The preflight itself never performs acquisition.
 
 A CI integration must validate policy, work-item metadata, registry schema/duplicate IDs/hashes/fingerprints, run-ledger integrity and synthetic tests before research can reopen. A check on a different SHA is not evidence.
 
-The canonical validator is `python -m infra.control_plane.validate_governance`. It validates `schemas/governance-records-v1.schema.json`, the active execution policy and work item, every artifact/run JSONL record, and cross-record idempotency/authorization invariants. The infrastructure CI job must run this command and `python -m unittest discover -s tests/infra -p 'test_governance_validation.py' -v`. These commands being wired into CI is not proof they have passed; record exact-head evidence only after an authorized run.
+The canonical validator is `python -m infra.control_plane.validate_governance`. It validates `schemas/governance-records-v1.schema.json`, the active execution policy and work item, every artifact/run JSONL record, and cross-record idempotency/authorization invariants. The infrastructure CI job must run this command, `python -m unittest discover -s tests/infra -p 'test_safety_gate.py' -v`, `python -m unittest discover -s tests/infra -p 'test_preflight_cli.py' -v`, and `python -m unittest discover -s tests/infra -p 'test_governance_validation.py' -v`. These commands being wired into CI is not proof they have passed; record exact-head evidence only after an authorized run.
 
 ## End-of-task sequence
 
