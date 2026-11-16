@@ -456,3 +456,38 @@ Continue repository-only infrastructure work: audit the remaining execution entr
 Continue repository-only work: add an explicit run-ledger reservation/finalization interface with concurrency-safe idempotency, and a contract test that proves failed runs remain reserved against identical retries. Then inspect backup/restore implementation gaps. Do not dispatch or rerun CI without separate owner authorization.
 
 **Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
+
+
+---
+
+## Append-only run reservation checkpoint — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Implementation head before this state update:** `cc84d6d42bb3557402dd801412ea059485dda465`  
+**Status:** IN PROGRESS / NOT ACCEPTED / NOT RUNTIME-VERIFIED
+
+### Changes authored and read back
+
+- Added append-only run events to the governance schema: one `RESERVED` event and at most one `FINALIZED` event per run.
+- Added `reserve_run`: an OS file lock protects the read/check/append transaction; any prior matching fingerprint blocks a new run, including an earlier failed or still-running reservation.
+- Added `finalize_run`: appends one terminal event and refuses a second finalization; existing events are never edited.
+- Added `preflight_and_reserve_run`: enforces preflight before the atomic reservation, plus the terminal finalization API.
+- Removed the generic unguarded JSONL append helper from the safety module.
+- Updated the governance validator to check event IDs, fingerprint ownership, reservation/finalization order, authorization, and one terminal event maximum.
+- Added synthetic tests for failed-run retry blocking, one-time finalization, combined preflight/reservation and both event schema variants.
+- Updated WORK_PROTOCOL and the active work item's acceptance criteria.
+
+### Validation boundary
+
+- Changed source, schema, tests, workflows and governance records were fetched back from GitHub after writes.
+- No tests, Python commands or workflows were executed. All commits use `[skip ci]`; exact-head hosted checks remain absent pending separate owner authorization.
+- This provides repository-side reservation primitives but does not yet persist run events automatically from every GitHub/local execution environment. The current RUN_LEDGER remains empty; no historical runs were invented or backfilled.
+- A reserved run left without a final event intentionally blocks retry; a separately authorized recovery procedure is still needed for abandoned reservations.
+- No real data, provider, local Runner, research or adjustment process was accessed. Candidate CSVs remain PATH_UNRESOLVED and unchanged.
+
+### Next permitted action
+
+Inspect and design the durable storage/restore layer for the canonical registry and ledger: define independent backup locations, append-only evidence export, integrity checks and a synthetic restore drill. Do not access local private paths or perform real backups until the owner authorizes that host-specific operation.
+
+**Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
