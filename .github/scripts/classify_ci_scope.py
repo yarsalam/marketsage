@@ -20,6 +20,7 @@ ALLOWED_PREFIXES = (
     "docs/governance/",
     "docs/infra/",
     "infra/control_plane/",
+    "tests/infra/",
 )
 
 
