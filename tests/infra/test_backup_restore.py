@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 from infra.control_plane.backup_restore import (
@@ -8,6 +9,10 @@ from infra.control_plane.backup_restore import (
     restore_backup_copy,
     validate_321_copies,
     verify_backup_copy,
+)
+from infra.control_plane.validate_backup_manifest import BackupManifestError, validate_backup_manifest
+
+#
 )
 
 
@@ -40,6 +45,58 @@ class BackupRestoreTests(unittest.TestCase):
             restored = restore_backup_copy(records[2], root / "restore" / "raw.bin")
             self.assertTrue(restored["verified"])
             self.assertEqual((root / "restore" / "raw.bin").read_bytes(), source.read_bytes())
+            now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            manifest = {
+                "manifest_version": 1, "backup_id": "backup-1",
+                "artifact_id": "fixture-1", "source_sha256": records[0]["sha256"],
+                "source_size_bytes": records[0]["size_bytes"], "created_at_utc": now,
+                "copies": records,
+                "restore_drills": [{
+                    "restore_id": "restore-1", "source_location_id": "loc-c",
+                    "restored_path": restored["restored_path"],
+                    "sha256": restored["sha256"], "size_bytes": restored["size_bytes"],
+                    "restored_at_utc": now, "verified": True,
+                }],
+            }
+            schema_path = Path(__file__).resolve().parents[2] / "schemas" / "backup-manifest-v1.schema.json"
+            self.assertEqual(validate_backup_manifest(manifest, schema_path=schema_path)["copies"], 3)
+
+    def test_manifest_rejects_copy_hash_mismatch_and_incomplete_restore(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "raw.bin"
+            source.write_bytes(b"backup fixture")
+            records = []
+            for index, (location, medium, failure, offline) in enumerate([
+                ("a", "disk", "rack-a", False),
+                ("b", "disk", "rack-b", False),
+                ("c", "removable", "vault", True),
+            ]):
+                target = root / f"target-{index}"
+                target.mkdir()
+                records.append(create_backup_copy(
+                    source, target_root=target, relative_path="raw.bin",
+                    backup_id="backup-2", artifact_id="fixture-2",
+                    location_id=location, medium_id=medium,
+                    failure_domain=failure, offline_attested=offline,
+                ))
+            now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            manifest = {
+                "manifest_version": 1, "backup_id": "backup-2",
+                "artifact_id": "fixture-2", "source_sha256": records[0]["sha256"],
+                "source_size_bytes": records[0]["size_bytes"], "created_at_utc": now,
+                "copies": records,
+                "restore_drills": [{
+                    "restore_id": "restore-2", "source_location_id": "c",
+                    "restored_path": str(root / "restored.bin"),
+                    "sha256": records[0]["sha256"], "size_bytes": records[0]["size_bytes"],
+                    "restored_at_utc": now, "verified": True,
+                }],
+            }
+            schema_path = Path(__file__).resolve().parents[2] / "schemas" / "backup-manifest-v1.schema.json"
+            manifest["copies"][1]["sha256"] = "f" * 64
+            with self.assertRaisesRegex(BackupManifestError, "backup_copy_source_identity_mismatch"):
+                validate_backup_manifest(manifest, schema_path=schema_path)
 
     def test_three_copies_without_offline_attestation_are_rejected(self):
         records = [
