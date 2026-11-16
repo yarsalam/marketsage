@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:marketsage:governance-records-v1",
+  "title": "MarketSage governance records",
+  "oneOf": [
+    { "$ref": "#/$defs/artifact" },
+    { "$ref": "#/$defs/run" },
+    { "$ref": "#/$defs/policy" },
+    { "$ref": "#/$defs/work_item" }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "work_id": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]{7,127}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id","artifact_identity","original_filename","sha256","size_bytes","artifact_type","provider","instrument_id","date_range","frequency","units","request_fingerprint","acquired_at_utc","storage_path","archive_locations","producing_run_id","producing_commit_sha","rights_restrictions","immutable","status","backup_restore_status","notes"],
+      "properties": {
+        "artifact_id": { "type": "string", "minLength": 1 },
+        "artifact_identity": { "type": "string", "minLength": 1 },
+        "original_filename": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "size_bytes": { "type": ["integer","null"], "minimum": 0 },
+        "artifact_type": { "type": "string", "minLength": 1 },
+        "provider": { "type": ["string","null"] },
+        "instrument_id": { "type": ["string","null"] },
+        "date_range": { "type": ["string","null"] },
+        "frequency": { "type": ["string","null"] },
+        "units": { "type": ["string","null"] },
+        "request_fingerprint": { "type": ["string","null"], "pattern": "^[a-f0-9]{64}$" },
+        "acquired_at_utc": { "type": ["string","null"], "format": "date-time" },
+        "storage_path": { "type": ["string","null"] },
+        "archive_locations": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "producing_run_id": { "type": ["string","null"] },
+        "producing_commit_sha": { "type": ["string","null"], "pattern": "^[a-f0-9]{40}$" },
+        "rights_restrictions": { "type": "string", "minLength": 1 },
+        "immutable": { "const": true },
+        "status": { "enum": ["PATH_UNRESOLVED","RECOVERY_REQUIRED","VERIFIED","QUARANTINED","REJECTED"] },
+        "backup_restore_status": { "enum": ["UNKNOWN","NOT_VERIFIED","VERIFIED"] },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "enum": ["PATH_UNRESOLVED","RECOVERY_REQUIRED"] } }, "required": ["status"] },
+          "then": { "properties": { "storage_path": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "VERIFIED" } }, "required": ["status"] },
+          "then": { "properties": { "storage_path": { "type": "string", "minLength": 1 }, "size_bytes": { "type": "integer", "minimum": 0 } }, "required": ["storage_path","size_bytes"] }
+        }
+      ]
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id","work_id","action","run_fingerprint","code_sha","input_hashes","parameters","environment","started_at_utc","status","exit_code","result_artifact_ids","reason"],
+      "properties": {
+        "run_id": { "type": "string", "minLength": 1 },
+        "work_id": { "$ref": "#/$defs/work_id" },
+        "action": { "enum": ["infrastructure","governance","synthetic_test","research","acquisition","analysis","backtest"] },
+        "run_fingerprint": { "$ref": "#/$defs/sha256" },
+        "code_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "input_hashes": { "type": "object", "additionalProperties": { "$ref": "#/$defs/sha256" } },
+        "parameters": { "type": "object" },
+        "environment": { "type": "object" },
+        "started_at_utc": { "type": "string", "format": "date-time" },
+        "status": { "enum": ["RUNNING","SUCCESS","FAILED","BLOCKED","REJECTED"] },
+        "exit_code": { "type": ["integer","null"] },
+        "result_artifact_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "reason": { "type": ["string","null"] }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version","project","scope_lock","research_locked","allowed_actions","authorized_work_ids","owner_approval_required_for","raw_artifacts_must_be_immutable","unresolved_paths_require_recovery_before_acquisition","identical_run_policy","network_access_in_unit_tests","last_updated_utc"],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "project": { "const": "MarketSage" },
+        "scope_lock": { "enum": ["INFRA_ONLY","OPEN"] },
+        "research_locked": { "type": "boolean" },
+        "allowed_actions": { "type": "array", "items": { "enum": ["infrastructure","governance","synthetic_test","research","acquisition","analysis","backtest"] }, "uniqueItems": true },
+        "authorized_work_ids": { "type": "array", "items": { "$ref": "#/$defs/work_id" }, "uniqueItems": true },
+        "owner_approval_required_for": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "raw_artifacts_must_be_immutable": { "const": true },
+        "unresolved_paths_require_recovery_before_acquisition": { "const": true },
+        "identical_run_policy": { "const": "BLOCK_SUCCESS_AND_FAILURE" },
+        "network_access_in_unit_tests": { "const": false },
+        "last_updated_utc": { "type": "string", "format": "date-time" }
+      }
+    },
+    "work_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_id","objective","owner","status","allowed_actions","inputs","prerequisites","expected_outputs","acceptance_criteria","prohibited_actions","status_note"],
+      "properties": {
+        "work_id": { "$ref": "#/$defs/work_id" },
+        "objective": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["AUTHORIZED","IN_PROGRESS","DONE","BLOCKED","REJECTED"] },
+        "allowed_actions": { "type": "array", "items": { "enum": ["infrastructure","governance","synthetic_test","research","acquisition","analysis","backtest"] }, "uniqueItems": true },
+        "inputs": { "type": "array", "items": { "type": "string" } },
+        "prerequisites": { "type": "array", "items": { "type": "string" } },
+        "expected_outputs": { "type": "array", "items": { "type": "string" } },
+        "acceptance_criteria": { "type": "array", "items": { "type": "string" } },
+        "prohibited_actions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "status_note": { "type": "string" }
+      }
+    }
+  }
+}
