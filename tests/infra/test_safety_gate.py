@@ -158,7 +158,7 @@ class SafetyGateTests(unittest.TestCase):
                 )
 
     def test_changed_parameter_changes_fingerprint(self):
-        base = dict(code_sha="a" * 64, input_hashes={"x": "b" * 64},
+        base = dict(code_sha="a" * 40, input_hashes={"x": "b" * 64},
                     environment={"python": "3.12"})
         self.assertNotEqual(
             derive_run_fingerprint(parameters={"window": 5}, **base),
