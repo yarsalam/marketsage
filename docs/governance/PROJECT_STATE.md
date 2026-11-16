@@ -415,3 +415,9 @@ PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known
 Continue repository-only infrastructure work: audit the remaining execution entry points and add a fail-closed preflight adapter at safe boundaries without executing them; then add tests for missing/corrupt canonical records and immutable raw-file tampering. Exact-head CI validation still requires the separately recorded owner authorization.
 
 **Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
+
+
+### Work-item status correction
+
+- The canonical work item is now `IN_PROGRESS` (not merely `AUTHORIZED`); its status-note explicitly says the validator and tests are authored but not executed.
+- Work-item update commit: `b687b34b97dab8c472f67590be9bd81f08b6b4cf`.
