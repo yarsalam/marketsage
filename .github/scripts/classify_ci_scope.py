@@ -79,13 +79,15 @@ def changed_paths_from_git(event_name: str, base_sha: str, before_sha: str) -> l
     else:
         return []
     result = subprocess.run(
-        ["git", "diff", "--name-only", "--no-renames", revision],
+        ["git", "diff", "--name-only", "--no-renames", "-z", revision],
         check=True,
         capture_output=True,
-        text=True,
+        text=False,
         timeout=20,
     )
-    return [line for line in result.stdout.splitlines() if line]
+    # NUL-delimited paths preserve embedded newlines; line-delimited parsing
+    # could split one unusual filename into multiple allowlisted fragments.
+    return [os.fsdecode(item) for item in result.stdout.split(b"\\0") if item]
 
 
 def main() -> int:
