@@ -85,6 +85,25 @@ def append_jsonl(path: str | Path, record: Mapping[str, Any]) -> None:
         os.close(descriptor)
 
 
+def verify_immutable_artifact(record: Mapping[str, Any]) -> tuple[str, int]:
+    """Re-hash one registered immutable artifact immediately before use."""
+    if record.get("immutable") is not True or record.get("status") != "VERIFIED":
+        raise SafetyGateError("immutable_artifact_not_verified")
+    path = record.get("storage_path")
+    if not isinstance(path, str) or not path:
+        raise RecoveryRequired("immutable_artifact_path_unresolved")
+    try:
+        actual_hash, actual_size = file_sha256(path)
+    except OSError as exc:
+        raise RecoveryRequired("immutable_artifact_unavailable_for_recovery") from exc
+    if actual_hash != record.get("sha256"):
+        raise SafetyGateError("immutable_artifact_hash_mismatch")
+    expected_size = record.get("size_bytes")
+    if expected_size is not None and actual_size != expected_size:
+        raise SafetyGateError("immutable_artifact_size_mismatch")
+    return actual_hash, actual_size
+
+
 def validate_artifact_registry(records: Iterable[Mapping[str, Any]]) -> None:
     ids: set[str] = set()
     hashes: dict[str, str] = {}
@@ -186,11 +205,9 @@ def preflight(
         path = record.get("storage_path")
         if not path:
             raise RecoveryRequired("input_artifact_path_unresolved")
-        actual_hash, actual_size = file_sha256(path)
-        if actual_hash != expected_hash or actual_hash != record.get("sha256"):
+        actual_hash, actual_size = verify_immutable_artifact(record)
+        if actual_hash != expected_hash:
             raise SafetyGateError("input_artifact_hash_mismatch")
-        if record.get("size_bytes") is not None and actual_size != record["size_bytes"]:
-            raise SafetyGateError("input_artifact_size_mismatch")
         verified[artifact_id] = actual_hash
 
     if request_fingerprint:
