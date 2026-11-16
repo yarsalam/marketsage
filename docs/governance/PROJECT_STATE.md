@@ -601,3 +601,20 @@ Complete the final static integrity audit, update the active PR/Issue checkpoint
 - Backup/restore code and manifest validation are authored, but no real copies, independent media/failure-domain evidence, physical offline verification or host restore drill exist. Synthetic tests are authored but not executed.
 - Exact current branch-head workflow/status evidence must be re-read after this checkpoint; prior green checks do not transfer to the new commit. PR #74 remains Draft/open/unmerged; PR #82 remains held and untouched.
 - **Status:** `IN_PROGRESS`; no acceptance claim. **Next permitted action:** continue repository-only hardening of the preflight/ledger integration and static review; do not run tests or workflows until the owner separately authorizes a bounded exact-head validation. Research remains locked.
+
+---
+
+## Repository-only hardening checkpoint — 2026-11-16
+
+Work ID: `MS-20261116-CONTINUITY-001`
+
+- Fixed the observed preflight test failure by making the scope lock take precedence over the action allowlist. The expected lock reason is now deterministic. Change: `infra/control_plane/safety_gate.py`.
+- Added fail-closed requirements: research/analysis/backtest must provide at least one registered immutable input artifact; acquisition must provide a SHA-256 request fingerprint. Tests were authored for both conditions.
+- Hardened `preflight_cli.py`: even if the policy is later opened, the legacy research workflows remain blocked until the CLI is upgraded to accept registered input manifests, validate the actual workflow output path, and persist durable RESERVED/FINALIZED run events. A test covers the unlocked-policy case.
+- Hardened CI scope classification: reject absolute/traversal/backslash/control-character paths and parse `git diff --name-only -z` as NUL-delimited paths so embedded newlines cannot split a changed filename into allowlisted fragments. Regression tests were authored.
+- All changes were written to the existing PR #74 branch with `[skip ci]` commits. They are authored and read back from GitHub; **no tests or workflows were run for these corrections**. The prior run #43794311916 remains a failure on its tested SHA; it is not evidence for the corrected code.
+- Static review of backup helpers/schema found the required no-overwrite, hash/size verification, 3-location/2-media/2-failure-domain and offline-attestation metadata checks, plus at least one restore-drill record. Physical independence/offline isolation is not machine-proven and no real backup/restore has been performed.
+- Remaining technical blockers: runtime preflight still does not invoke the full strict JSON-Schema/cross-record governance validator; legacy workflow CLI does not bind actual registered inputs/output destinations or durable run events; historical runs have not been reconstructed; and real host backup/restore remains unproven.
+- Registry retains the three pre-existing candidate CSV identities/hashes as `PATH_UNRESOLVED`. Registry archive locations are empty; no local/registered archive scan, redownload, or reconstruction was performed under the research lock. RUN_LEDGER remains empty.
+- No changes were made to PR #82. PR #74 remains Draft/open/unmerged. No merge, workflow dispatch/rerun, local Runner, provider/network request, dataset read, calculation, deploy, secret, spend or visibility change occurred.
+- **Status:** `IN_PROGRESS`; Issue #49 remains open and 24/7 readiness is not proven. **Next permitted action:** continue repository-only integration of strict runtime governance validation and durable execution-ledger interfaces; exact-head validation and any real host backup drill remain owner-gated.
