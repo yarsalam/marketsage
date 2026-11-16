@@ -62,3 +62,16 @@ PR #6 remains open and must not be merged to main without explicit owner approva
 - Do not inspect or tune against the locked final holdout.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
 - No production scoring, broker access, portfolio allocation or real-money trade is authorized. Any capital-risk action requires separate explicit owner approval.
+
+## PR #82
+
+- **Title:** docs(research): add Iranian equity event investigation notebook
+- **Branch:** `research/iran-equity-event-notebook-2026-11-12`
+- **Base:** `main`
+- **Status:** Draft, open, unmerged
+- **Latest HEAD:** `488d919`
+- **Strategic objective:** Iran equity event investigation and vaghdir 2011 adjustment audit
+- **Scope:** `data/market-research/iran-equities/adjustment-evidence/` and `scripts/research/iran-equities/`
+- **Evidence:** CODAL PDFs (38803, 40620, 38805), TSETMC raw JSON, reconciliation diagnostics, 2011 audit
+- **Limitations:** 2.18-rial reopening difference (UNRESOLVED_MARKET_MICROSTRUCTURE); Total Return not built
+- **Follow-up:** Awaiting review; investment ranking remains disabled

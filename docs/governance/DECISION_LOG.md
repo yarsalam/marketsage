@@ -179,3 +179,22 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
+
+---
+
+## 2026-11-16 — Reopen Goal 2 for Iran equity evidence audit
+
+**Decision ID:** D-2026-11-16-01
+**Authority:** Owner (yarsalam)
+**Context:** PR #82 contains vaghdir 2011 adjustment audit. Work was paused pending review of governance locks.
+**Investigation:** No `execution_policy.json`, `WORK_STATE.md`, `*.jsonl`, `research_locked` flag, or `MS-20261116-CONTINUITY-001` exists in this repository (verified by full-tree grep at commit `488d919`).
+**Decision:** Goal 2 is reopened for the Iran equity evidence audit. Work may proceed on PR #82 only, no new PR, no re-download of provider data.
+**Scope:**
+- Audit of vaghdir/foolad/parsian adjustment evidence
+- Total Return script development
+- All within `data/market-research/iran-equities/adjustment-evidence/` and `scripts/research/iran-equities/`
+**Prohibited:**
+- Production/backtest use of any adjusted series
+- Enabling investment ranking or scoring
+- Publishing adjusted series as canonical market data
+**Status:** Active.

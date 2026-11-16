@@ -85,3 +85,37 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 6. Keep source scoring, investment ranking, calibrated probabilities, production release, broker access and trading disabled until all relevant data and empirical gates pass. Any real-money allocation or trade still requires the owner's separate explicit approval.
 
 **Investment-stage status: NOT READY.** A successful Runner job, parser, dataset hash audit, or integration CI run is not an investment approval.
+
+
+---
+
+## Update — 2026-11-16 (PR #82 research branch)
+
+**Snapshot date:** 2026-11-16
+**Active PR:** #82, branch `research/iran-equity-event-notebook-2026-11-12`
+**Latest HEAD:** `488d91956c25417e67cde1345091104238cac3fd`
+**Status:** Draft, open, unmerged.
+
+### Completed (2026-11-16)
+
+- Vaghdir 2011 adjustment audit complete with documented limitation:
+  - DPS = 500 rials (CODAL 38803.pdf)
+  - K = 301.113924 rials (error 0.0015%)
+  - pClosing applies capital increase only
+  - Reopening diff = 2.18 rials (UNRESOLVED_MARKET_MICROSTRUCTURE)
+- Repository cleanup: ~111 MB removed (3 duplicate CSVs + 2 ZIPs)
+- Manifest and SHA256SUMS synchronized (342 entries)
+- CI: 0 failing checks
+
+### Open
+
+- 2.18-rial reopening difference: interpretation documented, not formally closed
+- Total Return script: not built
+- Adjusted series release: not approved for production
+- Investment ranking/scoring: still disabled
+
+### Next action
+
+Awaiting reviewer confirmation on PR #82.
+
+**Investment-stage status: NOT READY.**
