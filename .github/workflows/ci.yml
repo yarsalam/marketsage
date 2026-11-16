@@ -139,6 +139,8 @@ jobs:
         run: python -m pip --isolated install --disable-pip-version-check --no-cache-dir -r requirements-infra.txt
       - name: Test all control-plane modules
         run: python -m unittest discover -s infra/control_plane -p 'test_*.py' -v
+      - name: Test artifact registry and no-repeat safety gate
+        run: python -m unittest discover -s tests/infra -p 'test_safety_gate.py' -v
 
   ci-infra-tests:
     name: Test CI automation helpers
