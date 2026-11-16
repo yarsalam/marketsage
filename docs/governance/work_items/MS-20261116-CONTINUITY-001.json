@@ -24,7 +24,9 @@
     "RUN_LEDGER.jsonl",
     "schemas/governance-records-v1.schema.json",
     "infra/control_plane/validate_governance.py",
-    "tests/infra/test_governance_validation.py"
+    "tests/infra/test_governance_validation.py",
+    "infra/control_plane/preflight_cli.py",
+    "tests/infra/test_preflight_cli.py"
   ],
   "acceptance_criteria": [
     "synthetic tests cover duplicate IDs/hashes/acquisitions/runs and unresolved paths",
@@ -32,7 +34,11 @@
     "all changes read back from GitHub",
     "strict JSON Schema validation covers policy, active work item, artifact registry and run ledger records",
     "cross-record checks reject duplicate artifact identities, hashes, acquisition fingerprints, run IDs and run fingerprints",
-    "CI invokes canonical governance validation and synthetic regression tests"
+    "CI invokes canonical governance validation and synthetic regression tests",
+    "workflow preflight adapter blocks all three existing local TSETMC workflow entrypoints before data/output access while research is locked",
+    "preflight accepts IN_PROGRESS work items and actual 40-character Git commit SHAs",
+    "synthetic tests detect immutable artifact tampering and missing/corrupt canonical preflight records",
+    "CI classifier allowlists only the three preflight-gated local TSETMC workflow edits"
   ],
   "prohibited_actions": [
     "research",
@@ -46,5 +52,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; schema validator, regression tests and CI wiring authored and read back from GitHub; execution remains unverified because no CI dispatch/rerun is authorized."
+  "status_note": "IN_PROGRESS; governance schema validator and fail-closed preflight adapter are authored; three local TSETMC workflows are gated before data/output access; synthetic regression tests and CI wiring are authored but not executed; exact-head validation remains unauthorized."
 }
