@@ -374,15 +374,6 @@
       "compression": "none"
     },
     {
-      "source_relative": "three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
-      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
-      "source_bytes": 32028260,
-      "stored_bytes": 32028260,
-      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
-      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
-      "compression": "none"
-    },
-    {
       "source_relative": "three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
       "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.json",
       "source_bytes": 13236,
@@ -410,15 +401,6 @@
       "compression": "none"
     },
     {
-      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results.zip",
-      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results.zip",
-      "source_bytes": 17794480,
-      "stored_bytes": 17794480,
-      "source_sha256": "ecf7c31273a1a5b87b9a3639f6a86dc57504b35e8fcd1b8d96e0a700b7d27aae",
-      "stored_sha256": "ecf7c31273a1a5b87b9a3639f6a86dc57504b35e8fcd1b8d96e0a700b7d27aae",
-      "compression": "none"
-    },
-    {
       "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/event_coverage_and_precision_audit.txt",
       "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/event_coverage_and_precision_audit.txt",
       "source_bytes": 32945,
@@ -434,15 +416,6 @@
       "stored_bytes": 30420,
       "source_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
       "stored_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
-      "compression": "none"
-    },
-    {
-      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_factor_diagnostics.csv",
-      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_diagnostics/adjustment_factor_diagnostics.csv",
-      "source_bytes": 32028260,
-      "stored_bytes": 32028260,
-      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
-      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
       "compression": "none"
     },
     {
@@ -470,15 +443,6 @@
       "stored_bytes": 30420,
       "source_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
       "stored_sha256": "a1a10413269f4edb680df34c097738e9485adda480894fd507241549258abe27",
-      "compression": "none"
-    },
-    {
-      "source_relative": "three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
-      "destination_relative": "_shared/three_symbol_audit_runs/20261112T194429Z/three_symbol_audit_results/factor_run/adjustment_factor_diagnostics/adjustment_factor_diagnostics.csv",
-      "source_bytes": 32028260,
-      "stored_bytes": 32028260,
-      "source_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
-      "stored_sha256": "392c58e0a3e5e4ee401205237766282674b75480cbad45bdb6c172e196571a9f",
       "compression": "none"
     },
     {
@@ -1982,15 +1946,6 @@
       "stored_bytes": 37262,
       "source_sha256": "1973bca2718b8decdf9b79c65d589e8ea790497bfdc4652b02f9546066a02faa",
       "stored_sha256": "1973bca2718b8decdf9b79c65d589e8ea790497bfdc4652b02f9546066a02faa",
-      "compression": "none"
-    },
-    {
-      "source_relative": "tse_client_validation/tse_client_validation.zip",
-      "destination_relative": "_shared/tse_client_validation/tse_client_validation.zip",
-      "source_bytes": 817818,
-      "stored_bytes": 817818,
-      "source_sha256": "aeae09e3421646169cfb57f465284b95d8d895755ee731c2097e098cfcb4ffaa",
-      "stored_sha256": "aeae09e3421646169cfb57f465284b95d8d895755ee731c2097e098cfcb4ffaa",
       "compression": "none"
     },
     {
