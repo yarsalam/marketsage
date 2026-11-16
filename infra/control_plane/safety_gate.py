@@ -92,8 +92,15 @@ def verify_immutable_artifact(record: Mapping[str, Any]) -> tuple[str, int]:
     path = record.get("storage_path")
     if not isinstance(path, str) or not path:
         raise RecoveryRequired("immutable_artifact_path_unresolved")
+    target = Path(path)
+    absolute = Path(os.path.abspath(target))
+    current = Path(absolute.anchor)
+    for part in absolute.parts[1:]:
+        current = current / part
+        if current.is_symlink():
+            raise SafetyGateError("immutable_artifact_symlink_path")
     try:
-        actual_hash, actual_size = file_sha256(path)
+        actual_hash, actual_size = file_sha256(target)
     except OSError as exc:
         raise RecoveryRequired("immutable_artifact_unavailable_for_recovery") from exc
     if actual_hash != record.get("sha256"):
@@ -184,6 +191,16 @@ def preflight(
         work = json.loads(Path(work_item_path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SafetyGateError("canonical_policy_or_work_item_unavailable") from exc
+    if (
+        policy.get("schema_version") != 1
+        or policy.get("project") != "MarketSage"
+        or policy.get("scope_lock") not in {"INFRA_ONLY", "OPEN"}
+        or not isinstance(policy.get("research_locked"), bool)
+        or not isinstance(policy.get("allowed_actions"), list)
+    ):
+        raise SafetyGateError("execution_policy_invalid_or_incomplete")
+    if action not in policy["allowed_actions"]:
+        raise SafetyGateError("action_not_authorized_by_execution_policy")
     if policy.get("scope_lock") == "INFRA_ONLY" and action not in {"infrastructure", "governance", "synthetic_test"}:
         raise SafetyGateError("project_scope_locked")
     if policy.get("research_locked", True) and action in {"research", "acquisition", "analysis", "backtest"}:
