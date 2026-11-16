@@ -12,8 +12,6 @@ from infra.control_plane.backup_restore import (
 )
 from infra.control_plane.validate_backup_manifest import BackupManifestError, validate_backup_manifest
 
-#
-)
 
 
 class BackupRestoreTests(unittest.TestCase):
