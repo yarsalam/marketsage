@@ -523,3 +523,35 @@ Inspect and design the durable storage/restore layer for the canonical registry 
 Add a versioned backup-manifest schema and integrity validator for backup-copy records, then extend synthetic tests for manifest corruption and restore-set completeness. A real host backup/restore drill remains separately owner-authorized.
 
 **Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
+
+
+---
+
+## Versioned backup manifest checkpoint — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Implementation head before this state update:** `92639ff34d35be33781fcf3dabed513a15237663`  
+**Status:** IN PROGRESS / NOT ACCEPTED / NOT RUNTIME-VERIFIED
+
+### Changes authored and read back
+
+- Added `schemas/backup-manifest-v1.schema.json` for immutable copy records and restore-drill evidence.
+- Added `infra/control_plane/validate_backup_manifest.py` to validate the strict schema and cross-record consistency: same artifact/hash/size across copies, three locations, two media, two failure domains, offline attestation, unique copy paths and at least one successful matching restore record.
+- Extended synthetic backup tests to validate a complete manifest and reject copy hash mismatch.
+- Added the new schema to the infrastructure-only CI path allowlist and a classifier regression assertion.
+- Updated WORK_PROTOCOL and the active work item's expected outputs/acceptance criteria.
+
+### Validation boundary
+
+- Files were fetched back from GitHub after changes.
+- No tests or workflows were executed; no real backup, host path, or restore operation was performed.
+- The manifest can validate an operator's offline attestation but cannot prove physical disconnection or independent media; that remains a host-level acceptance test.
+- The canonical RUN_LEDGER remains empty. No historic records were invented.
+- Research remains locked; candidate CSVs remain PATH_UNRESOLVED and untouched.
+
+### Next permitted action
+
+Perform a repository-only integrity audit of the complete governance toolchain: confirm schema/validator compatibility, every required test is included in CI, every local research workflow is preflight-gated, and no path/identifier can escape configured roots. Record only static/read-back evidence; runtime tests and host backup remain owner-gated.
+
+**Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
