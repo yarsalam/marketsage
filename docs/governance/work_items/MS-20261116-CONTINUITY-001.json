@@ -30,7 +30,9 @@
     "atomic run reservation/finalization API",
     "append-only run event schema with RESERVED and FINALIZED states",
     "infra/control_plane/backup_restore.py",
-    "tests/infra/test_backup_restore.py"
+    "tests/infra/test_backup_restore.py",
+    "schemas/backup-manifest-v1.schema.json",
+    "infra/control_plane/validate_backup_manifest.py"
   ],
   "acceptance_criteria": [
     "synthetic tests cover duplicate IDs/hashes/acquisitions/runs and unresolved paths",
@@ -54,7 +56,9 @@
     "3-2-1 validator requires three locations, two media, two failure domains and an offline attestation",
     "backup copy verification and restore verify exact SHA-256 and byte size",
     "restore never overwrites an existing destination",
-    "synthetic backup/restore tests are wired into infrastructure CI"
+    "synthetic backup/restore tests are wired into infrastructure CI",
+    "backup manifest validates against a versioned strict JSON Schema",
+    "backup manifest cross-checks copy identity, source hashes, 3-2-1 topology and successful restore evidence"
   ],
   "prohibited_actions": [
     "research",
@@ -68,5 +72,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; schema validator, fail-closed workflow gates, atomic append-only run ledger primitives and synthetic 3-2-1 backup/restore helpers are authored. Tests and exact-head CI remain unexecuted pending owner authorization; no real backup or host path accessed."
+  "status_note": "IN_PROGRESS; versioned backup manifest schema and validator plus synthetic copy/restore tests are authored. No real backups or host-specific restore were run; tests and exact-head CI remain unexecuted pending owner authorization."
 }
