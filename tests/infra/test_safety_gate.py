@@ -67,7 +67,7 @@ class SafetyGateTests(unittest.TestCase):
                 preflight(policy_path=policy, work_item_path=work,
                           artifact_registry_path=artifacts, run_ledger_path=ledger,
                           work_id="MS-20261116-CONTINUITY-001", action="research",
-                          code_sha="a" * 64, input_artifacts={}, parameters={},
+                          code_sha="a" * 40, input_artifacts={}, parameters={},
                           environment={}, output_path=root / "new-output")
 
 
