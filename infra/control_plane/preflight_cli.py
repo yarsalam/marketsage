@@ -54,6 +54,17 @@ def main() -> int:
         print(f"MARKETSAGE_PREFLIGHT=BLOCKED reason={reason}", file=sys.stderr)
         return 2
 
+    # This adapter currently has no input-manifest interface and cannot
+    # persist a RESERVED/FINALIZED event to a durable ledger. It is therefore
+    # a lock check only, never a sufficient authorization to start research.
+    if args.action in {"research", "acquisition", "analysis", "backtest"}:
+        print(
+            "MARKETSAGE_PREFLIGHT=BLOCKED "
+            "reason=research_cli_manifest_and_ledger_integration_missing",
+            file=sys.stderr,
+        )
+        return 2
+
     print(f"MARKETSAGE_PREFLIGHT={result['preflight']}")
     return 0
 
