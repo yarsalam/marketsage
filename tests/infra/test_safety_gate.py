@@ -71,6 +71,62 @@ class SafetyGateTests(unittest.TestCase):
                           environment={}, output_path=root / "new-output")
 
 
+    def test_open_research_scope_still_requires_registered_input_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            policy = root / "policy.json"
+            work = root / "work.json"
+            artifacts = root / "artifacts.jsonl"
+            ledger = root / "runs.jsonl"
+            work_id = "MS-20261116-CONTINUITY-001"
+            policy.write_text(json.dumps({
+                "schema_version": 1, "project": "MarketSage",
+                "scope_lock": "OPEN", "research_locked": False,
+                "allowed_actions": ["research"], "authorized_work_ids": [work_id],
+            }), encoding="utf-8")
+            work.write_text(json.dumps({
+                "work_id": work_id, "status": "IN_PROGRESS",
+                "allowed_actions": ["research"],
+            }), encoding="utf-8")
+            artifacts.write_text("", encoding="utf-8")
+            ledger.write_text("", encoding="utf-8")
+            with self.assertRaisesRegex(SafetyGateError, "research_requires_registered_input_artifacts"):
+                preflight(
+                    policy_path=policy, work_item_path=work,
+                    artifact_registry_path=artifacts, run_ledger_path=ledger,
+                    work_id=work_id, action="research", code_sha="a" * 40,
+                    input_artifacts={}, parameters={}, environment={},
+                    output_path=root / "new-output",
+                )
+
+    def test_acquisition_requires_a_deterministic_request_fingerprint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            work_id = "MS-20261116-CONTINUITY-001"
+            policy = root / "policy.json"
+            work = root / "work.json"
+            artifacts = root / "artifacts.jsonl"
+            ledger = root / "runs.jsonl"
+            policy.write_text(json.dumps({
+                "schema_version": 1, "project": "MarketSage",
+                "scope_lock": "OPEN", "research_locked": False,
+                "allowed_actions": ["acquisition"], "authorized_work_ids": [work_id],
+            }), encoding="utf-8")
+            work.write_text(json.dumps({
+                "work_id": work_id, "status": "IN_PROGRESS",
+                "allowed_actions": ["acquisition"],
+            }), encoding="utf-8")
+            artifacts.write_text("", encoding="utf-8")
+            ledger.write_text("", encoding="utf-8")
+            with self.assertRaisesRegex(SafetyGateError, "acquisition_request_fingerprint_required"):
+                preflight(
+                    policy_path=policy, work_item_path=work,
+                    artifact_registry_path=artifacts, run_ledger_path=ledger,
+                    work_id=work_id, action="acquisition", code_sha="a" * 40,
+                    input_artifacts={}, parameters={}, environment={},
+                    output_path=root / "new-output",
+                )
+
     def test_preflight_accepts_active_in_progress_infrastructure_work_and_git_sha(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
