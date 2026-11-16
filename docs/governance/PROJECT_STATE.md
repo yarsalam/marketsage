@@ -360,7 +360,7 @@ PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known
 - GitHub confirmed each file commit and each changed file was read from the branch during implementation.
 - No Python test command was run in this environment. The synthetic tests are authored but **NOT YET VERIFIED**.
 - No CI workflow was dispatched or rerun. All implementation commits use `[skip ci]`; exact-head hosted validation still requires separate owner authorization.
-- The safety gate is a reusable primitive; existing acquisition/research entry points and CI have **not yet been wired to call it**. Therefore this is not yet an enforced repository-wide gate.
+- The safety gate is a reusable primitive. The PR #74 branch CI now includes the synthetic safety-gate test module in the existing required control-plane test job, and the scope classifier allowlists only the dedicated `tests/infra/` path. This CI change has not run on the new head. Existing acquisition/research entry points are **not yet wired to call preflight**; therefore this is not yet an enforced repository-wide gate.
 - `RUN_LEDGER.jsonl` is initialized empty; prior historical runs have not been backfilled. A future run must be recorded before it can be safely deduplicated by this ledger.
 - Durable 3-copy / 2-media / offline backup and restore proof are NOT implemented. No storage destination has been authorized or verified.
 - The three candidate CSVs remain `PATH_UNRESOLVED`. No archive scan or restore was performed.
@@ -373,3 +373,12 @@ PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known
 4. Do not merge, deploy, change visibility, create secrets, spend, activate providers, or dispatch local workflows.
 
 **Issue #49 remains OPEN / NOT COMPLETE / NOT 24/7 READY. Research remains LOCKED.**
+
+
+### Follow-up implementation — CI test wiring (2026-11-16)
+
+- Extended the existing PR #74 infrastructure test job to run `python -m unittest discover -s tests/infra -p 'test_safety_gate.py' -v`.
+- Added only `tests/infra/` to the infrastructure path allowlist and added a classifier regression assertion for the safety-gate test path.
+- Latest implementation commit: `e2f7ce5fdf613ce1941529d715418b99aa9da0ad`.
+- Commits remain `[skip ci]`; the exact-head test job has NOT run. No dispatch/rerun was performed.
+- Main remains unchanged; the infrastructure-only CI design remains only on PR #74 and is not active on main.
