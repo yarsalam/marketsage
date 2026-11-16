@@ -2,7 +2,7 @@
   "work_id": "MS-20261116-CONTINUITY-001",
   "objective": "Implement and validate fail-closed continuity, immutable artifact and duplicate-run safeguards.",
   "owner": "project-owner",
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "allowed_actions": [
     "infrastructure",
     "governance",
@@ -76,5 +76,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; static audit fixed the scope-lock error precedence exposed by CI run 43794311916, hardened the legacy research CLI so it cannot authorize research without manifest/durable-ledger integration, required registered inputs for research/analysis/backtest and request fingerprints for acquisition, and hardened CI path classification against traversal/control-character/newline path ambiguity. All changes are authored/read-back only and untested. Remaining blockers: runtime schema/cross-record validation integration, actual workflow output-path and durable run-ledger wiring, historic run recovery, synthetic/exact-head validation authorization, and real 3-2-1 backup/restore proof."
+  "status_note": "Owner authorized one bounded exact-head hosted validation on 2026-11-16. A documentation-only checkpoint commit was created at addcb4be3821543ad5bf5aa41f17ddff636bedd1, but GitHub did not emit a workflow run for the GitHub-App-authored Contents API commit. The connected GitHub capability exposes GET and rerun operations but no workflow_dispatch/push-as-user operation; local checkout is unavailable in this execution environment. The only existing failed run (43794311916/43794316955) is on older SHA 5834b9d44504167148aa4ac09fcd2b3485a4666b and cannot validate the current code, so it was not rerun. No tests, provider requests, downloads, dataset reads, calculations, local Runner jobs, or research reopening occurred. RUN_LEDGER remains empty because no test execution occurred. Resume only when an exact-head test execution path is available; do not rerun the old SHA."
 }
