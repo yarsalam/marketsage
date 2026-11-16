@@ -688,3 +688,12 @@ Work ID: `MS-20261116-THREE-SYMBOL-ADJ-001`
 - Legacy adjusted candidate CSV identities remain `PATH_UNRESOLVED` in the registry; they will not be reconstructed or redownloaded before a separate archive search. This task starts from the already-imported evidence bundle in PR #82.
 - **Next action:** inspect the exact event-step diagnostics, original CODAL documents, per-symbol ledgers and missing TSE Client evidence; then request only the missing local files from the owner.
 - The prior Work ID `MS-20261116-CONTINUITY-001` remains BLOCKED and unchanged; its failed test suite is not being retried.
+
+
+### First event reconstruction — وغدیر 2011 mixed action
+
+- Existing CODAL primary texts 38803, 38805, 46666, 59965 and 61220 establish a 500 Rial DPS and a capital increase from 6.075bn to 12bn shares, funded by 1.410bn retained earnings, 2.721bn reserves and 1.794bn cash/receivables; the rights/subscription/registration chronology extends into 1390/10.
+- Independent theoretical references using 1,000 Rial nominal subscription value: before DPS `(7252×6.075 + 1000×1.794)/12 = 3820.825`; after DPS `(6752×6.075 + 1000×1.794)/12 = 3567.700`. Existing provider tuples contain 3,820 and 3,567; the reported first traded close is 3,569 after stale/no-trade 3,820 observations on 23–25 April 2011.
+- Price-basis capital-only factor: 0.52686500; combined DPS-plus-capital total-return factor: 0.49196084. Existing official-chart implied factor: 0.52729296, close to the capital-only factor, suggesting the chart's price-basis series excludes DPS. This remains a reconstructed candidate, not final acceptance, pending provider tuple semantics and exact effective-session confirmation.
+- Missing local evidence request: TSE Client `adjustInfo` event payloads; original CODAL documents for فولاد and پارسیان. Existing CODAL metadata index (107 فولاد, 79 پارسیان records), raw TSETMC daily/event files and official chart captures are already in PR #82 and must not be downloaded again.
+- **Next action:** obtain only the missing local evidence; continue event-by-event reconstruction for فولاد and پارسیان and unresolved وغدیر events.
