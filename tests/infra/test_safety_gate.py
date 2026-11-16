@@ -6,7 +6,7 @@ from pathlib import Path
 from infra.control_plane.safety_gate import (
     DuplicateAcquisition, DuplicateRun, RecoveryRequired, SafetyGateError,
     derive_run_fingerprint, find_existing_acquisition, reject_duplicate_run,
-    validate_artifact_registry, preflight, verify_immutable_artifact, reserve_run, finalize_run,
+    validate_artifact_registry, preflight, verify_immutable_artifact, reserve_run, finalize_run, preflight_and_reserve_run,
 )
 
 
@@ -183,6 +183,36 @@ class SafetyGateTests(unittest.TestCase):
             lines = ledger.read_text(encoding="utf-8").splitlines()
             self.assertEqual(len(lines), 2)
             self.assertEqual([json.loads(line)["event_type"] for line in lines], ["RESERVED", "FINALIZED"])
+
+    def test_preflight_and_reservation_are_one_required_call_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            governance = root / "docs" / "governance"
+            (governance / "work_items").mkdir(parents=True)
+            work_id = "MS-20261116-CONTINUITY-001"
+            (governance / "execution_policy.json").write_text(json.dumps({
+                "schema_version": 1, "project": "MarketSage",
+                "scope_lock": "INFRA_ONLY", "research_locked": True,
+                "allowed_actions": ["synthetic_test"], "authorized_work_ids": [work_id],
+            }), encoding="utf-8")
+            (governance / "work_items" / f"{work_id}.json").write_text(json.dumps({
+                "work_id": work_id, "status": "IN_PROGRESS",
+                "allowed_actions": ["synthetic_test"],
+            }), encoding="utf-8")
+            (governance / "ARTIFACT_REGISTRY.jsonl").write_text("", encoding="utf-8")
+            ledger = governance / "RUN_LEDGER.jsonl"
+            ledger.write_text("", encoding="utf-8")
+            result = preflight_and_reserve_run(
+                ledger, policy_path=governance / "execution_policy.json",
+                work_item_path=governance / "work_items" / f"{work_id}.json",
+                artifact_registry_path=governance / "ARTIFACT_REGISTRY.jsonl",
+                work_id=work_id, action="synthetic_test", run_id="run-atomic",
+                code_sha="a" * 40, input_artifacts={}, parameters={"suite": "smoke"},
+                environment={"python": "3.12"}, output_path=root / "new-output",
+            )
+            self.assertEqual(result["preflight"], "PASS_NO_SIDE_EFFECTS")
+            self.assertEqual(result["reservation"]["event_type"], "RESERVED")
+            self.assertEqual(len(ledger.read_text(encoding="utf-8").splitlines()), 1)
 
     def test_run_can_be_finalized_only_once(self):
         with tempfile.TemporaryDirectory() as directory:
