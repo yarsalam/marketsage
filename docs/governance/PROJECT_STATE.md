@@ -333,3 +333,43 @@ PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known
 - No hosted/local dispatch or rerun, merge, auto-merge, release, deployment, provider registration, secret creation, spending, visibility change, or product/data/investment work occurred.
 
 **Goal 1 / Issue #49: OPEN / NOT COMPLETE / NOT 24/7 READY.**
+
+
+---
+
+## Continuity safeguards implementation — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Issue:** #49  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Latest recorded commit at this state update:** `99055b46ea88a9281ed7c678310b71052912c0bc` (the subsequent state update itself creates a newer commit)  
+**Status:** IN PROGRESS / NOT ACCEPTED
+
+### Implemented on this branch (not yet runtime-validated)
+
+- Added `infra/control_plane/safety_gate.py`: standard-library-only JSONL registry readers, duplicate artifact/request detection, unresolved-path recovery stop, run fingerprinting from code SHA + input hashes + parameters + environment, duplicate-run rejection, immutable input hash verification, output-path collision checks, and fail-closed work/scope preflight.
+- Added `tests/infra/test_safety_gate.py` with synthetic tests for duplicate artifact IDs/hashes, duplicate acquisition, unresolved paths, deterministic run fingerprints, duplicate failed-run blocking, changed parameters, and research scope-lock rejection.
+- Added `docs/governance/WORK_PROTOCOL.md` with mandatory session startup, work-type procedures (acquisition, corporate-action adjustment, audit/test, backup/restore), preflight and end-of-task requirements.
+- Added `execution_policy.json` with `INFRA_ONLY` scope and research lock enabled.
+- Added append-only registry/ledger files. Three previously recorded adjusted-candidate CSV identities are retained with their known SHA-256 values and `PATH_UNRESOLVED`; no path, size, request parameters, rights approval or backup status is invented. They must not be re-downloaded or reconstructed before recovery search.
+- Added the unique work-item record `MS-20261116-CONTINUITY-001`.
+- Extended the execution constitution to bind the detailed work protocol and machine-readable safety records.
+
+### Validation and limitations
+
+- GitHub confirmed each file commit and each changed file was read from the branch during implementation.
+- No Python test command was run in this environment. The synthetic tests are authored but **NOT YET VERIFIED**.
+- No CI workflow was dispatched or rerun. All implementation commits use `[skip ci]`; exact-head hosted validation still requires separate owner authorization.
+- The safety gate is a reusable primitive; existing acquisition/research entry points and CI have **not yet been wired to call it**. Therefore this is not yet an enforced repository-wide gate.
+- `RUN_LEDGER.jsonl` is initialized empty; prior historical runs have not been backfilled. A future run must be recorded before it can be safely deduplicated by this ledger.
+- Durable 3-copy / 2-media / offline backup and restore proof are NOT implemented. No storage destination has been authorized or verified.
+- The three candidate CSVs remain `PATH_UNRESOLVED`. No archive scan or restore was performed.
+
+### Current owner gates / next permitted action
+
+1. Continue repository-only infrastructure work on this branch: harden and test the gate, add schema validation, wire it into CI and relevant entry points without executing research.
+2. Keep PR #74 Draft/open/unmerged. Do not dispatch/rerun CI until separately authorized.
+3. Keep PR #82 Draft/open/unmerged and all research/data work locked.
+4. Do not merge, deploy, change visibility, create secrets, spend, activate providers, or dispatch local workflows.
+
+**Issue #49 remains OPEN / NOT COMPLETE / NOT 24/7 READY. Research remains LOCKED.**
