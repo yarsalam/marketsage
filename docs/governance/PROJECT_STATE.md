@@ -382,3 +382,36 @@ PR #14 is already integrated into PR #6 and must not be re-merged. PR #8's known
 - Latest implementation commit: `e2f7ce5fdf613ce1941529d715418b99aa9da0ad`.
 - Commits remain `[skip ci]`; the exact-head test job has NOT run. No dispatch/rerun was performed.
 - Main remains unchanged; the infrastructure-only CI design remains only on PR #74 and is not active on main.
+
+
+---
+
+## Governance schema validation checkpoint — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Implementation head immediately before this state update:** `e9de35445793b6e7defb74cc44ebb1bf4bccc4c6`  
+**Status:** IN PROGRESS / NOT ACCEPTED / NOT RUNTIME-VERIFIED
+
+### Repository-only changes authored and read back from GitHub
+
+- Added `schemas/governance-records-v1.schema.json` with strict Draft 2020-12 record definitions for artifact registry, run ledger, execution policy and active work item.
+- Added `infra/control_plane/validate_governance.py`: validates schema correctness, canonical policy/work item, every JSONL record, unique artifact IDs/identities/hashes/acquisition fingerprints, unique run IDs/fingerprints, work-item authorization, action scope and research-lock consistency.
+- Added `tests/infra/test_governance_validation.py` with synthetic regression cases for duplicate artifact identity/hash/request, unresolved-path safety, duplicate failed/successful run fingerprints and research-lock violations.
+- Extended CI's existing infrastructure test job to invoke the canonical validator and the new synthetic test module.
+- Added the new schema to the infrastructure-only CI allowlist and a classifier regression assertion.
+- Updated the work item acceptance criteria and the canonical work protocol with the validator command and exact-evidence rule.
+
+### Validation boundary
+
+- All changed files were fetched back from the branch; GitHub returned successful file/commit responses.
+- No Python test, schema-validation command or CI workflow was executed in this turn. The new implementation is **AUTHORED / NOT VERIFIED**.
+- The commits were marked `[skip ci]`; no workflow dispatch/rerun occurred. Exact-head hosted validation remains blocked pending separate owner authorization.
+- No data, provider, research or adjustment workflow was accessed. The research lock remains active.
+- This checkpoint does not yet wire preflight into every existing acquisition/research entry point, backfill historical run evidence, or prove the three-copy/two-media/offline backup and restore policy.
+
+### Next permitted action
+
+Continue repository-only infrastructure work: audit the remaining execution entry points and add a fail-closed preflight adapter at safe boundaries without executing them; then add tests for missing/corrupt canonical records and immutable raw-file tampering. Exact-head CI validation still requires the separately recorded owner authorization.
+
+**Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
