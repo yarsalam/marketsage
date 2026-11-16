@@ -325,12 +325,15 @@ def preflight(
         or not isinstance(policy.get("allowed_actions"), list)
     ):
         raise SafetyGateError("execution_policy_invalid_or_incomplete")
-    if action not in policy["allowed_actions"]:
-        raise SafetyGateError("action_not_authorized_by_execution_policy")
+    # Scope locks take precedence over the allowlist so callers receive the
+    # canonical lock reason for prohibited work, even when the action is also
+    # absent from allowed_actions. This keeps workflow gates deterministic.
     if policy.get("scope_lock") == "INFRA_ONLY" and action not in {"infrastructure", "governance", "synthetic_test"}:
         raise SafetyGateError("project_scope_locked")
     if policy.get("research_locked", True) and action in {"research", "acquisition", "analysis", "backtest"}:
         raise SafetyGateError("research_scope_locked")
+    if action not in policy["allowed_actions"]:
+        raise SafetyGateError("action_not_authorized_by_execution_policy")
     if work.get("work_id") != work_id or work.get("status") not in {"AUTHORIZED", "IN_PROGRESS"}:
         raise SafetyGateError("work_item_not_authorized")
     if action not in work.get("allowed_actions", []):
