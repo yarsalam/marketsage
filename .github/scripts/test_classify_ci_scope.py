@@ -13,6 +13,7 @@ class InfrastructurePathTests(unittest.TestCase):
         self.assertTrue(is_allowed_infrastructure_path(".github/workflows/local-tsetmc-sanitized-diagnostics.yml"))
         self.assertTrue(is_allowed_infrastructure_path("schemas/infra-task-v1.schema.json"))
         self.assertTrue(is_allowed_infrastructure_path("schemas/governance-records-v1.schema.json"))
+        self.assertTrue(is_allowed_infrastructure_path("schemas/backup-manifest-v1.schema.json"))
 
     def test_infrastructure_documentation_and_code_are_allowed(self):
         self.assertTrue(is_allowed_infrastructure_path("docs/infra/worker-sandbox.md"))
