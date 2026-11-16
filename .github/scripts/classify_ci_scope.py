@@ -14,6 +14,7 @@ ALLOWED_EXACT = {
     ".github/scripts/test_classify_ci_scope.py",
     "requirements-infra.txt",
     "schemas/infra-task-v1.schema.json",
+    "schemas/governance-records-v1.schema.json",
 }
 ALLOWED_PREFIXES = (
     "docs/automation/",
