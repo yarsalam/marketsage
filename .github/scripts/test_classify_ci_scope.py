@@ -8,6 +8,9 @@ from classify_ci_scope import is_allowed_infrastructure_path, is_infrastructure_
 class InfrastructurePathTests(unittest.TestCase):
     def test_exact_workflow_and_schema_paths_are_allowed(self):
         self.assertTrue(is_allowed_infrastructure_path(".github/workflows/ci.yml"))
+        self.assertTrue(is_allowed_infrastructure_path(".github/workflows/local-tsetmc-offline-acceptance.yml"))
+        self.assertTrue(is_allowed_infrastructure_path(".github/workflows/local-tsetmc-integrated-acceptance.yml"))
+        self.assertTrue(is_allowed_infrastructure_path(".github/workflows/local-tsetmc-sanitized-diagnostics.yml"))
         self.assertTrue(is_allowed_infrastructure_path("schemas/infra-task-v1.schema.json"))
         self.assertTrue(is_allowed_infrastructure_path("schemas/governance-records-v1.schema.json"))
 
@@ -93,6 +96,20 @@ class WorkflowContractTests(unittest.TestCase):
         workflow = (Path(__file__).resolve().parents[1] / "workflows" / "ci.yml").read_text(encoding="utf-8")
         for forbidden in ("pytest ", "pnpm ", "docker compose", "docker build"):
             self.assertNotIn(forbidden, workflow)
+
+    def test_local_research_workflows_run_preflight_before_data_or_output_access(self):
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1] / "workflows"
+        contracts = {
+            "local-tsetmc-offline-acceptance.yml": ("Enforce MarketSage research scope", "Verify staged dataset offline"),
+            "local-tsetmc-integrated-acceptance.yml": ("Enforce MarketSage research scope", "Run memory-bounded local offline TSETMC acceptance"),
+            "local-tsetmc-sanitized-diagnostics.yml": ("Enforce MarketSage research scope", "Run read-only sanitized diagnostics"),
+        }
+        for filename, (gate, action) in contracts.items():
+            content = (root / filename).read_text(encoding="utf-8")
+            self.assertIn("preflight_cli --action research", content)
+            self.assertLess(content.index(gate), content.index(action))
 
     def test_concurrency_and_timeouts_remain_bounded(self):
         from pathlib import Path
