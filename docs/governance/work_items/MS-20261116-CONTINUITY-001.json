@@ -2,7 +2,7 @@
   "work_id": "MS-20261116-CONTINUITY-001",
   "objective": "Implement and validate fail-closed continuity, immutable artifact and duplicate-run safeguards.",
   "owner": "project-owner",
-  "status": "AUTHORIZED",
+  "status": "IN_PROGRESS",
   "allowed_actions": [
     "infrastructure",
     "governance",
