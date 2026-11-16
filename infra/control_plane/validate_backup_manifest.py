@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from .backup_restore import BackupSafetyError, sha256_file, verify_backup_copy
+from .backup_restore import BackupSafetyError, _reject_symlink_components, sha256_file, verify_backup_copy
 from jsonschema import Draft202012Validator, FormatChecker
 
 
@@ -66,6 +66,7 @@ def validate_backup_manifest(
         if restore["restored_path"] in copy_paths:
             raise BackupManifestError("restore_overwrites_backup_copy")
         try:
+            _reject_symlink_components(Path(restore["restored_path"]))
             restored_hash, restored_size = sha256_file(restore["restored_path"])
         except OSError as exc:
             raise BackupManifestError("restore_file_unavailable") from exc
