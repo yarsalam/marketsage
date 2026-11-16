@@ -141,6 +141,8 @@ jobs:
         run: python -m unittest discover -s infra/control_plane -p 'test_*.py' -v
       - name: Test artifact registry and no-repeat safety gate
         run: python -m unittest discover -s tests/infra -p 'test_safety_gate.py' -v
+      - name: Test fail-closed workflow preflight adapter
+        run: python -m unittest discover -s tests/infra -p 'test_preflight_cli.py' -v
       - name: Validate canonical governance schemas and cross-record invariants
         run: python -m infra.control_plane.validate_governance
       - name: Test governance registry and run-ledger validation
