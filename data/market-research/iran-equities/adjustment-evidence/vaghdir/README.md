@@ -99,3 +99,19 @@ Scripts in `scripts/research/iran-equities/adjustment/`:
 - This evidence covers **one symbol (وغدیر)** and **one event year (2011)**.
 - It does **not** approve investment ranking, backtesting, or production use.
 - فولاد and پارسیان remain to be documented.
+
+## Raw data layout (2026-11-16)
+
+Two raw directories exist by design:
+
+- **`raw/tsetmc/`** — Original, unmodified API captures from earlier work.
+  Contains full field sets (`insCode`, `corporateTypeCode`, `instrument`, `idn`, etc.).
+  **Use this for `price_adjust` and `share_change`.**
+  
+- **`raw/vaghdir_daily_raw_snapshot_20261115.json`** — Newer daily snapshot
+  (5,691 records, through 2026-11-15) versus the older `raw/tsetmc/vaghdir_daily_raw.json`
+  (5,688 records, through 2026-11-11). Extends coverage by 4 trading days.
+
+The stripped `raw/vaghdir_price_adjust_raw.json` and
+`raw/vaghdir_share_change_raw.json` (minimal fields only) were removed
+because `raw/tsetmc/` already contains complete versions of the same data.
