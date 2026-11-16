@@ -58,7 +58,11 @@
     "restore never overwrites an existing destination",
     "synthetic backup/restore tests are wired into infrastructure CI",
     "backup manifest validates against a versioned strict JSON Schema",
-    "backup manifest cross-checks copy identity, source hashes, 3-2-1 topology and successful restore evidence"
+    "backup manifest cross-checks copy identity, source hashes, 3-2-1 topology and successful restore evidence",
+    "research, analysis and backtest preflight requires at least one registered immutable input artifact and verifies its SHA-256",
+    "acquisition preflight requires a deterministic SHA-256 request fingerprint and blocks an equivalent registered acquisition",
+    "legacy research CLI remains fail-closed even after policy unlock until it accepts registered input manifests, validates the actual output path, and durably reserves/finalizes run-ledger events",
+    "CI scope classifier rejects absolute, traversal, backslash and control-character paths and parses changed paths with NUL delimiters"
   ],
   "prohibited_actions": [
     "research",
@@ -72,5 +76,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; static audit identified and corrected a deterministic scope-lock error-order defect after CI run 43794311916 failed in the preflight CLI test. The correction is authored/read-back only and untested. Material blockers remain: CLI lacks registered input-manifest binding, actual workflow output-path validation, and durable run reservation/finalization; runtime preflight does not itself enforce the full governance schema/cross-record validator. Synthetic tests, exact-head CI, historical run recovery and real 3-2-1 backup/restore remain unverified and require their respective owner-authorized paths."
+  "status_note": "IN_PROGRESS; static audit fixed the scope-lock error precedence exposed by CI run 43794311916, hardened the legacy research CLI so it cannot authorize research without manifest/durable-ledger integration, required registered inputs for research/analysis/backtest and request fingerprints for acquisition, and hardened CI path classification against traversal/control-character/newline path ambiguity. All changes are authored/read-back only and untested. Remaining blockers: runtime schema/cross-record validation integration, actual workflow output-path and durable run-ledger wiring, historic run recovery, synthetic/exact-head validation authorization, and real 3-2-1 backup/restore proof."
 }
