@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 _SHA = re.compile(r"^[0-9a-f]{64}$")
+_GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 _WORK = re.compile(r"^[A-Z0-9][A-Z0-9._-]{7,127}$")
 
 
@@ -130,7 +131,7 @@ def derive_run_fingerprint(
     *, code_sha: str, input_hashes: Mapping[str, str], parameters: Mapping[str, Any],
     environment: Mapping[str, Any],
 ) -> str:
-    if not _SHA.fullmatch(code_sha):
+    if not _GIT_SHA.fullmatch(code_sha):
         raise SafetyGateError("code_sha_invalid")
     if any(not _SHA.fullmatch(value) for value in input_hashes.values()):
         raise SafetyGateError("input_sha256_invalid")
@@ -168,7 +169,7 @@ def preflight(
         raise SafetyGateError("project_scope_locked")
     if policy.get("research_locked", True) and action in {"research", "acquisition", "analysis", "backtest"}:
         raise SafetyGateError("research_scope_locked")
-    if work.get("work_id") != work_id or work.get("status") != "AUTHORIZED":
+    if work.get("work_id") != work_id or work.get("status") not in {"AUTHORIZED", "IN_PROGRESS"}:
         raise SafetyGateError("work_item_not_authorized")
     if action not in work.get("allowed_actions", []):
         raise SafetyGateError("action_not_authorized_for_work_item")
@@ -212,7 +213,7 @@ def preflight(
     for record in artifacts:
         if record.get("immutable") and record.get("storage_path"):
             protected = Path(record["storage_path"]).resolve()
-            if destination == protected or protected in destination.parents:
+            if destination == protected or protected in destination.parents or destination in protected.parents:
                 raise SafetyGateError("output_path_overlaps_immutable_artifact")
     return {"work_id": work_id, "run_fingerprint": fingerprint,
             "verified_input_hashes": verified, "output_path": str(destination),
