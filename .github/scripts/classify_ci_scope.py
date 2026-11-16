@@ -87,7 +87,7 @@ def changed_paths_from_git(event_name: str, base_sha: str, before_sha: str) -> l
     )
     # NUL-delimited paths preserve embedded newlines; line-delimited parsing
     # could split one unusual filename into multiple allowlisted fragments.
-    return [os.fsdecode(item) for item in result.stdout.split(b"\\0") if item]
+    return [os.fsdecode(item) for item in result.stdout.split(b"\0") if item]
 
 
 def main() -> int:
