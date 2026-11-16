@@ -30,7 +30,19 @@ ALLOWED_PREFIXES = (
 
 
 def is_allowed_infrastructure_path(path: str) -> bool:
-    normalized = str(PurePosixPath(path))
+    # Git paths are untrusted input to this authorization boundary. Reject
+    # absolute, traversal, separator-confused and control-character paths
+    # before applying any exact/prefix allowlist.
+    if (
+        not isinstance(path, str)
+        or not path
+        or path.startswith("/")
+        or "\\" in path
+        or any(part in {"", ".", ".."} for part in path.split("/"))
+        or any(ord(char) < 32 or ord(char) == 127 for char in path)
+    ):
+        return False
+    normalized = PurePosixPath(path).as_posix()
     if normalized in ALLOWED_EXACT:
         return True
     return any(normalized.startswith(prefix) for prefix in ALLOWED_PREFIXES)
