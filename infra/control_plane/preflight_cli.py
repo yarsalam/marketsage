@@ -7,12 +7,15 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 
 from .safety_gate import SafetyGateError, preflight
 
 DEFAULT_WORK_ID = "MS-20261116-CONTINUITY-001"
+_WORK_ID = re.compile(r"^[A-Z0-9][A-Z0-9._-]{7,127}$")
+_RUN_ID = re.compile(r"^[A-Za-z0-9._-]{1,80}$")
 
 
 def main() -> int:
@@ -27,6 +30,9 @@ def main() -> int:
     parser.add_argument("--run-id", default=os.environ.get("GITHUB_RUN_ID", "manual"))
     args = parser.parse_args()
 
+    if not _WORK_ID.fullmatch(args.work_id) or not _RUN_ID.fullmatch(args.run_id):
+        print("MARKETSAGE_PREFLIGHT=BLOCKED reason=invalid_cli_identity", file=sys.stderr)
+        return 2
     root = args.root.resolve()
     governance = root / "docs" / "governance"
     try:
