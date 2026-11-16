@@ -49,6 +49,8 @@ All acquisition/research entry points must call `infra.control_plane.safety_gate
 
 A CI integration must validate policy, work-item metadata, registry schema/duplicate IDs/hashes/fingerprints, run-ledger integrity and synthetic tests before research can reopen. A check on a different SHA is not evidence.
 
+The canonical validator is `python -m infra.control_plane.validate_governance`. It validates `schemas/governance-records-v1.schema.json`, the active execution policy and work item, every artifact/run JSONL record, and cross-record idempotency/authorization invariants. The infrastructure CI job must run this command and `python -m unittest discover -s tests/infra -p 'test_governance_validation.py' -v`. These commands being wired into CI is not proof they have passed; record exact-head evidence only after an authorized run.
+
 ## End-of-task sequence
 
 1. Append the run record and terminal work status (`DONE`, `BLOCKED`, or `REJECTED`) with exact commit, inputs, parameters, environment, result and evidence IDs.
