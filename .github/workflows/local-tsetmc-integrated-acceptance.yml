@@ -38,6 +38,10 @@ jobs:
           persist-credentials: false
           clean: true
 
+      - name: Enforce MarketSage research scope before reading staged data
+        working-directory: workflow-source
+        run: python3 -m infra.control_plane.preflight_cli --action research
+
       - name: Run memory-bounded local offline TSETMC acceptance in private batches
         env:
           MARKETSAGE_DATASET_ROOT: /srv/marketsage/data/tsetmc_history_20261022
