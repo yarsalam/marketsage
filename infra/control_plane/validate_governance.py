@@ -88,21 +88,48 @@ def validate_artifact_records(records: list[dict[str, Any]]) -> None:
 
 
 def validate_run_records(records: list[dict[str, Any]], policy: dict[str, Any], work: dict[str, Any]) -> None:
-    run_ids: set[str] = set()
-    fingerprints: set[str] = set()
+    event_ids: set[str] = set()
+    fingerprint_owners: dict[str, str] = {}
+    runs: dict[str, dict[str, dict[str, Any]]] = {}
     for record in records:
-        if record["run_id"] in run_ids:
-            raise GovernanceValidationError("duplicate_run_id")
-        if record["run_fingerprint"] in fingerprints:
+        event_id = record["event_id"]
+        run_id = record["run_id"]
+        event_type = record["event_type"]
+        fingerprint = record["run_fingerprint"]
+        if event_id in event_ids:
+            raise GovernanceValidationError("duplicate_run_event_id")
+        event_ids.add(event_id)
+        owner = fingerprint_owners.get(fingerprint)
+        if owner is not None and owner != run_id:
             raise GovernanceValidationError("duplicate_run_fingerprint")
-        if record["work_id"] != work["work_id"]:
-            raise GovernanceValidationError("run_references_unknown_work_item")
-        if record["action"] not in work["allowed_actions"] or record["action"] not in policy["allowed_actions"]:
-            raise GovernanceValidationError("run_action_not_authorized")
-        if policy["research_locked"] and record["action"] in {"research", "acquisition", "analysis", "backtest"}:
-            raise GovernanceValidationError("research_run_recorded_while_locked")
-        run_ids.add(record["run_id"])
-        fingerprints.add(record["run_fingerprint"])
+        fingerprint_owners[fingerprint] = run_id
+        events = runs.setdefault(run_id, {})
+        if event_type in events:
+            raise GovernanceValidationError("duplicate_run_event_type")
+        if event_type == "RESERVED":
+            if record["work_id"] != work["work_id"]:
+                raise GovernanceValidationError("run_references_unknown_work_item")
+            if record["action"] not in work["allowed_actions"] or record["action"] not in policy["allowed_actions"]:
+                raise GovernanceValidationError("run_action_not_authorized")
+            if policy["research_locked"] and record["action"] in {"research", "acquisition", "analysis", "backtest"}:
+                raise GovernanceValidationError("research_run_recorded_while_locked")
+        elif event_type == "FINALIZED":
+            reservation = events.get("RESERVED")
+            if reservation is None:
+                raise GovernanceValidationError("run_finalized_without_reservation")
+            if reservation["run_fingerprint"] != fingerprint:
+                raise GovernanceValidationError("run_finalization_fingerprint_mismatch")
+        else:
+            raise GovernanceValidationError("unknown_run_event_type")
+        events[event_type] = record
+
+    for events in runs.values():
+        if "RESERVED" not in events:
+            raise GovernanceValidationError("run_reservation_missing")
+        reservation = events["RESERVED"]
+        final = events.get("FINALIZED")
+        if final is not None and final["recorded_at_utc"] < reservation["recorded_at_utc"]:
+            raise GovernanceValidationError("run_finalization_precedes_reservation")
 
 
 def validate_governance(root: Path) -> dict[str, int | str]:
@@ -135,7 +162,7 @@ def validate_governance(root: Path) -> dict[str, int | str]:
 
     runs = _read_jsonl(governance / "RUN_LEDGER.jsonl")
     for record in runs:
-        _validate_schema(record, schema, "run")
+        _validate_schema(record, schema, "run_event")
     validate_run_records(runs, policy, work)
 
     return {"artifacts": len(artifacts), "runs": len(runs), "work_id": work["work_id"]}
