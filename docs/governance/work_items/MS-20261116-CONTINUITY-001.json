@@ -21,12 +21,18 @@
     "WORK_PROTOCOL.md",
     "execution_policy.json",
     "ARTIFACT_REGISTRY.jsonl",
-    "RUN_LEDGER.jsonl"
+    "RUN_LEDGER.jsonl",
+    "schemas/governance-records-v1.schema.json",
+    "infra/control_plane/validate_governance.py",
+    "tests/infra/test_governance_validation.py"
   ],
   "acceptance_criteria": [
     "synthetic tests cover duplicate IDs/hashes/acquisitions/runs and unresolved paths",
     "preflight fails closed on scope lock and missing canonical records",
-    "all changes read back from GitHub"
+    "all changes read back from GitHub",
+    "strict JSON Schema validation covers policy, active work item, artifact registry and run ledger records",
+    "cross-record checks reject duplicate artifact identities, hashes, acquisition fingerprints, run IDs and run fingerprints",
+    "CI invokes canonical governance validation and synthetic regression tests"
   ],
   "prohibited_actions": [
     "research",
@@ -40,5 +46,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; not yet tested or accepted"
+  "status_note": "IN_PROGRESS; schema validator, regression tests and CI wiring authored and read back from GitHub; execution remains unverified because no CI dispatch/rerun is authorized."
 }
