@@ -170,3 +170,10 @@ Until that process completes, the current version remains in force.
 This constitution and its technical controls can make unauthorized scope drift detectable, make unreviewed code changes difficult to merge, preserve durable context, and prevent routine work from silently crossing into capital-risk decisions.
 
 They cannot guarantee that a market strategy will be profitable, that every external data provider will remain available, or that software has zero defects. A human administrator could also deliberately override repository controls. Therefore the practical adherence target is: no unrecorded strategy change, no untraceable task, no repeated test without a change trigger, no unreviewed code on the trusted runner, and no capital-risk action without the owner's explicit approval.
+
+
+### Rule 10 — Mandatory protocol and technical preflight
+
+The detailed, work-type-specific execution sequence is maintained in `docs/governance/WORK_PROTOCOL.md`. It is mandatory for every chat, terminal session, branch and workflow. The machine-readable scope lock is `docs/governance/execution_policy.json`; artifact identities and run fingerprints are tracked in `ARTIFACT_REGISTRY.jsonl` and `RUN_LEDGER.jsonl`. These records supplement, and do not weaken, this constitution.
+
+Before acquisition, research, calculation or test execution, the common `infra.control_plane.safety_gate.preflight` must verify authorization, scope, registered inputs and hashes, request/run idempotency, and a new output path. Missing or unresolved records fail closed. Work-type procedures for source discovery, corporate-action adjustment, audit, tests and backup/restore are in WORK_PROTOCOL. A chat handoff or attachment never authorizes repeating an operation.
