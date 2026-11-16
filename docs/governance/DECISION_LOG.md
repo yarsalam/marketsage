@@ -179,3 +179,24 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
+
+
+## 2026-11-16 — Reopen bounded three-symbol adjustment research
+
+**Authority:** Explicit owner instruction in the current conversation.  
+**Work ID:** `MS-20261116-THREE-SYMBOL-ADJ-001`  
+**Status:** Authorized / in progress.
+
+**Decision**
+- Lift the infrastructure-only research pause in `execution_policy.json` (`scope_lock=OPEN`, `research_locked=false`) for the owner-authorized work item covering only فولاد، وغدیر، پارسیان price adjustment.
+- Reuse PR #82's existing immutable raw TSETMC inputs, event feeds, CODAL evidence, official chart captures, SHA-256 manifest and prior offline diagnostics. Do not repeat the 2026-11-12 audit unchanged.
+- The owner will download/provide any missing local-only evidence after a precise request. The assistant must not make provider requests or automatic downloads.
+- Keep all raw artifacts immutable; unresolved event intervals quarantined; price-basis adjusted and total-return outputs separate.
+- This authorization does not approve source rights, investment scoring/ranking, strategy backtesting, production, merge, deployment, broker access or trading. No unrelated research is reopened.
+
+**Evidence checkpoint**
+- PR #82 head: `1cdeb07f10d1b5bbc56ff519d50835cff8c0aa6e`, Draft/open/unmerged.
+- Prior evidence integrity run #43715149800: integrity job passed; historical-market-state job cancelled.
+- Existing diagnostic p95 chart-shape errors: فولاد 91.02% current; best tested exact-date-suppressed variant 7.34%; وغدیر 30.99%; پارسیان 4.81%. These are not acceptance results.
+
+**Capital-risk impact:** No investment outputs or capital decisions are enabled.
