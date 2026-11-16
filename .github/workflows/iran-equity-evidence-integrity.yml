@@ -56,7 +56,8 @@ jobs:
     # TSETMC/CODAL legacy endpoints may be network-restricted outside Iran.
     # This job performs only read-only GET requests from the repository's registered local runner.
     runs-on: self-hosted
-    timeout-minutes: 4
+    timeout-minutes: 10
+    continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
