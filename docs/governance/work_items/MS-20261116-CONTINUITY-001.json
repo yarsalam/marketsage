@@ -26,7 +26,9 @@
     "infra/control_plane/validate_governance.py",
     "tests/infra/test_governance_validation.py",
     "infra/control_plane/preflight_cli.py",
-    "tests/infra/test_preflight_cli.py"
+    "tests/infra/test_preflight_cli.py",
+    "atomic run reservation/finalization API",
+    "append-only run event schema with RESERVED and FINALIZED states"
   ],
   "acceptance_criteria": [
     "synthetic tests cover duplicate IDs/hashes/acquisitions/runs and unresolved paths",
@@ -38,7 +40,11 @@
     "workflow preflight adapter blocks all three existing local TSETMC workflow entrypoints before data/output access while research is locked",
     "preflight accepts IN_PROGRESS work items and actual 40-character Git commit SHAs",
     "synthetic tests detect immutable artifact tampering and missing/corrupt canonical preflight records",
-    "CI classifier allowlists only the three preflight-gated local TSETMC workflow edits"
+    "CI classifier allowlists only the three preflight-gated local TSETMC workflow edits",
+    "run reservation is atomic under an OS file lock and blocks identical fingerprints before execution",
+    "a failed or successful run remains in the ledger and blocks identical retries",
+    "run finalization appends a terminal event without modifying the reservation event",
+    "validator enforces one reservation and at most one terminal event per run, with unique fingerprint ownership"
   ],
   "prohibited_actions": [
     "research",
@@ -52,5 +58,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; governance schema validator and fail-closed preflight adapter are authored; three local TSETMC workflows are gated before data/output access; synthetic regression tests and CI wiring are authored but not executed; exact-head validation remains unauthorized."
+  "status_note": "IN_PROGRESS; schema validator, workflow preflight gates, atomic append-only run reservation/finalization primitives and synthetic regression tests are authored. CI/test execution and exact-head validation remain unverified and separately authorization-gated."
 }
