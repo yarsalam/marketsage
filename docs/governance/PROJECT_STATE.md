@@ -636,3 +636,14 @@ Work ID: `MS-20261116-CONTINUITY-001`
 - Scope remains `INFRA_ONLY`; `research_locked=true`. This authorization is limited to the existing infrastructure/synthetic-test acceptance suite. It does not authorize research reopening, provider requests, downloads, dataset reads, calculations, local Runner dispatch, workflow_dispatch/rerun, merge, deploy, secrets, spend or visibility changes.
 - Reuse the existing PR #74 branch and work item. No new issue, PR, work ID, or duplicate test is created. The existing failed run #43794311916 remains attached to its original SHA and is not retried as-is; validation is for the new exact head after the recorded code changes.
 - Acceptance: exact-head CI must run the infrastructure control-plane tests, preflight CLI tests, backup/restore tests and governance validation. Record the actual result and run ID; skipped jobs are not passes. If the exact-head run fails, do not repeat without a material correction and a recorded reason.
+
+
+## Validation execution blocker — 2026-11-16
+
+Work ID: `MS-20261116-CONTINUITY-001`
+
+- The owner-authorized bounded validation was prepared against the existing PR #74 branch. Checkpoint commit: `addcb4be3821543ad5bf5aa41f17ddff636bedd1`.
+- The GitHub Contents API write did not produce a push workflow run (no new run appeared for that commit). The connected GitHub integration exposes no workflow-dispatch or push-as-user operation. A local checkout is also unavailable in this execution environment; network clone was unavailable.
+- Existing runs `43794311916` and `43794316955` both target the older SHA `5834b9d44504167148aa4ac09fcd2b3485a4666b`; both failed at the preflight CLI test. They are not valid evidence for the current branch HEAD and were not rerun.
+- No tests were executed. No run event was fabricated; `RUN_LEDGER.jsonl` remains empty. No provider request, data download/read, research calculation, local Runner job, workflow dispatch/rerun, merge or deploy occurred. Research remains locked.
+- Work item status is now `BLOCKED` solely on the missing exact-head execution path. Do not rerun the old SHA. **Next permitted action:** provide an authorized exact-head CI execution path (workflow dispatch capability or an approved local checkout/runner), then run the existing infrastructure suite once and record the exact result.
