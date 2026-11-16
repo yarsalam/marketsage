@@ -618,3 +618,11 @@ Work ID: `MS-20261116-CONTINUITY-001`
 - Registry retains the three pre-existing candidate CSV identities/hashes as `PATH_UNRESOLVED`. Registry archive locations are empty; no local/registered archive scan, redownload, or reconstruction was performed under the research lock. RUN_LEDGER remains empty.
 - No changes were made to PR #82. PR #74 remains Draft/open/unmerged. No merge, workflow dispatch/rerun, local Runner, provider/network request, dataset read, calculation, deploy, secret, spend or visibility change occurred.
 - **Status:** `IN_PROGRESS`; Issue #49 remains open and 24/7 readiness is not proven. **Next permitted action:** continue repository-only integration of strict runtime governance validation and durable execution-ledger interfaces; exact-head validation and any real host backup drill remain owner-gated.
+
+### Exact-head read-back after repository-only hardening
+
+- Branch head immediately before this state refresh: 92aa26c09626a6d72ece86c330374b3d9a9ec922.
+- Branch comparison against main: 176 commits ahead, 0 behind; merge base is the current main SHA 4c4b032196137af4658ea2c28e38a21605ee923b.
+- Exact-head workflow-run query for 92aa26c: zero PR workflow runs. Combined status query: zero status entries. This is absence of validation, not a pass.
+- Read-back confirmed the changed safety gate, CLI, tests, classifier, protocol, work item, registry and ledger. Registry still has exactly three unresolved candidate records; ledger is still empty.
+- The known prior CI failure #43794311916 remains the only observed validation outcome for the affected earlier code: Test provider-neutral control plane failed at the CLI test; scope classification and CI helper tests passed. The corrective commits have no test evidence.
