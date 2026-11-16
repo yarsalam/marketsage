@@ -51,6 +51,12 @@ def main() -> int:
         )
     except (SafetyGateError, OSError, ValueError) as exc:
         reason = str(exc).split(":", 1)[0].replace("\n", "")[:100]
+        # The legacy CLI always supplies an empty input manifest and has no
+        # durable run-ledger interface. Preserve the more actionable adapter
+        # block reason when the common preflight reaches its registered-input
+        # guard; do not mask earlier lock or canonical-record failures.
+        if args.action in {"research", "acquisition", "analysis", "backtest"} and reason == "research_requires_registered_input_artifacts":
+            reason = "research_cli_manifest_and_ledger_integration_missing"
         print(f"MARKETSAGE_PREFLIGHT=BLOCKED reason={reason}", file=sys.stderr)
         return 2
 
