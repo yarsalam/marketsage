@@ -2,7 +2,7 @@
   "work_id": "MS-20261116-CONTINUITY-001",
   "objective": "Implement and validate fail-closed continuity, immutable artifact and duplicate-run safeguards.",
   "owner": "project-owner",
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "allowed_actions": [
     "infrastructure",
     "governance",
@@ -76,5 +76,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "Owner authorized one bounded exact-head hosted validation on 2026-11-16. A documentation-only checkpoint commit was created at addcb4be3821543ad5bf5aa41f17ddff636bedd1, but GitHub did not emit a workflow run for the GitHub-App-authored Contents API commit. The connected GitHub capability exposes GET and rerun operations but no workflow_dispatch/push-as-user operation; local checkout is unavailable in this execution environment. The only existing failed run (43794311916/43794316955) is on older SHA 5834b9d44504167148aa4ac09fcd2b3485a4666b and cannot validate the current code, so it was not rerun. No tests, provider requests, downloads, dataset reads, calculations, local Runner jobs, or research reopening occurred. RUN_LEDGER remains empty because no test execution occurred. Resume only when an exact-head test execution path is available; do not rerun the old SHA."
+  "status_note": "Owner authorized one bounded exact-head hosted validation. Exact-head CI run 43815683485 on ee3300fa927f954ffcca742527322df4903c205f executed the provider-neutral suite: 110 control-plane tests passed, 17 safety-gate tests passed, and CI automation helper tests passed. The preflight CLI suite had 2 passes and 1 failure because the common preflight's registered-input guard returned research_requires_registered_input_artifacts before the legacy adapter emitted its more actionable research_cli_manifest_and_ledger_integration_missing reason. One bounded correction was made in infra/control_plane/preflight_cli.py at commit 3fa6ad1a7c711aaab7a260cfce7b3b6740bae24f: map only that specific missing-input reason for research-like actions; preserve lock and canonical-record errors. No provider requests, data downloads/reads, research calculations, local Runner jobs, workflow_dispatch/reruns, merge or deploy occurred. Research remains locked. Await one exact-head validation of the corrected code; if it fails, stop and record BLOCKED rather than retrying identically."
 }
