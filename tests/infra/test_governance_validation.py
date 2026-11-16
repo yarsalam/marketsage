@@ -1,4 +1,9 @@
 import unittest
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+from jsonschema import Draft202012Validator, FormatChecker
 
 from infra.control_plane.validate_governance import (
     GovernanceValidationError,
@@ -73,6 +78,30 @@ class GovernanceValidationTests(unittest.TestCase):
         }
         validate_run_records([reservation], policy, work)
 
+
+    def test_run_reservation_and_finalization_match_append_only_schema(self):
+        root = Path(__file__).resolve().parents[2]
+        schema = json.loads((root / "schemas/governance-records-v1.schema.json").read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        reservation = {
+            "event_id": "event-1", "event_type": "RESERVED",
+            "run_id": "run-1", "work_id": "MS-20261116-CONTINUITY-001",
+            "action": "synthetic_test", "run_fingerprint": "d" * 64,
+            "code_sha": "a" * 40, "input_hashes": {"fixture": "b" * 64},
+            "parameters": {}, "environment": {"python": "3.12"},
+            "started_at_utc": now, "recorded_at_utc": now,
+            "status": "RUNNING", "exit_code": None,
+            "result_artifact_ids": [], "reason": None,
+        }
+        finalization = {
+            "event_id": "event-2", "event_type": "FINALIZED",
+            "run_id": "run-1", "run_fingerprint": "d" * 64,
+            "recorded_at_utc": now, "status": "FAILED",
+            "exit_code": 1, "result_artifact_ids": [], "reason": "synthetic failure",
+        }
+        self.assertTrue(validator.is_valid(reservation))
+        self.assertTrue(validator.is_valid(finalization))
 
     def test_research_run_is_rejected_while_scope_is_locked(self):
         policy = {"research_locked": True, "allowed_actions": ["research"]}
