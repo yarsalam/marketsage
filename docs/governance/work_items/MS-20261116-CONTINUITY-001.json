@@ -72,5 +72,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; versioned backup manifest schema and validator plus synthetic copy/restore tests are authored. No real backups or host-specific restore were run; tests and exact-head CI remain unexecuted pending owner authorization."
+  "status_note": "IN_PROGRESS; static audit identified and corrected a deterministic scope-lock error-order defect after CI run 43794311916 failed in the preflight CLI test. The correction is authored/read-back only and untested. Material blockers remain: CLI lacks registered input-manifest binding, actual workflow output-path validation, and durable run reservation/finalization; runtime preflight does not itself enforce the full governance schema/cross-record validator. Synthetic tests, exact-head CI, historical run recovery and real 3-2-1 backup/restore remain unverified and require their respective owner-authorized paths."
 }
