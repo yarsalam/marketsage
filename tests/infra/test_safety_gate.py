@@ -58,7 +58,7 @@ class SafetyGateTests(unittest.TestCase):
             work = root / "work.json"
             artifacts = root / "artifacts.jsonl"
             ledger = root / "runs.jsonl"
-            policy.write_text(json.dumps({"scope_lock": "INFRA_ONLY", "research_locked": True}), encoding="utf-8")
+            policy.write_text(json.dumps({"schema_version": 1, "project": "MarketSage", "scope_lock": "INFRA_ONLY", "research_locked": True, "allowed_actions": ["research"]}), encoding="utf-8")
             work.write_text(json.dumps({"work_id": "MS-20261116-CONTINUITY-001",
                                         "status": "IN_PROGRESS", "allowed_actions": ["research"]}), encoding="utf-8")
             artifacts.write_text("", encoding="utf-8")
@@ -80,8 +80,9 @@ class SafetyGateTests(unittest.TestCase):
             ledger = root / "runs.jsonl"
             work_id = "MS-20261116-CONTINUITY-001"
             policy.write_text(json.dumps({
+                "schema_version": 1, "project": "MarketSage",
                 "scope_lock": "INFRA_ONLY", "research_locked": True,
-                "authorized_work_ids": [work_id],
+                "allowed_actions": ["synthetic_test"], "authorized_work_ids": [work_id],
             }), encoding="utf-8")
             work.write_text(json.dumps({
                 "work_id": work_id, "status": "IN_PROGRESS",
@@ -112,6 +113,49 @@ class SafetyGateTests(unittest.TestCase):
             path.write_bytes(b"tampered payload")
             with self.assertRaisesRegex(SafetyGateError, "immutable_artifact_hash_mismatch"):
                 verify_immutable_artifact(record)
+
+
+    def test_preflight_fails_closed_when_canonical_policy_is_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(SafetyGateError, "canonical_policy_or_work_item_unavailable"):
+                preflight(
+                    policy_path=root / "missing-policy.json",
+                    work_item_path=root / "missing-work.json",
+                    artifact_registry_path=root / "artifacts.jsonl",
+                    run_ledger_path=root / "runs.jsonl",
+                    work_id="MS-20261116-CONTINUITY-001", action="synthetic_test",
+                    code_sha="a" * 40, input_artifacts={}, parameters={},
+                    environment={}, output_path=root / "out",
+                )
+
+    def test_preflight_fails_closed_on_corrupt_artifact_ledger(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            work_id = "MS-20261116-CONTINUITY-001"
+            policy = root / "policy.json"
+            work = root / "work.json"
+            artifacts = root / "artifacts.jsonl"
+            ledger = root / "runs.jsonl"
+            policy.write_text(json.dumps({
+                "schema_version": 1, "project": "MarketSage",
+                "scope_lock": "INFRA_ONLY", "research_locked": True,
+                "allowed_actions": ["synthetic_test"], "authorized_work_ids": [work_id],
+            }), encoding="utf-8")
+            work.write_text(json.dumps({
+                "work_id": work_id, "status": "IN_PROGRESS",
+                "allowed_actions": ["synthetic_test"],
+            }), encoding="utf-8")
+            artifacts.write_text("{not-json}\n", encoding="utf-8")
+            ledger.write_text("", encoding="utf-8")
+            with self.assertRaisesRegex(SafetyGateError, "ledger_invalid_jsonl_line"):
+                preflight(
+                    policy_path=policy, work_item_path=work,
+                    artifact_registry_path=artifacts, run_ledger_path=ledger,
+                    work_id=work_id, action="synthetic_test",
+                    code_sha="a" * 40, input_artifacts={}, parameters={},
+                    environment={}, output_path=root / "out",
+                )
 
     def test_changed_parameter_changes_fingerprint(self):
         base = dict(code_sha="a" * 64, input_hashes={"x": "b" * 64},
