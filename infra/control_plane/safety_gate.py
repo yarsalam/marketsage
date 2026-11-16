@@ -340,6 +340,12 @@ def preflight(
         raise SafetyGateError("action_not_authorized_for_work_item")
     if action != "infrastructure" and work_id not in policy.get("authorized_work_ids", []):
         raise SafetyGateError("owner_authorization_missing")
+    if action in {"research", "analysis", "backtest"} and not input_artifacts:
+        raise SafetyGateError("research_requires_registered_input_artifacts")
+    if action == "acquisition" and (
+        not isinstance(request_fingerprint, str) or not _SHA.fullmatch(request_fingerprint)
+    ):
+        raise SafetyGateError("acquisition_request_fingerprint_required")
 
     artifacts = read_jsonl(artifact_registry_path)
     validate_artifact_registry(artifacts)
