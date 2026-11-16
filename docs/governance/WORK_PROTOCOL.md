@@ -35,7 +35,7 @@
 ### Backup / restore
 - Never treat Git history, one local disk, chat attachments or Actions artifacts as durable independent backups.
 - Require at least three copies across two independent media and at least two failure domains, including one offline/isolated copy. Checksum each copy.
-- Use `infra.control_plane.backup_restore.create_backup_copy` to create each copy with exclusive-create semantics; an existing destination is never overwritten. Use `validate_321_copies` to check the declared topology and `verify_backup_copy` to re-hash it.
+- Use `infra.control_plane.backup_restore.create_backup_copy` to create each copy with exclusive-create semantics; an existing destination is never overwritten. Use `validate_321_copies` to check the declared topology and `verify_backup_copy` to re-hash it. Store the copy records and restore evidence in a manifest conforming to `schemas/backup-manifest-v1.schema.json`, and validate it with `infra.control_plane.validate_backup_manifest.validate_backup_manifest`.
 - Use `restore_backup_copy` to restore only to a new destination and verify the exact hash. A restore drill must recreate the selected files and confirm exact hashes. Record location class, media/failure domain, timestamp, hash manifest, restore set and result. No deletion/migration without a verified restore.
 - `offline_attested=true` is an operator attestation, not an automated proof that a device is physically disconnected. Verify the actual isolation and mount/device independence during the owner-authorized host-specific drill.
 - These helpers may be tested only with synthetic fixtures while scope is locked. Do not run them against private host paths or real MarketSage data until separately authorized.
