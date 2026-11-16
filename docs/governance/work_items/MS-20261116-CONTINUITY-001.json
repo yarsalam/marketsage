@@ -1,0 +1,44 @@
+{
+  "work_id": "MS-20261116-CONTINUITY-001",
+  "objective": "Implement and validate fail-closed continuity, immutable artifact and duplicate-run safeguards.",
+  "owner": "project-owner",
+  "status": "AUTHORIZED",
+  "allowed_actions": [
+    "infrastructure",
+    "governance",
+    "synthetic_test"
+  ],
+  "inputs": [
+    "existing provider-neutral control-plane code"
+  ],
+  "prerequisites": [
+    "research scope remains locked",
+    "no workflow dispatch or rerun"
+  ],
+  "expected_outputs": [
+    "safety_gate.py",
+    "test_safety_gate.py",
+    "WORK_PROTOCOL.md",
+    "execution_policy.json",
+    "ARTIFACT_REGISTRY.jsonl",
+    "RUN_LEDGER.jsonl"
+  ],
+  "acceptance_criteria": [
+    "synthetic tests cover duplicate IDs/hashes/acquisitions/runs and unresolved paths",
+    "preflight fails closed on scope lock and missing canonical records",
+    "all changes read back from GitHub"
+  ],
+  "prohibited_actions": [
+    "research",
+    "provider_requests",
+    "data_downloads",
+    "workflow_dispatch",
+    "workflow_rerun",
+    "merge",
+    "deploy",
+    "secrets",
+    "spend",
+    "visibility_change"
+  ],
+  "status_note": "IN_PROGRESS; not yet tested or accepted"
+}
