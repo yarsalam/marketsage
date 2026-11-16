@@ -109,7 +109,7 @@ def _read_locked_ledger(stream: Any) -> list[dict[str, Any]]:
 
 def _append_locked(stream: Any, record: Mapping[str, Any]) -> None:
     stream.seek(0, os.SEEK_END)
-    stream.write(json.dumps(dict(record), sort_keys=True, separators=(",", ":")) + "\\n")
+    stream.write(json.dumps(dict(record), sort_keys=True, separators=(",", ":")) + "\n")
     stream.flush()
     os.fsync(stream.fileno())
 
