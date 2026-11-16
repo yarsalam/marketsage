@@ -6,7 +6,7 @@ from pathlib import Path
 from infra.control_plane.safety_gate import (
     DuplicateAcquisition, DuplicateRun, RecoveryRequired, SafetyGateError,
     derive_run_fingerprint, find_existing_acquisition, reject_duplicate_run,
-    validate_artifact_registry,
+    validate_artifact_registry, preflight,
 )
 
 
@@ -49,6 +49,26 @@ class SafetyGateTests(unittest.TestCase):
         fingerprint = "c" * 64
         with self.assertRaises(DuplicateRun):
             reject_duplicate_run([{"run_fingerprint": fingerprint, "status": "FAILED"}], fingerprint)
+
+
+    def test_preflight_rejects_research_while_infrastructure_scope_is_locked(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            policy = root / "policy.json"
+            work = root / "work.json"
+            artifacts = root / "artifacts.jsonl"
+            ledger = root / "runs.jsonl"
+            policy.write_text(json.dumps({"scope_lock": "INFRA_ONLY", "research_locked": True}), encoding="utf-8")
+            work.write_text(json.dumps({"work_id": "MS-20261116-CONTINUITY-001",
+                                        "status": "AUTHORIZED", "allowed_actions": ["research"]}), encoding="utf-8")
+            artifacts.write_text("", encoding="utf-8")
+            ledger.write_text("", encoding="utf-8")
+            with self.assertRaisesRegex(SafetyGateError, "project_scope_locked"):
+                preflight(policy_path=policy, work_item_path=work,
+                          artifact_registry_path=artifacts, run_ledger_path=ledger,
+                          work_id="MS-20261116-CONTINUITY-001", action="research",
+                          code_sha="a" * 64, input_artifacts={}, parameters={},
+                          environment={}, output_path=root / "new-output")
 
     def test_changed_parameter_changes_fingerprint(self):
         base = dict(code_sha="a" * 64, input_hashes={"x": "b" * 64},
