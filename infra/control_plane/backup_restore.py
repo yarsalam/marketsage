@@ -8,9 +8,13 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import shutil
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping
+
+
+_IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 
 class BackupSafetyError(RuntimeError):
@@ -54,6 +58,11 @@ def create_backup_copy(
     source_path = Path(source)
     target_base = Path(target_root)
     relative = _safe_relative(relative_path)
+    for value in (backup_id, artifact_id, location_id, medium_id, failure_domain):
+        if not isinstance(value, str) or not _IDENTIFIER.fullmatch(value) or value in {".", ".."}:
+            raise BackupSafetyError("backup_identity_invalid")
+    if not isinstance(offline_attested, bool):
+        raise BackupSafetyError("offline_attestation_invalid")
     _reject_symlink_components(source_path)
     _reject_symlink_components(target_base)
     if not source_path.is_file() or not target_base.is_dir():
@@ -111,8 +120,13 @@ def validate_321_copies(records: Iterable[Mapping[str, Any]]) -> dict[str, int]:
         raise BackupSafetyError("offline_copy_attestation_required")
     hashes = {record.get("sha256") for record in copies}
     sizes = {record.get("size_bytes") for record in copies}
-    if len(hashes) != 1 or len(sizes) != 1:
+    artifact_ids = {record.get("artifact_id") for record in copies}
+    backup_ids = {record.get("backup_id") for record in copies}
+    copy_paths = {record.get("copy_path") for record in copies}
+    if len(hashes) != 1 or len(sizes) != 1 or len(artifact_ids) != 1 or len(backup_ids) != 1:
         raise BackupSafetyError("backup_copy_identity_mismatch")
+    if len(copy_paths) != len(copies):
+        raise BackupSafetyError("backup_copy_path_reused")
     return {
         "copies": len(copies),
         "locations": len({record.get("location_id") for record in copies}),
