@@ -1,3 +1,20 @@
+# Latest owner priority — 2026-11-16 07:30 UTC
+
+> This block is the current execution authority and supersedes any conflicting later-dated research-unlock, work-item, or policy text retained below as history.
+
+- **Goal 1 only.** Continue only work directly required to design, secure, test, document and prove the unattended GitHub automation infrastructure. Goals 2 and 3 remain paused.
+- Canonical scope is `INFRA_ONLY`; `research_locked` is `true`. Only `infrastructure`, `governance`, and `synthetic_test` actions are allowed.
+- Stop product development, provider discovery/requests, data acquisition, research, analysis, scoring, ranking, probability calibration, backtests, production builds/releases, broker/trading and capital-allocation work.
+- Do not dispatch or rerun workflows in this execution. A new exact-head hosted validation requires separate explicit owner authorization. Never dispatch local workflows or assume the laptop Runner is online.
+- No merge, auto-merge, release, deployment, secret access/change, spending, runner registration/configuration, branch-protection change or visibility change is authorized here. PR #6 remains separately protected from merge.
+- Main remains at `4c4b032196137af4658ea2c28e38a21605ee923b`. The latest observed main Schedule run is [#1438](https://github.com/yarsalam/marketsage/actions/runs/43706919338), which succeeded on 2026-11-15 but still executed product, analysis and production-image jobs. The Goal 1 freeze is therefore not active on main.
+- PR #74 remains Draft/open/unmerged. Its current branch head before this governance correction had no exact-head validation; the preceding bounded run failed one governance regression test. This correction is marked `[skip ci]`; it does not claim CI success.
+- PR #71 remains Draft/open and diverged from its PR #74 base. PR #82 remains Draft/open under the research hold. PR #6 remains open and must not be merged without separate explicit owner approval.
+- GitHub currently reports the repository as **public**. Treat all repository content as public; do not change visibility without separate owner approval.
+- The current artifact registry is intentionally empty. No local data files or data-artifact metadata are being added to this infrastructure branch.
+
+---
+
 # MarketSage — Current Project State
 
 **Snapshot date:** 2026-11-14 14:19 UTC  

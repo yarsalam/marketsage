@@ -284,3 +284,15 @@ This snapshot supersedes older PR status rows above for current open/closed stat
 - No local/hosted dispatch or rerun, merge, auto-merge, release, deployment, provider registration, secret creation, spending, visibility change, or product/data/investment work occurred.
 
 **Issue #49: OPEN / NOT COMPLETE / NOT 24/7 READY.**
+
+
+## Current owner priority checkpoint — 2026-11-16 07:30 UTC
+
+- **Goal 1 only:** infrastructure, governance and synthetic tests. Goal 2/3 remain paused.
+- **PR #74:** Draft/open/unmerged; current head requires a separately authorized exact-head hosted validation after the governance correction. Do not infer success from earlier SHAs.
+- **PR #71:** Draft/open; branch comparison is diverged (117 ahead / 118 behind its PR #74 base). No automatic reconciliation or merge.
+- **PR #82:** Draft/open; research/data scope remains on hold. No additional commits, review request, data/analysis workflow, or merge.
+- **PR #6:** open; never merge without separate explicit owner approval.
+- **main:** still runs product/research/production jobs on Schedule; the freeze is not yet active on the default branch.
+- No workflow dispatch/rerun, local Runner operation, provider request, data acquisition, merge, deployment, secret, spending or visibility change is authorized in this checkpoint.
+

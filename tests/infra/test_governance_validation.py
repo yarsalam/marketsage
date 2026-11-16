@@ -107,8 +107,12 @@ class GovernanceValidationTests(unittest.TestCase):
         policy = {"research_locked": True, "allowed_actions": ["research"]}
         work = {"work_id": "MS-20261116-CONTINUITY-001", "allowed_actions": ["research"]}
         record = {
-            "run_id": "run-1", "run_fingerprint": "d" * 64,
-            "work_id": work["work_id"], "action": "research", "status": "SUCCESS"
+            "event_id": "event-1",
+            "event_type": "RESERVED",
+            "run_id": "run-1",
+            "run_fingerprint": "d" * 64,
+            "work_id": work["work_id"],
+            "action": "research",
         }
         with self.assertRaisesRegex(GovernanceValidationError, "research_run_recorded_while_locked"):
             validate_run_records([record], policy, work)

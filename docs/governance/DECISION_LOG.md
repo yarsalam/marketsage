@@ -200,3 +200,19 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - Existing diagnostic p95 chart-shape errors: فولاد 91.02% current; best tested exact-date-suppressed variant 7.34%; وغدیر 30.99%; پارسیان 4.81%. These are not acceptance results.
 
 **Capital-risk impact:** No investment outputs or capital decisions are enabled.
+
+
+## 2026-11-16 — Reaffirm Goal 1 infrastructure-only priority
+
+**Decision authority:** Owner, latest direct instruction dated 2026-11-16.  
+**Status:** Active; supersedes any conflicting research-unlock text or work item on the infrastructure branch.
+
+**Decision**
+- Goal 1 is the sole active objective until its practical acceptance evidence is complete.
+- Keep `scope_lock=INFRA_ONLY` and `research_locked=true`; allow only infrastructure, governance and synthetic-test work.
+- Pause ordinary product, data, provider, research, analysis, backtest and production work. No unapproved data may enter features, labels, backtests or investment analysis.
+- Do not dispatch or rerun workflows in this execution. A new exact-head GitHub-hosted validation requires separate explicit owner authorization. Never dispatch local workflows.
+- No merge, release, deployment, secrets, spending, runner registration, branch-protection or visibility change is authorized. PR #6 remains protected from merge absent separate explicit approval.
+- Do not upload local datasets, raw data, data artifacts or private operational details to GitHub.
+- Goal 1 may be declared complete only after exact-head event-driven and scheduled CI evidence, recovery/concurrency/timeout/cancellation drills, independent health observation, operator documentation, persistent-host evidence, and a full 24-hour observation window.
+
