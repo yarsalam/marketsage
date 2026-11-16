@@ -647,3 +647,15 @@ Work ID: `MS-20261116-CONTINUITY-001`
 - Existing runs `43794311916` and `43794316955` both target the older SHA `5834b9d44504167148aa4ac09fcd2b3485a4666b`; both failed at the preflight CLI test. They are not valid evidence for the current branch HEAD and were not rerun.
 - No tests were executed. No run event was fabricated; `RUN_LEDGER.jsonl` remains empty. No provider request, data download/read, research calculation, local Runner job, workflow dispatch/rerun, merge or deploy occurred. Research remains locked.
 - Work item status is now `BLOCKED` solely on the missing exact-head execution path. Do not rerun the old SHA. **Next permitted action:** provide an authorized exact-head CI execution path (workflow dispatch capability or an approved local checkout/runner), then run the existing infrastructure suite once and record the exact result.
+
+
+## Exact-head synthetic validation and bounded correction — 2026-11-16
+
+Work ID: `MS-20261116-CONTINUITY-001`
+
+- Exact-head run [#43815683485](https://github.com/yarsalam/marketsage/actions/runs/43815683485) tested SHA `ee3300fa927f954ffcca742527322df4903c205f`.
+- Provider-neutral control-plane suite: **110 tests passed**. Safety-gate suite: **17 tests passed**. CI automation helper suite: passed. Scope classification passed; product/backend/frontend/admin/production-image jobs were skipped by the infrastructure-only classifier, not counted as passes.
+- Preflight CLI suite: 2 passed, 1 failed. Failure was an error-message ordering mismatch: common preflight rejected the CLI's empty input manifest with `research_requires_registered_input_artifacts` before the legacy adapter's explicit `research_cli_manifest_and_ledger_integration_missing` guard.
+- One bounded correction was applied at `infra/control_plane/preflight_cli.py`, commit `3fa6ad1a7c711aaab7a260cfce7b3b6740bae24f`: map only that exact missing-input error for research-like actions to the legacy adapter block reason. Scope-lock and canonical-record failures remain unmodified and fail closed.
+- This correction does not open research or make the legacy CLI research-capable. Policy remains `INFRA_ONLY`; `research_locked=true`. No provider request, download, dataset read, research calculation, local Runner job, workflow_dispatch/rerun, merge or deploy occurred.
+- **Next action:** one exact-head CI validation of the corrected CLI on the current branch head. If it fails, stop and mark this work blocked; no identical retry.
