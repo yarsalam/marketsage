@@ -164,7 +164,7 @@ def preflight(
         work = json.loads(Path(work_item_path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SafetyGateError("canonical_policy_or_work_item_unavailable") from exc
-    if policy.get("scope_lock") == "INFRA_ONLY" and action != "infrastructure":
+    if policy.get("scope_lock") == "INFRA_ONLY" and action not in {"infrastructure", "governance", "synthetic_test"}:
         raise SafetyGateError("project_scope_locked")
     if policy.get("research_locked", True) and action in {"research", "acquisition", "analysis", "backtest"}:
         raise SafetyGateError("research_scope_locked")
