@@ -6,7 +6,7 @@ from pathlib import Path
 from infra.control_plane.safety_gate import (
     DuplicateAcquisition, DuplicateRun, RecoveryRequired, SafetyGateError,
     derive_run_fingerprint, find_existing_acquisition, reject_duplicate_run,
-    validate_artifact_registry, preflight,
+    validate_artifact_registry, preflight, verify_immutable_artifact,
 )
 
 
@@ -41,7 +41,7 @@ class SafetyGateTests(unittest.TestCase):
             )
 
     def test_run_fingerprint_is_deterministic(self):
-        args = dict(code_sha="a" * 64, input_hashes={"x": "b" * 64},
+        args = dict(code_sha="a" * 40, input_hashes={"x": "b" * 64},
                     parameters={"window": 5}, environment={"python": "3.12"})
         self.assertEqual(derive_run_fingerprint(**args), derive_run_fingerprint(**args))
 
@@ -60,7 +60,7 @@ class SafetyGateTests(unittest.TestCase):
             ledger = root / "runs.jsonl"
             policy.write_text(json.dumps({"scope_lock": "INFRA_ONLY", "research_locked": True}), encoding="utf-8")
             work.write_text(json.dumps({"work_id": "MS-20261116-CONTINUITY-001",
-                                        "status": "AUTHORIZED", "allowed_actions": ["research"]}), encoding="utf-8")
+                                        "status": "IN_PROGRESS", "allowed_actions": ["research"]}), encoding="utf-8")
             artifacts.write_text("", encoding="utf-8")
             ledger.write_text("", encoding="utf-8")
             with self.assertRaisesRegex(SafetyGateError, "project_scope_locked"):
@@ -69,6 +69,49 @@ class SafetyGateTests(unittest.TestCase):
                           work_id="MS-20261116-CONTINUITY-001", action="research",
                           code_sha="a" * 64, input_artifacts={}, parameters={},
                           environment={}, output_path=root / "new-output")
+
+
+    def test_preflight_accepts_active_in_progress_infrastructure_work_and_git_sha(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            policy = root / "policy.json"
+            work = root / "work.json"
+            artifacts = root / "artifacts.jsonl"
+            ledger = root / "runs.jsonl"
+            work_id = "MS-20261116-CONTINUITY-001"
+            policy.write_text(json.dumps({
+                "scope_lock": "INFRA_ONLY", "research_locked": True,
+                "authorized_work_ids": [work_id],
+            }), encoding="utf-8")
+            work.write_text(json.dumps({
+                "work_id": work_id, "status": "IN_PROGRESS",
+                "allowed_actions": ["synthetic_test"],
+            }), encoding="utf-8")
+            artifacts.write_text("", encoding="utf-8")
+            ledger.write_text("", encoding="utf-8")
+            result = preflight(
+                policy_path=policy, work_item_path=work,
+                artifact_registry_path=artifacts, run_ledger_path=ledger,
+                work_id=work_id, action="synthetic_test",
+                code_sha="a" * 40, input_artifacts={}, parameters={},
+                environment={"python": "3.12"}, output_path=root / "new-output",
+            )
+            self.assertEqual(result["preflight"], "PASS_NO_SIDE_EFFECTS")
+
+    def test_immutable_artifact_tampering_is_detected_before_use(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "raw.bin"
+            path.write_bytes(b"original immutable payload")
+            from infra.control_plane.safety_gate import file_sha256
+            digest, size = file_sha256(path)
+            record = {
+                "artifact_id": "raw-1", "immutable": True, "status": "VERIFIED",
+                "storage_path": str(path), "sha256": digest, "size_bytes": size,
+            }
+            self.assertEqual(verify_immutable_artifact(record), (digest, size))
+            path.write_bytes(b"tampered payload")
+            with self.assertRaisesRegex(SafetyGateError, "immutable_artifact_hash_mismatch"):
+                verify_immutable_artifact(record)
 
     def test_changed_parameter_changes_fingerprint(self):
         base = dict(code_sha="a" * 64, input_hashes={"x": "b" * 64},
