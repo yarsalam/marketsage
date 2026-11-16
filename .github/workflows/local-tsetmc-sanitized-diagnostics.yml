@@ -29,6 +29,9 @@ jobs:
           persist-credentials: false
           clean: true
 
+      - name: Enforce MarketSage research scope before reading prior outputs
+        run: python3 -m infra.control_plane.preflight_cli --action research
+
       - name: Run read-only sanitized diagnostics
         run: |
           python3 user/analysis-engine/scripts/diagnose_tsetmc_input_errors.py
