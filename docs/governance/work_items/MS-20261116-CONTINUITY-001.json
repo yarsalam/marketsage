@@ -44,7 +44,10 @@
     "run reservation is atomic under an OS file lock and blocks identical fingerprints before execution",
     "a failed or successful run remains in the ledger and blocks identical retries",
     "run finalization appends a terminal event without modifying the reservation event",
-    "validator enforces one reservation and at most one terminal event per run, with unique fingerprint ownership"
+    "validator enforces one reservation and at most one terminal event per run, with unique fingerprint ownership",
+    "preflight_and_reserve_run performs preflight before atomically reserving the run fingerprint",
+    "run reservation and finalization records each validate against the versioned JSON Schema",
+    "generic unguarded JSONL append is not exposed for run-ledger writes"
   ],
   "prohibited_actions": [
     "research",
@@ -58,5 +61,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; schema validator, workflow preflight gates, atomic append-only run reservation/finalization primitives and synthetic regression tests are authored. CI/test execution and exact-head validation remain unverified and separately authorization-gated."
+  "status_note": "IN_PROGRESS; append-only run events, atomic preflight-plus-reservation, finalization and schema regression tests are authored. Exact-head CI/test execution remains unverified and owner-authorization gated."
 }
