@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from .backup_restore import BackupSafetyError, sha256_file, verify_backup_copy
 from jsonschema import Draft202012Validator, FormatChecker
 
 
@@ -37,6 +38,10 @@ def validate_backup_manifest(
             raise BackupManifestError("backup_copy_references_wrong_artifact_or_set")
         if record["sha256"] != source_hash or record["size_bytes"] != source_size:
             raise BackupManifestError("backup_copy_source_identity_mismatch")
+        try:
+            verify_backup_copy(record)
+        except BackupSafetyError as exc:
+            raise BackupManifestError("backup_copy_file_integrity_failed") from exc
     locations = {record["location_id"] for record in copies}
     media = {record["medium_id"] for record in copies}
     failure_domains = {record["failure_domain"] for record in copies}
@@ -60,6 +65,12 @@ def validate_backup_manifest(
             raise BackupManifestError("restore_hash_or_size_mismatch")
         if restore["restored_path"] in copy_paths:
             raise BackupManifestError("restore_overwrites_backup_copy")
+        try:
+            restored_hash, restored_size = sha256_file(restore["restored_path"])
+        except OSError as exc:
+            raise BackupManifestError("restore_file_unavailable") from exc
+        if restored_hash != source_hash or restored_size != source_size:
+            raise BackupManifestError("restore_file_integrity_failed")
     return {
         "copies": len(copies),
         "locations": len(locations),
