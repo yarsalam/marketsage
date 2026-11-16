@@ -18,6 +18,7 @@ ALLOWED_EXACT = {
     "requirements-infra.txt",
     "schemas/infra-task-v1.schema.json",
     "schemas/governance-records-v1.schema.json",
+    "schemas/backup-manifest-v1.schema.json",
 }
 ALLOWED_PREFIXES = (
     "docs/automation/",
