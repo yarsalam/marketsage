@@ -27,6 +27,7 @@ class InfrastructurePathTests(unittest.TestCase):
         self.assertFalse(is_allowed_infrastructure_path("docs/governance/../research/notes.md"))
         self.assertFalse(is_allowed_infrastructure_path(r"infra\\control_plane\\safety_gate.py"))
         self.assertFalse(is_allowed_infrastructure_path("infra/control_plane/worker_runtime.py\\nuser/analysis.py"))
+        self.assertFalse(is_allowed_infrastructure_path("infra/control_plane/worker_runtime.py\ninfra/control_plane/another.py"))
 
     def test_product_and_unknown_paths_are_rejected(self):
         self.assertFalse(is_allowed_infrastructure_path("user/analysis-engine/model.py"))
