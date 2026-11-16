@@ -6,7 +6,7 @@ from pathlib import Path
 from infra.control_plane.safety_gate import (
     DuplicateAcquisition, DuplicateRun, RecoveryRequired, SafetyGateError,
     derive_run_fingerprint, find_existing_acquisition, reject_duplicate_run,
-    validate_artifact_registry, preflight, verify_immutable_artifact,
+    validate_artifact_registry, preflight, verify_immutable_artifact, reserve_run, finalize_run,
 )
 
 
@@ -156,6 +156,46 @@ class SafetyGateTests(unittest.TestCase):
                     code_sha="a" * 40, input_artifacts={}, parameters={},
                     environment={}, output_path=root / "out",
                 )
+
+
+    def test_atomic_run_reservation_blocks_retry_after_failed_finalization(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = Path(directory) / "RUN_LEDGER.jsonl"
+            reservation = reserve_run(
+                ledger, run_id="run-1", work_id="MS-20261116-CONTINUITY-001",
+                action="synthetic_test", run_fingerprint="d" * 64,
+                code_sha="a" * 40, input_hashes={"fixture": "b" * 64},
+                parameters={"case": "retry"}, environment={"python": "3.12"},
+            )
+            self.assertEqual(reservation["event_type"], "RESERVED")
+            finalized = finalize_run(
+                ledger, run_id="run-1", status="FAILED", exit_code=1,
+                reason="synthetic failure",
+            )
+            self.assertEqual(finalized["event_type"], "FINALIZED")
+            with self.assertRaises(DuplicateRun):
+                reserve_run(
+                    ledger, run_id="run-2", work_id="MS-20261116-CONTINUITY-001",
+                    action="synthetic_test", run_fingerprint="d" * 64,
+                    code_sha="a" * 40, input_hashes={"fixture": "b" * 64},
+                    parameters={"case": "retry"}, environment={"python": "3.12"},
+                )
+            lines = ledger.read_text(encoding="utf-8").splitlines()
+            self.assertEqual(len(lines), 2)
+            self.assertEqual([json.loads(line)["event_type"] for line in lines], ["RESERVED", "FINALIZED"])
+
+    def test_run_can_be_finalized_only_once(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = Path(directory) / "RUN_LEDGER.jsonl"
+            reserve_run(
+                ledger, run_id="run-1", work_id="MS-20261116-CONTINUITY-001",
+                action="synthetic_test", run_fingerprint="e" * 64,
+                code_sha="a" * 40, input_hashes={}, parameters={},
+                environment={},
+            )
+            finalize_run(ledger, run_id="run-1", status="SUCCESS", exit_code=0)
+            with self.assertRaisesRegex(SafetyGateError, "run_already_finalized"):
+                finalize_run(ledger, run_id="run-1", status="FAILED", exit_code=1)
 
     def test_changed_parameter_changes_fingerprint(self):
         base = dict(code_sha="a" * 40, input_hashes={"x": "b" * 64},
