@@ -28,7 +28,9 @@
     "infra/control_plane/preflight_cli.py",
     "tests/infra/test_preflight_cli.py",
     "atomic run reservation/finalization API",
-    "append-only run event schema with RESERVED and FINALIZED states"
+    "append-only run event schema with RESERVED and FINALIZED states",
+    "infra/control_plane/backup_restore.py",
+    "tests/infra/test_backup_restore.py"
   ],
   "acceptance_criteria": [
     "synthetic tests cover duplicate IDs/hashes/acquisitions/runs and unresolved paths",
@@ -47,7 +49,12 @@
     "validator enforces one reservation and at most one terminal event per run, with unique fingerprint ownership",
     "preflight_and_reserve_run performs preflight before atomically reserving the run fingerprint",
     "run reservation and finalization records each validate against the versioned JSON Schema",
-    "generic unguarded JSONL append is not exposed for run-ledger writes"
+    "generic unguarded JSONL append is not exposed for run-ledger writes",
+    "backup-copy creation uses exclusive create and never overwrites existing destinations",
+    "3-2-1 validator requires three locations, two media, two failure domains and an offline attestation",
+    "backup copy verification and restore verify exact SHA-256 and byte size",
+    "restore never overwrites an existing destination",
+    "synthetic backup/restore tests are wired into infrastructure CI"
   ],
   "prohibited_actions": [
     "research",
@@ -61,5 +68,5 @@
     "spend",
     "visibility_change"
   ],
-  "status_note": "IN_PROGRESS; append-only run events, atomic preflight-plus-reservation, finalization and schema regression tests are authored. Exact-head CI/test execution remains unverified and owner-authorization gated."
+  "status_note": "IN_PROGRESS; schema validator, fail-closed workflow gates, atomic append-only run ledger primitives and synthetic 3-2-1 backup/restore helpers are authored. Tests and exact-head CI remain unexecuted pending owner authorization; no real backup or host path accessed."
 }
