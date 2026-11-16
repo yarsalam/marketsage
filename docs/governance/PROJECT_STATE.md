@@ -626,3 +626,13 @@ Work ID: `MS-20261116-CONTINUITY-001`
 - Exact-head workflow-run query for 92aa26c: zero PR workflow runs. Combined status query: zero status entries. This is absence of validation, not a pass.
 - Read-back confirmed the changed safety gate, CLI, tests, classifier, protocol, work item, registry and ledger. Registry still has exactly three unresolved candidate records; ledger is still empty.
 - The known prior CI failure #43794311916 remains the only observed validation outcome for the affected earlier code: Test provider-neutral control plane failed at the CLI test; scope classification and CI helper tests passed. The corrective commits have no test evidence.
+
+
+## Owner-authorized bounded validation — 2026-11-16
+
+Work ID: `MS-20261116-CONTINUITY-001`
+
+- The owner explicitly authorized one bounded exact-head hosted validation in this conversation after the prior untested hardening checkpoint.
+- Scope remains `INFRA_ONLY`; `research_locked=true`. This authorization is limited to the existing infrastructure/synthetic-test acceptance suite. It does not authorize research reopening, provider requests, downloads, dataset reads, calculations, local Runner dispatch, workflow_dispatch/rerun, merge, deploy, secrets, spend or visibility changes.
+- Reuse the existing PR #74 branch and work item. No new issue, PR, work ID, or duplicate test is created. The existing failed run #43794311916 remains attached to its original SHA and is not retried as-is; validation is for the new exact head after the recorded code changes.
+- Acceptance: exact-head CI must run the infrastructure control-plane tests, preflight CLI tests, backup/restore tests and governance validation. Record the actual result and run ID; skipped jobs are not passes. If the exact-head run fails, do not repeat without a material correction and a recorded reason.
