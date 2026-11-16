@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "project": "MarketSage",
+  "scope_lock": "INFRA_ONLY",
+  "research_locked": true,
+  "allowed_actions": [
+    "infrastructure",
+    "governance",
+    "synthetic_test"
+  ],
+  "authorized_work_ids": [
+    "MS-20261116-CONTINUITY-001"
+  ],
+  "owner_approval_required_for": [
+    "workflow_dispatch",
+    "workflow_rerun",
+    "local_runner_dispatch",
+    "merge",
+    "deploy",
+    "release",
+    "provider_activation",
+    "secrets",
+    "spend",
+    "visibility_change",
+    "research_reopen"
+  ],
+  "raw_artifacts_must_be_immutable": true,
+  "unresolved_paths_require_recovery_before_acquisition": true,
+  "identical_run_policy": "BLOCK_SUCCESS_AND_FAILURE",
+  "network_access_in_unit_tests": false,
+  "last_updated_utc": "2026-11-16T00:00:00Z"
+}
