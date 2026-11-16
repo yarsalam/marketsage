@@ -18,6 +18,7 @@ from typing import Any, Iterable, Mapping
 _SHA = re.compile(r"^[0-9a-f]{64}$")
 _GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 _WORK = re.compile(r"^[A-Z0-9][A-Z0-9._-]{7,127}$")
+_RUN = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
 
 
 class SafetyGateError(RuntimeError):
@@ -70,23 +71,6 @@ def read_jsonl(path: str | Path) -> list[dict[str, Any]]:
     return records
 
 
-def append_jsonl(path: str | Path, record: Mapping[str, Any]) -> None:
-    """Append one fsync'd record under an OS file lock; never replace the ledger."""
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    encoded = (json.dumps(dict(record), sort_keys=True, separators=(",", ":")) + "\n").encode()
-    descriptor = os.open(target, os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600)
-    try:
-        with os.fdopen(descriptor, "ab", closefd=False) as stream:
-            fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
-            stream.write(encoded)
-            stream.flush()
-            os.fsync(stream.fileno())
-            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
-    finally:
-        os.close(descriptor)
-
-
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
@@ -120,7 +104,7 @@ def reserve_run(
     parameters: Mapping[str, Any], environment: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Atomically reserve a run; every prior fingerprint, including failures, blocks retry."""
-    if not run_id or not _WORK.fullmatch(work_id) or not _GIT_SHA.fullmatch(code_sha):
+    if not _RUN.fullmatch(run_id) or not _WORK.fullmatch(work_id) or not _GIT_SHA.fullmatch(code_sha):
         raise SafetyGateError("run_reservation_identity_invalid")
     if not _SHA.fullmatch(run_fingerprint) or any(not _SHA.fullmatch(v) for v in input_hashes.values()):
         raise SafetyGateError("run_reservation_hash_invalid")
@@ -192,6 +176,10 @@ def finalize_run(
     """Append one terminal event for a previously reserved run; never edits history."""
     if status not in {"SUCCESS", "FAILED", "BLOCKED", "REJECTED"}:
         raise SafetyGateError("run_terminal_status_invalid")
+    if exit_code is not None and not isinstance(exit_code, int):
+        raise SafetyGateError("run_exit_code_invalid")
+    if reason is not None and not isinstance(reason, str):
+        raise SafetyGateError("run_reason_invalid")
     target = Path(ledger_path)
     if not target.is_file():
         raise SafetyGateError("run_reservation_missing")
