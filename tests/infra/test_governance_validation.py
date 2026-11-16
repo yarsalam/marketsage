@@ -48,13 +48,31 @@ class GovernanceValidationTests(unittest.TestCase):
     def test_duplicate_run_fingerprint_is_rejected_even_after_failure(self):
         policy = {"research_locked": True, "allowed_actions": ["synthetic_test"]}
         work = {"work_id": "MS-20261116-CONTINUITY-001", "allowed_actions": ["synthetic_test"]}
-        first = {
-            "run_id": "run-1", "run_fingerprint": "d" * 64,
-            "work_id": work["work_id"], "action": "synthetic_test", "status": "FAILED"
+        reservation = {
+            "event_id": "event-1", "event_type": "RESERVED",
+            "run_id": "run-1", "work_id": work["work_id"],
+            "action": "synthetic_test", "run_fingerprint": "d" * 64,
         }
-        second = {**first, "run_id": "run-2", "status": "SUCCESS"}
+        failed = {
+            "event_id": "event-2", "event_type": "FINALIZED",
+            "run_id": "run-1", "run_fingerprint": "d" * 64,
+        }
+        duplicate = {
+            **reservation, "event_id": "event-3", "run_id": "run-2",
+        }
         with self.assertRaisesRegex(GovernanceValidationError, "duplicate_run_fingerprint"):
-            validate_run_records([first, second], policy, work)
+            validate_run_records([reservation, failed, duplicate], policy, work)
+
+    def test_running_reservation_without_terminal_event_is_valid(self):
+        policy = {"research_locked": True, "allowed_actions": ["synthetic_test"]}
+        work = {"work_id": "MS-20261116-CONTINUITY-001", "allowed_actions": ["synthetic_test"]}
+        reservation = {
+            "event_id": "event-1", "event_type": "RESERVED",
+            "run_id": "run-1", "work_id": work["work_id"],
+            "action": "synthetic_test", "run_fingerprint": "d" * 64,
+        }
+        validate_run_records([reservation], policy, work)
+
 
     def test_research_run_is_rejected_while_scope_is_locked(self):
         policy = {"research_locked": True, "allowed_actions": ["research"]}
