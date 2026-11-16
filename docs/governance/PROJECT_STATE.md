@@ -659,3 +659,17 @@ Work ID: `MS-20261116-CONTINUITY-001`
 - One bounded correction was applied at `infra/control_plane/preflight_cli.py`, commit `3fa6ad1a7c711aaab7a260cfce7b3b6740bae24f`: map only that exact missing-input error for research-like actions to the legacy adapter block reason. Scope-lock and canonical-record failures remain unmodified and fail closed.
 - This correction does not open research or make the legacy CLI research-capable. Policy remains `INFRA_ONLY`; `research_locked=true`. No provider request, download, dataset read, research calculation, local Runner job, workflow_dispatch/rerun, merge or deploy occurred.
 - **Next action:** one exact-head CI validation of the corrected CLI on the current branch head. If it fails, stop and mark this work blocked; no identical retry.
+
+
+## Bounded validation stop — 2026-11-16
+
+Work ID: `MS-20261116-CONTINUITY-001`
+
+- Exact-head run [#43815807777](https://github.com/yarsalam/marketsage/actions/runs/43815807777) completed with failure on SHA `be5ccb6117848d9e8cb30069091f6076242cd16b`.
+- Passed: 110 provider-neutral control-plane tests; 17 safety-gate tests; 3 preflight CLI tests; 5 backup/restore tests; canonical governance schema/cross-record CLI validation; CI automation helper tests; infrastructure scope classification.
+- Failed: the final governance-validation unit suite had 7 passes and 1 error. Test `test_research_run_is_rejected_while_scope_is_locked` supplies a run record missing required `event_id` and `event_type`; `validate_run_records` indexes `event_id` before the intended locked-research validation, raising `KeyError` rather than `GovernanceValidationError`.
+- The preflight CLI mismatch from run #43815683485 was corrected once and all 3 CLI tests now pass. The remaining governance test error is a separate observed failure. This was the second exact-head validation attempt after the bounded correction; under Constitution Rule 6, **stop here**. No third test, correction or identical retry is authorized by the current work item.
+- CI automation helpers passed; scope classification passed. Product/research/backend/frontend/admin/production-image jobs were skipped under the infrastructure-only classifier, not counted as passes.
+- Work item `MS-20261116-CONTINUITY-001` is `BLOCKED`. Policy remains `INFRA_ONLY`; `research_locked=true`. No provider request, download, dataset read, research calculation, local Runner, workflow_dispatch/rerun, merge or deploy occurred.
+- `RUN_LEDGER.jsonl` remains empty: the current CI workflow does not reserve/finalize its own run events, and no historical reservation was fabricated after execution. The CI run is recorded here as evidence, not falsely represented as a pre-reserved ledger run.
+- **Next permitted action:** stop this validation task. A separate materially scoped task and owner authorization are required before addressing the malformed governance-test fixture/validator contract. Do not rerun this suite unchanged.
