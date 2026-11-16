@@ -673,3 +673,18 @@ Work ID: `MS-20261116-CONTINUITY-001`
 - Work item `MS-20261116-CONTINUITY-001` is `BLOCKED`. Policy remains `INFRA_ONLY`; `research_locked=true`. No provider request, download, dataset read, research calculation, local Runner, workflow_dispatch/rerun, merge or deploy occurred.
 - `RUN_LEDGER.jsonl` remains empty: the current CI workflow does not reserve/finalize its own run events, and no historical reservation was fabricated after execution. The CI run is recorded here as evidence, not falsely represented as a pre-reserved ledger run.
 - **Next permitted action:** stop this validation task. A separate materially scoped task and owner authorization are required before addressing the malformed governance-test fixture/validator contract. Do not rerun this suite unchanged.
+
+
+## Owner authorization — three-symbol price-adjustment research reopened (2026-11-16)
+
+Work ID: `MS-20261116-THREE-SYMBOL-ADJ-001`
+
+- The owner explicitly superseded the prior research pause and authorized the bounded adjustment investigation for **فولاد، وغدیر، پارسیان**. The execution policy is now `scope_lock=OPEN`, `research_locked=false`; this does not authorize unrelated research.
+- Allowed work for this item: inspect/recover existing immutable evidence, reconcile corporate-action terms and effective sessions, perform exact-decimal independent factor calculations, compare with existing official-chart captures, and create separately versioned candidate series for evidenced intervals.
+- No provider requests or automatic downloads by the assistant. If local-only primary evidence is missing, ask the owner for the specific existing file/report to download and provide. No raw-file overwrite, source approval, investment scoring/ranking, strategy backtest, merge, deploy or trading.
+- Existing evidence is in PR #82, head `1cdeb07f10d1b5bbc56ff519d50835cff8c0aa6e`; PR #82 is Draft/open/unmerged. Its integrity run [#43715149800](https://github.com/yarsalam/marketsage/actions/runs/43715149800) passed the integrity job; historical-market-state job was cancelled and is not a successful acquisition.
+- Existing offline audit `20261112T194429Z` and chart/factor diagnostics are reused; no identical audit/test is being repeated. Feed identity is verified for all 66 price-adjust rows and 28 share-change rows across the three exact primary InsCodes, with no identity mismatch.
+- Diagnostic p95 factor-shape errors against the official adjusted chart: فولاد current candidate 91.02%; exact-date share suppression variant 7.34%; وغدیر 30.99%; پارسیان 4.81%. These are diagnostic only, not accepted adjustments.
+- Legacy adjusted candidate CSV identities remain `PATH_UNRESOLVED` in the registry; they will not be reconstructed or redownloaded before a separate archive search. This task starts from the already-imported evidence bundle in PR #82.
+- **Next action:** inspect the exact event-step diagnostics, original CODAL documents, per-symbol ledgers and missing TSE Client evidence; then request only the missing local files from the owner.
+- The prior Work ID `MS-20261116-CONTINUITY-001` remains BLOCKED and unchanged; its failed test suite is not being retried.
