@@ -555,3 +555,35 @@ Add a versioned backup-manifest schema and integrity validator for backup-copy r
 Perform a repository-only integrity audit of the complete governance toolchain: confirm schema/validator compatibility, every required test is included in CI, every local research workflow is preflight-gated, and no path/identifier can escape configured roots. Record only static/read-back evidence; runtime tests and host backup remain owner-gated.
 
 **Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
+
+
+---
+
+## Backup manifest integrity checkpoint — 2026-11-16
+
+**Work ID:** `MS-20261116-CONTINUITY-001`  
+**Branch:** `infra/provider-neutral-control-plane-2026-11`  
+**Implementation head before this state update:** `92639ff34d35be33781fcf3dabed513a15237663`  
+**Status:** IN PROGRESS / NOT ACCEPTED / NOT RUNTIME-VERIFIED
+
+### Changes authored and read back
+
+- Added `schemas/backup-manifest-v1.schema.json`, a strict versioned manifest schema for 3-2-1 copy records and restore-drill evidence.
+- Added `infra/control_plane/validate_backup_manifest.py` to validate the schema and cross-record topology/identity invariants.
+- The validator now re-hashes the actual backup-copy files and restored file, checks exact byte sizes, rejects symlinked evidence paths, verifies all copies belong to the same artifact/backup set, and requires restore evidence from one of the recorded copies.
+- Added a synthetic manifest-validation test and allowlisted the schema as an infrastructure-only path.
+- CI already includes the synthetic backup/restore test module.
+
+### Static evidence only
+
+- Relevant source, test, schema, workflow and protocol files were fetched back from the current branch.
+- The three local TSETMC workflows contain a preflight command before their data/output step; the classifier and contract test include those workflow paths.
+- The infrastructure CI file contains test commands for the safety gate, preflight CLI, backup/restore and governance validation suites.
+- No Python tests, YAML parser, schema command or workflow was executed. These are source/read-back checks only.
+- No real backup, restore, local path access, data operation or provider request occurred. Offline status remains an operator attestation until physically verified.
+
+### Next permitted action
+
+Complete the final static integrity audit, update the active PR/Issue checkpoint and preserve the research lock. Exact-head runtime validation, host backup/restore, and any merge remain separately gated.
+
+**Issue #49: OPEN / NOT COMPLETE. PR #74: Draft/open/unmerged. PR #82: Draft/open/unmerged. Research: LOCKED. 24/7 readiness: NOT PROVEN.**
