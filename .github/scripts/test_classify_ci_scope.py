@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from classify_ci_scope import is_allowed_infrastructure_path, is_infrastructure_only
 
@@ -127,6 +128,40 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("cancel-in-progress: true", workflow)
         self.assertIn("timeout-minutes: 15", workflow)
         self.assertIn("timeout-minutes: 5", workflow)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class WorkflowScopeContractTests(unittest.TestCase):
+    def test_scheduled_runs_cannot_execute_product_or_production_jobs(self):
+        workflow = (
+            Path(__file__).resolve().parents[1] / "workflows" / "ci.yml"
+        ).read_text(encoding="utf-8")
+        self.assertRegex(workflow, r"(?m)^  schedule:\\s*$")
+        self.assertIn('    - cron: "17 3 * * *"', workflow)
+
+        product_jobs = (
+            "analysis",
+            "user-backend",
+            "user-frontend",
+            "admin-workspace",
+            "production-images",
+        )
+        for job_id in product_jobs:
+            match = re.search(
+                rf"(?ms)^  {re.escape(job_id)}:\\n(.*?)(?=^  [A-Za-z0-9_-]+:\\n|\\Z)",
+                workflow,
+            )
+            self.assertIsNotNone(match, f"missing workflow job: {job_id}")
+            job = match.group(1)
+            self.assertIn("needs: [classify-change-scope]", job)
+            self.assertIn(
+                "needs.classify-change-scope.outputs.infra_only != 'true'",
+                job,
+            )
+            self.assertIn("exit 1", job)
 
 
 if __name__ == "__main__":
