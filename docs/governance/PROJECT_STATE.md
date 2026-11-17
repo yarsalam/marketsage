@@ -85,3 +85,12 @@ The matching monthly-price CSV and its exact hash/configuration are not currentl
 6. Keep source scoring, investment ranking, calibrated probabilities, production release, broker access and trading disabled until all relevant data and empirical gates pass. Any real-money allocation or trade still requires the owner's separate explicit approval.
 
 **Investment-stage status: NOT READY.** A successful Runner job, parser, dataset hash audit, or integration CI run is not an investment approval.
+
+---
+
+## Update — 2026-11-16 (PR #82 research branch)
+
+**Snapshot date:** 2026-11-16
+**Active PR:** #82, branch `research/iran-equity-event-notebook-2026-11-12`
+**Latest HEAD:** `488d91956c25417e67cde1345091104238cac3fd`
+**Status:** Draft, open, unmerged.

@@ -11,7 +11,7 @@
 | PR | Target | Scope / current state | Handling |
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
-| [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
+| [#82](https://github.com/yarsalam/marketsage/pull/82) | main ← research/iran-equity-event-notebook-2026-11-12 | Research notebook for Iran equity event investigation; draft, not merged; head fc1ffe8 + governance restore b1ae67f | Keep open as Draft. Do not merge without explicit owner approval. || [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
 
 
 
