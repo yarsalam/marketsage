@@ -1,0 +1,71 @@
+{
+  "symbol": "فولاد",
+  "task_id": "MS-DATA-002",
+  "generated_at": "2026-11-18T18:36:16.211835+00:00",
+  "engine_version": "1.0",
+  "manifest_hash": "8ebe1356822f7bcd1bb8645e342e54f79e686b6e056b377dd9b7510a77b74b44",
+  "status": "PROVISIONAL_WITH_CRITICAL_GAP",
+  "status_reason": "Adjusted series built but 7 ShareChange events (2020-2026) have no matching PriceAdjust. Compound dilution ~15.3x would change pre-2020 adjusted prices by ~15x if applied.",
+  "counts": {
+    "price_adjust_records": 23,
+    "forward_events": 23,
+    "daily_rows": 4269,
+    "adjusted_rows": 4269
+  },
+  "blockers": [
+    {
+      "id": "B1",
+      "severity": "CRITICAL",
+      "description": "7 ShareChange events without PriceAdjust",
+      "events": [
+        "20200112",
+        "20210524",
+        "20220809",
+        "20230319",
+        "20240227",
+        "20250312",
+        "20260330"
+      ],
+      "compound_dilution": 15.3,
+      "impact": "Adjusted pre-2020 prices overstated by up to 15x",
+      "next_action": "Investigate TSETMC pagination OR verify against official chart"
+    },
+    {
+      "id": "B2",
+      "severity": "HIGH",
+      "description": "Funding source of capital increases not verified via CODAL",
+      "next_action": "CODAL lookup for 5 matched ShareChange events"
+    },
+    {
+      "id": "B3",
+      "severity": "HIGH",
+      "description": "No independent chart comparison",
+      "next_action": "Compare with TSETMC official adjusted chart, compute max error"
+    },
+    {
+      "id": "B4",
+      "severity": "MEDIUM",
+      "description": "Total Return not computed",
+      "next_action": "Add dividends to return formula"
+    }
+  ],
+  "accepted_ranges": [],
+  "quarantined_ranges": [
+    {
+      "from": "2007-03-11",
+      "to": "2026-11-16",
+      "reason": "B1 unresolved: pre-2020 adjusted prices unreliable"
+    }
+  ],
+  "panel_visibility": {
+    "raw_prices": "VISIBLE",
+    "corporate_events": "VISIBLE_WITH_LABEL",
+    "adjusted_series": "RESEARCH_ONLY_DO_NOT_USE",
+    "total_return": "NOT_COMPUTED"
+  },
+  "release_gates": {
+    "RG-03": "NOT_PASSED",
+    "RG-04": "NOT_PASSED",
+    "investment_outputs": "DISABLED"
+  }
+}

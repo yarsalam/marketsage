@@ -1,0 +1,18 @@
+{
+  "symbol_dir": "data/market-research/iran-equities/adjustment-evidence/vaghdir",
+  "generated_at": "2026-11-18T18:39:50.287130+00:00",
+  "engine_version": "1.0",
+  "input_hashes": {
+    "price_adjust": "1fadcc07e1a4b1da95f2a687aba527d1a1bc50e265d0c465543afeb8cd086a3d",
+    "raw_prices": "48a552633ead0b85dbac8b136a28336e3ca3b28ca91f697d9d834155debdfc49"
+  },
+  "output_hashes": {
+    "adjusted_close": "0d0356d6c581b0369a99b3da62521eb61cdd1bd11861d6baadb6cba319cc166f"
+  },
+  "counts": {
+    "price_adjust_records": 25,
+    "forward_events": 23,
+    "daily_rows": 5386,
+    "adjusted_rows": 5386
+  }
+}
