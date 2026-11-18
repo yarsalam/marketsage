@@ -123,7 +123,7 @@ def read_raw_csv(path):
             if not date_col and date_candidates:
                 date_col = date_candidates[0]
             # Prefer 'close' > 'pClosing' > 'final_price'
-            for cand in ['close', 'pclosing', 'final_price', 'final']:
+            for cand in ['final_price', 'pclosing', 'close', 'final']:
                 for k in close_candidates:
                     if k.lower() == cand.lower():
                         close_col = k

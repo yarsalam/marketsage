@@ -1,13 +1,13 @@
 {
   "symbol_dir": "data/market-research/iran-equities/adjustment-evidence/parsian",
-  "generated_at": "2026-11-18T19:00:06.185977+00:00",
+  "generated_at": "2026-11-18T20:00:19.578345+00:00",
   "engine_version": "1.0",
   "input_hashes": {
     "price_adjust": "66160ec454c4f077fae7ba308118f24fb7fc615c79a11343362365d310a55118",
     "raw_prices": "90b848d89eda91531085f23b246f82e4fb01d33fe2a141ff08499ff4daa63325"
   },
   "output_hashes": {
-    "adjusted_close": "e3d2b8b22167e7403d9d6217fdca15acf8affb95cd1fabb2d19e271946f39b31"
+    "adjusted_close": "f71ec9f25dc645be11f55363131b2cbe066a9d3e1df3cd2882c9ff880fdc78eb"
   },
   "counts": {
     "price_adjust_records": 18,
