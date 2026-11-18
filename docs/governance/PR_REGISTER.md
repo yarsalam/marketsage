@@ -1,3 +1,64 @@
+# Live PR and Actions register — 2026-11-18 14:55 UTC
+
+**Repository:** yarsalam/marketsage — GitHub API: Public; current owner request: Private; mismatch unresolved  
+**Default branch:** main — `4c4b032196137af4658ea2c28e38a21605ee923b` (last commit 2026-11-07 19:55:51 UTC)  
+**Active infrastructure PR:** [#74](https://github.com/yarsalam/marketsage/pull/74), Draft/open/unmerged, current head `a0c27efa94e72a67e6765c742edd90fb3371e7e8`  
+**Issue #49:** OPEN / NOT COMPLETE / NOT 24/7 READY
+
+## Live open-PR inventory — 2026-11-18 14:55 UTC
+
+All PR metadata and Check Run counts below are from the live API for each exact current HEAD. Skipped, cancelled, queued, or missing checks are not successes.
+
+| PR | State / Draft | Base branch | Exact head SHA | Mergeable | Exact-head checks | Current handling |
+|---|---|---|---|---:|---:|---|
+| [#82](https://github.com/yarsalam/marketsage/pull/82) | open / Draft | main | `7f6212b851b9dab93ecb2120315b9a0892a8da82` | yes | 20: 16 success, 4 skipped | Research hold. Automatic runs #44299973898/#44299989543 matched `marketsage-local-01` via generic `self-hosted`, acquired TSETMC state and uploaded two raw artifacts #14428310796/#14428125818. Owner containment action in Issue #49 comment #6982302666; do not rerun or make Runner available. |
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | open / Draft | main | `8d49042b520b78a877a5032bb9cf2e6f45e6169e` | yes | 17: 13 success, 4 skipped | Product/integration work paused. |
+| [#80](https://github.com/yarsalam/marketsage/pull/80) | open / Draft | main | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | yes | 8: 6 success, 2 skipped | Product/admin work paused. |
+| [#79](https://github.com/yarsalam/marketsage/pull/79) | open / Draft | main | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | yes | 8: 6 success, 2 skipped | Product/auth work paused. |
+| [#78](https://github.com/yarsalam/marketsage/pull/78) | open / Draft | main | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | yes | 10: 8 success, 2 skipped | Strategy/product work paused. |
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | open / Draft | main | `67356939f65224a580c915fd2caa0ea52d8d09a9` | yes | 8: 6 success, 2 skipped | Product safety feature work paused. |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | open / Draft | main | `a0c27efa94e72a67e6765c742edd90fb3371e7e8` | yes | 0 | Existing infrastructure path. Current docs-only head is unvalidated; earlier code SHA `9a439b389b530ae2008e3d864b369fb8d3d73f87` passed Push #43891676244 and PR #43891687575 only. |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | open / Draft | main | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | yes | 16: 12 success, 4 skipped | Research work paused. |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | open / Draft | PR #74 branch | `e630517c7e2916ed58b7568b0ebbbf1d390b86ce` | no | 0 | Existing outbox/worker/watchdog path. Diverged from #74: 117 ahead / 124 behind, merge base `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10`. Do not merge/rebase or duplicate. |
+| [#62](https://github.com/yarsalam/marketsage/pull/62) | open / Ready | main | `54fbf4a364a91b4e8d834fdcec0245d079440982` | yes | 8: 6 success, 2 skipped | Dependabot action pin update; retain human review. |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | open / Draft | PR #74 branch | `25ce24283e35dd7e55eb8545c590a047606643ee` | no | 0 | Documentation branch; non-mergeable and unvalidated. |
+| [#51](https://github.com/yarsalam/marketsage/pull/51) | open / Ready | PR #6 branch | `da803a1c69ba6524f7cc27d7b0cc4a3d4397df28` | yes | 10: all success | Data-source screening paused. |
+| [#41](https://github.com/yarsalam/marketsage/pull/41) | open / Ready | main | `162692f1a377ec8445ed958db4cc1171d4cafc47` | yes | 5: all success | Data/evidence work paused. |
+| [#8](https://github.com/yarsalam/marketsage/pull/8) | open / Ready | fix/gdelt-fred-tindex-current-docs | `0cb94fd24f531162d4a3d403f9749789ce6f1797` | yes | 6: 5 success, 1 failure | Parked after known TSETMC ConnectTimeout; do not repeat from the same environment. |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | open / Ready | main | `1d90726c593b0818982407c309ff13301798f5b3` | no | 15: all success | Never merge without separate explicit owner approval. PR #14 is already integrated into #6. |
+
+## Latest default-branch run and exact evidence
+
+- Main Schedule [#44298255820](https://github.com/yarsalam/marketsage/actions/runs/44298255820) succeeded on `4c4b032...` on 2026-11-18 at 11:50:06 UTC. It started 8h33m06s after the 03:17 UTC cron and ran analysis, backend, frontend, admin, production-images and CI helper tests. It did not run the provider-neutral control-plane test job. It is a successful schedule event, not the infrastructure-only schedule acceptance.
+- PR #74 code SHA `9a439b389b530ae2008e3d864b369fb8d3d73f87`: Push [#43891676244](https://github.com/yarsalam/marketsage/actions/runs/43891676244) and PR [#43891687575](https://github.com/yarsalam/marketsage/actions/runs/43891687575) succeeded. The current PR #74 head `a0c27efa...` has zero Check Runs and no workflow run for that SHA; do not transfer prior results.
+- PR #82 exact head `7f6212b...`: MarketSage CI Push #44299973935 and PR #44299989608 succeeded but ran out-of-scope product/research/admin/production jobs. Integrity Push #44299973898 and PR #44299989543 also succeeded; each ran `historical-market-state` on `marketsage-local-01` runner ID 21 through generic `runs-on: self-hosted`, then uploaded raw-response artifacts #14428310796 and #14428125818. Both were unexpired at audit time. No artifact was downloaded or deleted. Owner action: [Issue #49 comment #6982302666](https://github.com/yarsalam/marketsage/issues/49#issuecomment-6982302666).
+- The previously queued PR #82 run #44163917731 is now cancelled; do not rerun it.
+
+## Workflow, permissions and protection audit
+
+- **main CI:** pre-freeze workflow remains active on push/PR/schedule/manual dispatch; global `contents: read`, per-ref/PR concurrency with cancellation, bounded job timeouts, product/research/production jobs. Main has no infrastructure-only scope classifier yet.
+- **PR #74 CI:** push/PR/schedule/workflow_dispatch triggers; global `contents: read`; job-scoped `issues: write` only for direct-main provenance and failure notification; per-ref/PR concurrency with `cancel-in-progress: true`; job timeouts 2–15 minutes. Schedule is classified infrastructure-only on this branch. No explicit retry policy, deployed stale/queued/hung detector, or artifact-retention override is present. Failure notification excludes PR events and runs on `ubuntu-latest`, the same hosted runner pool.
+- **PR #71 Docker canary:** main push, daily 04:43 UTC schedule and manual dispatch; `ubuntu-latest`, 15-minute timeout, cancelling concurrency, no-network worker sandbox. Its failure notifier also uses the hosted pool. **PR #71 self-hosted acceptance:** manual-only, owner-confirmed, exact branch and dedicated `marketsage-server-worker` labels, 20-minute timeout, non-cancelling serialization. No independently registered/online server Runner is proven.
+- **PR #82 branch workflow:** automatic push/PR triggers, generic `self-hosted` label and seven-day artifact upload of raw acquisition output. This is incompatible with the Goal 1 freeze and local-runner isolation; the owner containment action remains outstanding.
+- **Ruleset #26789479:** active; one approval, seven required contexts, deletion/non-fast-forward blocked, no bypass actors; strict freshness and stale-review dismissal disabled. Legacy branch-protection read returned 403 and remains unverified.
+- No external independent failure notifier, proven retry/permanent-failure semantics, stale/hung observer, worker-loss/restart drill, backup/restore drill, second-provider end-to-end canary, or 24-hour observation is proven.
+
+## PR #54 / SQLite branch — do not merge
+
+[PR #54](https://github.com/yarsalam/marketsage/pull/54) is **closed, Draft, unmerged** at `e8f7d8add3df577120b92b8927c590aece001509`. [Issue #55](https://github.com/yarsalam/marketsage/issues/55) records 16/16 owner-run tests on this exact head; prior 11/11 belongs only to an earlier SHA. Current branch comparison against #74 is diverged: 8 ahead / 168 behind, merge base `99b25dc24daa8606514bd9910e883ef136cf5d7f`. Keep closed/unmerged. The separate reconciled SQLite branch is also diverged (3 ahead / 143 behind #74); no operational approval is implied.
+
+## Current issue gates
+
+- [#49](https://github.com/yarsalam/marketsage/issues/49) OPEN / NOT COMPLETE / NOT 24/7 READY.
+- [#52](https://github.com/yarsalam/marketsage/issues/52) OPEN: five Chabokan wheel hashes remain owner-blocked; do not repeat the already-passed install/tests.
+- [#53](https://github.com/yarsalam/marketsage/issues/53) CLOSED: public/zero-additional-spend decision only.
+- [#55](https://github.com/yarsalam/marketsage/issues/55) CLOSED: 16/16 exact-head SQLite unit tests only.
+- [#59](https://github.com/yarsalam/marketsage/issues/59) OPEN: schedule/orchestration acceptance remains incomplete.
+
+> This live snapshot supersedes all historical PR inventories below. Historical sections remain for traceability. No workflow dispatch/rerun, local Runner operation, merge, auto-merge, release, deployment, provider registration, secret creation, spending, visibility change, data acquisition or investment action was performed by this execution.
+
+---
+
 # MarketSage — Pull Request Register
 
 **Live snapshot:** 2026-11-17 14:25 UTC  
