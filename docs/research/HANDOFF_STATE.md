@@ -1,6 +1,6 @@
 # HANDOFF_STATE — MarketSage Adjustment Project
 
-**آخرین به‌روزرسانی:** 2026-11-18 (جلسه ۳ — موتور v2)
+**آخرین به‌روزرسانی:** 2026-11-18 (جلسه ۴ — checkpoint + کشف B6)
 **HEAD:** (پس از commit بعدی ثبت می‌شود)
 **Branch:** research/iran-equity-event-notebook-2026-11-12
 **PR:** #82 (Draft)
@@ -9,7 +9,7 @@
 
 | نماد | event-ledger | adjusted_close | Total Return | تطبیق رسمی | پذیرش |
 |---|---|---|---|---|---|
-| **فولاد** | ✅ ۳۰ رویداد (۲۳ PA + ۷ SC) | ✅ ۴۲۶۹ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_WITH_ASSUMPTIONS** |
+| **فولاد** | ✅ ۳۰ رویداد (۲۳ PA + ۷ SC) | 🟡 ۴۲۶۹ ردیف (ستون اشتباه: close به‌جای final_price) | ❌ | ❌ | 🟡 **PROVISIONAL_WITH_ASSUMPTIONS + B6** |
 | **پارسیان** | ❌ ساخته نشده | ✅ ۳۵۴۲ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_UNTESTED** |
 | **وغدیر** | ✅ ۸ ردیف (کهنه) | ✅ ۵۳۸۶ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_UNTESTED** |
 
@@ -35,6 +35,13 @@
 
 ### B4 — Total Return محاسبه نشده
 **اقدام:** فرمول TR = (P_t + dividends_t) / P_{t-1} - 1
+
+
+### B6 — ⚠️ ستون `close` به‌جای `final_price` خوانده می‌شود
+- **کشف:** `read_raw_csv` در `build_adjusted_series.py` ستون `close` (آخرین معامله) را می‌خواند، نه `final_price` (قیمت پایانی).
+- **تأیید:** `final_price` دقیقاً با TSETMC `pClosing` یکی است (۲۰۲۰-۰۱-۱۳: ۳۹۷۶، ۲۰۲۶-۱۱-۱۶: ۵۲۷۰).
+- **تأثیر:** سری adjusted فعلی روی ستون اشتباه ساخته شده — باید با `final_price` بازسازی شود.
+- **اقدام:** اصلاح `read_raw_csv` (اولویت `final_price` > `pclosing` > `close`)، rebuild ۳ سری، مقایسه raw-to-raw با TSETMC.
 
 ### B5 — فایل‌های کهنه vaghdir
 `ADJUSTMENT_REPORT.md` (۴۸ خط) و `event-ledger.csv` (۸ خط) هنوز نسخه قدیمی‌اند (MS-DATA-001، A/B/C بدون تفکیک)
