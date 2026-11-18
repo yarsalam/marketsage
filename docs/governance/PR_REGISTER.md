@@ -11,7 +11,7 @@
 | PR | Target | Scope / current state | Handling |
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
-| [#82](https://github.com/yarsalam/marketsage/pull/82) | main ← research/iran-equity-event-notebook-2026-11-12 | Research notebook for Iran equity event investigation; draft, not merged; head fc1ffe8 + governance restore b1ae67f | Keep open as Draft. Do not merge without explicit owner approval. || [#8](https://github.com/yarsalam/marketsage/pull/8) | research/iran-free-data-smoke | GitHub-hosted TSETMC live request timed out | Parked. Do not repeat the same request from the same environment. |
+| [#82](https://github.com/yarsalam/marketsage/pull/82) | main ← research/iran-equity-event-notebook-2026-11-12 | Research notebook for Iran equity event investigation; draft, not merged; head 65ff7a9 (governance: EV-VAGHDIR-ADJUSTMENT-EXISTENCE, PARTIAL) | Keep open as Draft. Do not merge without explicit owner approval. |
 
 
 
@@ -62,16 +62,3 @@ PR #6 remains open and must not be merged to main without explicit owner approva
 - Do not inspect or tune against the locked final holdout.
 - A local Runner/checksum/workflow success does not approve a source, backtest, ranking, probability or investment recommendation.
 - No production scoring, broker access, portfolio allocation or real-money trade is authorized. Any capital-risk action requires separate explicit owner approval.
-
-## PR #82
-
-- **Title:** docs(research): add Iranian equity event investigation notebook
-- **Branch:** `research/iran-equity-event-notebook-2026-11-12`
-- **Base:** `main`
-- **Status:** Draft, open, unmerged
-- **Latest HEAD:** `488d919`
-- **Strategic objective:** Iran equity event investigation and vaghdir 2011 adjustment audit
-- **Scope:** `data/market-research/iran-equities/adjustment-evidence/` and `scripts/research/iran-equities/`
-- **Evidence:** CODAL PDFs (38803, 40620, 38805), TSETMC raw JSON, reconciliation diagnostics, 2011 audit
-- **Limitations:** 2.18-rial reopening difference (UNRESOLVED_MARKET_MICROSTRUCTURE); Total Return not built
-- **Follow-up:** Awaiting review; investment ranking remains disabled

@@ -295,5 +295,41 @@
       "evidence_refs": [],
       "requires_user_flow_proof": true
     }
+,
+    {
+      "id": "MS-DATA-002",
+      "title": "Vaghdir price adjustment evidence",
+      "track": "data-product",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "research/iran-equity-event-notebook-2026-11-12",
+      "pull_request": 82,
+      "depends_on": [],
+      "timebox_hours": null,
+      "objective": "Establish and verify price adjustment events for Vaghdir within PR #82, without claiming coefficients are approved.",
+      "user_problem": "Cannot trust Vaghdir historical prices until all adjustment events and coefficients are independently verified or documented as quarantined.",
+      "deliverables": [
+        "Vaghdir adjustment event ledger",
+        "TSETMC vs iranquant comparison",
+        "CODAL evidence or documented quarantine for ambiguous PriceAdjust events",
+        "Separation of research-adjusted output from raw provider data"
+      ],
+      "acceptance_criteria": [
+        "All ShareChange events matched (7/7)",
+        "Each ambiguous PriceAdjust event either has CODAL evidence or is permanently quarantined with documented reason",
+        "2011 composite event ordering and meaning reconstructed",
+        "All five PriceAdjust coefficients independently verified",
+        "2.18 rial opening gap resolved"
+      ],
+      "stop_conditions": [
+        "No adjustment coefficient accepted without independent evidence",
+        "No price series released for research use while outcome is PARTIAL",
+        "Investment use remains disabled until RELEASE_GATES RG-03 and RG-04 are satisfied",
+        "No new PR created; work continues only within PR #82",
+        "No provider data re-downloaded"
+      ],
+      "evidence_refs": ["EV-VAGHDIR-ADJUSTMENT-EXISTENCE"],
+      "requires_user_flow_proof": false
+    }
   ]
 }

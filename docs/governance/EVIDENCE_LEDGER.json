@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-11-09",
+  "updated_at": "2026-11-18",
   "evidence": [
     {
       "id": "EV-PR73-CI",
@@ -23,18 +23,17 @@
       "observed_at": "2026-11-09",
       "scope": "Exact-head CI across application and production-image jobs.",
       "limitations": "Draft PR only; not merged/deployed; UI browser journey not demonstrated."
-    }
-
-,
+    },
     {
       "id": "EV-VAGHDIR-ADJUSTMENT-EXISTENCE",
-      "task_id": "MS-DATA-001",
+      "task_id": "MS-DATA-002",
       "type": "SOURCE_APPROVAL",
       "outcome": "PARTIAL",
-      "commit": "8497d2c",
+      "commit": "65ff7a9",
       "reference": "data/market-research/iran-equities/adjustment-evidence/vaghdir/ADJUSTMENT_REPORT.md",
       "observed_at": "2026-11-17",
       "scope": "Vaghdir adjustment event existence confirmed via CODAL and TSETMC. 7/7 capital increases match TSETMC ShareChange; 3/5 ambiguous PriceAdjust events confirmed by CODAL (105243, 202327, 38448); 1 event (2010-04-21) remains quarantined without CODAL source.",
       "limitations": "Event existence confirmed, not coefficient acceptance. 2.18-rial reopening difference unresolved. 2011 compound event (4 TSETMC records) ordering not reconstructed. 5 PriceAdjust coefficients not independently verified. RG-03 and RG-04 NOT passed."
-    }  ]
+    }
+  ]
 }

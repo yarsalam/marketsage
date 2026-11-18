@@ -1,7 +1,8 @@
-event_id,symbol,provider_date,event_family,issuer_terms_status,effective_session_status,provider_factor,independent_factor,relationship_status,series_status,notes
-VAGH-2026-04-18,vaghdir,2026-04-18,cash_distribution_candidate,primary_resolution_not_verified,first_affected_session_not_verified,0.900464499004645,,,UNRESOLVED,QUARANTINED,"TSETMC price reference 15070 -> 13570; 1500 Rial difference; not accepted as final DPS/factor"
-VAGH-2011-MIXED,vaghdir,2011,mixed_corporate_action,partial_primary_evidence,chronology_conflict,,,"UNRESOLVED",QUARANTINED,"23-Apr stale/no-trade observation 3820 vs 26-Apr traded close 3569; provider tuple relationship unresolved"
-VAGH-2012-02-20,vaghdir,2012-02-20,cash_distribution_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; locate original CODAL terms"
-VAGH-2012-12-08,vaghdir,2012-12-08,capital_increase_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; original EGM terms required"
-VAGH-2013-02-27,vaghdir,2013-02-27,cash_distribution_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; secondary locator is not primary proof"
-VAGH-2013-04-09,vaghdir,2013-04-09,capital_increase_candidate,not_verified,not_verified,,,,UNRESOLVED,QUARANTINED,"Candidate from preserved provider feed; original EGM terms required"
+event_id,task_id,event_date_jalali,event_date_gregorian,event_type,source,source_reference,percentage,status,verification_level,notes
+EV-VAGHDIR-2024-09,MS-DATA-002,1403/06/11,2024-09-01,capital_increase,codal,آگهی ثبت افزایش سرمایه,200.00,READY,EXISTENCE_CONFIRMED,"سرمایه 72B→216B؛ ثبت رسمی 1403/06/11"
+EV-VAGHDIR-2013-02,MS-DATA-002,1391/11/28,2013-02-16,dividend,codal,تracing 105243,10.80,READY,EXISTENCE_CONFIRMED,"زمان‌بندی سود دوره 1391؛ ضریب 0.892"
+EV-VAGHDIR-2015-03,MS-DATA-002,1393/12/16,2015-03-07,dividend,codal,تracing 202327,16.30,READY,EXISTENCE_CONFIRMED,"زمان‌بندی سود دوره 1393؛ ضریب 0.837"
+EV-VAGHDIR-2011-04-A,MS-DATA-002,1390/02/06,2011-04-26,dividend,codal,تracing 38448,,IN_PROGRESS,EXISTENCE_CONFIRMED,"سود نقدی دوره 1389؛ ضریب ترکیبی"
+EV-VAGHDIR-2011-04-B,MS-DATA-002,1390/02/06,2011-04-26,capital_increase,tsetmc,GetInstrumentShareChange,,IN_PROGRESS,EXISTENCE_CONFIRMED,"97.53% از سود انباشته/اندوخته/آورده"
+EV-VAGHDIR-2011-04-C,MS-DATA-002,1390/02/06,2011-04-26,adjustment_component,tsetmc,GetPriceAdjustList,,IN_PROGRESS,UNRESOLVED,"رکورد 4گانه؛ ترتیب اعمال نامشخص"
+EV-VAGHDIR-2010-04,MS-DATA-002,1389/02/01,2010-04-21,unknown,none,,,BLOCKED,NO_SOURCE,"بدون سند کدال؛ نسبت TSETMC 0.888"
