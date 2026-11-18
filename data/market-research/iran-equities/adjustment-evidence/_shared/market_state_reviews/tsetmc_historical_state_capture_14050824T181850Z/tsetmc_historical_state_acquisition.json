@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "research_scope": "three-symbol historical instrument-state acquisition",
+  "source_owner": "TSETMC",
+  "source_route": "http://old.tsetmc.com/Loader.aspx",
+  "page_parameter": "Partree=15131L (historical instrument status table)",
+  "method_limit": "The route is a public legacy page identified in independent client implementations; its contents must be validated against visible table semantics and, where available, the authenticated TSETMC InstrumentsStateChange service.",
+  "started_at_utc": "2026-11-15T18:18:50.471990Z",
+  "completed_at_utc": "2026-11-15T18:18:56.750707Z",
+  "symbols_requested": 3,
+  "http_200_responses": 3,
+  "results": [
+    {
+      "symbol": "vaghdir",
+      "ticker": "وغدیر",
+      "insCode": "26014913469567886",
+      "request_url": "http://old.tsetmc.com/Loader.aspx?i=26014913469567886&Partree=15131L",
+      "final_url": "https://old.tsetmc.com/Loader.aspx?i=26014913469567886&Partree=15131L",
+      "retrieved_at_utc": "2026-11-15T18:18:50.471990Z",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Date": "Sun, 15 Nov 2026 18:18:51 GMT",
+        "ETag": null,
+        "Last-Modified": null
+      },
+      "content_type": "text/html; charset=utf-8",
+      "response_bytes": 5086,
+      "response_sha256": "d6fb9028322f774223c48248330c1cefdbcccdc7ab3eab0528d2bc02d06ce92a",
+      "raw_response_file": "vaghdir_tsetmc_historical_state_changes.html",
+      "parse_status": "no_state_rows_parsed",
+      "parsed_state_row_count": 0,
+      "state_rows": []
+    },
+    {
+      "symbol": "foolad",
+      "ticker": "فولاد",
+      "insCode": "46348559193224090",
+      "request_url": "http://old.tsetmc.com/Loader.aspx?i=46348559193224090&Partree=15131L",
+      "final_url": "https://old.tsetmc.com/Loader.aspx?i=46348559193224090&Partree=15131L",
+      "retrieved_at_utc": "2026-11-15T18:18:52.897281Z",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Date": "Sun, 15 Nov 2026 18:18:53 GMT",
+        "ETag": null,
+        "Last-Modified": null
+      },
+      "content_type": "text/html; charset=utf-8",
+      "response_bytes": 6950,
+      "response_sha256": "6c08b3ccf7b223807ee30fafea108fa1686f3a384a78666906c6987463be3c76",
+      "raw_response_file": "foolad_tsetmc_historical_state_changes.html",
+      "parse_status": "no_state_rows_parsed",
+      "parsed_state_row_count": 0,
+      "state_rows": []
+    },
+    {
+      "symbol": "parsian",
+      "ticker": "پارسیان",
+      "insCode": "9481703061634967",
+      "request_url": "http://old.tsetmc.com/Loader.aspx?i=9481703061634967&Partree=15131L",
+      "final_url": "https://old.tsetmc.com/Loader.aspx?i=9481703061634967&Partree=15131L",
+      "retrieved_at_utc": "2026-11-15T18:18:55.355218Z",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Date": "Sun, 15 Nov 2026 18:18:55 GMT",
+        "ETag": null,
+        "Last-Modified": null
+      },
+      "content_type": "text/html; charset=utf-8",
+      "response_bytes": 5568,
+      "response_sha256": "7d747039fc13f1f8161a49e695fdbf7004cc3f6d2ca5bfd65b451d953f56071a",
+      "raw_response_file": "parsian_tsetmc_historical_state_changes.html",
+      "parse_status": "no_state_rows_parsed",
+      "parsed_state_row_count": 0,
+      "state_rows": []
+    }
+  ]
+}

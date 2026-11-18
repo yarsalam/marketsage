@@ -11,7 +11,7 @@
 | PR | Target | Scope / current state | Handling |
 |---|---|---|---|
 | [#6](https://github.com/yarsalam/marketsage/pull/6) | main ← feat/tindex-free-data-connector | Integrated research/data-source work; pinned integration head 819f8b4028469cb0d498098fec88545a18ebacc6; required five-job CI passed on exact post-#30 head | Keep open. **Do not merge to main without explicit owner approval.** |
-| [#82](https://github.com/yarsalam/marketsage/pull/82) | main ← research/iran-equity-event-notebook-2026-11-12 | Research notebook for Iran equity event investigation; draft, not merged; head 65ff7a9 (governance: EV-VAGHDIR-ADJUSTMENT-EXISTENCE, PARTIAL) | Keep open as Draft. Do not merge without explicit owner approval. |
+| [#82](https://github.com/yarsalam/marketsage/pull/82) | main ← research/iran-equity-event-notebook-2026-11-12 | Research notebook for Iran equity event investigation; draft, not merged; head ca63384 (governance: EV-VAGHDIR-ADJUSTMENT-EXISTENCE PARTIAL; event-ledger dates + MS-DATA-002) | Keep open as Draft. Do not merge without explicit owner approval. |
 
 
 

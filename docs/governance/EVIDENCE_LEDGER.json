@@ -33,7 +33,8 @@
       "reference": "data/market-research/iran-equities/adjustment-evidence/vaghdir/ADJUSTMENT_REPORT.md",
       "observed_at": "2026-11-17",
       "scope": "Vaghdir adjustment event existence confirmed via CODAL and TSETMC. 7/7 capital increases match TSETMC ShareChange; 3/5 ambiguous PriceAdjust events confirmed by CODAL (105243, 202327, 38448); 1 event (2010-04-21) remains quarantined without CODAL source.",
-      "limitations": "Event existence confirmed, not coefficient acceptance. 2.18-rial reopening difference unresolved. 2011 compound event (4 TSETMC records) ordering not reconstructed. 5 PriceAdjust coefficients not independently verified. RG-03 and RG-04 NOT passed."
+      "limitations": "Event existence confirmed, not coefficient acceptance. 2.18-rial reopening difference unresolved. 2011 compound event (4 TSETMC records) ordering not reconstructed. 5 PriceAdjust coefficients not independently verified. RG-03 and RG-04 NOT passed.",
+      "last_updated_commit": "ca63384"
     }
   ]
 }
