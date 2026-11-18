@@ -34,7 +34,7 @@
       "observed_at": "2026-11-17",
       "scope": "Vaghdir adjustment event existence confirmed via CODAL and TSETMC. 7/7 capital increases match TSETMC ShareChange. 2011 4-record set reconstructed as 2 base factors (dividend 0.9311 + capital 0.5283) plus 2 display records (combined + inverse) — not 4 independent events. Capital increase factor 0.5283 vs pure-free theoretical 0.5063 implies ~30% paid-in component (hypothesis, unconfirmed). 3 CODAL letters (105243, 202327, 38448) provide existence evidence; CODAL re-verification blocked by HTTP 429 on 2026-11-17. 1 event (2010-04-21) remains quarantined without CODAL source.",
       "limitations": "Event existence confirmed, not coefficient acceptance. No independent coefficient verification (only TSETMC source). 2011 free/paid-in split hypothesis unconfirmed (needs CODAL 38805/59965). 2015 discrepancy: TSETMC 16.31% vs iranquant 19.49%. 2.18-rial reopening gap source unidentified. 2 records (2010-04-21, 2013-02-27) absent from changes.csv due to change filter. RG-03 and RG-04 NOT passed.",
-      "last_updated_commit": "PENDING_COMMIT"
+      "last_updated_commit": "8ce0643"
     }
   ]
 }
