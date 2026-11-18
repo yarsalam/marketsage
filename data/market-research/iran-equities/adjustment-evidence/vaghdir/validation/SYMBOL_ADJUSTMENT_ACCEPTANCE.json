@@ -1,0 +1,60 @@
+{
+  "symbol": "وغدیر",
+  "symbol_slug": "vaghdir",
+  "task_id": "MS-DATA-002",
+  "generated_at": "2026-11-18T19:00:06.317512+00:00",
+  "engine_version": "1.0",
+  "manifest_hash": "33f1a57da4b8ee4248f066c4a9c4b011e28a88cd129753fedd281c9c405d8faa",
+  "status": "PROVISIONAL_WITH_ASSUMPTIONS",
+  "assumptions": [
+    "ShareChange events without matching PriceAdjust are treated as free capital increases from retained earnings.",
+    "Factor = old_shares / new_shares applied backward.",
+    "CODAL verification of funding source: NOT YET DONE."
+  ],
+  "counts": {
+    "price_adjust_records": 25,
+    "forward_events": 24,
+    "share_change_only_events": 1,
+    "daily_rows": 5386,
+    "adjusted_rows": 5386
+  },
+  "blockers": [
+    {
+      "id": "B2",
+      "severity": "HIGH",
+      "description": "Funding source of capital increases not verified via CODAL",
+      "next_action": "CODAL lookup"
+    },
+    {
+      "id": "B3",
+      "severity": "HIGH",
+      "description": "No independent chart comparison",
+      "next_action": "Compare with TSETMC official adjusted chart"
+    },
+    {
+      "id": "B4",
+      "severity": "MEDIUM",
+      "description": "Total Return not computed (only adjusted close)",
+      "next_action": "Add dividends + share-count tracking"
+    }
+  ],
+  "accepted_ranges": [],
+  "quarantined_ranges": [
+    {
+      "from": "ALL",
+      "to": "ALL",
+      "reason": "B2/B3/B4 unresolved; PROVISIONAL only"
+    }
+  ],
+  "panel_visibility": {
+    "raw_prices": "VISIBLE",
+    "corporate_events": "VISIBLE_WITH_LABEL",
+    "adjusted_series": "RESEARCH_ONLY_DO_NOT_USE",
+    "total_return": "NOT_COMPUTED"
+  },
+  "release_gates": {
+    "RG-03": "NOT_PASSED",
+    "RG-04": "NOT_PASSED",
+    "investment_outputs": "DISABLED"
+  }
+}

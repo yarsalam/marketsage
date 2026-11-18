@@ -1,6 +1,6 @@
 # HANDOFF_STATE — MarketSage Adjustment Project
 
-**آخرین به‌روزرسانی:** 2026-11-18 (جلسه ۳)
+**آخرین به‌روزرسانی:** 2026-11-18 (جلسه ۳ — موتور v2)
 **HEAD:** (پس از commit بعدی ثبت می‌شود)
 **Branch:** research/iran-equity-event-notebook-2026-11-12
 **PR:** #82 (Draft)
@@ -9,13 +9,14 @@
 
 | نماد | event-ledger | adjusted_close | Total Return | تطبیق رسمی | پذیرش |
 |---|---|---|---|---|---|
-| **فولاد** | ✅ ۲۳ رویداد | ✅ ۴۲۶۹ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_WITH_CRITICAL_GAP** |
+| **فولاد** | ✅ ۳۰ رویداد (۲۳ PA + ۷ SC) | ✅ ۴۲۶۹ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_WITH_ASSUMPTIONS** |
 | **پارسیان** | ❌ ساخته نشده | ✅ ۳۵۴۲ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_UNTESTED** |
 | **وغدیر** | ✅ ۸ ردیف (کهنه) | ✅ ۵۳۸۶ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_UNTESTED** |
 
 ## 🚨 blockerهای بحرانی
 
-### B1 — ۷ ShareChange فولاد بدون PriceAdjust
+### B1 — ✅ حل شد (موتور v2): ۷ ShareChange به‌عنوان factor رایگان اعمال شد
+**فرض:** افزایش سرمایه از سود انباشته. **تأیید CODAL: هنوز نه.**
 - ۲۰۲۰-۰۱-۱۲: +۶۰٫۷۷٪
 - ۲۰۲۱-۰۵-۲۴: +۴۰٫۱۹٪
 - ۲۰۲۲-۰۸-۰۹: +۸۰٫۸۹٪

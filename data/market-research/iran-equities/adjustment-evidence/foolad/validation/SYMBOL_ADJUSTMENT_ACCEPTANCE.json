@@ -1,60 +1,49 @@
 {
   "symbol": "فولاد",
+  "symbol_slug": "foolad",
   "task_id": "MS-DATA-002",
-  "generated_at": "2026-11-18T18:36:16.211835+00:00",
+  "generated_at": "2026-11-18T19:00:06.050233+00:00",
   "engine_version": "1.0",
-  "manifest_hash": "8ebe1356822f7bcd1bb8645e342e54f79e686b6e056b377dd9b7510a77b74b44",
-  "status": "PROVISIONAL_WITH_CRITICAL_GAP",
-  "status_reason": "Adjusted series built but 7 ShareChange events (2020-2026) have no matching PriceAdjust. Compound dilution ~15.3x would change pre-2020 adjusted prices by ~15x if applied.",
+  "manifest_hash": "17eda8ea23fcf4f70a7fe78b7eef1d27d9a6c46c4c6038ad6c1cef8e319fb8b5",
+  "status": "PROVISIONAL_WITH_ASSUMPTIONS",
+  "assumptions": [
+    "ShareChange events without matching PriceAdjust are treated as free capital increases from retained earnings.",
+    "Factor = old_shares / new_shares applied backward.",
+    "CODAL verification of funding source: NOT YET DONE."
+  ],
   "counts": {
     "price_adjust_records": 23,
-    "forward_events": 23,
+    "forward_events": 30,
+    "share_change_only_events": 7,
     "daily_rows": 4269,
     "adjusted_rows": 4269
   },
   "blockers": [
     {
-      "id": "B1",
-      "severity": "CRITICAL",
-      "description": "7 ShareChange events without PriceAdjust",
-      "events": [
-        "20200112",
-        "20210524",
-        "20220809",
-        "20230319",
-        "20240227",
-        "20250312",
-        "20260330"
-      ],
-      "compound_dilution": 15.3,
-      "impact": "Adjusted pre-2020 prices overstated by up to 15x",
-      "next_action": "Investigate TSETMC pagination OR verify against official chart"
-    },
-    {
       "id": "B2",
       "severity": "HIGH",
       "description": "Funding source of capital increases not verified via CODAL",
-      "next_action": "CODAL lookup for 5 matched ShareChange events"
+      "next_action": "CODAL lookup"
     },
     {
       "id": "B3",
       "severity": "HIGH",
       "description": "No independent chart comparison",
-      "next_action": "Compare with TSETMC official adjusted chart, compute max error"
+      "next_action": "Compare with TSETMC official adjusted chart"
     },
     {
       "id": "B4",
       "severity": "MEDIUM",
-      "description": "Total Return not computed",
-      "next_action": "Add dividends to return formula"
+      "description": "Total Return not computed (only adjusted close)",
+      "next_action": "Add dividends + share-count tracking"
     }
   ],
   "accepted_ranges": [],
   "quarantined_ranges": [
     {
-      "from": "2007-03-11",
-      "to": "2026-11-16",
-      "reason": "B1 unresolved: pre-2020 adjusted prices unreliable"
+      "from": "ALL",
+      "to": "ALL",
+      "reason": "B2/B3/B4 unresolved; PROVISIONAL only"
     }
   ],
   "panel_visibility": {

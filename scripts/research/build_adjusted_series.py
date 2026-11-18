@@ -23,23 +23,56 @@ def classify_price_adjust(rec):
     if f > 1.0001: return 'reverse', f
     return 'neutral', 1.0
 
-def build_events(price_adjust_records):
+def build_events(price_adjust_records, share_change_records=None):
+    """Combine PriceAdjust (dividend + paid capital) with ShareChange-only (free capital).
+
+    ShareChange events WITHOUT matching PriceAdjust are treated as free capital
+    increases (from retained earnings). Their factor = old_shares / new_shares
+    is applied backward, same as a paid capital PriceAdjust would be.
+
+    NOTE: This assumes missing PriceAdjust means 'free capital increase'.
+    CODAL verification pending. Documented in SYMBOL_ADJUSTMENT_ACCEPTANCE.
+    """
     by_date = {}
+    pa_dates_forward = set()
+
+    # PriceAdjust events
     for rec in price_adjust_records:
         d = str(rec['dEven'])
         kind, f = classify_price_adjust(rec)
         if kind == 'forward':
-            by_date.setdefault(d, []).append(f)
-        elif kind == 'reverse':
-            by_date.setdefault(d + '_reverse', []).append(f)
+            by_date.setdefault(d, []).append(('price_adjust', f))
+            pa_dates_forward.add(d)
+
+    # ShareChange-only events
+    share_change_only_dates = []
+    if share_change_records:
+        for rec in share_change_records:
+            d = str(rec['dEven'])
+            if d in pa_dates_forward:
+                continue  # already captured by PriceAdjust
+            old = rec.get('numberOfShareOld')
+            new = rec.get('numberOfShareNew')
+            if not old or not new or new <= old:
+                continue
+            f = float(old) / float(new)  # < 1 for dilution
+            by_date.setdefault(d, []).append(('share_change_free', f))
+            share_change_only_dates.append(d)
+
     events = []
-    for d in sorted(k for k in by_date if not k.endswith('_reverse')):
-        factors = by_date[d]
+    for d in sorted(by_date):
+        factors = [f for _, f in by_date[d]]
         net = 1.0
         for f in factors:
             net *= f
-        events.append({'date': d, 'factors': factors, 'net_factor': net})
-    return events
+        events.append({
+            'date': d,
+            'sources': [s for s, _ in by_date[d]],
+            'factors': factors,
+            'net_factor': net,
+        })
+    return events, sorted(share_change_only_dates)
+
 
 def build_adjusted_series(daily_rows, events):
     if not daily_rows: return []
@@ -131,7 +164,12 @@ def main():
         return 1
     pa_path = pa_files[0]
     pa_data = load_json(pa_path)
-    events = build_events(pa_data.get('priceAdjust', []))
+    pa_recs = pa_data.get('priceAdjust', [])
+    sc_recs = []
+    sc_files = list(raw_tsetmc.glob('*share_change*.json'))
+    if sc_files:
+        sc_recs = load_json(sc_files[0]).get('instrumentShareChange', [])
+    events, sc_only_dates = build_events(pa_recs, sc_recs)
 
     price_candidates = []
     for pattern in ['*raw.csv', '*full.csv', '*adjusted_all.csv']:
@@ -156,7 +194,7 @@ def main():
         'input_hashes': {'price_adjust': sha256_file(pa_path), 'raw_prices': sha256_file(price_csv)},
         'output_hashes': {'adjusted_close': sha256_file(out_csv)},
         'counts': {'price_adjust_records': len(pa_data.get('priceAdjust', [])),
-                   'forward_events': len(events), 'daily_rows': len(daily), 'adjusted_rows': len(adjusted)},
+                   'forward_events': len(events), 'share_change_only_events': len(sc_only_dates) if 'sc_only_dates' in dir() else 0, 'daily_rows': len(daily), 'adjusted_rows': len(adjusted)},
     }
     manifest_path = out_dir / 'manifest.json'
     with open(manifest_path, 'w', encoding='utf-8') as f:
