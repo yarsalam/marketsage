@@ -54,12 +54,6 @@
         "merged": false
       },
       "base_commit": "543ee32e9885d87a28c77f443d6dfa04c00e095e",
-      "inputs": [
-        "بیانیهٔ مأموریت MarketSage",
-        "دستور مالک برای کنار گذاشتن روش دستی و ساخت اجرای batch یکپارچه",
-        "WORK_PROTOCOL.md و WORK_STATE.md در شاخهٔ کاری",
-        "مستندات عمومی منابع بازار و APIهای بررسی‌شده"
-      ],
       "actions": [
         "بازبینی اسناد حاکمیتی و تاریخچهٔ کار",
         "تأیید شاخهٔ main و نبود issue/PR باز مرتبط پیش از شروع",
@@ -70,11 +64,15 @@
         "پیاده‌سازی هستهٔ orchestrator و state machine",
         "پیاده‌سازی raw content-addressed و cache مبتنی بر request fingerprint",
         "افزودن هشت آزمون synthetic",
-        "افزودن workflow آزمون و ایجاد PR شمارهٔ ۱ به‌صورت Draft"
+        "اجرای CI هسته با نتیجه موفق",
+        "ثبت رجیستری منابع candidate",
+        "اجرای probe کم‌حجم هفت endpoint از GitHub-hosted runner",
+        "ثبت نتایج probe و محدودیت‌های هر منبع"
       ],
       "owner_authorization": {
         "automated_pipeline_for_all_manifest_markets": true,
         "source_research": true,
+        "minimal_read_only_source_probes": true,
         "acquisition_after_source_registration": true,
         "adjustment_when_required_and_evidence_sufficient": true,
         "delete_or_overwrite_raw_data": false,
@@ -84,38 +82,40 @@
       "evidence": {
         "repository": "yarsalam/marketsage",
         "branch": "feat/multimarket-batch-data-pipeline",
+        "pull_request_number": 1,
         "source_matrix_path": "docs/DATA_SOURCE_CANDIDATES.md",
         "architecture_path": "docs/BATCH_PIPELINE_DESIGN.md",
+        "source_registry_path": "config/source_registry.json",
+        "source_probe_results_path": "docs/SOURCE_PROBE_RESULTS.md",
         "engine_path": "src/marketsage_pipeline/engine.py",
         "tests_path": "tests/test_pipeline_engine.py",
         "workflow_path": ".github/workflows/pipeline-core-tests.yml",
-        "workflow_run_id": 44555227688,
-        "workflow_run_url": "https://github.com/yarsalam/marketsage/actions/runs/44555227688",
-        "tested_commit": "6b94339257d8b636b9b208389249a355fcdb20ee",
-        "workflow_conclusion": "success",
-        "job_conclusion": "success",
-        "tests_passed": 8,
-        "tests_failed": 0,
-        "test_type": "synthetic_unit_tests",
-        "live_market_data_acquired": false,
+        "probe_script_path": "scripts/probe_sources.py",
+        "probe_workflow_path": ".github/workflows/source-probes.yml",
+        "core_test_run_id": 44555227688,
+        "core_test_conclusion": "success",
+        "core_tests_passed": 8,
+        "source_probe_run_id": 44555538334,
+        "source_probe_url": "https://github.com/yarsalam/marketsage/actions/runs/44555538334",
+        "source_probe_artifact_id": 14545386411,
+        "source_probe_artifact_sha256": "4c3f58a9b7581f28c7722eec68417c6b97a401f4f68a3bd8df30e819d85053ef",
+        "source_probe_conclusion": "success",
+        "source_probe_count": 7,
+        "source_probe_counts": {
+          "HTTP_OK": 4,
+          "RESPONSE_TOO_LARGE_FOR_PROBE": 2,
+          "HTTP_ERROR": 1
+        },
+        "live_full_history_acquired": false,
         "adjustment_performed": false,
         "uploaded_financial_csv_excluded": true
       },
-      "data_access": false,
+      "data_access": true,
       "acquisition_performed": false,
       "adjustment_performed": false,
       "tests_performed": true,
-      "acceptance_criteria": [
-        "ماتریس منابع و پوشش برای همهٔ کلاس‌های بازار",
-        "تشخیص قابل‌آزمون وضعیت تعدیل",
-        "روش مستقل تعدیل برای هر کلاس دارایی",
-        "اجرای batch بدون مداخلهٔ دستی نمادبه‌نماد",
-        "ادامهٔ batch با وجود شکست موردی",
-        "دادهٔ خام تغییرناپذیر و خروجی‌های قابل‌ردیابی",
-        "گزارش پوشش، کیفیت و شکست‌ها"
-      ],
       "final_status": "IN_PROGRESS",
-      "next_permitted_action": "probe کم‌حجم نامزدهای منبع و بررسی دسترسی/مجوز؛ سپس پیاده‌سازی adapter واقعی و اجرای end-to-end کنترل‌شده."
+      "next_permitted_action": "ساخت adapterهای واقعی و دریافت کنترل‌شدهٔ تاریخچهٔ محدود برای هر کلاس؛ بررسی schema و وضعیت تعدیل از روی دادهٔ دریافتی؛ سپس توسعهٔ دریافت کامل و تعدیل."
     }
   ]
 }
