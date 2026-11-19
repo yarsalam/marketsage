@@ -67,7 +67,8 @@
         "اجرای CI هسته با نتیجه موفق",
         "ثبت رجیستری منابع candidate",
         "اجرای probe کم‌حجم هفت endpoint از GitHub-hosted runner",
-        "ثبت نتایج probe و محدودیت‌های هر منبع"
+        "ثبت نتایج probe و محدودیت‌های هر منبع",
+        "اصلاح trigger workflow برای جلوگیری از اجرای probe با تغییر رجیستری"
       ],
       "owner_authorization": {
         "automated_pipeline_for_all_manifest_markets": true,
@@ -106,6 +107,9 @@
           "RESPONSE_TOO_LARGE_FOR_PROBE": 2,
           "HTTP_ERROR": 1
         },
+        "duplicate_probe_run_id": 44555979408,
+        "duplicate_probe_run_conclusion": "success",
+        "duplicate_probe_reason": "تغییر config/source_registry.json به‌علت path filter اولیه، workflow را دوباره فعال کرد؛ نتیجهٔ اجرای دوم برای تصمیم منبع استفاده نشد و trigger اصلاح شد.",
         "live_full_history_acquired": false,
         "adjustment_performed": false,
         "uploaded_financial_csv_excluded": true
