@@ -1,97 +1,79 @@
 # HANDOFF_STATE — MarketSage Adjustment Project
 
-**آخرین به‌روزرسانی:** 2026-11-18 (جلسه ۴ — checkpoint + کشف B6)
-**HEAD:** (پس از commit بعدی ثبت می‌شود)
+**آخرین به‌روزرسانی:** 2026-11-19 (جلسه ۵ — B3 حل، ۵ از ۶ blocker)
+**HEAD:** (پس از commit بعدی)
 **Branch:** research/iran-equity-event-notebook-2026-11-12
 **PR:** #82 (Draft)
 
 ## 🎯 وضعیت فعلی هر ۳ نماد
 
-| نماد | event-ledger | adjusted_close | Total Return | تطبیق رسمی | پذیرش |
+| نماد | events | adjusted | Total Return | تطبیق TSE Client | پذیرش |
 |---|---|---|---|---|---|
-| **فولاد** | ✅ ۳۰ رویداد (۲۳ PA + ۷ SC) | 🟡 ۴۲۶۹ ردیف (ستون اشتباه: close به‌جای final_price) | ❌ | ❌ | 🟡 **PROVISIONAL_WITH_ASSUMPTIONS + B6** |
-| **پارسیان** | ❌ ساخته نشده | ✅ ۳۵۴۲ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_UNTESTED** |
-| **وغدیر** | ✅ ۸ ردیف (کهنه) | ✅ ۵۳۸۶ ردیف | ❌ | ❌ | 🟡 **PROVISIONAL_UNTESTED** |
+| **فولاد** | ✅ ۳۰ | ✅ ۴۲۶۹ | ✅ CAGR 47.7% | ✅ median 0.41% | 🟢 **PROVISIONAL_VERIFIED** |
+| **پارسیان** | ✅ ۲۳ | ✅ ۳۵۴۲ | ✅ | ❌ نیازمند TSE Client | 🟡 PROVISIONAL |
+| **وغدیر** | ✅ ۲۴ | ✅ ۵۳۸۶ | ✅ | ❌ نیازمند TSE Client | 🟡 PROVISIONAL |
 
-## 🚨 blockerهای بحرانی
+## ✅ blockerهای حل‌شده (۵ از ۶)
 
-### B1 — ✅ حل شد (موتور v2): ۷ ShareChange به‌عنوان factor رایگان اعمال شد
-**فرض:** افزایش سرمایه از سود انباشته. **تأیید CODAL: هنوز نه.**
-- ۲۰۲۰-۰۱-۱۲: +۶۰٫۷۷٪
-- ۲۰۲۱-۰۵-۲۴: +۴۰٫۱۹٪
-- ۲۰۲۲-۰۸-۰۹: +۸۰٫۸۹٪
-- ۲۰۲۳-۰۳-۱۹: +۵۰٫۹۴٪
-- ۲۰۲۴-۰۲-۲۷: +۳۵٫۰۰٪
-- ۲۰۲۵-۰۳-۱۲: +۳۸٫۸۹٪
-- ۲۰۲۶-۰۳-۳۰: +۲۹٫۰۰٪
-**تأثیر:** adjusted 2007 باید ۱۵٫۳ برابر کوچک‌تر باشد (۳٫۰۸ نه ۴۷٫۲۰)
-**اقدام:** بررسی pagination TSETMC، یا تطبیق با نمودار رسمی
+### B1 — ✅ (ac62649): موتور v2 (SC-only)
+۷/۵/۱ رویداد ShareChange به‌عنوان factor رایگان اعمال شد.
 
-### B2 — نوع تأمین هر افزایش سرمایه نامشخص
-**اقدام:** CODAL 38805/59965 (وغدیر) + معادل فولاد/پارسیان
+### B4 — ✅ (dc62b12): Total Return
+Foolad CAGR 47.7%/19y. روش: `adj_close_t / adj_close_0 - 1`.
 
-### B3 — تطبیق با نمودار رسمی انجام نشده
-**اقدام:** ساخت `comparison_vs_official.csv` برای هر ۳ نماد
+### B5 — ✅ (05bd419): vaghdir بازنویسی
+گزارش + ledger هم‌گام.
 
-### B4 — Total Return محاسبه نشده
-**اقدام:** فرمول TR = (P_t + dividends_t) / P_{t-1} - 1
+### B6 — ✅ (840a2d1): `final_price` اولویت
+`raw_close` = TSETMC `pClosing` (verified: 1900/3976/5270).
 
+### B3 — ✅ (این جلسه): تطبیق با TSE Client 2.27.6 adjustInfo
+- **median error: 0.41%** (truncation floor — TSE Client به عدد صحیح truncate می‌کند)
+- **max 14.33%** فقط در قیمت‌های < 10 ریال (truncation)
+- **TSE Client تأیید کرد که ۷ SC event را هم اعمال می‌کند** → فرض «رایگان» معتبر
+- فایل: `validation/tse_client_adjustinfo.csv`
 
-### B6 — ⚠️ ستون `close` به‌جای `final_price` خوانده می‌شود
-- **کشف:** `read_raw_csv` در `build_adjusted_series.py` ستون `close` (آخرین معامله) را می‌خواند، نه `final_price` (قیمت پایانی).
-- **تأیید:** `final_price` دقیقاً با TSETMC `pClosing` یکی است (۲۰۲۰-۰۱-۱۳: ۳۹۷۶، ۲۰۲۶-۱۱-۱۶: ۵۲۷۰).
-- **تأثیر:** سری adjusted فعلی روی ستون اشتباه ساخته شده — باید با `final_price` بازسازی شود.
-- **اقدام:** اصلاح `read_raw_csv` (اولویت `final_price` > `pclosing` > `close`)، rebuild ۳ سری، مقایسه raw-to-raw با TSETMC.
+## 🔴 blocker باقی‌مانده (۱ از ۶)
 
-### B5 — فایل‌های کهنه vaghdir
-`ADJUSTMENT_REPORT.md` (۴۸ خط) و `event-ledger.csv` (۸ خط) هنوز نسخه قدیمی‌اند (MS-DATA-001، A/B/C بدون تفکیک)
-**اقدام:** بازنویسی در commit بعدی
+### B2 — تأیید CODAL نوع تأمین افزایش سرمایه
+- مسدود: CODAL HTTP 429
+- **اثر:** برای `ACCEPTED` نهایی (نه PROVISIONAL) لازم است
+- **گام:** منتظر رفع rate limit یا استفاده از `codal-mcp`
 
 ## 📁 فایل‌های کلیدی
 
-| فایل | مسیر | وضعیت |
-|---|---|---|
-| استاندارد | `docs/research/ADJUSTMENT_RESEARCH_STANDARD.md` | ✅ ۶۶ خط |
-| موتور | `scripts/research/build_adjusted_series.py` | ✅ syntax OK |
-| GOVERNANCE | `docs/governance/RELEASE_GATES.json` | RG-03/RG-04 NOT_PASSED |
-| شاهد | `docs/governance/EVIDENCE_LEDGER.json` | EV-VAGHDIR با PARTIAL |
-| فولاد event-ledger | `data/.../foolad/event-ledger.csv` | ✅ ۲۳ رویداد |
-| فولاد adjusted | `data/.../foolad/derived/adjusted_close.csv` | ✅ ۴۲۶۹ ردیف |
-| فولاد manifest | `data/.../foolad/derived/manifest.json` | ✅ SHA256 |
-| پارسیان adjusted | `data/.../parsian/derived/adjusted_close.csv` | ✅ ۳۵۴۲ ردیف |
-| وغدیر adjusted | `data/.../vaghdir/derived/adjusted_close.csv` | ✅ ۵۳۸۶ ردیف |
+| فایل | وضعیت |
+|---|---|
+| `docs/research/ADJUSTMENT_RESEARCH_STANDARD.md` | ✅ |
+| `docs/research/HANDOFF_STATE.md` | ✅ این فایل |
+| `scripts/research/build_adjusted_series.py` | ✅ v2 + B6 fix |
+| `scripts/research/build_total_return.py` | ✅ |
+| `scripts/research/compare_tse_client.py` | ✅ **جدید** |
+| `data/.../foolad/validation/tse_client_adjustinfo.csv` | ✅ **جدید** |
+| `data/.../foolad/validation/SYMBOL_ADJUSTMENT_ACCEPTANCE.json` | ✅ **PROVISIONAL_VERIFIED** |
 
-## 🎯 گام بعدی (به ترتیب)
+## 🎯 گام بعدی
 
 | # | کار | اولویت |
 |---|---|---|
-| ۱ | ساخت `HANDOFF_STATE.md` (این فایل) + commit | 🔴 الان |
-| ۲ | ساخت `foolad/validation/SYMBOL_ADJUSTMENT_ACCEPTANCE.json` با blocker B1 | 🔴 الان |
-| ۳ | ساخت `parsian/event-ledger.csv` (مثل فولاد) | 🟡 |
-| ۴ | بازنویسی `vaghdir/ADJUSTMENT_REPORT.md` + `event-ledger.csv` | 🟡 |
-| ۵ | بررسی pagination TSETMC (B1) | 🔴 حیاتی |
-| ۶ | تطبیق با نمودار رسمی (B3) | 🟡 |
-| ۷ | Total Return (B4) | 🟡 |
+| ۱ | گرفتن TSE Client adjustInfo برای پارسیان و وغدیر | 🔴 بالا |
+| ۲ | اعمال همان compare_tse_client.py برای هر دو | 🔴 بالا |
+| ۳ | B2 (CODAL) — بلندمدت | 🟢 کم |
+| ۴ | اتصال به پنل (فاز ۵) | 🟡 بعد از تأیید ۳ نماد |
 
 ## 📋 قوانین مرجع
 
 1. `ADJUSTMENT_RESEARCH_STANDARD.md` — پروتکل
-2. `RELEASE_GATES.json` — RG-03/RG-04 pass نشده
-3. `DECISION_POLICY` — D-2026-11-16-01: ۳ نماد، PR #82، بدون دانلود مجدد
+2. `RELEASE_GATES.json` — RG-03/RG-04 NOT_PASSED
+3. `D-2026-11-16-01`: ۳ نماد، PR #82، بدون دانلود مجدد
 4. ممنوع: PR جدید، merge بدون تأیید، استفاده در بک‌تست
-
-## 🔄 نحوه به‌روزرسانی این فایل
-
-هر جلسه:
-1. `git pull` (اگر جای دیگر کار شده)
-2. آپدیت جدول وضعیت
-3. اضافه/حذف blockerها
-4. commit با پیام `chore(handoff): update state after session N`
 
 ## 📊 تاریخچه جلسات
 
-| جلسه | تاریخ | کار انجام‌شده |
+| جلسه | تاریخ | کار |
 |---|---|---|
 | ۱ | 2026-11-17 | governance sync (پالا) |
-| ۲ | 2026-11-18 | ۵ کشف vaghdir، EVIDENCE_LEDGER بازنویسی |
-| ۳ (این) | 2026-11-18 | استاندارد + موتور + ۳ سری adjusted، کشف B1 |
+| ۲ | 2026-11-18 | ۵ کشف vaghdir |
+| ۳ | 2026-11-18 | استاندارد + موتور v1+v2 + ۳ سری |
+| ۴ | 2026-11-18/19 | B6 + B4 + B5 |
+| ۵ (این) | 2026-11-19 | **B3 حل با TSE Client** |

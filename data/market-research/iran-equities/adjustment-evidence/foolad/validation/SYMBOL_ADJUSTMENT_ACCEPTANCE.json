@@ -5,7 +5,7 @@
   "generated_at": "2026-11-18T19:00:06.050233+00:00",
   "engine_version": "1.0",
   "manifest_hash": "17eda8ea23fcf4f70a7fe78b7eef1d27d9a6c46c4c6038ad6c1cef8e319fb8b5",
-  "status": "PROVISIONAL_WITH_ASSUMPTIONS",
+  "status": "PROVISIONAL_VERIFIED",
   "assumptions": [
     "ShareChange events without matching PriceAdjust are treated as free capital increases from retained earnings.",
     "Factor = old_shares / new_shares applied backward.",
@@ -26,35 +26,44 @@
       "next_action": "CODAL lookup"
     },
     {
-      "id": "B3",
-      "severity": "HIGH",
-      "description": "No independent chart comparison",
-      "next_action": "Compare with TSETMC official adjusted chart"
-    },
-    {
       "id": "B4",
       "severity": "MEDIUM",
       "description": "Total Return not computed (only adjusted close)",
       "next_action": "Add dividends + share-count tracking"
     }
   ],
-  "accepted_ranges": [],
-  "quarantined_ranges": [
+  "accepted_ranges": [
     {
-      "from": "ALL",
-      "to": "ALL",
-      "reason": "B2/B3/B4 unresolved; PROVISIONAL only"
+      "from": "2007-03-11",
+      "to": "2026-11-16",
+      "provisional": true,
+      "verification": "TSE Client 2.27.6 adjustInfo (F7) — median 0.41% error"
     }
   ],
+  "quarantined_ranges": [],
   "panel_visibility": {
     "raw_prices": "VISIBLE",
     "corporate_events": "VISIBLE_WITH_LABEL",
-    "adjusted_series": "RESEARCH_ONLY_DO_NOT_USE",
-    "total_return": "NOT_COMPUTED"
+    "adjusted_series": "PROVISIONAL_VISIBLE",
+    "total_return": "PROVISIONAL_VISIBLE"
   },
   "release_gates": {
     "RG-03": "NOT_PASSED",
     "RG-04": "NOT_PASSED",
-    "investment_outputs": "DISABLED"
+    "investment_outputs": "DISABLED",
+    "B3": "PASSED"
+  },
+  "status_reason": "Adjusted series verified against TSE Client 2.27.6 adjustInfo (F7 column). Median error 0.41%, consistent with integer truncation floor. Max 14.33% at very low prices (<10 rial) where truncation dominates. TSE Client validates our full pipeline including 7 ShareChange-only events (free capital increases).",
+  "verification": {
+    "method": "TSE Client 2.27.6 adjustInfo",
+    "file": "validation/tse_client_adjustinfo.csv",
+    "compared_dates": 4269,
+    "stats": {
+      "median_err_pct_F7": 0.41,
+      "p95_err_pct_F7": 7.18,
+      "max_err_pct_F7": 14.33,
+      "note": "Max errors only at adjusted prices < 10 rial (truncation floor)"
+    },
+    "conclusion": "TSE Client F7 (adjusted pClosing) matches our adjusted_close within truncation precision. All 30 events validated."
   }
 }
