@@ -6,16 +6,21 @@
     {
       "work_id": "MS-BOOTSTRAP-20261119-01",
       "type": "governance_bootstrap",
-      "status": "IN_PROGRESS",
+      "status": "COMPLETED",
       "started_at": "2026-11-19",
+      "completed_at": "2026-11-19",
       "inputs": [
         "درخواست مالک برای ایجاد نسخه فارسی بیانیه",
         "وضعیت مخزن خالی yarsalam/marketsage"
       ],
       "actions": [
         "بررسی مخزن، شاخه‌ها، commitها، issueها و PRها",
-        "ایجاد پروتکل کاری فارسی",
-        "ایجاد اسناد وضعیت، ثبت آثار، دفتر اجرا و بیانیه"
+        "ایجاد WORK_PROTOCOL.md",
+        "ایجاد WORK_STATE.md",
+        "ایجاد ARTIFACT_REGISTRY.json",
+        "ایجاد RUN_LEDGER.json",
+        "ایجاد بیانیه-ماموریت.md",
+        "بازخوانی فایل‌ها و ثبت هش blob گیت‌هاب"
       ],
       "data_access": false,
       "local_path_access": false,
@@ -25,8 +30,15 @@
         "عدم دسترسی به /home/nima/marketsage-data",
         "ثبت هش فایل‌ها در ARTIFACT_REGISTRY.json"
       ],
-      "final_status": "PENDING_VERIFICATION",
-      "notes": "هیچ پژوهش، دریافت داده، محاسبه یا آزمون تحلیلی در این کار مجاز نیست."
+      "final_status": "COMPLETED",
+      "evidence": {
+        "repository": "yarsalam/marketsage",
+        "branch": "main",
+        "files_read_back": true,
+        "hash_type": "git_blob_sha1",
+        "data_or_code_transferred": false
+      },
+      "notes": "هیچ پژوهش، دریافت داده، محاسبه یا آزمون تحلیلی انجام نشد. قفل پژوهش داده فعال باقی ماند."
     }
   ]
 }
