@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01",
+  "policy": {
+    "status_values": ["CANDIDATE", "PROBED", "ACCEPTED", "REJECTED", "BLOCKED_LICENSE"],
+    "bulk_acquisition_allowed_only_when": [
+      "status_is_ACCEPTED",
+      "coverage_and_schema_verified",
+      "rate_limit_and_retry_policy_recorded",
+      "terms_and_redistribution_rights_reviewed"
+    ],
+    "probe_policy": "read_only_minimal_requests_only",
+    "raw_data_immutable": true
+  },
+  "last_probe": {
+    "workflow_run_id": 44555538334,
+    "workflow_run_url": "https://github.com/yarsalam/marketsage/actions/runs/44555538334",
+    "artifact_id": 14545386411,
+    "artifact_sha256": "4c3f58a9b7581f28c7722eec68417c6b97a401f4f68a3bd8df30e819d85053ef",
+    "tested_commit": "68d0980c5b5916247a0e3784f6cf4f1855d72377",
+    "environment": "GitHub-hosted Ubuntu 26.04, westus3",
+    "probe_time_utc": "2026-11-19T15:30:31Z/2026-11-19T15:31:10Z",
+    "source_count": 7,
+    "status_counts": {
+      "HTTP_OK": 4,
+      "RESPONSE_TOO_LARGE_FOR_PROBE": 2,
+      "HTTP_ERROR": 1
+    },
+    "note": "این probe فقط دسترسی و schema محدود را بررسی کرد؛ payload کامل بازار ذخیره نشد و هیچ منبعی با این نتیجه به ACCEPTED تغییر نکرد."
+  },
+  "sources": [
+    {
+      "source_id": "tsetmc_public",
+      "asset_classes": ["iran_equity"],
+      "authority": "exchange_public_surface",
+      "status": "PROBED",
+      "base_url": "https://cdn.tsetmc.com/api",
+      "probe_endpoint": "/Instrument/GetInstrumentSearch/{query}",
+      "history_endpoint": "/ClosingPrice/GetClosingPriceDailyList/{insCode}/{n}",
+      "event_endpoints": [
+        "/ClosingPrice/GetPriceAdjustList/{insCode}",
+        "/Instrument/GetInstrumentShareChange/{insCode}"
+      ],
+      "last_probe": {
+        "status": "HTTP_OK",
+        "http_status": 200,
+        "query": "فولاد",
+        "rows": 41,
+        "response_sha256": "39c5b42166570c75cd7a19439f571c8a513a46ce21d0fe592a8d2136f4193db2"
+      },
+      "coverage_caveat": "کاتالوگ مستقل هشدار می‌دهد GetClosingPriceDailyList ممکن است برای بسیاری از ابزارها خالی باشد؛ endpoint جایگزین InstTradeHistory.aspx نیز باید بررسی شود.",
+      "event_completeness": "NOT_ESTABLISHED",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "دسترسی search از GitHub-hosted runner تأیید شد؛ تاریخچه، رویدادها و پوشش universe هنوز تأیید نشده‌اند. endpoint عمومی غیرمستند و شرایط بازتوزیع نامعلوم است."
+    },
+    {
+      "source_id": "codal_disclosures",
+      "asset_classes": ["iran_equity", "iran_funds"],
+      "authority": "official_disclosure_registry",
+      "status": "CANDIDATE",
+      "base_url": "https://codal.ir",
+      "probe_endpoint": "official public search page/API to be confirmed",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "برای شواهد رویداد شرکت/صندوق نامزد اصلی است؛ endpoint، schema و سیاست دسترسی خودکار هنوز تأیید نشده‌اند."
+    },
+    {
+      "source_id": "fipiran_nav",
+      "asset_classes": ["iran_funds", "fixed_income"],
+      "authority": "fund_information_platform",
+      "status": "CANDIDATE",
+      "base_url": "https://www.fipiran.com/services/",
+      "universe_endpoint": "POST fund/fundcompare/",
+      "history_endpoint": "GET chart/getfundchart?regno={regNo}&showAll=true",
+      "fields_candidate": ["issueNav", "cancelNav", "statisticalNav", "date"],
+      "last_probe": {
+        "status": "NOT_PROBED",
+        "evidence": "base service and endpoints observed in third-party wrapper source"
+      },
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "base service از wrapper عمومی مشخص شد؛ دسترسی مستقیم، پوشش کامل، معنای توزیع سود و حق بازتوزیع هنوز بررسی نشده است."
+    },
+    {
+      "source_id": "tgju_history",
+      "asset_classes": ["iran_gold", "iran_coins", "iran_fx"],
+      "authority": "third_party_market_aggregator",
+      "status": "PROBED",
+      "base_url": "https://api.tgju.org",
+      "history_endpoint": "/v1/market/indicator/summary-table-data/{symbol}",
+      "pagination": {
+        "parameters": ["start", "length"],
+        "evidence": "third-party implementation using DataTables request parameters"
+      },
+      "last_probe": {
+        "status": "RESPONSE_TOO_LARGE_FOR_PROBE",
+        "http_status": 200,
+        "read_cap_bytes": 262144,
+        "response_prefix_sha256": "4e67eebfd7ff96b9d3c6da18c6dab579e20ca30b26cb052f32ccce4bd61aafa4",
+        "parse_complete": false
+      },
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "endpoint پاسخ می‌دهد اما تاریخچه کامل از سقف probe بزرگ‌تر است؛ pagination لازم است. API رسمی مستند و حق بازتوزیع تأیید نشده."
+    },
+    {
+      "source_id": "nerkhara_history",
+      "asset_classes": ["iran_gold", "iran_coins", "iran_fx", "iran_crypto_reference"],
+      "authority": "third_party_market_aggregator",
+      "status": "PROBED",
+      "base_url": "https://nerkhara.com/api/v1",
+      "probe_endpoint": "/index.json",
+      "history_endpoint": "/history/{id}.json",
+      "last_probe": {
+        "status": "HTTP_OK",
+        "http_status": 200,
+        "bytes": 14366,
+        "top_level_keys": ["api", "attribution", "by_day_years", "documentation", "endpoints", "generated_utc", "ids", "methods", "terms", "units"],
+        "response_sha256": "8175b90f36cac290af6942039c2f454a0012d30c4a9965c5ff11e802d9e053b7"
+      },
+      "terms_status": "PUBLISHER_CLAIMS_FREE_COMMERCIAL_USE_REVIEW_REQUIRED",
+      "notes": "index قابل دریافت است؛ شناسه‌های نماد و terms باید از محتوای کامل بررسی شوند. تاریخچهٔ نمونه هنوز probe نشده."
+    },
+    {
+      "source_id": "netarz_fx",
+      "asset_classes": ["iran_fx"],
+      "authority": "third_party_fx_provider",
+      "status": "PROBED",
+      "base_url": "https://netarz.ir/api/fx/v1",
+      "probe_endpoint": "/currencies",
+      "history_endpoint": "/history/{code}",
+      "last_probe": {
+        "status": "HTTP_ERROR",
+        "http_status": 401,
+        "error": "Unauthorized"
+      },
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "درخواست بدون credential با 401 پاسخ داد؛ برای آزمون تاریخچه به API key و بررسی free/pro نیاز است."
+    },
+    {
+      "source_id": "nobitex_public",
+      "asset_classes": ["iran_crypto_exchange"],
+      "authority": "exchange_public_api",
+      "status": "PROBED",
+      "base_url": "https://apiv2.nobitex.ir",
+      "probe_endpoint": "/market/stats",
+      "history_endpoint": "/market/udf/history?symbol={symbol}&resolution={resolution}&from={from}&to={to}",
+      "last_probe": {
+        "status": "HTTP_OK",
+        "http_status": 200,
+        "bytes": 359,
+        "top_level_keys": ["global", "stats", "status"],
+        "response_sha256": "2ce3d66f4c664e702981fe4f538e7d2a1c031f92f69416039524ede27c166a17"
+      },
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "market stats عمومی پاسخ داد؛ تاریخچه OHLC و pagination هنوز probe نشده. هر صرافی/جفت سری مستقل است."
+    },
+    {
+      "source_id": "wallex_public",
+      "asset_classes": ["iran_crypto_exchange"],
+      "authority": "exchange_public_api",
+      "status": "PROBED",
+      "base_url": "https://api.wallex.ir",
+      "probe_endpoint": "/v1/markets",
+      "history_endpoint": "/v1/udf/history?symbol={symbol}&resolution={resolution}&from={from}&to={to}",
+      "last_probe": {
+        "status": "RESPONSE_TOO_LARGE_FOR_PROBE",
+        "http_status": 200,
+        "read_cap_bytes": 262144,
+        "response_prefix_sha256": "fc973e88048fda75b9eaea279973d500a4791f70465f5770154f2a85d245c2b1",
+        "parse_complete": false
+      },
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "فهرست بازار پاسخ می‌دهد اما از سقف probe بزرگ‌تر است؛ مستند رسمی مسیر OHLC و resolution روزانه 1D را شرح می‌دهد. تاریخچهٔ نمونه هنوز probe نشده."
+    },
+    {
+      "source_id": "alpha_vantage",
+      "asset_classes": ["global_equity", "global_etf", "global_fx", "global_crypto", "commodities"],
+      "authority": "commercial_data_provider",
+      "status": "PROBED",
+      "base_url": "https://www.alphavantage.co/query",
+      "probe_endpoint": "TIME_SERIES_DAILY with demo key for IBM",
+      "history_endpoint": "TIME_SERIES_DAILY or TIME_SERIES_DAILY_ADJUSTED",
+      "last_probe": {
+        "status": "HTTP_OK",
+        "http_status": 200,
+        "bytes": 21300,
+        "top_level_keys": ["Meta Data", "Time Series (Daily)"],
+        "response_sha256": "213af3a5ce95f9603e82a43efada8ed18cc1924c4792968e486769307bcf4d60"
+      },
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "daily endpoint با demo key پاسخ داد؛ adjusted history ممکن است premium باشد و محدودیت/حق استفاده تجاری بررسی نشده است."
+    },
+    {
+      "source_id": "fred_alfred",
+      "asset_classes": ["global_macro"],
+      "authority": "official_economic_data_provider",
+      "status": "CANDIDATE",
+      "base_url": "https://api.stlouisfed.org/fred",
+      "probe_endpoint": "series/observations (API key required)",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "برای سری‌های اقتصاد کلان و ALFRED vintage history؛ نه جایگزین عمومی قیمت سهام/دارایی."
+    },
+    {
+      "source_id": "nasdaq_data_link",
+      "asset_classes": ["global_equity", "global_indices", "global_funds"],
+      "authority": "commercial_market_data_provider",
+      "status": "CANDIDATE",
+      "base_url": "https://data.nasdaq.com/api/v3",
+      "probe_endpoint": "dataset metadata endpoint (API key/plan dependent)",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "پوشش و دسترسی به dataset/product subscription وابسته است؛ ارزیابی به تفکیک universe."
+    }
+  ]
+}

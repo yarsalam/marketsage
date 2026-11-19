@@ -1,0 +1,40 @@
+name: MarketSage Pipeline Core Tests
+
+on:
+  push:
+    branches:
+      - feat/multimarket-batch-data-pipeline
+    paths:
+      - src/marketsage_pipeline/**
+      - tests/**
+      - pyproject.toml
+      - requirements*.txt
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/marketsage_pipeline/**
+      - tests/**
+      - pyproject.toml
+      - requirements*.txt
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketsage-core-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run standard-library test suite
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
