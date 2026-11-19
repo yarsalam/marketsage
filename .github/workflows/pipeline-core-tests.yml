@@ -1,0 +1,26 @@
+name: MarketSage Pipeline Core Tests
+
+on:
+  push:
+    branches:
+      - feat/multimarket-batch-data-pipeline
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run standard-library test suite
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
