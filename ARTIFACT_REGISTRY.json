@@ -76,7 +76,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "9a3772866f92e06e8c0375a60b4eab2e08054f44",
+      "git_blob_sha": "f0224e1efc0efeed90fb9a948b55c7bf762f4920",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -86,7 +86,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "ffb93a5601c33bf6ecb393f2d597f8b74d3bea48",
+      "git_blob_sha": "a6f2d319df2af5ff40ea8cec2ee4e4d32b9ab4ea",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -127,6 +127,46 @@
       "language": "fa",
       "status": "verified",
       "git_blob_sha": "a2d51098bceef8135b9bcb2ff625b6127adc450f",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-PIPELINE-ENGINE-001",
+      "path": "src/marketsage_pipeline/engine.py",
+      "type": "pipeline_core",
+      "language": "python",
+      "status": "verified",
+      "git_blob_sha": "c4dd75ca4fe9204fbc97dd102fa26be6b258c96d",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-PIPELINE-PACKAGE-001",
+      "path": "src/marketsage_pipeline/__init__.py",
+      "type": "python_package",
+      "language": "python",
+      "status": "verified",
+      "git_blob_sha": "43b09a9adcaea54283017dc97d659622b0c31a46",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-PIPELINE-TESTS-001",
+      "path": "tests/test_pipeline_engine.py",
+      "type": "synthetic_unit_tests",
+      "language": "python",
+      "status": "verified",
+      "git_blob_sha": "06f1b843f948a1ba8bc702d437a9e2ce99251c16",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-PIPELINE-CI-001",
+      "path": ".github/workflows/pipeline-core-tests.yml",
+      "type": "ci_workflow",
+      "language": "yaml",
+      "status": "verified",
+      "git_blob_sha": "790c6505d74ecd99c648daa25cbbc9175c84c811",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     }
