@@ -78,6 +78,46 @@
       ],
       "final_status": "IN_PROGRESS",
       "next_permitted_action": "طراحی قرارداد استاندارد داده، ماتریس منابع/پوشش و معماری orchestrator؛ سپس ثبت adapterها و دریافت کنترل‌شده."
+    },
+    {
+      "work_id": "MS-FOOLAD-ADJUSTMENT-RECONCILIATION-20261119-01",
+      "type": "legacy_foolad_adjustment_reconciliation",
+      "status": "BLOCKED_ON_LOCAL_EVIDENCE_BYTES",
+      "started_at": "2026-11-19",
+      "inputs": [
+        "فهرست فایل‌ها و مانیفست خروجی فولاد ارائه‌شده در گفتگوهای قبلی",
+        "خروجی‌های ممیزی قبلی TSETMC و مقایسهٔ نمودار",
+        "دستور صریح مالک برای استفادهٔ محدود از داده‌های قبلی فولاد و اصلاح شکاف‌های اثبات‌شده",
+        "اسناد حاکمیتی فعلی مخزن"
+      ],
+      "actions": [
+        "بازیابی مسیرها، نام فایل‌ها، اندازه‌ها و هش‌های گزارش‌شده از گفتگوهای قبلی",
+        "بررسی مانیفست خروجی تعدیل مورخ ۲۰۲۶-۱۱-۱۸",
+        "بازبینی وضعیت PR/CI و معماری فعلی خط لوله",
+        "تحقیق فنی دربارهٔ endpointهای تاریخچه و رویداد TSETMC و بررسی منابع عمومی رویدادهای افزایش سرمایه"
+      ],
+      "owner_authorization": {
+        "reuse_previous_foolad_evidence_for_offline_audit": true,
+        "reconcile_and_adjust_proven_gaps": true,
+        "new_live_downloads": false,
+        "overwrite_raw_files": false,
+        "guess_adjustment_factors": false,
+        "enable_investment_ranking": false,
+        "merge_or_deploy": false
+      },
+      "findings": [
+        "خروجی adjusted_close و total_return قبلاً ساخته شده‌اند؛ مانیفست آن‌ها را candidate معرفی می‌کند و پذیرش مستقل را اثبات نمی‌کند.",
+        "مانیفست ۲۰۲۶-۱۱-۱۸ تعداد ۴۲۶۹ ردیف روزانه، ۲۳ رکورد price-adjust و ۳۰ رویداد ترکیبی را گزارش می‌کند.",
+        "ممیزی قدیمی‌تر ۲۸۵ نقض OHLC در خام و ۴۱ مورد پس از تعدیل گزارش کرده؛ این شواهد مربوط به snapshot قدیمی‌تر است و نباید به snapshot ۴۲۶۹ ردیفی تعمیم داده شود.",
+        "در ممیزی رویدادهای قبلی، نگاشت شناسه‌های مرتبط و تطبیق تاریخ‌های رویداد با feed قیمت باز مانده است."
+      ],
+      "data_access": false,
+      "local_path_access": false,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "live_source_probe_performed": false,
+      "final_status": "BLOCKED_ON_LOCAL_EVIDENCE_BYTES",
+      "next_permitted_action": "دریافت یک بستهٔ فقط‌خواندنی از پوشهٔ قبلی فولاد و شواهد مرتبط، بازحساب هش‌ها، سپس اجرای یک ممیزی آفلاین یک‌باره و تولید خروجی تعدیل نسخه‌دار فقط برای رویدادهای تأییدشده."
     }
   ]
 }
