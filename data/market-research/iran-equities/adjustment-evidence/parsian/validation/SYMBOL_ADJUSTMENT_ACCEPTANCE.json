@@ -1,16 +1,11 @@
 {
   "symbol": "پارسیان",
-  "symbol_slug": "parsian",
   "task_id": "MS-DATA-002",
-  "generated_at": "2026-11-18T19:00:06.185977+00:00",
+  "generated_at": "2026-11-19T09:51:45.744906+00:00",
   "engine_version": "1.0",
-  "manifest_hash": "e3d2b8b22167e7403d9d6217fdca15acf8affb95cd1fabb2d19e271946f39b31",
-  "status": "PROVISIONAL_WITH_ASSUMPTIONS",
-  "assumptions": [
-    "ShareChange events without matching PriceAdjust are treated as free capital increases from retained earnings.",
-    "Factor = old_shares / new_shares applied backward.",
-    "CODAL verification of funding source: NOT YET DONE."
-  ],
+  "manifest_hash": "f71ec9f25dc645be11f55363131b2cbe066a9d3e1df3cd2882c9ff880fdc78eb",
+  "status": "PROVISIONAL_VERIFIED",
+  "status_reason": "Verified vs TSE Client adjustInfo (F7): median 2.40%, p95 4.80%, max 14.97%",
   "counts": {
     "price_adjust_records": 18,
     "forward_events": 23,
@@ -18,43 +13,40 @@
     "daily_rows": 3542,
     "adjusted_rows": 3542
   },
-  "blockers": [
+  "accepted_ranges": [
     {
-      "id": "B2",
-      "severity": "HIGH",
-      "description": "Funding source of capital increases not verified via CODAL",
-      "next_action": "CODAL lookup"
-    },
-    {
-      "id": "B3",
-      "severity": "HIGH",
-      "description": "No independent chart comparison",
-      "next_action": "Compare with TSETMC official adjusted chart"
-    },
-    {
-      "id": "B4",
-      "severity": "MEDIUM",
-      "description": "Total Return not computed (only adjusted close)",
-      "next_action": "Add dividends + share-count tracking"
+      "from": "2009-06-23",
+      "to": "2026-08-03",
+      "provisional": true
     }
   ],
-  "accepted_ranges": [],
-  "quarantined_ranges": [
-    {
-      "from": "ALL",
-      "to": "ALL",
-      "reason": "B2/B3/B4 unresolved; PROVISIONAL only"
-    }
+  "quarantined_ranges": [],
+  "blockers": [
+    "CODAL re-verification unavailable"
+  ],
+  "next_steps": [
+    "Compare adjusted_close with TSETMC official chart",
+    "Verify capital increase funding sources via CODAL"
   ],
   "panel_visibility": {
     "raw_prices": "VISIBLE",
     "corporate_events": "VISIBLE_WITH_LABEL",
-    "adjusted_series": "RESEARCH_ONLY_DO_NOT_USE",
-    "total_return": "NOT_COMPUTED"
+    "adjusted_series": "RESEARCH_ONLY",
+    "total_return": "NOT_YET_COMPUTED"
   },
   "release_gates": {
     "RG-03": "NOT_PASSED",
     "RG-04": "NOT_PASSED",
     "investment_outputs": "DISABLED"
+  },
+  "verification": {
+    "method": "TSE Client 2.27.6 adjustInfo",
+    "file": "validation/official_chart_adjusted.csv",
+    "compared_dates": 3542,
+    "stats": {
+      "median_err_pct": 2.4,
+      "p95_err_pct": 4.8,
+      "max_err_pct": 14.97
+    }
   }
 }

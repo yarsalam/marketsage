@@ -1,9 +1,24 @@
 event_id,task_id,event_date_jalali,event_date_gregorian,event_type,source,source_reference,percentage,status,verification_level,notes
-EV-VAGHDIR-2024-08,MS-DATA-002,1403/05/13,2024-08-03,capital_increase,codal,آگهی ثبت افزایش سرمایه,200.0,IN_PROGRESS,EXISTENCE_CONFIRMED,72B→216B factor 0.3333؛ SC-only (بدون PriceAdjust)
-EV-VAGHDIR-2015-03,MS-DATA-002,1393/12/16,2015-03-07,dividend,codal,tracing 202327,16.3,READY,EXISTENCE_CONFIRMED,factor 0.8369؛ iranquant 19.49% (2015-03-28) — ناسازگاری
-EV-VAGHDIR-2013-02,MS-DATA-002,1391/11/28,2013-02-16,dividend,codal,tracing 105243,10.8,READY,EXISTENCE_CONFIRMED,factor 0.8923؛ در changes.csv غایب
-EV-VAGHDIR-2011-04-A,MS-DATA-002,1390/02/06,2011-04-26,dividend,codal,tracing 38448,6.89,IN_PROGRESS,EXISTENCE_CONFIRMED,7252→6752 factor 0.9311
-EV-VAGHDIR-2011-04-B,MS-DATA-002,1390/02/06,2011-04-26,capital_increase,tsetmc,GetInstrumentShareChange,97.53,IN_PROGRESS,EXISTENCE_CONFIRMED,6752→3567 factor 0.5283؛ فرضیه ~70/30 رایگان/آورده (تأیید نشده)
-EV-VAGHDIR-2011-04-C,MS-DATA-002,1390/02/03,2011-04-23,adjustment_display,tsetmc,GetPriceAdjustList,,RESOLVED,DISPLAY_ONLY,3820 vs 7252 factor 0.5268؛ نمایش ترکیبی — در موتور اعمال نمی‌شود
-EV-VAGHDIR-2011-04-D,MS-DATA-002,1390/02/06,2011-04-26,adjustment_reverse,tsetmc,GetPriceAdjustList,,RESOLVED,DISPLAY_ONLY,7252 vs 3820 factor 1.8984؛ معکوس #C — در موتور اعمال نمی‌شود
-EV-VAGHDIR-2010-04,MS-DATA-002,1389/02/01,2010-04-21,unknown,none,,,BLOCKED,NO_SOURCE,بدون CODAL؛ TSETMC 0.8881؛ در changes.csv غایب؛ قرنطینه
+EV-VAGHDIR-20090419,MS-DATA-002,,2009-04-19,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8297; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20100421,MS-DATA-002,,2010-04-21,dividend,tsetmc,GetPriceAdjustList,,BLOCKED,NO_SOURCE,بدون CODAL؛ TSETMC 0.8881؛ قرنطینه
+EV-VAGHDIR-20110423,MS-DATA-002,,2011-04-23,capital_increase,codal+tsetmc,tracing 38805/59965,97.53,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.5268; old=6075000000 new=12000000000; 1 forward record(s) | افزایش سرمایه 97.53% (CODAL 38805/59965)؛ فرضیه رایگان+آورده
+EV-VAGHDIR-20110426,MS-DATA-002,,2011-04-26,dividend,codal+tsetmc,tracing 38448,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.4919; dividend-only; 2 forward record(s) | سود نقدی 1389 (CODAL 38448)
+EV-VAGHDIR-20120220,MS-DATA-002,,2012-02-20,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8904; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20121208,MS-DATA-002,,2012-12-08,capital_increase,tsetmc,GetInstrumentShareChange+GetPriceAdjustList,33.33,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.7499; old=12000000000 new=16000000000; 1 forward record(s)
+EV-VAGHDIR-20130227,MS-DATA-002,,2013-02-27,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8923; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20130409,MS-DATA-002,,2013-04-09,capital_increase,tsetmc,GetInstrumentShareChange+GetPriceAdjustList,12.5,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8888; old=16000000000 new=18000000000; 1 forward record(s)
+EV-VAGHDIR-20140317,MS-DATA-002,,2014-03-17,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.9049; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20141014,MS-DATA-002,,2014-10-14,capital_increase,tsetmc,GetInstrumentShareChange+GetPriceAdjustList,100.0,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.5482; old=18000000000 new=36000000000; 1 forward record(s)
+EV-VAGHDIR-20150317,MS-DATA-002,,2015-03-17,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8369; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20151103,MS-DATA-002,,2015-11-03,capital_increase,tsetmc,GetInstrumentShareChange+GetPriceAdjustList,28.0,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8738; old=36000000000 new=46080000000; 1 forward record(s)
+EV-VAGHDIR-20160316,MS-DATA-002,,2016-03-16,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.85; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20161123,MS-DATA-002,,2016-11-23,capital_increase,tsetmc,GetInstrumentShareChange+GetPriceAdjustList,56.25,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.7052; old=46080000000 new=72000000000; 1 forward record(s)
+EV-VAGHDIR-20170318,MS-DATA-002,,2017-03-18,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.874; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20180317,MS-DATA-002,,2018-03-17,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.857; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20190317,MS-DATA-002,,2019-03-17,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8687; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20210315,MS-DATA-002,,2021-03-15,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.9352; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20220314,MS-DATA-002,,2022-03-14,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8665; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20230424,MS-DATA-002,,2023-04-24,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.9206; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20240416,MS-DATA-002,,2024-04-16,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.8785; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20250226,MS-DATA-002,,2025-02-26,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.9016; dividend-only; 1 forward record(s)
+EV-VAGHDIR-20260418,MS-DATA-002,,2026-04-18,dividend,tsetmc,GetPriceAdjustList,,PROVISIONAL,EXISTENCE_CONFIRMED,factor 0.9005; dividend-only; 1 forward record(s)
