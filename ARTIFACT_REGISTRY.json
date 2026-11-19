@@ -76,7 +76,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "5836d2d21dad519a011b1f6a4a3fbb70a5e8e6dc",
+      "git_blob_sha": "85b3d0356041e898ec7b8cb0a8c3e730be3ee60d",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -86,7 +86,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "7abda8ec3391978bcb521382ff20098e17bf99b3",
+      "git_blob_sha": "83984c47718a862899fe4843b6426245be4da138",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -186,7 +186,7 @@
       "type": "ci_workflow",
       "language": "yaml",
       "status": "verified",
-      "git_blob_sha": "790c6505d74ecd99c648daa25cbbc9175c84c811",
+      "git_blob_sha": "7e2f7f55b8c270aece05236028d1ede219401fc3",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
