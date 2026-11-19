@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "project": "MarketSage",
+  "policy": {
+    "raw_files_are_immutable": true,
+    "verify_hash_and_provenance_before_reuse": true,
+    "missing_path_status": "PATH_UNRESOLVED",
+    "never_redownload_without_archive_and_backup_check": true
+  },
+  "artifacts": [
+    {
+      "artifact_id": "MS-GOV-PROTOCOL-001",
+      "path": "WORK_PROTOCOL.md",
+      "type": "governance",
+      "language": "fa",
+      "status": "created_hash_pending",
+      "sha256": null,
+      "immutable": false,
+      "work_id": "MS-BOOTSTRAP-20261119-01"
+    },
+    {
+      "artifact_id": "MS-GOV-STATE-001",
+      "path": "WORK_STATE.md",
+      "type": "governance",
+      "language": "fa",
+      "status": "created_hash_pending",
+      "sha256": null,
+      "immutable": false,
+      "work_id": "MS-BOOTSTRAP-20261119-01"
+    },
+    {
+      "artifact_id": "MS-GOV-LEDGER-001",
+      "path": "RUN_LEDGER.json",
+      "type": "execution_ledger",
+      "language": "fa",
+      "status": "created_hash_pending",
+      "sha256": null,
+      "immutable": false,
+      "work_id": "MS-BOOTSTRAP-20261119-01"
+    },
+    {
+      "artifact_id": "MS-GOV-REGISTRY-001",
+      "path": "ARTIFACT_REGISTRY.json",
+      "type": "artifact_registry",
+      "language": "fa",
+      "status": "created_hash_pending",
+      "sha256": null,
+      "immutable": false,
+      "work_id": "MS-BOOTSTRAP-20261119-01"
+    },
+    {
+      "artifact_id": "MS-MANIFESTO-001",
+      "path": "بیانیه-ماموریت.md",
+      "type": "project_manifesto",
+      "language": "fa",
+      "status": "created_hash_pending",
+      "sha256": null,
+      "immutable": false,
+      "work_id": "MS-BOOTSTRAP-20261119-01"
+    }
+  ]
+}
