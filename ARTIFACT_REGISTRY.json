@@ -51,7 +51,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "20cc8fe6707fdef88a3fc27f19d408361303be68",
+      "git_blob_sha": "e595d2ea76babb6e4a26a0e4651c0e89849a23af",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -60,8 +60,8 @@
       "path": "WORK_STATE.md",
       "type": "governance",
       "language": "fa",
-      "status": "pending_update",
-      "git_blob_sha": "5be6ad59f6fc59d37ee0d12ae99f1c30acee9d3f",
+      "status": "verified",
+      "git_blob_sha": "a2c48a5fcfcd21bd4d00cd22ea70feb3665cace5",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -70,8 +70,8 @@
       "path": "RUN_LEDGER.json",
       "type": "execution_ledger",
       "language": "fa",
-      "status": "pending_update",
-      "git_blob_sha": "bdbb167e687d8b54e77839e1906b1f0d0aa38c69",
+      "status": "verified",
+      "git_blob_sha": "e0fe64f5795cd86a5e2ce235f3f32836e7e7e2cc",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -80,8 +80,8 @@
       "path": "ARTIFACT_REGISTRY.json",
       "type": "artifact_registry",
       "language": "fa",
-      "status": "pending_update",
-      "git_blob_sha": "22b4c7398506a407cfc092425b33562423f1d921",
+      "status": "verified_after_commit",
+      "git_blob_sha": null,
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
