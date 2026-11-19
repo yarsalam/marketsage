@@ -136,7 +136,8 @@
         "جست‌وجوی Library و بررسی آرشیوها و backupهای موجود پیش از هر دانلود",
         "بازبینی read-only مانیفست و candidate فولاد در آرشیو موجود",
         "محاسبهٔ بازه، تعداد ردیف‌ها، factor changeها، روزهای بدون حجم و شکاف‌های بیش از ۱۰ روز در candidate archive",
-        "جست‌وجوی منابع عمومی تاریخی برای تطبیق علت برخی توقف‌ها"
+        "جست‌وجوی منابع عمومی تاریخی برای تطبیق علت برخی توقف‌ها",
+        "اجرای یک آزمون حسابی مستقل برای رابطهٔ close_adjusted و close_raw × adjustment_factor و مقایسهٔ نقض‌های OHLC قبل و بعد از تعدیل"
       ],
       "owner_authorization": {
         "offline_financial_csv_audit_only": true,
@@ -195,7 +196,18 @@
               "calendar_days": 43
             }
           ],
-          "adjustment_acceptance": "NOT_VERIFIED_REVIEW_REQUIRED"
+          "adjustment_acceptance": "NOT_VERIFIED_REVIEW_REQUIRED",
+          "arithmetic_check": {
+            "rows_checked": 4680,
+            "formula": "close_adjusted = close_raw * adjustment_factor",
+            "mismatches": 0,
+            "max_absolute_error": "approximately 5e-25",
+            "raw_close_outside_high_low": 285,
+            "adjusted_close_outside_high_low": 285,
+            "zero_volume_day_flagged": 414,
+            "halt_placeholder_candidate_flagged": 0,
+            "interpretation": "arithmetic transformation is internally consistent; economic correctness/completeness of factors remains unverified"
+          }
         }
       },
       "findings": [
@@ -203,7 +215,8 @@
         "candidate از 2007-03-11 تا 2026-11-11 و 4680 ردیف دارد؛ این سری برای scoring/backtest پذیرفته نیست.",
         "دو شکاف اول با منابع تاریخی به توقف و بازگشایی پس از اطلاعیه/تعدیل EPS مرتبط‌اند؛ علت دو شکاف بعدی هنوز با سند رسمی تأیید نشده است.",
         "هیچ رویداد تعدیل ثبت‌شده‌ای در event ledger آرشیو برای 2007–2008 وجود ندارد؛ این به معنی نبود رویداد نیست.",
-        "تعدیل candidate به‌دلیل روش هم‌پوشانی ±7 روز، یک مورد مبهم و 285 نقض OHLC هنوز تأیید نشده است."
+        "تعدیل candidate به‌دلیل روش هم‌پوشانی ±7 روز، یک مورد مبهم و 285 نقض OHLC هنوز تأیید نشده است.",
+        "در candidate آرشیو، رابطهٔ adjusted close با raw close و factor در تمام 4680 ردیف از نظر حسابی برقرار است؛ این فقط درستی اعمال فرمول را نشان می‌دهد، نه درستی رویدادها/ضرایب."
       ],
       "data_access": true,
       "local_path_access": false,
