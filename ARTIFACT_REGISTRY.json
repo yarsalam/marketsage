@@ -76,7 +76,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "f0224e1efc0efeed90fb9a948b55c7bf762f4920",
+      "git_blob_sha": "d55a1095dc7b695748864454135dacee51bf594b",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -86,7 +86,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "a6f2d319df2af5ff40ea8cec2ee4e4d32b9ab4ea",
+      "git_blob_sha": "6232cc3bc706f5cbb6fc705ff926629cc00f781b",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -131,6 +131,26 @@
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
     {
+      "artifact_id": "MS-DATA-SOURCE-REGISTRY-001",
+      "path": "config/source_registry.json",
+      "type": "source_registry",
+      "language": "json",
+      "status": "verified",
+      "git_blob_sha": "feb87f2a0162cf261460cccf17e0179b5866a752",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-SOURCE-PROBE-RESULTS-001",
+      "path": "docs/SOURCE_PROBE_RESULTS.md",
+      "type": "source_probe_report",
+      "language": "fa",
+      "status": "verified",
+      "git_blob_sha": "e94593d0922d2e03c4fa79ba8e8fa14a283e3d6d",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
       "artifact_id": "MS-PIPELINE-ENGINE-001",
       "path": "src/marketsage_pipeline/engine.py",
       "type": "pipeline_core",
@@ -167,6 +187,26 @@
       "language": "yaml",
       "status": "verified",
       "git_blob_sha": "790c6505d74ecd99c648daa25cbbc9175c84c811",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-SOURCE-PROBE-SCRIPT-001",
+      "path": "scripts/probe_sources.py",
+      "type": "read_only_source_probe",
+      "language": "python",
+      "status": "verified",
+      "git_blob_sha": "0317de12a43e67818dad8467a88e20e75ef9406f",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-SOURCE-PROBE-WORKFLOW-001",
+      "path": ".github/workflows/source-probes.yml",
+      "type": "source_probe_workflow",
+      "language": "yaml",
+      "status": "verified",
+      "git_blob_sha": "c41788a78053f4a889c11edfeea70d5cb8d26ad1",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     }
