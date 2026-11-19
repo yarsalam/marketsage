@@ -1,6 +1,10 @@
 {
   "schema_version": 1,
   "project": "MarketSage",
+  "hash_policy": {
+    "recorded_hash_type": "git_blob_sha1",
+    "note": "هش‌های زیر شناسهٔ blob گیت‌هاب (SHA-1) هستند، نه SHA-256؛ برای تطبیق دقیق نسخهٔ ثبت‌شده به‌کار می‌روند."
+  },
   "policy": {
     "raw_files_are_immutable": true,
     "verify_hash_and_provenance_before_reuse": true,
@@ -13,8 +17,8 @@
       "path": "WORK_PROTOCOL.md",
       "type": "governance",
       "language": "fa",
-      "status": "created_hash_pending",
-      "sha256": null,
+      "status": "verified",
+      "git_blob_sha": "20cc8fe6707fdef88a3fc27f19d408361303be68",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -23,8 +27,8 @@
       "path": "WORK_STATE.md",
       "type": "governance",
       "language": "fa",
-      "status": "created_hash_pending",
-      "sha256": null,
+      "status": "verified",
+      "git_blob_sha": "25f5e21c763e8c1853f398c8c32003f284368250",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -33,8 +37,8 @@
       "path": "RUN_LEDGER.json",
       "type": "execution_ledger",
       "language": "fa",
-      "status": "created_hash_pending",
-      "sha256": null,
+      "status": "verified",
+      "git_blob_sha": "e915ef3fa5db24255c7fca1c07f040b446aa86ff",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -43,8 +47,9 @@
       "path": "ARTIFACT_REGISTRY.json",
       "type": "artifact_registry",
       "language": "fa",
-      "status": "created_hash_pending",
-      "sha256": null,
+      "status": "verified_after_commit",
+      "git_blob_sha": null,
+      "hash_note": "هش فایل فهرست پس از ثبت نهایی آن در بررسی بعدی ثبت خواهد شد؛ هش خودارجاعی درون فایل درج نمی‌شود.",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -53,8 +58,8 @@
       "path": "بیانیه-ماموریت.md",
       "type": "project_manifesto",
       "language": "fa",
-      "status": "created_hash_pending",
-      "sha256": null,
+      "status": "verified",
+      "git_blob_sha": "93f53f0463d90edd894ab70f1c5fed7e9a34cf8c",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     }
