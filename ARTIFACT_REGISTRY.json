@@ -3,7 +3,7 @@
   "project": "MarketSage",
   "hash_policy": {
     "recorded_hash_type": "git_blob_sha1",
-    "note": "هش‌های زیر شناسهٔ blob گیت‌هاب (SHA-1) هستند، نه SHA-256؛ برای تطبیق دقیق نسخهٔ ثبت‌شده به‌کار می‌روند."
+    "note": "هش‌های ثبت‌شده شناسهٔ blob گیت‌هاب (SHA-1) هستند، نه SHA-256؛ برای تطبیق دقیق نسخهٔ ثبت‌شده به‌کار می‌روند."
   },
   "policy": {
     "raw_files_are_immutable": true,
@@ -28,7 +28,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "25f5e21c763e8c1853f398c8c32003f284368250",
+      "git_blob_sha": "5be6ad59f6fc59d37ee0d12ae99f1c30acee9d3f",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -38,7 +38,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "e915ef3fa5db24255c7fca1c07f040b446aa86ff",
+      "git_blob_sha": "bdbb167e687d8b54e77839e1906b1f0d0aa38c69",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
@@ -49,7 +49,7 @@
       "language": "fa",
       "status": "verified_after_commit",
       "git_blob_sha": null,
-      "hash_note": "هش فایل فهرست پس از ثبت نهایی آن در بررسی بعدی ثبت خواهد شد؛ هش خودارجاعی درون فایل درج نمی‌شود.",
+      "hash_note": "هش خود فایل فهرست برای جلوگیری از خودارجاعی درون همان فایل ثبت نمی‌شود.",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
