@@ -3,13 +3,15 @@
   "project": "MarketSage",
   "hash_policy": {
     "recorded_hash_type": "git_blob_sha1",
-    "note": "هش‌های ثبت‌شده شناسهٔ blob گیت‌هاب (SHA-1) هستند، نه SHA-256."
+    "external_file_hash_type": "sha256",
+    "note": "هش اسناد مخزن Git blob SHA-1 است؛ هش فایل‌های بیرونی SHA-256 است."
   },
   "policy": {
     "raw_files_are_immutable": true,
     "verify_hash_and_provenance_before_reuse": true,
     "missing_path_status": "PATH_UNRESOLVED",
-    "never_redownload_without_archive_and_backup_check": true
+    "never_redownload_without_archive_and_backup_check": true,
+    "legacy_unverified_data_is_not_pipeline_input": true
   },
   "external_assets_reported_by_owner": [
     {
@@ -41,7 +43,20 @@
       ],
       "content_inspected": false,
       "hashes_recorded": false,
-      "note": "فقط نام‌های گزارش‌شده ثبت شده‌اند؛ مسیرهای داخلی، محتوا و هش‌ها هنوز تأیید نشده‌اند."
+      "reuse_in_new_pipeline": false,
+      "note": "این دارایی‌ها در کار جدید ورودی محسوب نمی‌شوند؛ حذف یا تغییر داده نشده‌اند."
+    }
+  ],
+  "excluded_inputs": [
+    {
+      "artifact_id": "MS-EXCLUDED-FINANCIAL-CSV-001",
+      "reported_name": "Financial.csv",
+      "origin": "conversation_upload",
+      "status": "explicitly_excluded_by_owner",
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01",
+      "size_bytes": 150754,
+      "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+      "reason": "مالک صریحاً داده‌ها و خروجی‌های قبلی را از ورودی خط لولهٔ جدید کنار گذاشت."
     }
   ],
   "artifacts": [
@@ -51,9 +66,9 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "e595d2ea76babb6e4a26a0e4651c0e89849a23af",
+      "git_blob_sha": "fcc887321e1030e969fc6333dc89398e84bb486d",
       "immutable": false,
-      "work_id": "MS-BOOTSTRAP-20261119-01"
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
     {
       "artifact_id": "MS-GOV-STATE-001",
@@ -61,9 +76,9 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "a2c48a5fcfcd21bd4d00cd22ea70feb3665cace5",
+      "git_blob_sha": "2d886b43c15070ea1fc47a75c1b556eac2f221ad",
       "immutable": false,
-      "work_id": "MS-BOOTSTRAP-20261119-01"
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
     {
       "artifact_id": "MS-GOV-LEDGER-001",
@@ -71,9 +86,9 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "e0fe64f5795cd86a5e2ce235f3f32836e7e7e2cc",
+      "git_blob_sha": "65206c2fe7093684fe53edefad7335d99d18503a",
       "immutable": false,
-      "work_id": "MS-BOOTSTRAP-20261119-01"
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
     {
       "artifact_id": "MS-GOV-REGISTRY-001",
@@ -83,7 +98,7 @@
       "status": "verified_after_commit",
       "git_blob_sha": null,
       "immutable": false,
-      "work_id": "MS-BOOTSTRAP-20261119-01"
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
     {
       "artifact_id": "MS-MANIFESTO-001",
