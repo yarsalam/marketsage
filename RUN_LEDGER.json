@@ -23,31 +23,61 @@
     {
       "work_id": "MS-ADJUSTMENT-INVENTORY-20261119-01",
       "type": "existing_asset_inventory",
-      "status": "IN_PROGRESS",
+      "status": "SUPERSEDED_BY_OWNER_PRIORITY_CHANGE",
       "started_at": "2026-11-19",
       "inputs": [
-        "درخواست مالک برای تعدیل سری‌های زمانی تمام بازارهای هدف",
-        "فهرست ls ارائه‌شده از ~/marketsage-data",
-        "اسناد حاکمیتی و رجیستری موجود در main"
+        "درخواست اولیهٔ فهرست‌برداری محلی",
+        "فهرست ls ارائه‌شده از ~/marketsage-data"
       ],
       "actions": [
-        "بررسی پروتکل، وضعیت، رجیستری و دفتر اجرا",
-        "بررسی شاخه‌ها، commitها، issueها و PRهای مخزن",
-        "ثبت دامنهٔ مجاز فهرست‌برداری فقط‌خواندنی"
+        "بررسی اسناد حاکمیتی و رجیستری",
+        "بررسی شاخه‌ها، issueها و PRها"
       ],
       "data_access": false,
       "local_path_access": false,
       "acquisition_performed": false,
       "adjustment_performed": false,
-      "acceptance_criteria": [
-        "ثبت فهرست بازگشتی فایل‌ها و پوشه‌ها",
-        "ثبت اندازه، زمان تغییر و SHA-256 فایل‌ها",
-        "تفکیک داده خام، خروجی مشتق‌شده، اسناد و کد",
-        "ثبت پوشش واقعی بازارها و نمادها با شواهد",
-        "عدم تغییر فایل خام و عدم دریافت داده"
+      "final_status": "SUPERSEDED_NOT_EXECUTED",
+      "reason": "مالک صریحاً اولویت را به خط لولهٔ خودکار دریافت تا اعتبارسنجی برای تمام بازارها تغییر داد و داده‌ها/خروجی‌های قبلی را از ورودی کار جدید کنار گذاشت."
+    },
+    {
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01",
+      "type": "automated_multimarket_data_pipeline",
+      "status": "IN_PROGRESS",
+      "started_at": "2026-11-19",
+      "inputs": [
+        "بیانیهٔ مأموریت MarketSage",
+        "دستور مالک برای کنار گذاشتن روش دستی و ساخت اجرای batch یکپارچه",
+        "WORK_PROTOCOL.md در commit 9062d2639b3084d21abf2d4ac24368eaefe4d34c",
+        "WORK_STATE.md در commit 28966e18edcd6bafd95ca1b3b4295bf15f89c998"
       ],
-      "final_status": "PENDING_OWNER_INVENTORY_OUTPUT",
-      "next_permitted_action": "دریافت خروجی دستور فهرست‌برداری فقط‌خواندنی از مالک"
+      "actions": [
+        "بازبینی اسناد حاکمیتی و تاریخچهٔ کار",
+        "تأیید شاخهٔ main و نبود issue/PR باز مرتبط",
+        "ثبت تغییر اولویت و دامنهٔ جدید در پروتکل و وضعیت پروژه"
+      ],
+      "owner_authorization": {
+        "automated_pipeline_for_all_manifest_markets": true,
+        "acquisition_after_source_registration": true,
+        "adjustment_when_required_and_evidence_sufficient": true,
+        "delete_or_overwrite_raw_data": false,
+        "guess_adjustment_factors": false,
+        "investment_analysis_or_trading": false
+      },
+      "data_access": false,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "acceptance_criteria": [
+        "ماتریس منابع و پوشش برای همهٔ کلاس‌های بازار",
+        "تشخیص قابل‌آزمون وضعیت تعدیل",
+        "روش مستقل تعدیل برای هر کلاس دارایی",
+        "اجرای batch بدون مداخلهٔ دستی نمادبه‌نماد",
+        "ادامهٔ batch با وجود شکست موردی",
+        "دادهٔ خام تغییرناپذیر و خروجی‌های قابل‌ردیابی",
+        "گزارش پوشش، کیفیت و شکست‌ها"
+      ],
+      "final_status": "IN_PROGRESS",
+      "next_permitted_action": "طراحی قرارداد استاندارد داده، ماتریس منابع/پوشش و معماری orchestrator؛ سپس ثبت adapterها و دریافت کنترل‌شده."
     }
   ]
 }
