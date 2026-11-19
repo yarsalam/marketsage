@@ -9,36 +9,45 @@
       "status": "COMPLETED",
       "started_at": "2026-11-19",
       "completed_at": "2026-11-19",
-      "inputs": [
-        "درخواست مالک برای ایجاد نسخه فارسی بیانیه",
-        "وضعیت مخزن خالی yarsalam/marketsage"
-      ],
-      "actions": [
-        "بررسی مخزن، شاخه‌ها، commitها، issueها و PRها",
-        "ایجاد WORK_PROTOCOL.md",
-        "ایجاد WORK_STATE.md",
-        "ایجاد ARTIFACT_REGISTRY.json",
-        "ایجاد RUN_LEDGER.json",
-        "ایجاد بیانیه-ماموریت.md",
-        "بازخوانی فایل‌ها و ثبت هش blob گیت‌هاب"
-      ],
+      "final_status": "COMPLETED",
       "data_access": false,
       "local_path_access": false,
-      "acceptance_criteria": [
-        "ثبت اسناد پایه و بیانیه فارسی",
-        "عدم انتقال کد یا داده",
-        "عدم دسترسی به /home/nima/marketsage-data",
-        "ثبت هش فایل‌ها در ARTIFACT_REGISTRY.json"
-      ],
-      "final_status": "COMPLETED",
       "evidence": {
         "repository": "yarsalam/marketsage",
         "branch": "main",
         "files_read_back": true,
         "hash_type": "git_blob_sha1",
         "data_or_code_transferred": false
-      },
-      "notes": "هیچ پژوهش، دریافت داده، محاسبه یا آزمون تحلیلی انجام نشد. قفل پژوهش داده فعال باقی ماند."
+      }
+    },
+    {
+      "work_id": "MS-ADJUSTMENT-INVENTORY-20261119-01",
+      "type": "existing_asset_inventory",
+      "status": "IN_PROGRESS",
+      "started_at": "2026-11-19",
+      "inputs": [
+        "درخواست مالک برای تعدیل سری‌های زمانی تمام بازارهای هدف",
+        "فهرست ls ارائه‌شده از ~/marketsage-data",
+        "اسناد حاکمیتی و رجیستری موجود در main"
+      ],
+      "actions": [
+        "بررسی پروتکل، وضعیت، رجیستری و دفتر اجرا",
+        "بررسی شاخه‌ها، commitها، issueها و PRهای مخزن",
+        "ثبت دامنهٔ مجاز فهرست‌برداری فقط‌خواندنی"
+      ],
+      "data_access": false,
+      "local_path_access": false,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "acceptance_criteria": [
+        "ثبت فهرست بازگشتی فایل‌ها و پوشه‌ها",
+        "ثبت اندازه، زمان تغییر و SHA-256 فایل‌ها",
+        "تفکیک داده خام، خروجی مشتق‌شده، اسناد و کد",
+        "ثبت پوشش واقعی بازارها و نمادها با شواهد",
+        "عدم تغییر فایل خام و عدم دریافت داده"
+      ],
+      "final_status": "PENDING_OWNER_INVENTORY_OUTPUT",
+      "next_permitted_action": "دریافت خروجی دستور فهرست‌برداری فقط‌خواندنی از مالک"
     }
   ]
 }
