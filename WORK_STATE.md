@@ -3,47 +3,60 @@
 - شناسهٔ کار جاری: `MS-BATCH-DATA-PIPELINE-20261119-01`
 - وضعیت: `IN_PROGRESS`
 - شاخهٔ کاری: `feat/multimarket-batch-data-pipeline`
-- آخرین commit بررسی‌شده: `6b94339257d8b636b9b208389249a355fcdb20ee`
+- آخرین commit بررسی‌شده: `c7129735bcd836983622a6c85b76068c309ffd6d`
 - PR: [#1](https://github.com/yarsalam/marketsage/pull/1) — Draft، باز، ادغام‌نشده.
 - مجوز مالک: اجرای خط لولهٔ خودکار برای تمام بازارهای مانیفست؛ دریافت داده، تشخیص وضعیت تعدیل، تعدیل مشروط، اعتبارسنجی و گزارش شکست‌های موردی.
-- تصمیم: روش دستی و ماه‌به‌ماه/نمادبه‌نماد کنار گذاشته شد. اجرای batch و پردازش مستقل دارایی‌ها الزامی است.
+- روش دستی و ماه‌به‌ماه/نمادبه‌نماد کنار گذاشته شد.
 - داده‌ها و خروجی‌های قدیمی فاقد منشأ/هش معتبر از ورودی این کار کنار گذاشته می‌شوند؛ حذف یا بازنویسی نمی‌شوند.
 - فایل پیوست `Financial.csv` نیز بنا بر دستور مالک از ورودی این کار کنار گذاشته شد.
-- دریافت دادهٔ بازار و تعدیل واقعی هنوز اجرا نشده است.
+- دریافت کامل تاریخچهٔ بازار و تعدیل سری واقعی هنوز اجرا نشده است.
 
 ## اسناد و کد ثبت‌شده
-- `docs/DATA_SOURCE_CANDIDATES.md`: ماتریس نامزدهای منبع و ریسک‌ها.
-- `docs/BATCH_PIPELINE_DESIGN.md`: معماری orchestrator، adapterها، raw immutable، تشخیص تعدیل، رویدادها و quality gates.
-- `src/marketsage_pipeline/engine.py`: هستهٔ orchestrator، cache مبتنی بر request fingerprint، ذخیرهٔ خام content-addressed و پردازش مستقل هر دارایی.
+- `docs/DATA_SOURCE_CANDIDATES.md`: ماتریس اولیهٔ منابع و قواعد تعدیل هر کلاس.
+- `docs/BATCH_PIPELINE_DESIGN.md`: معماری batch و state machine.
+- `docs/SOURCE_PROBE_RESULTS.md`: نتایج نخستین probe کم‌حجم هفت endpoint.
+- `config/source_registry.json`: رجیستری candidateها، endpointها، شواهد probe و وضعیت مجوز.
+- `src/marketsage_pipeline/engine.py`: هستهٔ orchestrator، cache مبتنی بر request fingerprint، raw content-addressed و پردازش مستقل دارایی.
+- `scripts/probe_sources.py`: probe فقط‌خواندنی و کم‌حجم.
 - `tests/test_pipeline_engine.py`: هشت آزمون synthetic.
-- `.github/workflows/pipeline-core-tests.yml`: اجرای آزمون‌های هسته در GitHub Actions.
+- `.github/workflows/pipeline-core-tests.yml` و `.github/workflows/source-probes.yml`: CI و probe منابع.
 
-## شواهد آزمون
-- GitHub Actions run: `44555227688`
-- commit آزمون‌شده: `6b94339257d8b636b9b208389249a355fcdb20ee`
-- نتیجه: `success`
-- آزمون‌ها: ۸ از ۸ موفق.
-- موارد پوشش‌داده‌شده: شکست جزئی، جلوگیری از دریافت تکراری، وضعیت تعدیل نامعلوم، پوشش ناقص رویداد، تعدیل با رویداد کامل، نبود رویداد با پوشش کامل، شکست اعتبارسنجی و تغییرناپذیری raw.
-- این آزمون‌ها synthetic هستند؛ هیچ منبع زنده یا دادهٔ واقعی بازار را تأیید نمی‌کنند.
+## شواهد آزمون و probe
+- آزمون هسته: run `44555227688`، نتیجهٔ success؛ ۸ آزمون از ۸ آزمون synthetic موفق.
+- probe منابع: run `44555538334`، نتیجهٔ success؛ artifact `14545386411`.
+- محیط probe: GitHub-hosted Ubuntu 26.04 در westus3.
+- TSETMC search: HTTP 200، پاسخ JSON معتبر و ۴۱ نتیجه برای «فولاد».
+- TGJU history: HTTP 200؛ پاسخ بزرگ‌تر از سقف ۲۵۶ KiB probe؛ نیازمند pagination با start/length.
+- NerkhAra index: HTTP 200؛ JSON معتبر ۱۴٬۳۶۶ بایتی و شامل metadata، ids و terms.
+- NetArz currencies: HTTP 401؛ برای ادامه به API key نیاز دارد.
+- Nobitex market stats: HTTP 200؛ JSON معتبر ۳۵۹ بایتی.
+- Wallex markets: HTTP 200؛ پاسخ بزرگ‌تر از سقف probe؛ parse کامل انجام نشد.
+- Alpha Vantage daily: HTTP 200؛ JSON معتبر ۲۱٬۳۰۰ بایتی با سری روزانهٔ IBM.
+- این probe فقط اتصال و ساختار محدود را سنجید؛ دادهٔ کامل ذخیره نشد و هیچ منبعی صرفاً با HTTP 200 پذیرفته نشده است.
+- مستندات فنی TSETMC هشدار می‌دهد تاریخچهٔ GetClosingPriceDailyList ممکن است برای بسیاری از ابزارها خالی باشد؛ fallback باید بررسی شود.
+- کد wrapper FIPIRAN، base service و endpointهای NAV را مشخص می‌کند؛ اتصال مستقیم هنوز probe نشده است.
 
-## وضعیت نامزدهای منبع
-- TSETMC + CODAL: نامزد سهام؛ نیازمند probe زنده، کنترل پوشش و مجوز.
-- FIPIRAN: نامزد NAV صندوق؛ endpoint و شرایط استفاده نیازمند بررسی مستقیم.
-- TGJU / NerkhAra: نامزد طلا/سکه؛ منبع ثالث و وضعیت مجوز/پایداری نیازمند بررسی.
-- NetArz / نرخ رسمی بانک مرکزی: نامزدهای مجزا برای نرخ آزاد و رسمی؛ نباید ادغام شوند.
-- Nobitex / Wallex: نامزدهای OHLC رمزارز؛ هر صرافی و جفت سری مستقل دارد.
-- Alpha Vantage / Nasdaq Data Link: نامزد دادهٔ جهانی؛ کلید، محدودیت، هزینه و حق استفاده باید روشن شود.
-- FRED/ALFRED: فقط نامزد متغیرهای اقتصاد کلان، نه قیمت سهام/دارایی.
-- هیچ‌یک هنوز برای دریافت انبوه پذیرفته نشده‌اند.
+## وضعیت منابع
+- TSETMC: `PROBED`؛ جست‌وجو موفق، تاریخچه و رویدادها باز.
+- TGJU: `PROBED`؛ پاسخ بزرگ، pagination لازم، مجوز نامشخص.
+- NerkhAra: `PROBED`؛ index موفق، شناسه‌ها/terms/تاریخچهٔ نمونه باید بررسی شود.
+- NetArz: `PROBED`؛ 401 بدون کلید.
+- Nobitex: `PROBED`؛ آمار بازار موفق، OHLC باز.
+- Wallex: `PROBED`؛ فهرست بازار بزرگ، OHLC باز.
+- Alpha Vantage: `PROBED`؛ daily با demo key موفق، adjusted history و محدودیت free tier باز.
+- FIPIRAN و CODAL: هنوز probe نشده‌اند.
+- FRED/ALFRED و Nasdaq Data Link: هنوز probe نشده‌اند و به کلید/پلن یا انتخاب dataset نیاز دارند.
+- هیچ منبعی هنوز `ACCEPTED` نیست؛ دریافت انبوه تا بررسی پوشش، محدودیت و حق استفاده متوقف است.
 
 ## معیارهای پذیرش
 - [x] ماتریس اولیهٔ منابع و طراحی معماری batch ثبت شد.
 - [x] هستهٔ orchestrator و state machine اولیه پیاده‌سازی شد.
 - [x] هشت آزمون synthetic هسته در GitHub Actions موفق شد.
-- [ ] نامزدهای منبع با probe زنده و بررسی مجوز پذیرفته شوند.
+- [x] رجیستری candidateها و probe کم‌حجم هفت endpoint ثبت شد.
+- [ ] تاریخچهٔ واقعی و رویدادها برای هر کلاس دریافت و schema آن‌ها تأیید شود.
+- [ ] مجوز/محدودیت و پوشش هر منبع بررسی و منابع مناسب ACCEPTED شوند.
 - [ ] adapter واقعی و universe discovery برای همهٔ کلاس‌ها پیاده‌سازی شود.
-- [ ] تشخیص دادهٔ ازقبل‌تعدیل‌شده برای هر کلاس تعریف و آزمون شود.
-- [ ] روش تعدیل هر کلاس و رویدادهای پشتیبانی‌شده مستند و اجرا شود.
+- [ ] تشخیص تعدیل و روش مستقل هر کلاس با دادهٔ واقعی آزمون شود.
 - [ ] اجرای واحد batch تمام دارایی‌های فعال را بدون مداخلهٔ دستی پردازش کند.
 - [ ] شکست یک دارایی، سایر دارایی‌ها را متوقف نکند.
 - [ ] raw immutable، خروجی‌ها versioned و اجراها idempotent باشند.
@@ -51,10 +64,9 @@
 
 ## محدودیت‌ها
 - فایل خام حذف یا بازنویسی نمی‌شود.
-- روش یکسان برای همهٔ کلاس‌ها ممنوع است.
-- ضریب یا رویداد حدسی ممنوع است.
+- روش یکسان برای همهٔ کلاس‌ها و ضریب حدسی ممنوع است.
 - دادهٔ قدیمی فاقد provenance معتبر، ورودی pipeline جدید نیست.
 - تحلیل سرمایه‌گذاری، رتبه‌بندی، معامله و اتصال کارگزاری خارج از این کار است.
 
 ## اقدام بعدی مجاز
-probe کم‌حجم و فقط‌خواندنی نامزدهای ثبت‌شده، ثبت نتیجه و مجوز هر منبع، سپس ساخت adapter واقعی و اجرای end-to-end با یک دارایی از هر کلاس. PR #1 تا بررسی و تکمیل adapterها Draft باقی می‌ماند و merge نمی‌شود.
+ساخت adapterهای واقعی و دریافت کنترل‌شدهٔ تاریخچهٔ محدود برای هر کلاس، بررسی schema و وضعیت تعدیل از روی دادهٔ دریافتی، سپس توسعهٔ دریافت کامل و تعدیل. ابتدا TSETMC، FIPIRAN، TGJU/NerkhAra، Nobitex/Wallex و Alpha Vantage بررسی می‌شوند؛ NetArz تا تأمین کلید غیرفعال می‌ماند.
