@@ -46,23 +46,31 @@
       "status": "IN_PROGRESS",
       "started_at": "2026-11-19",
       "branch": "feat/multimarket-batch-data-pipeline",
+      "pull_request": {
+        "number": 1,
+        "url": "https://github.com/yarsalam/marketsage/pull/1",
+        "state": "open",
+        "draft": true,
+        "merged": false
+      },
       "base_commit": "543ee32e9885d87a28c77f443d6dfa04c00e095e",
       "inputs": [
         "بیانیهٔ مأموریت MarketSage",
         "دستور مالک برای کنار گذاشتن روش دستی و ساخت اجرای batch یکپارچه",
-        "WORK_PROTOCOL.md در commit 9062d2639b3084d21abf2d4ac24368eaefe4d34c",
-        "WORK_STATE.md در commit 28966e18edcd6bafd95ca1b3b4295bf15f89c998",
+        "WORK_PROTOCOL.md و WORK_STATE.md در شاخهٔ کاری",
         "مستندات عمومی منابع بازار و APIهای بررسی‌شده"
       ],
       "actions": [
         "بازبینی اسناد حاکمیتی و تاریخچهٔ کار",
-        "تأیید شاخهٔ main و نبود issue/PR باز مرتبط",
+        "تأیید شاخهٔ main و نبود issue/PR باز مرتبط پیش از شروع",
         "ثبت تغییر اولویت و دامنهٔ جدید در پروتکل و وضعیت پروژه",
         "ایجاد شاخهٔ کاری مستقل",
         "بررسی نامزدهای منابع داده برای شش کلاس بازار",
-        "ثبت ماتریس نامزدهای منبع در docs/DATA_SOURCE_CANDIDATES.md",
-        "ثبت طراحی batch در docs/BATCH_PIPELINE_DESIGN.md",
-        "ثبت وضعیت و شواهد در اسناد حاکمیتی شاخه"
+        "ثبت ماتریس نامزدهای منبع و طراحی معماری batch",
+        "پیاده‌سازی هستهٔ orchestrator و state machine",
+        "پیاده‌سازی raw content-addressed و cache مبتنی بر request fingerprint",
+        "افزودن هشت آزمون synthetic",
+        "افزودن workflow آزمون و ایجاد PR شمارهٔ ۱ به‌صورت Draft"
       ],
       "owner_authorization": {
         "automated_pipeline_for_all_manifest_markets": true,
@@ -77,23 +85,26 @@
         "repository": "yarsalam/marketsage",
         "branch": "feat/multimarket-batch-data-pipeline",
         "source_matrix_path": "docs/DATA_SOURCE_CANDIDATES.md",
-        "source_matrix_blob_sha": "5733d6c3e60049cff311896da07389dd1603e63d",
         "architecture_path": "docs/BATCH_PIPELINE_DESIGN.md",
-        "architecture_blob_sha": "a2d51098bceef8135b9bcb2ff625b6127adc450f",
-        "web_sources_reviewed": [
-          "TSETMC endpoint catalog and source caveats",
-          "FIPIRAN NAV history wrapper",
-          "TGJU historical endpoint candidate",
-          "NerkhAra and NetArz history API documentation",
-          "Nobitex and Wallex OHLC API documentation",
-          "Alpha Vantage, Nasdaq Data Link and FRED API documentation"
-        ],
+        "engine_path": "src/marketsage_pipeline/engine.py",
+        "tests_path": "tests/test_pipeline_engine.py",
+        "workflow_path": ".github/workflows/pipeline-core-tests.yml",
+        "workflow_run_id": 44555227688,
+        "workflow_run_url": "https://github.com/yarsalam/marketsage/actions/runs/44555227688",
+        "tested_commit": "6b94339257d8b636b9b208389249a355fcdb20ee",
+        "workflow_conclusion": "success",
+        "job_conclusion": "success",
+        "tests_passed": 8,
+        "tests_failed": 0,
+        "test_type": "synthetic_unit_tests",
+        "live_market_data_acquired": false,
+        "adjustment_performed": false,
         "uploaded_financial_csv_excluded": true
       },
       "data_access": false,
       "acquisition_performed": false,
       "adjustment_performed": false,
-      "tests_performed": false,
+      "tests_performed": true,
       "acceptance_criteria": [
         "ماتریس منابع و پوشش برای همهٔ کلاس‌های بازار",
         "تشخیص قابل‌آزمون وضعیت تعدیل",
@@ -104,7 +115,7 @@
         "گزارش پوشش، کیفیت و شکست‌ها"
       ],
       "final_status": "IN_PROGRESS",
-      "next_permitted_action": "پیاده‌سازی هستهٔ pipeline و تست‌های synthetic؛ سپس probe کم‌حجم منابع ثبت‌شده و فعال‌سازی adapterهای پذیرفته‌شده."
+      "next_permitted_action": "probe کم‌حجم نامزدهای منبع و بررسی دسترسی/مجوز؛ سپس پیاده‌سازی adapter واقعی و اجرای end-to-end کنترل‌شده."
     }
   ]
 }
