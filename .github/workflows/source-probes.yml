@@ -6,11 +6,13 @@ on:
       - feat/multimarket-batch-data-pipeline
     paths:
       - scripts/probe_sources.py
-      - config/source_registry.json
-      - .github/workflows/source-probes.yml
 
 permissions:
   contents: read
+
+concurrency:
+  group: marketsage-source-probes-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   probe:
