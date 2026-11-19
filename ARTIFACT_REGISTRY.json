@@ -113,11 +113,16 @@
       "artifact_id": "MS-EXCLUDED-FINANCIAL-CSV-001",
       "reported_name": "Financial.csv",
       "origin": "conversation_upload",
-      "status": "explicitly_excluded_by_owner",
+      "status": "owner_reauthorized_for_offline_foolad_audit_only",
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01",
       "size_bytes": 150754,
       "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
-      "reason": "مالک صریحاً داده‌ها و خروجی‌های قبلی را از ورودی خط لولهٔ جدید کنار گذاشت."
+      "reason": "مالک صریحاً داده‌ها و خروجی‌های قبلی را از ورودی خط لولهٔ جدید کنار گذاشت.",
+      "offline_audit_authorized": true,
+      "general_pipeline_input": false,
+      "bytes_accessible_in_current_project": false,
+      "hash_recomputed": false,
+      "note": "مالک در ۲۰۲۶-۱۱-۱۹ صریحاً ممیزی آفلاین و فقط‌خواندنی همین فایل را درخواست کرد. کنارگذاری از خط لوله عمومی برقرار است؛ فایل Library پیدا شد اما materialization بایت‌ها مجاز نبود و هش ثبت‌شده هنوز باز‌محاسبه نشده است."
     }
   ],
   "artifacts": [
@@ -127,7 +132,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "f12c94b3cf762c2c4e2261ed10e6889ee070a37b",
+      "git_blob_sha": "485a40b939635f874946df33fb2a5f6197c187b6",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -137,7 +142,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "31116329c8692fa4393fa50a53ce7c9c2fc130a5",
+      "git_blob_sha": "42b764a43becf58e0e003c2d0b4782766f72139c",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -147,7 +152,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "4722521420ed1a8feb1f9189805f512fffb678ac",
+      "git_blob_sha": "d6edeee271f075c6f79c74528bb1b26a56c0e470",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -170,6 +175,22 @@
       "git_blob_sha": "93f53f0463d90edd894ab70f1c5fed7e9a34cf8c",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-REVIEW-ARCHIVE-001",
+      "path": "Library/marketsage-three-symbols-review.zip",
+      "type": "legacy_evidence_archive",
+      "status": "verified_read_only",
+      "size_bytes": 1244637,
+      "sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+      "contains": {
+        "manifest_sha256": "65658b218332b694ae690287946b229627b19b2f4fd70e7a76da64ac2094c4b4",
+        "foolad_candidate_sha256": "97c600e4470de55a23d0df3691c274d911c020bdf0dfcedaf443bfc300554d41",
+        "event_ledger_sha256": "0f251fcf97714ee65a885f53b036b53f1d3668e5d2fbccc9dc0613422dc894fe"
+      },
+      "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
+      "immutable": true,
+      "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود."
     }
   ]
 }
