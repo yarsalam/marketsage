@@ -11,7 +11,8 @@
     "verify_hash_and_provenance_before_reuse": true,
     "missing_path_status": "PATH_UNRESOLVED",
     "never_redownload_without_archive_and_backup_check": true,
-    "legacy_unverified_data_is_not_pipeline_input": true
+    "legacy_unverified_data_is_not_pipeline_input": true,
+    "legacy_foolad_audit_exception": true
   },
   "external_assets_reported_by_owner": [
     {
@@ -45,6 +46,66 @@
       "hashes_recorded": false,
       "reuse_in_new_pipeline": false,
       "note": "این دارایی‌ها در کار جدید ورودی محسوب نمی‌شوند؛ حذف یا تغییر داده نشده‌اند."
+    },
+    {
+      "inventory_id": "MS-FOOLAD-LEGACY-PACKAGE-001",
+      "reported_paths": [
+        "/home/nima/projects/marketsage/data/market-research/iran-equities/adjustment-evidence/foolad",
+        "/home/nima/marketsage-data/tsetmc-three-adjusted"
+      ],
+      "status": "PATH_UNRESOLVED",
+      "listing_method": "prior_conversation_terminal_inventory_and_manifest",
+      "prior_local_repo_state": {
+        "branch": "research/iran-equity-event-notebook-2026-11-12",
+        "head": "30bb1a7eeca09dc8cdad7dca7d33c5eb5adcfa0c",
+        "working_tree_changes_reported": true
+      },
+      "work_id": "MS-FOOLAD-ADJUSTMENT-RECONCILIATION-20261119-01",
+      "instrument": {
+        "symbol": "فولاد",
+        "name": "فولاد مبارکه اصفهان",
+        "insCode": "46348559193224090",
+        "related_insCodes": [
+          "61934586397353104",
+          "53809308236531169",
+          "61318276340211749"
+        ]
+      },
+      "reported_files": {
+        "raw/tsetmc/foolad_daily_raw.json": 1504108,
+        "raw/tsetmc/foolad_closing_daily_20261118.json": 1505438,
+        "raw/tsetmc/foolad_instrument_search.json": 16206,
+        "raw/tsetmc/foolad_price_adjust_raw.json": 3173,
+        "raw/tsetmc/foolad_share_change_raw.json": 1895,
+        "raw/فولاد_raw.csv": 412366,
+        "raw/فولاد_adjusted_all.csv": 698019,
+        "raw/فولاد_adjusted_capital.csv": 697157,
+        "derived/adjusted_close.csv": 162756,
+        "derived/total_return.csv": 176154,
+        "event-ledger.csv": 4137,
+        "validation/SYMBOL_ADJUSTMENT_ACCEPTANCE.json": 2601
+      },
+      "reported_manifest": {
+        "generated_at": "2026-11-18T20:00:19.465456+00:00",
+        "engine_version": "1.0",
+        "counts": {
+          "price_adjust_records": 23,
+          "forward_events": 30,
+          "share_change_only_events": 7,
+          "daily_rows": 4269,
+          "adjusted_rows": 4269
+        },
+        "reported_sha256": {
+          "price_adjust": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+          "raw_prices": "07b5a80c675d324fb0c30973ad9f6ecfe8d210a3f5cb7a3d2091e62911c5d53f",
+          "adjusted_close": "b8dac0b951eb0f12b98aabfd57f1b74060ed4a8f70a8726fa3dd8b6fc4cfe828"
+        }
+      },
+      "content_inspected": false,
+      "hashes_recomputed": false,
+      "reuse_authorized_for_offline_foolad_audit": true,
+      "reuse_in_general_pipeline": false,
+      "note": "مالک در ۲۰۲۶-۱۱-۱۹ صریحاً استفادهٔ محدود از شواهد قبلی فولاد را برای ممیزی و اصلاح شکاف‌ها مجاز کرد. فایل‌های واقعی هنوز در محیط فعلی قابل دسترسی نیستند؛ اندازه‌ها و هش‌ها از transcript/مانیفست قبلی گزارش شده‌اند و باید با بایت‌های اصلی تطبیق شوند."
     }
   ],
   "excluded_inputs": [
