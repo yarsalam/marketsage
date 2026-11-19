@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01",
+  "policy": {
+    "status_values": ["CANDIDATE", "PROBED", "ACCEPTED", "REJECTED", "BLOCKED_LICENSE"],
+    "bulk_acquisition_allowed_only_when": [
+      "status_is_ACCEPTED",
+      "coverage_and_schema_verified",
+      "rate_limit_and_retry_policy_recorded",
+      "terms_and_redistribution_rights_reviewed"
+    ],
+    "probe_policy": "read_only_minimal_requests_only",
+    "raw_data_immutable": true
+  },
+  "sources": [
+    {
+      "source_id": "tsetmc_public",
+      "asset_classes": ["iran_equity"],
+      "authority": "exchange_public_surface",
+      "status": "CANDIDATE",
+      "base_url": "https://cdn.tsetmc.com/api",
+      "probe_endpoint": "/Instrument/GetInstrumentSearch/{query}",
+      "history_endpoint": "/ClosingPrice/GetClosingPriceDailyList/{insCode}/0",
+      "event_endpoints": [
+        "/ClosingPrice/GetPriceAdjustList/{insCode}",
+        "/Instrument/GetInstrumentShareChange/{insCode}"
+      ],
+      "event_completeness": "NOT_ESTABLISHED",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Public endpoint catalogued by independent technical references; not a stable documented redistribution contract. Corporate-action feed alone must not be treated as complete."
+    },
+    {
+      "source_id": "codal_disclosures",
+      "asset_classes": ["iran_equity", "iran_funds"],
+      "authority": "official_disclosure_registry",
+      "status": "CANDIDATE",
+      "base_url": "https://codal.ir",
+      "probe_endpoint": "official public search page/API to be confirmed",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Use as primary event evidence for company/fund disclosures; endpoint schema and automated access policy must be confirmed before adapter implementation."
+    },
+    {
+      "source_id": "fipiran_nav",
+      "asset_classes": ["iran_funds", "fixed_income"],
+      "authority": "fund_information_platform",
+      "status": "CANDIDATE",
+      "base_url": "https://www.fipiran.com",
+      "probe_endpoint": "/api base and chart/getfundchart?regno={regNo} (unofficial wrapper reference)",
+      "fields_candidate": ["issueNav", "cancelNav", "statisticalNav", "date"],
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Endpoint observed in a third-party Python wrapper; direct service base, historical completeness and redistribution rights remain unverified."
+    },
+    {
+      "source_id": "tgju_history",
+      "asset_classes": ["iran_gold", "iran_coins", "iran_fx"],
+      "authority": "third_party_market_aggregator",
+      "status": "CANDIDATE",
+      "base_url": "https://api.tgju.org",
+      "probe_endpoint": "/v1/market/indicator/summary-table-data/{symbol}",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Undocumented public endpoint used by independent crawlers; no assumption of stability or redistribution rights."
+    },
+    {
+      "source_id": "nerkhara_history",
+      "asset_classes": ["iran_gold", "iran_coins", "iran_fx", "iran_crypto_reference"],
+      "authority": "third_party_market_aggregator",
+      "status": "CANDIDATE",
+      "base_url": "https://nerkhara.com/api/v1",
+      "probe_endpoint": "/index.json",
+      "history_endpoint": "/history/{id}.json",
+      "terms_status": "PUBLISHER_CLAIMS_FREE_COMMERCIAL_USE_REVIEW_REQUIRED",
+      "notes": "Publisher documents public daily histories and claims commercial use is allowed; inspect license metadata and provenance before acceptance."
+    },
+    {
+      "source_id": "netarz_fx",
+      "asset_classes": ["iran_fx"],
+      "authority": "third_party_fx_provider",
+      "status": "CANDIDATE",
+      "base_url": "https://netarz.ir/api/fx/v1",
+      "probe_endpoint": "/currencies",
+      "history_endpoint": "/history/{code}",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Documented daily and intraday history with source/unit metadata; some history plans require a key or paid tier. Free-tier coverage must be measured."
+    },
+    {
+      "source_id": "nobitex_public",
+      "asset_classes": ["iran_crypto_exchange"],
+      "authority": "exchange_public_api",
+      "status": "CANDIDATE",
+      "base_url": "https://apiv2.nobitex.ir",
+      "probe_endpoint": "/market/stats",
+      "history_endpoint": "/market/udf/history?symbol={symbol}&resolution=D&from={from}&to={to}",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Official public docs describe OHLC history and pagination up to 500 candles per response. Exchange-specific series only."
+    },
+    {
+      "source_id": "wallex_public",
+      "asset_classes": ["iran_crypto_exchange"],
+      "authority": "exchange_public_api",
+      "status": "CANDIDATE",
+      "base_url": "https://api.wallex.ir",
+      "probe_endpoint": "/v1/markets",
+      "history_endpoint": "/v1/udf/history?symbol={symbol}&resolution=1D&from={from}&to={to}",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Official API documentation describes OHLC candles; public-data permission and historical coverage to verify."
+    },
+    {
+      "source_id": "alpha_vantage",
+      "asset_classes": ["global_equity", "global_etf", "global_fx", "global_crypto", "commodities"],
+      "authority": "commercial_data_provider",
+      "status": "CANDIDATE",
+      "base_url": "https://www.alphavantage.co/query",
+      "probe_endpoint": "TIME_SERIES_DAILY with demo key for documentation probe only",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Daily and adjusted history documented; adjusted endpoints may be premium. Key, request limits and commercial rights need confirmation."
+    },
+    {
+      "source_id": "fred_alfred",
+      "asset_classes": ["global_macro"],
+      "authority": "official_economic_data_provider",
+      "status": "CANDIDATE",
+      "base_url": "https://api.stlouisfed.org/fred",
+      "probe_endpoint": "series/observations (API key required)",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Use for macroeconomic series and ALFRED vintage history, not as a general equities/asset-price source."
+    },
+    {
+      "source_id": "nasdaq_data_link",
+      "asset_classes": ["global_equity", "global_indices", "global_funds"],
+      "authority": "commercial_market_data_provider",
+      "status": "CANDIDATE",
+      "base_url": "https://data.nasdaq.com/api/v3",
+      "probe_endpoint": "dataset metadata endpoint (API key/plan dependent)",
+      "terms_status": "REVIEW_REQUIRED",
+      "notes": "Coverage and access depend on dataset/product subscription; evaluate per required universe."
+    }
+  ]
+}
