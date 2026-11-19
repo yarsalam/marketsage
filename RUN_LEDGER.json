@@ -118,6 +118,102 @@
       "live_source_probe_performed": false,
       "final_status": "BLOCKED_ON_LOCAL_EVIDENCE_BYTES",
       "next_permitted_action": "دریافت یک بستهٔ فقط‌خواندنی از پوشهٔ قبلی فولاد و شواهد مرتبط، بازحساب هش‌ها، سپس اجرای یک ممیزی آفلاین یک‌باره و تولید خروجی تعدیل نسخه‌دار فقط برای رویدادهای تأییدشده."
+    },
+    {
+      "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
+      "type": "foolad_financial_csv_adjustment_and_gap_audit",
+      "status": "PARTIALLY_COMPLETED_BLOCKED_ON_FINANCIAL_CSV_BYTES",
+      "started_at": "2026-11-19",
+      "completed_at": null,
+      "inputs": [
+        "مالک: درخواست صریح ممیزی Financial.csv، راستی‌آزمایی تعدیل و بررسی شکاف‌ها",
+        "Financial.csv در Library؛ size=150754؛ SHA-256 ثبت‌شده ولی باز‌محاسبه‌نشده",
+        "آرشیو marketsage-three-symbols-review.zip؛ SHA-256=81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea"
+      ],
+      "actions": [
+        "خواندن WORK_PROTOCOL، WORK_STATE، ARTIFACT_REGISTRY و RUN_LEDGER",
+        "بررسی PR #1 و وضعیت branch/CI ثبت‌شده در WORK_STATE؛ بدون merge/deploy",
+        "جست‌وجوی Library و بررسی آرشیوها و backupهای موجود پیش از هر دانلود",
+        "بازبینی read-only مانیفست و candidate فولاد در آرشیو موجود",
+        "محاسبهٔ بازه، تعداد ردیف‌ها، factor changeها، روزهای بدون حجم و شکاف‌های بیش از ۱۰ روز در candidate archive",
+        "جست‌وجوی منابع عمومی تاریخی برای تطبیق علت برخی توقف‌ها"
+      ],
+      "owner_authorization": {
+        "offline_financial_csv_audit_only": true,
+        "reuse_existing_foolad_archive": true,
+        "new_live_downloads": false,
+        "overwrite_raw_files": false,
+        "infer_adjustment_factors": false,
+        "scoring_or_backtest": false,
+        "merge_or_deploy": false
+      },
+      "evidence": {
+        "financial_csv": {
+          "library_file_id": "file_0000000039e482109c208e16bf5c8c64",
+          "size_bytes": 150754,
+          "registered_sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+          "bytes_accessible": false,
+          "hash_recomputed": false,
+          "content_inspected": false,
+          "status": "PROJECT_FILE_BYTES_UNAVAILABLE"
+        },
+        "archive": {
+          "name": "marketsage-three-symbols-review.zip",
+          "size_bytes": 1244637,
+          "sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+          "candidate_sha256": "97c600e4470de55a23d0df3691c274d911c020bdf0dfcedaf443bfc300554d41",
+          "candidate_rows": 4680,
+          "first_date": "2007-03-11",
+          "last_date": "2026-11-11",
+          "price_adjustment_records": 23,
+          "share_change_events": 12,
+          "merged_event_dates": 29,
+          "overlapping_share_events": 6,
+          "standalone_share_events_applied": 6,
+          "ambiguous_overlaps": 1,
+          "zero_volume_rows": 414,
+          "adjusted_ohlc_violation_rows": 285,
+          "gaps": [
+            {
+              "last_observed": "2007-10-23",
+              "next_observed": "2007-11-03",
+              "calendar_days": 11
+            },
+            {
+              "last_observed": "2008-01-16",
+              "next_observed": "2008-01-29",
+              "calendar_days": 13
+            },
+            {
+              "last_observed": "2008-06-22",
+              "next_observed": "2008-07-05",
+              "calendar_days": 13
+            },
+            {
+              "last_observed": "2008-09-13",
+              "next_observed": "2008-10-26",
+              "calendar_days": 43
+            }
+          ],
+          "adjustment_acceptance": "NOT_VERIFIED_REVIEW_REQUIRED"
+        }
+      },
+      "findings": [
+        "آمار آرشیو candidate را نمی‌توان به Financial.csv نسبت داد؛ بایت‌های Financial.csv در دسترس نیست.",
+        "candidate از 2007-03-11 تا 2026-11-11 و 4680 ردیف دارد؛ این سری برای scoring/backtest پذیرفته نیست.",
+        "دو شکاف اول با منابع تاریخی به توقف و بازگشایی پس از اطلاعیه/تعدیل EPS مرتبط‌اند؛ علت دو شکاف بعدی هنوز با سند رسمی تأیید نشده است.",
+        "هیچ رویداد تعدیل ثبت‌شده‌ای در event ledger آرشیو برای 2007–2008 وجود ندارد؛ این به معنی نبود رویداد نیست.",
+        "تعدیل candidate به‌دلیل روش هم‌پوشانی ±7 روز، یک مورد مبهم و 285 نقض OHLC هنوز تأیید نشده است."
+      ],
+      "data_access": true,
+      "local_path_access": false,
+      "financial_csv_bytes_accessed": false,
+      "archive_read_only_inspection": true,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "live_source_probe_performed": false,
+      "final_status": "PARTIALLY_COMPLETED_BLOCKED_ON_FINANCIAL_CSV_BYTES",
+      "next_permitted_action": "مالک همان Financial.csv را در همین گفتگو دوباره پیوست کند تا SHA-256 باز‌محاسبه و تاریخ‌ها/شکاف‌ها/تعدیل دقیقاً روی همان فایل محاسبه شود؛ هیچ دانلود زنده‌ای تا مجوز جداگانه انجام نشود."
     }
   ]
 }
