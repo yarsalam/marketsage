@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "project": "MarketSage",
+  "timezone": "Asia/Tehran",
+  "runs": [
+    {
+      "work_id": "MS-BOOTSTRAP-20261119-01",
+      "type": "governance_bootstrap",
+      "status": "IN_PROGRESS",
+      "started_at": "2026-11-19",
+      "inputs": [
+        "درخواست مالک برای ایجاد نسخه فارسی بیانیه",
+        "وضعیت مخزن خالی yarsalam/marketsage"
+      ],
+      "actions": [
+        "بررسی مخزن، شاخه‌ها، commitها، issueها و PRها",
+        "ایجاد پروتکل کاری فارسی",
+        "ایجاد اسناد وضعیت، ثبت آثار، دفتر اجرا و بیانیه"
+      ],
+      "data_access": false,
+      "local_path_access": false,
+      "acceptance_criteria": [
+        "ثبت اسناد پایه و بیانیه فارسی",
+        "عدم انتقال کد یا داده",
+        "عدم دسترسی به /home/nima/marketsage-data",
+        "ثبت هش فایل‌ها در ARTIFACT_REGISTRY.json"
+      ],
+      "final_status": "PENDING_VERIFICATION",
+      "notes": "هیچ پژوهش، دریافت داده، محاسبه یا آزمون تحلیلی در این کار مجاز نیست."
+    }
+  ]
+}
