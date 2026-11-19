@@ -3,7 +3,7 @@
 - شناسهٔ کار جاری: `MS-BATCH-DATA-PIPELINE-20261119-01`
 - وضعیت: `IN_PROGRESS`
 - شاخهٔ کاری: `feat/multimarket-batch-data-pipeline`
-- آخرین commit بررسی‌شده: `c7129735bcd836983622a6c85b76068c309ffd6d`
+- آخرین commit بررسی‌شده: `72a63a45de834151205579daf76af3f111073949`
 - PR: [#1](https://github.com/yarsalam/marketsage/pull/1) — Draft، باز، ادغام‌نشده.
 - مجوز مالک: اجرای خط لولهٔ خودکار برای تمام بازارهای مانیفست؛ دریافت داده، تشخیص وضعیت تعدیل، تعدیل مشروط، اعتبارسنجی و گزارش شکست‌های موردی.
 - روش دستی و ماه‌به‌ماه/نمادبه‌نماد کنار گذاشته شد.
@@ -23,7 +23,7 @@
 
 ## شواهد آزمون و probe
 - آزمون هسته: run `44555227688`، نتیجهٔ success؛ ۸ آزمون از ۸ آزمون synthetic موفق.
-- probe منابع: run `44555538334`، نتیجهٔ success؛ artifact `14545386411`.
+- probe اصلی منابع: run `44555538334`، نتیجهٔ success؛ artifact `14545386411`.
 - محیط probe: GitHub-hosted Ubuntu 26.04 در westus3.
 - TSETMC search: HTTP 200، پاسخ JSON معتبر و ۴۱ نتیجه برای «فولاد».
 - TGJU history: HTTP 200؛ پاسخ بزرگ‌تر از سقف ۲۵۶ KiB probe؛ نیازمند pagination با start/length.
@@ -32,7 +32,8 @@
 - Nobitex market stats: HTTP 200؛ JSON معتبر ۳۵۹ بایتی.
 - Wallex markets: HTTP 200؛ پاسخ بزرگ‌تر از سقف probe؛ parse کامل انجام نشد.
 - Alpha Vantage daily: HTTP 200؛ JSON معتبر ۲۱٬۳۰۰ بایتی با سری روزانهٔ IBM.
-- این probe فقط اتصال و ساختار محدود را سنجید؛ دادهٔ کامل ذخیره نشد و هیچ منبعی صرفاً با HTTP 200 پذیرفته نشده است.
+- یک probe تکراری ناخواسته با run `44555979408` به‌دلیل trigger شدن workflow هنگام تغییر رجیستری اجرا شد؛ نتیجهٔ آن در تصمیم منبع استفاده نمی‌شود. trigger اصلاح شد تا فقط تغییر اسکریپت probe باعث اجرای مجدد شود.
+- probe فقط اتصال و ساختار محدود را سنجید؛ دادهٔ کامل ذخیره نشد و هیچ منبعی صرفاً با HTTP 200 پذیرفته نشده است.
 - مستندات فنی TSETMC هشدار می‌دهد تاریخچهٔ GetClosingPriceDailyList ممکن است برای بسیاری از ابزارها خالی باشد؛ fallback باید بررسی شود.
 - کد wrapper FIPIRAN، base service و endpointهای NAV را مشخص می‌کند؛ اتصال مستقیم هنوز probe نشده است.
 
