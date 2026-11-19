@@ -3,7 +3,7 @@
   "project": "MarketSage",
   "hash_policy": {
     "recorded_hash_type": "git_blob_sha1",
-    "note": "هش‌های ثبت‌شده شناسهٔ blob گیت‌هاب (SHA-1) هستند، نه SHA-256؛ برای تطبیق دقیق نسخهٔ ثبت‌شده به‌کار می‌روند."
+    "note": "هش‌های ثبت‌شده شناسهٔ blob گیت‌هاب (SHA-1) هستند، نه SHA-256."
   },
   "policy": {
     "raw_files_are_immutable": true,
@@ -11,6 +11,39 @@
     "missing_path_status": "PATH_UNRESOLVED",
     "never_redownload_without_archive_and_backup_check": true
   },
+  "external_assets_reported_by_owner": [
+    {
+      "inventory_id": "MS-LOCAL-DATA-ROOT-001",
+      "reported_path": "/home/nima/marketsage-data",
+      "status": "reported_by_owner_unverified",
+      "listing_method": "user_pasted_ls_output",
+      "work_id": "MS-ADJUSTMENT-INVENTORY-20261119-01",
+      "top_level_items": [
+        "Financial.csv",
+        "Financial (1).csv",
+        "Financial (2).csv",
+        "scripts",
+        "vaghdir_codal_mcp",
+        "vaghdir_codal_mcp_2011",
+        "vaghdir_codal_proxy_n5000.json",
+        "vaghdir_daily_jumps.json",
+        "vaghdir_daily_raw.json",
+        "vaghdir_price_adjust_raw.json",
+        "vaghdir_reconciliation.json",
+        "vaghdir_share_change_raw.json",
+        "vaghdir_2011_announcements",
+        "vaghdir_2011_pdfs",
+        "vaghdir_approach2",
+        "vaghdir_codal_all_letters.json",
+        "vaghdir_codal_capital_increase_letters.json",
+        "vaghdir_codal_capital_letters_clean.json",
+        "vaghdir_tsetmc_codal_proxy.json"
+      ],
+      "content_inspected": false,
+      "hashes_recorded": false,
+      "note": "فقط نام‌های گزارش‌شده ثبت شده‌اند؛ مسیرهای داخلی، محتوا و هش‌ها هنوز تأیید نشده‌اند."
+    }
+  ],
   "artifacts": [
     {
       "artifact_id": "MS-GOV-PROTOCOL-001",
@@ -27,7 +60,7 @@
       "path": "WORK_STATE.md",
       "type": "governance",
       "language": "fa",
-      "status": "verified",
+      "status": "pending_update",
       "git_blob_sha": "5be6ad59f6fc59d37ee0d12ae99f1c30acee9d3f",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
@@ -37,7 +70,7 @@
       "path": "RUN_LEDGER.json",
       "type": "execution_ledger",
       "language": "fa",
-      "status": "verified",
+      "status": "pending_update",
       "git_blob_sha": "bdbb167e687d8b54e77839e1906b1f0d0aa38c69",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
@@ -47,9 +80,8 @@
       "path": "ARTIFACT_REGISTRY.json",
       "type": "artifact_registry",
       "language": "fa",
-      "status": "verified_after_commit",
-      "git_blob_sha": null,
-      "hash_note": "هش خود فایل فهرست برای جلوگیری از خودارجاعی درون همان فایل ثبت نمی‌شود.",
+      "status": "pending_update",
+      "git_blob_sha": "22b4c7398506a407cfc092425b33562423f1d921",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
     },
