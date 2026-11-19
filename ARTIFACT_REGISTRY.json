@@ -76,7 +76,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "2d886b43c15070ea1fc47a75c1b556eac2f221ad",
+      "git_blob_sha": "9a3772866f92e06e8c0375a60b4eab2e08054f44",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -86,7 +86,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "65206c2fe7093684fe53edefad7335d99d18503a",
+      "git_blob_sha": "ffb93a5601c33bf6ecb393f2d597f8b74d3bea48",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -109,6 +109,26 @@
       "git_blob_sha": "93f53f0463d90edd894ab70f1c5fed7e9a34cf8c",
       "immutable": false,
       "work_id": "MS-BOOTSTRAP-20261119-01"
+    },
+    {
+      "artifact_id": "MS-DATA-SOURCE-CANDIDATES-001",
+      "path": "docs/DATA_SOURCE_CANDIDATES.md",
+      "type": "source_candidate_matrix",
+      "language": "fa",
+      "status": "verified",
+      "git_blob_sha": "5733d6c3e60049cff311896da07389dd1603e63d",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
+    },
+    {
+      "artifact_id": "MS-BATCH-PIPELINE-DESIGN-001",
+      "path": "docs/BATCH_PIPELINE_DESIGN.md",
+      "type": "architecture_design",
+      "language": "fa",
+      "status": "verified",
+      "git_blob_sha": "a2d51098bceef8135b9bcb2ff625b6127adc450f",
+      "immutable": false,
+      "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     }
   ]
 }
