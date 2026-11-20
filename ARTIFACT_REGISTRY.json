@@ -113,7 +113,7 @@
       "artifact_id": "MS-EXCLUDED-FINANCIAL-CSV-001",
       "reported_name": "Financial.csv",
       "origin": "conversation_upload",
-      "status": "owner_reauthorized_for_offline_foolad_audit_only",
+      "status": "BYTES_ACCESSED_HASH_VERIFIED_IDENTITY_CONFLICT",
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01",
       "size_bytes": 150754,
       "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
@@ -155,7 +155,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "c9034620c3bca495a2b095f11551d80d02bdc229",
+      "git_blob_sha": "6533078e1e734348e4659a811064d86e472fb811",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
