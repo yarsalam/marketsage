@@ -403,7 +403,7 @@
     {
       "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
       "type": "authorized_local_foolad_chart_download_and_comparison",
-      "status": "ACQUIRED_SCHEMA_VALIDATED_COMPARISON_COMPLETED_PENDING_EVENT_RECONCILIATION",
+      "status": "IDENTITY_MATCH_CONFIRMED_A1_EQUALS_REGISTERED_FINANCIAL_CSV_SEMANTICS_UNRESOLVED",
       "started_at": "2026-11-20",
       "inputs": [
         "TSETMC chart endpoint candidate already registered in ARTIFACT_REGISTRY",
@@ -450,14 +450,17 @@
         "هش و اندازهٔ بایت‌های خام طبق خروجی مالک ثبت شد؛ هر دو پاسخ gzip بودند و فقط در حافظه بازگشایی شدند؛ فایل‌های خام تغییر نکردند",
         "هر دو سری پس از بازگشایی با schema هفت‌ستونی و تاریخ‌های یکتا parse شدند: 4271 ردیف از 2007-03-11 تا 2026-11-18",
         "مقایسهٔ آفلاین روی 4271 تاریخ مشترک: 73 ردیف کاملاً یکسان و 4198 ردیف متفاوت؛ هر شش ستون قیمتی در 4198 ردیف متفاوت، tvol در همهٔ ردیف‌ها یکسان",
-        "اندازهٔ محتوای بازشدهٔ a=1 برابر 150754 بایت و با اندازهٔ Financial.csv ثبت‌شده برابر است؛ تطبیق هویت فقط پس از مقایسهٔ SHA-256 محتوای بازشده مجاز است"
+        "اندازهٔ محتوای بازشدهٔ a=1 برابر 150754 بایت و با اندازهٔ Financial.csv ثبت‌شده برابر است؛ تطبیق هویت فقط پس از مقایسهٔ SHA-256 محتوای بازشده مجاز است",
+        "مالک SHA-256 محتوای gzip بازشده را آفلاین محاسبه کرد: a=0 برابر 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 (185348 بایت) و a=1 برابر 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31 (150754 بایت).",
+        "هش محتوای بازشدهٔ a=1 دقیقاً با هش ثبت‌شدهٔ Financial.csv برابر است؛ این تطبیق هویت محتوایی را ثابت می‌کند، نه صحت اقتصادی یا معنای پارامتر a=1.",
+        "به‌دلیل اینکه Financial.csv قبلاً از سوی مالک تعدیل‌نشده توصیف شده، برچسب فرضی a=1 به‌عنوان adjusted با شواهد موجود ناسازگار/حل‌نشده است؛ هیچ‌یک از دو mode به‌عنوان سری تعدیل‌شدهٔ معتبر پذیرفته نشد."
       ],
       "data_access": true,
       "acquisition_performed": true,
       "adjustment_performed": false,
       "live_source_probe_performed": true,
-      "final_status": "ACQUIRED_SCHEMA_VALIDATED_COMPARISON_COMPLETED_PENDING_EVENT_RECONCILIATION",
-      "next_permitted_action": "فقط پردازش آفلاین: محاسبهٔ SHA-256 محتوای gzip بازشدهٔ a=1 و مقایسه با هش ثبت‌شدهٔ Financial.csv (888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31)؛ سپس در صورت عدم تطبیق، تطبیق رویدادهای شرکتی با شواهد رسمی موجود. هیچ دریافت شبکه‌ای، نماد دیگر، پذیرش منبع یا تحلیل سرمایه‌گذاری مجاز نیست.",
+      "final_status": "IDENTITY_MATCH_CONFIRMED_A1_EQUALS_REGISTERED_FINANCIAL_CSV_SEMANTICS_UNRESOLVED",
+      "next_permitted_action": "هیچ درخواست شبکه‌ای یا دریافت دیگری انجام نشود. فقط شواهد آرشیوی و event ledger موجود فولاد، در صورت دسترسی به بایت‌های ثبت‌شده و تطبیق هش، برای بررسی آفلاین معنای a=0/a=1 و رویدادها بازبینی شود؛ اگر فایل محلی/آرشیوی در دسترس نیست PATH_UNRESOLVED ثبت و کار متوقف شود. تا رفع تعارض معنایی و تطبیق مستقل رویدادها، منبع CANDIDATE_NOT_ACCEPTED می‌ماند و هیچ خروجی ADJUSTED_VERIFIED یا تحلیل سرمایه‌گذاری مجاز نیست.",
       "evidence": {
         "local_output_directory": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z",
         "owner_reported_execution": true,
@@ -505,7 +508,24 @@
           },
           "economic_correctness": "NOT_ESTABLISHED"
         },
-        "time_provenance_note": "manifest timestamps were emitted using local Persian calendar; filesystem mtimes reported by owner as 2026-11-20T09:10:23.356751Z and 09:10:24.284774Z; original request timestamp not independently reconstructed"
+        "time_provenance_note": "manifest timestamps were emitted using local Persian calendar; filesystem mtimes reported by owner as 2026-11-20T09:10:23.356751Z and 09:10:24.284774Z; original request timestamp not independently reconstructed",
+        "decoded_hashes": {
+          "a=0": {
+            "size_bytes": 185348,
+            "sha256": "372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999"
+          },
+          "a=1": {
+            "size_bytes": 150754,
+            "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+            "matches_registered_Financial_csv": true
+          }
+        },
+        "semantic_conflict": {
+          "financial_csv_owner_description": "unadjusted",
+          "a1_content_identity": "byte-identical to registered Financial.csv",
+          "a1_adjusted_semantics": "UNRESOLVED",
+          "economic_correctness": "NOT_ESTABLISHED"
+        }
       }
     }
   ]
