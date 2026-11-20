@@ -322,6 +322,58 @@
       "live_source_probe_performed": false,
       "final_status": "PARTIALLY_COMPLETED_BLOCKED_ON_DISTINCT_ADJUSTED_COUNTERPART",
       "next_permitted_action": "بایت‌های نسخهٔ تعدیل‌شدهٔ متمایز که مالک قبلاً ارسال کرده بازیابی شود؛ هش و تاریخ‌های آن تطبیق داده شود. تا حل تعارض هویت، مقایسه و راستی‌آزمایی تعدیل انجام نشود؛ دانلود زنده ممنوع."
+    },
+    {
+      "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
+      "type": "single_instrument_chart_adjustment_probe",
+      "status": "SOURCE_REGISTERED_PROBE_PENDING",
+      "started_at": "2026-11-20",
+      "inputs": [
+        "TSETMC chart endpoint candidate for Foolad insCode 46348559193224090",
+        "tse-client adjustment methodology reference",
+        "owner authorization in current conversation",
+        "VPN state reported OFF by owner"
+      ],
+      "actions": [
+        "re-read current governance protocol, state, registry and ledger",
+        "inspect current main commit, open PR #1, branches and related issues",
+        "register TSETMC chart endpoint as CANDIDATE_NOT_ACCEPTED",
+        "register tse-client as REFERENCE_METHOD_NOT_ACCEPTED_SOURCE"
+      ],
+      "owner_authorization": {
+        "limited_foolad_probe": true,
+        "temporary_candidate_registration": true,
+        "vpn_state": "OFF",
+        "other_symbols": false,
+        "bulk_acquisition": false,
+        "overwrite_raw": false,
+        "investment_scoring": false,
+        "merge_or_deploy": false
+      },
+      "scope": {
+        "symbol": "فولاد",
+        "insCode": "46348559193224090",
+        "requests_planned": 2,
+        "adjustment_modes": [
+          "a=0",
+          "a=1"
+        ],
+        "endpoint": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i={insCode}&t=ph&a={0|1}"
+      },
+      "acceptance_criteria": [
+        "HTTP response successfully retrieved for each authorized mode or a documented reachability failure",
+        "raw response bytes saved immutable with URL, timestamp, parameters, size and SHA-256",
+        "response schema and date coverage validated",
+        "a=0 and a=1 compared on common dates",
+        "comparison against existing archived candidate and independent tse-client methodology performed only where evidence bytes and hashes are available",
+        "no claims of economic correctness without event-level reconciliation"
+      ],
+      "data_access": false,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "live_source_probe_performed": false,
+      "final_status": "SOURCE_REGISTERED_PROBE_PENDING",
+      "next_permitted_action": "perform only the two-request Foolad probe with VPN OFF; if network access is unavailable, record SOURCE_FAILED and do not retry via VPN or alternate source without renewed authorization"
     }
   ]
 }
