@@ -326,7 +326,7 @@
     {
       "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
       "type": "single_instrument_chart_adjustment_probe",
-      "status": "SOURCE_REGISTERED_PROBE_PENDING",
+      "status": "SOURCE_FAILED",
       "started_at": "2026-11-20",
       "inputs": [
         "TSETMC chart endpoint candidate for Foolad insCode 46348559193224090",
@@ -338,7 +338,9 @@
         "re-read current governance protocol, state, registry and ledger",
         "inspect current main commit, open PR #1, branches and related issues",
         "register TSETMC chart endpoint as CANDIDATE_NOT_ACCEPTED",
-        "register tse-client as REFERENCE_METHOD_NOT_ACCEPTED_SOURCE"
+        "register tse-client as REFERENCE_METHOD_NOT_ACCEPTED_SOURCE",
+        "attempted exactly two authorized GET requests from the available execution environment, with VPN reported OFF by owner",
+        "both requests failed before HTTP response because DNS resolution for members.tsetmc.com failed (curl exit 6); browser fetch also reported endpoint inaccessible"
       ],
       "owner_authorization": {
         "limited_foolad_probe": true,
@@ -371,9 +373,32 @@
       "data_access": false,
       "acquisition_performed": false,
       "adjustment_performed": false,
-      "live_source_probe_performed": false,
-      "final_status": "SOURCE_REGISTERED_PROBE_PENDING",
-      "next_permitted_action": "perform only the two-request Foolad probe with VPN OFF; if network access is unavailable, record SOURCE_FAILED and do not retry via VPN or alternate source without renewed authorization"
+      "live_source_probe_performed": true,
+      "final_status": "SOURCE_FAILED_DNS_RESOLUTION",
+      "next_permitted_action": "No retry or alternate source is permitted in this work item. Resume only after an explicit new authorization and a reachable execution environment; preserve candidate status and do not accept adjusted data.",
+      "evidence": {
+        "attempted_requests": [
+          {
+            "mode": "a=0",
+            "url": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i=46348559193224090&t=ph&a=0",
+            "http_status": null,
+            "network_error": "DNS_RESOLUTION_FAILED",
+            "curl_exit": 6,
+            "bytes_received": 0
+          },
+          {
+            "mode": "a=1",
+            "url": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i=46348559193224090&t=ph&a=1",
+            "http_status": null,
+            "network_error": "DNS_RESOLUTION_FAILED",
+            "curl_exit": 6,
+            "bytes_received": 0
+          }
+        ],
+        "response_hashes": null,
+        "raw_data_acquired": false,
+        "environment_note": "The request was made from the available cloud execution environment, not from the user's laptop; the user's VPN state was reported OFF."
+      }
     }
   ]
 }
