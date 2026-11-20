@@ -192,3 +192,16 @@
 - اسکریپت یکپارچهٔ آفلاین و گزارش JSON/Markdown در Library ثبت شده‌اند: `foolad_six_point_offline_audit.py`، `foolad_six_point_offline_audit_20261120.json` و `foolad_six_point_offline_audit_20261120.md`؛ هش‌ها در `ARTIFACT_REGISTRY.json` درج می‌شوند.
 - هیچ درخواست شبکه‌ای، دانلود، تعدیل، تغییر فایل خام، scoring، backtest، merge یا deploy انجام نشد. منبع و candidate همچنان `CANDIDATE_NOT_ACCEPTED` / `REVIEW_REQUIRED` هستند.
 - اقدام بعدی مجاز: مالک همان `a0.raw` و `a1.raw` موجود را از پوشهٔ قبلی بدون دریافت مجدد بارگذاری کند؛ اگر تقویم رسمی جلسات و اطلاعیه‌های رسمی فولاد در آرشیو/پشتیبان موجود است همان‌ها نیز ارائه شوند. سپس اسکریپت واحد روی ورودی‌های hash-verified اجرا شود. هیچ دانلود زنده یا حدس تقویمی/ضریب مجاز نیست.
+
+
+## اصلاح parser ممیزی شش‌محوری فولاد — ۲۰۲۶-۱۱-۲۰
+
+- شناسهٔ کار: `MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01`
+- وضعیت: `PARSER_FIX_VERIFIED_FIXTURE_TESTS_5_OF_5_ACTUAL_OWNER_FILES_PENDING`
+- علت خطای اجرای قبلی: پاسخ‌های decodeشدهٔ نمودار TSETMC یک خط فیزیکی با رکوردهای جداشده توسط `; ` هستند؛ parser قبلی newline را مرز رکورد فرض می‌کرد و کل فایل را یک ردیف نامعتبر می‌دید. بنابراین خروجی قبلی با صفر ردیف معتبر و صفر اختلاف برای a0/a1 فاقد اعتبار تحلیلی است.
+- اصلاح: نسخهٔ جدید `foolad_six_point_offline_audit_v2.py` با SHA-256 برابر `f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99` در Library ثبت شد. رکوردهای هفت‌فیلدی semicolon-delimited، gzip و CSV سطری را پشتیبانی می‌کند؛ ورودی بدون ردیف معتبر را fail-closed رد می‌کند؛ گزارش a0/a1 را پویا می‌سازد.
+- defect دوم که در اجرای یکپارچه کشف و رفع شد: candidate ستون `volume_adjusted` ندارد؛ مقایسهٔ نسخهٔ جدید این ستون را بدون exception و با مقدار null مدیریت می‌کند.
+- آزمون‌ها: ۵ از ۵ موفق؛ اجرای یکپارچه با آرشیو hash-verified و fixtureهای کوچک موفق. این اجرای fixture به‌هیچ‌وجه جایگزین مقایسهٔ واقعی فایل‌های مالک نیست.
+- فایل آزمون `test_foolad_chart_parser_v2.py` با SHA-256 برابر `dbcf45175d7f535f374b237a191e4b2b48fba6a54d9632d0227591a0bee78d58` در Library ثبت شد.
+- هیچ درخواست شبکه‌ای، دانلود، تغییر فایل خام، تعدیل، scoring، backtest، merge یا deploy انجام نشد.
+- اقدام بعدی مجاز: اجرای نسخهٔ v2 روی همان فایل‌های موجود `Financial.csv` و `Financial (1).csv` با هش‌های مورد انتظار به‌ترتیب `372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999` و `888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31`؛ سپس بررسی report.json. هیچ دریافت مجددی لازم یا مجاز نیست.
