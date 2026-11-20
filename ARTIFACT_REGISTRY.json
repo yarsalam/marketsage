@@ -194,6 +194,47 @@
       "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
       "immutable": true,
       "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود."
+    },
+    {
+      "artifact_id": "MS-FOOLAD-TSETMC-A0-RAW-20261120-001",
+      "path": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z/a0.raw",
+      "type": "immutable_raw_provider_response",
+      "provider": "TSETMC",
+      "instrument": "فولاد",
+      "insCode": "46348559193224090",
+      "adjustment_mode": "a=0",
+      "content_encoding": "gzip",
+      "size_bytes": 70762,
+      "sha256": "c3299d6c4ddf02ec2aa5734bcfb78d3ec5572516b1f434d438bd0bd9a6e92554",
+      "hash_status": "owner_reported_from_local_execution_output_not_independently_recomputed_here",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-TSETMC-A1-RAW-20261120-001",
+      "path": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z/a1.raw",
+      "type": "immutable_raw_provider_response",
+      "provider": "TSETMC",
+      "instrument": "فولاد",
+      "insCode": "46348559193224090",
+      "adjustment_mode": "a=1",
+      "content_encoding": "gzip",
+      "size_bytes": 51131,
+      "sha256": "89c06b21d59627781e9e965ceaf24bbd95a7fbcb20e35ddcfe576d9cc6bc706e",
+      "hash_status": "owner_reported_from_local_execution_output_not_independently_recomputed_here",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-TSETMC-COMPARISON-20261120-001",
+      "path": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z/comparison.csv",
+      "type": "derived_comparison",
+      "size_bytes": null,
+      "sha256": null,
+      "status": "owner_reported_created_hash_not_yet_registered",
+      "immutable": false,
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "note": "آمار مقایسه در RUN_LEDGER ثبت شده؛ hash خروجی مقایسه هنوز ارائه نشده است."
     }
   ],
   "sources": [
@@ -216,7 +257,7 @@
         }
       },
       "method": "HTTP GET; one instrument only; one request per adjustment mode; no pagination or bulk acquisition",
-      "response_format": "semicolon-delimited chart series; schema to be validated from actual response",
+      "response_format": "gzip-compressed semicolon-delimited chart series; decompressed schema: date plus six numeric fields (pmax,pmin,pf,pl,tvol,pc)",
       "terms_status": "REVIEW_REQUIRED",
       "redistribution_rights": "UNKNOWN_NOT_AUTHORIZED",
       "limitations": [
@@ -232,7 +273,7 @@
         "followup_vpn_state": "OFF",
         "followup_scope": "exactly two GET requests from owner's laptop for Foolad insCode 46348559193224090, a=0 and a=1; no bulk, retry, VPN, or other symbols"
       },
-      "acceptance_status": "CANDIDATE_NOT_ACCEPTED_PENDING_LOCAL_RESPONSE_AND_RECONCILIATION",
+      "acceptance_status": "CANDIDATE_NOT_ACCEPTED_PENDING_EVENT_RECONCILIATION_AND_TERMS_REVIEW",
       "authorized_followup_work_ids": [
         "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
       ]
