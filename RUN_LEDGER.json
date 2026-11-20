@@ -702,6 +702,90 @@
       "merge_or_deploy": false,
       "final_status": "PARTIAL_OFFLINE_AUDIT_BLOCKED_ON_A0_BYTES_OFFICIAL_DISCLOSURES_AND_TRADING_CALENDAR",
       "next_permitted_action": "مالک همان فایل‌های خام موجود a0.raw و a1.raw را از پوشهٔ قبلی، بدون دریافت مجدد، بارگذاری کند؛ اگر تقویم رسمی جلسات و اطلاعیه‌های رسمی فولاد نیز در آرشیو/پشتیبان موجود است همان فایل‌ها ارائه شوند. سپس اسکریپت واحد روی همین ورودی‌های hash-verified اجرا شود. هیچ دانلود زنده یا حدس تقویمی/ضریب مجاز نیست."
+    },
+    {
+      "work_id": "MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01",
+      "type": "offline_parser_correction_and_fixture_validation",
+      "status": "PARSER_FIX_VERIFIED_FIXTURE_TESTS_5_OF_5_ACTUAL_OWNER_FILES_PENDING",
+      "started_at": "2026-11-20",
+      "completed_at": "2026-11-20",
+      "inputs": [
+        "ثبت canonical WORK_PROTOCOL.md، WORK_STATE.md، ARTIFACT_REGISTRY.json و RUN_LEDGER.json از شاخه PR #3",
+        "اسکریپت قبلی با SHA-256=254fa01db2220d06ba972d49189a3d0c6f17963fbda0f8a7d28b5d8c4f79bf0a",
+        "آرشیو موجود marketsage-three-symbols-review.zip با SHA-256=81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+        "خروجی مالک برای Financial.csv و Financial (1).csv؛ هش‌ها به‌ترتیب 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 و 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31؛ پیش‌نمایش بایت‌ها قالب رکورد semicolon-delimited را نشان داد"
+      ],
+      "owner_authorization": {
+        "scope": "اصلاح parser و ادامهٔ ممیزی آفلاین فولاد با همان فایل‌های موجود",
+        "network_requests": false,
+        "new_downloads": false,
+        "raw_overwrite": false,
+        "factor_inference_or_adjustment": false,
+        "scoring_or_backtest": false,
+        "merge_or_deploy": false
+      },
+      "acceptance_criteria": [
+        "parser باید هر رکورد هفت‌فیلدی را از stream تک‌خطی semicolon-delimited بخواند",
+        "پشتیبانی قبلی از gzip و CSV سطری حفظ شود",
+        "ورودی بدون هیچ ردیف معتبر fail-closed شود",
+        "مقایسه با candidate فاقد volume_adjusted بدون exception اجرا شود",
+        "آزمون‌های fixture و اجرای یکپارچه با آرشیو hash-verified موفق شوند",
+        "فایل‌های واقعی a0/a1 فقط با هش‌های ثبت‌شده پردازش شوند و هیچ دانلود مجددی انجام نشود"
+      ],
+      "actions": [
+        "علت صفر شدن ردیف‌ها شناسایی شد: csv.reader به‌صورت newline-delimited خوانده بود، اما دادهٔ provider یک خط با رکوردهای جداشده از هم با semicolon است",
+        "نسخهٔ جدید parser ساخته شد؛ اسکریپت قبلی immutable باقی ماند",
+        "پنج آزمون parser اجرا شد",
+        "اجرای یکپارچهٔ اسکریپت روی آرشیو ثبت‌شده و fixtureهای کوچک a0/a1 انجام شد"
+      ],
+      "findings": [
+        "نسخهٔ قبلی هر فایل را یک ردیف نامعتبر می‌دید؛ آمار صفر ردیف معتبر و صفر اختلاف قبلی برای a0/a1 نامعتبر است",
+        "نسخهٔ جدید قالب semicolon_records را تشخیص می‌دهد و رکوردها را به‌درستی parse می‌کند",
+        "اجرای یکپارچه ابتدا یک defect دوم را در comparison کشف کرد: candidate ستون volume_adjusted ندارد؛ نسخهٔ جدید این مورد را به‌صورت null/بدون مقایسه مدیریت می‌کند",
+        "پنج آزمون از پنج آزمون موفق شدند",
+        "اجرای یکپارچه با آرشیو hash-verified و دو fixture موفق شد؛ 4680 ردیف candidate، 23 رویداد price-adjust، 12 share-change، 29 factor transitions، 285 نقض OHLC در هر دو سری و 4 فاصلهٔ candidate بیش از 10 روز گزارش شد",
+        "فایل‌های واقعی Financial.csv و Financial (1).csv در محیط اجرای اسکریپت اصلاح‌شده موجود نبودند؛ بنابراین مقایسهٔ واقعی هنوز انجام نشده است",
+        "هیچ درخواست شبکه‌ای، دانلود، تغییر خام، تعدیل، scoring، backtest، merge یا deploy انجام نشد"
+      ],
+      "evidence": {
+        "script_v2": {
+          "library_path": "/MarketSage/foolad_six_point_offline_audit_v2.py",
+          "library_file_id": "libfile_85a23bd0309c8191a7c427f37a49dc0d",
+          "size_bytes": 24671,
+          "sha256": "f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99"
+        },
+        "parser_tests": {
+          "library_path": "/MarketSage/test_foolad_chart_parser_v2.py",
+          "library_file_id": "libfile_7aa91d5e15488191a50d271ea0e7f294",
+          "size_bytes": 3407,
+          "sha256": "dbcf45175d7f535f374b237a191e4b2b48fba6a54d9632d0227591a0bee78d58"
+        },
+        "fixture_test": {
+          "tests_passed": 5,
+          "tests_failed": 0
+        },
+        "integration_fixture": {
+          "archive_sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+          "status": "SUCCESS",
+          "fixture_a0_rows": 2,
+          "fixture_a1_rows": 2,
+          "common_dates": 2,
+          "differing_rows": 2,
+          "network_requests": 0,
+          "raw_files_modified": false
+        }
+      },
+      "data_access": true,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "network_requests": 0,
+      "raw_files_modified": false,
+      "source_approved": false,
+      "adjusted_verified": false,
+      "scoring_or_backtest_approved": false,
+      "merge_or_deploy": false,
+      "final_status": "PARSER_FIX_VERIFIED_FIXTURE_TESTS_5_OF_5_ACTUAL_OWNER_FILES_PENDING",
+      "next_permitted_action": "مالک همان فایل‌های موجود Financial.csv و Financial (1).csv را با نسخهٔ v2 و آرشیو ثبت‌شده اجرا کند؛ سپس report.json را ارائه کند. هش ورودی‌ها باید دقیقاً با 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 و 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31 برابر باشد. هیچ دانلود زنده، تغییر فایل خام، پذیرش منبع یا ادعای صحت اقتصادی مجاز نیست."
     }
   ]
 }
