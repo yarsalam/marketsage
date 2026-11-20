@@ -227,9 +227,15 @@
       "authorization": {
         "owner_approved_limited_probe": true,
         "approved_on": "2026-11-20",
-        "vpn_state": "OFF"
+        "vpn_state": "OFF",
+        "followup_owner_approved_on": "2026-11-20",
+        "followup_vpn_state": "OFF",
+        "followup_scope": "exactly two GET requests from owner's laptop for Foolad insCode 46348559193224090, a=0 and a=1; no bulk, retry, VPN, or other symbols"
       },
-      "acceptance_status": "NOT_ACCEPTED_PENDING_PROBE_AND_RECONCILIATION"
+      "acceptance_status": "CANDIDATE_NOT_ACCEPTED_PENDING_LOCAL_RESPONSE_AND_RECONCILIATION",
+      "authorized_followup_work_ids": [
+        "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
+      ]
     },
     {
       "source_id": "MS-METHOD-TSE-CLIENT-ADJUSTMENT-001",
