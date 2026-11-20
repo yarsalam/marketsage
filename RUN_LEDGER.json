@@ -122,7 +122,7 @@
     {
       "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
       "type": "foolad_financial_csv_adjustment_and_gap_audit",
-      "status": "PARTIALLY_COMPLETED_BLOCKED_ON_FINANCIAL_CSV_BYTES",
+      "status": "PARTIALLY_COMPLETED_BLOCKED_ON_DISTINCT_ADJUSTED_COUNTERPART",
       "started_at": "2026-11-19",
       "completed_at": null,
       "inputs": [
@@ -137,7 +137,8 @@
         "بازبینی read-only مانیفست و candidate فولاد در آرشیو موجود",
         "محاسبهٔ بازه، تعداد ردیف‌ها، factor changeها، روزهای بدون حجم و شکاف‌های بیش از ۱۰ روز در candidate archive",
         "جست‌وجوی منابع عمومی تاریخی برای تطبیق علت برخی توقف‌ها",
-        "اجرای یک آزمون حسابی مستقل برای رابطهٔ close_adjusted و close_raw × adjustment_factor و مقایسهٔ نقض‌های OHLC قبل و بعد از تعدیل"
+        "اجرای یک آزمون حسابی مستقل برای رابطهٔ close_adjusted و close_raw × adjustment_factor و مقایسهٔ نقض‌های OHLC قبل و بعد از تعدیل",
+        "دریافت و بازحساب SHA-256 دو پیوست فعلی Financial؛ تأیید برابری بایت‌به‌بایت و تطبیق با هش ثبت‌شدهٔ Financial.csv"
       ],
       "owner_authorization": {
         "offline_financial_csv_audit_only": true,
@@ -153,10 +154,102 @@
           "library_file_id": "file_0000000039e482109c208e16bf5c8c64",
           "size_bytes": 150754,
           "registered_sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
-          "bytes_accessible": false,
-          "hash_recomputed": false,
-          "content_inspected": false,
-          "status": "PROJECT_FILE_BYTES_UNAVAILABLE"
+          "bytes_accessible": true,
+          "hash_recomputed": true,
+          "content_inspected": true,
+          "status": "PROJECT_FILE_BYTES_UNAVAILABLE",
+          "sha256_recomputed": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+          "owner_identified_as": "unadjusted",
+          "identity_conflict": "current unadjusted upload has the exact same SHA-256 as the previously registered Financial.csv; both current uploads are byte-identical",
+          "rows": 4271,
+          "first_date": "2007-03-11",
+          "last_date": "2026-11-18",
+          "duplicate_dates": 0,
+          "invalid_rows": 0,
+          "fields_per_row": 7,
+          "has_header": false,
+          "gaps_over_10_calendar_days": [
+            [
+              "2007-10-23",
+              "2007-11-03",
+              11
+            ],
+            [
+              "2008-01-16",
+              "2008-01-29",
+              13
+            ],
+            [
+              "2008-06-22",
+              "2008-07-05",
+              13
+            ],
+            [
+              "2008-09-13",
+              "2008-10-26",
+              43
+            ],
+            [
+              "2009-11-04",
+              "2009-12-15",
+              41
+            ],
+            [
+              "2010-11-27",
+              "2011-01-26",
+              60
+            ],
+            [
+              "2011-02-06",
+              "2011-02-19",
+              13
+            ],
+            [
+              "2012-07-14",
+              "2012-08-01",
+              18
+            ],
+            [
+              "2013-07-16",
+              "2013-07-28",
+              12
+            ],
+            [
+              "2014-07-28",
+              "2014-08-10",
+              13
+            ],
+            [
+              "2015-07-15",
+              "2015-09-09",
+              56
+            ],
+            [
+              "2015-10-10",
+              "2015-10-28",
+              18
+            ],
+            [
+              "2017-02-15",
+              "2017-02-26",
+              11
+            ],
+            [
+              "2025-03-18",
+              "2025-03-29",
+              11
+            ],
+            [
+              "2025-06-11",
+              "2025-06-28",
+              17
+            ],
+            [
+              "2026-02-25",
+              "2026-08-08",
+              164
+            ]
+          ]
         },
         "archive": {
           "name": "marketsage-three-symbols-review.zip",
@@ -216,7 +309,9 @@
         "دو شکاف اول با منابع تاریخی به توقف و بازگشایی پس از اطلاعیه/تعدیل EPS مرتبط‌اند؛ علت دو شکاف بعدی هنوز با سند رسمی تأیید نشده است.",
         "هیچ رویداد تعدیل ثبت‌شده‌ای در event ledger آرشیو برای 2007–2008 وجود ندارد؛ این به معنی نبود رویداد نیست.",
         "تعدیل candidate به‌دلیل روش هم‌پوشانی ±7 روز، یک مورد مبهم و 285 نقض OHLC هنوز تأیید نشده است.",
-        "در candidate آرشیو، رابطهٔ adjusted close با raw close و factor در تمام 4680 ردیف از نظر حسابی برقرار است؛ این فقط درستی اعمال فرمول را نشان می‌دهد، نه درستی رویدادها/ضرایب."
+        "در candidate آرشیو، رابطهٔ adjusted close با raw close و factor در تمام 4680 ردیف از نظر حسابی برقرار است؛ این فقط درستی اعمال فرمول را نشان می‌دهد، نه درستی رویدادها/ضرایب.",
+        "فایل تعدیل‌نشدهٔ اعلام‌شده توسط مالک در دسترس قرار گرفت؛ دو پیوست فعلی هش یکسان دارند و با هش ثبت‌شدهٔ Financial.csv برابرند، پس فایل تعدیل‌شدهٔ متمایز در دسترس نیست.",
+        "فایل ۴۲۷۱ ردیف از ۲۰۰۷-۰۳-۱۱ تا ۲۰۲۶-۱۱-۱۸ دارد؛ ۱۶ فاصلهٔ بیش از ۱۰ روز تقویمی دیده شد؛ علت هر فاصله هنوز طبقه‌بندی نشده است."
       ],
       "data_access": true,
       "local_path_access": false,
@@ -225,8 +320,8 @@
       "acquisition_performed": false,
       "adjustment_performed": false,
       "live_source_probe_performed": false,
-      "final_status": "PARTIALLY_COMPLETED_BLOCKED_ON_FINANCIAL_CSV_BYTES",
-      "next_permitted_action": "مالک همان Financial.csv را در همین گفتگو دوباره پیوست کند تا SHA-256 باز‌محاسبه و تاریخ‌ها/شکاف‌ها/تعدیل دقیقاً روی همان فایل محاسبه شود؛ هیچ دانلود زنده‌ای تا مجوز جداگانه انجام نشود."
+      "final_status": "PARTIALLY_COMPLETED_BLOCKED_ON_DISTINCT_ADJUSTED_COUNTERPART",
+      "next_permitted_action": "بایت‌های نسخهٔ تعدیل‌شدهٔ متمایز که مالک قبلاً ارسال کرده بازیابی شود؛ هش و تاریخ‌های آن تطبیق داده شود. تا حل تعارض هویت، مقایسه و راستی‌آزمایی تعدیل انجام نشود؛ دانلود زنده ممنوع."
     }
   ]
 }
