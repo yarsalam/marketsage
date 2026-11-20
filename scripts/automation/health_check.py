@@ -195,7 +195,7 @@ def main() -> int:
             current_run_id,
             datetime.now(timezone.utc),
         )
-    except (RuntimeError, KeyError, TypeError):
+    except Exception:
         print(json.dumps({"status": "error", "reason": "github_api_unavailable"}))
         return 2
 

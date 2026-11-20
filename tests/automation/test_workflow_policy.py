@@ -25,6 +25,7 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertIn("actions: read", content)
         self.assertIn("timeout-minutes: 8", content)
         self.assertIn("cancel-in-progress: false", content)
+        self.assertIn("queue: max", content)
         self.assertNotIn("self-hosted", content)
         self.assertNotIn("upload-artifact", content)
 

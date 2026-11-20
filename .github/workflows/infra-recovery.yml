@@ -35,6 +35,8 @@ jobs:
           REPOSITORY: \${{ github.repository }}
         run: |
           set -euo pipefail
+          case "$SOURCE_RUN_ID" in ''|*[!0-9]*) exit 1 ;; esac
+          test "$REPOSITORY" = "$GITHUB_REPOSITORY"
           gh api --method POST \
             "repos/\${REPOSITORY}/actions/runs/\${SOURCE_RUN_ID}/rerun-failed-jobs" \
             >/dev/null
