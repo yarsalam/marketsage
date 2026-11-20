@@ -403,7 +403,7 @@
     {
       "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
       "type": "authorized_local_foolad_chart_download_and_comparison",
-      "status": "IDENTITY_MATCH_CONFIRMED_A1_EQUALS_REGISTERED_FINANCIAL_CSV_SEMANTICS_UNRESOLVED",
+      "status": "IDENTITY_MATCH_CONFIRMED_EVENT_RECONCILIATION_BLOCKED_ARCHIVE_PATH_UNRESOLVED",
       "started_at": "2026-11-20",
       "inputs": [
         "TSETMC chart endpoint candidate already registered in ARTIFACT_REGISTRY",
@@ -453,14 +453,16 @@
         "اندازهٔ محتوای بازشدهٔ a=1 برابر 150754 بایت و با اندازهٔ Financial.csv ثبت‌شده برابر است؛ تطبیق هویت فقط پس از مقایسهٔ SHA-256 محتوای بازشده مجاز است",
         "مالک SHA-256 محتوای gzip بازشده را آفلاین محاسبه کرد: a=0 برابر 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 (185348 بایت) و a=1 برابر 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31 (150754 بایت).",
         "هش محتوای بازشدهٔ a=1 دقیقاً با هش ثبت‌شدهٔ Financial.csv برابر است؛ این تطبیق هویت محتوایی را ثابت می‌کند، نه صحت اقتصادی یا معنای پارامتر a=1.",
-        "به‌دلیل اینکه Financial.csv قبلاً از سوی مالک تعدیل‌نشده توصیف شده، برچسب فرضی a=1 به‌عنوان adjusted با شواهد موجود ناسازگار/حل‌نشده است؛ هیچ‌یک از دو mode به‌عنوان سری تعدیل‌شدهٔ معتبر پذیرفته نشد."
+        "به‌دلیل اینکه Financial.csv قبلاً از سوی مالک تعدیل‌نشده توصیف شده، برچسب فرضی a=1 به‌عنوان adjusted با شواهد موجود ناسازگار/حل‌نشده است؛ هیچ‌یک از دو mode به‌عنوان سری تعدیل‌شدهٔ معتبر پذیرفته نشد.",
+        "برای اقدام بعدی مجاز، Library و conversation با نام دقیق marketsage-three-symbols-review.zip و هش event ledger جست‌وجو شد؛ فایل ZIP واقعی پیدا نشد و فقط اسناد متنیِ حاوی اشاره به آرشیو یافت شدند. حذف فایل فرض نشده است.",
+        "مسیر آرشیو ثبت‌شده برای این محیط PATH_UNRESOLVED شد؛ هیچ materialization، دریافت مجدد یا پردازش event-level بدون بایت‌های آرشیو انجام نشد."
       ],
       "data_access": true,
       "acquisition_performed": true,
       "adjustment_performed": false,
       "live_source_probe_performed": true,
-      "final_status": "IDENTITY_MATCH_CONFIRMED_A1_EQUALS_REGISTERED_FINANCIAL_CSV_SEMANTICS_UNRESOLVED",
-      "next_permitted_action": "هیچ درخواست شبکه‌ای یا دریافت دیگری انجام نشود. فقط شواهد آرشیوی و event ledger موجود فولاد، در صورت دسترسی به بایت‌های ثبت‌شده و تطبیق هش، برای بررسی آفلاین معنای a=0/a=1 و رویدادها بازبینی شود؛ اگر فایل محلی/آرشیوی در دسترس نیست PATH_UNRESOLVED ثبت و کار متوقف شود. تا رفع تعارض معنایی و تطبیق مستقل رویدادها، منبع CANDIDATE_NOT_ACCEPTED می‌ماند و هیچ خروجی ADJUSTED_VERIFIED یا تحلیل سرمایه‌گذاری مجاز نیست.",
+      "final_status": "IDENTITY_MATCH_CONFIRMED_EVENT_RECONCILIATION_BLOCKED_ARCHIVE_PATH_UNRESOLVED",
+      "next_permitted_action": "توقف پردازش. فقط همان آرشیو ثبت‌شده با SHA-256 مورد انتظار 81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea را از محل موجود بازیابی/در گفتگو ارائه کن تا hash آن تطبیق داده شود؛ دانلود مجدد ممنوع. پس از تطبیق، event ledger و candidate موجود به‌صورت آفلاین بررسی شوند. هیچ درخواست شبکه‌ای جدید، نماد دیگر، پذیرش منبع، ADJUSTED_VERIFIED یا تحلیل سرمایه‌گذاری مجاز نیست.",
       "evidence": {
         "local_output_directory": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z",
         "owner_reported_execution": true,
@@ -525,6 +527,19 @@
           "a1_content_identity": "byte-identical to registered Financial.csv",
           "a1_adjusted_semantics": "UNRESOLVED",
           "economic_correctness": "NOT_ESTABLISHED"
+        },
+        "archive_recovery": {
+          "registered_archive": "marketsage-three-symbols-review.zip",
+          "expected_sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+          "search_scope": [
+            "Library",
+            "conversation"
+          ],
+          "result": "PATH_UNRESOLVED",
+          "actual_zip_found": false,
+          "only_textual_references_found": true,
+          "deleted": false,
+          "redownload_authorized": false
         }
       }
     }
