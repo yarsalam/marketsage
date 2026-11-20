@@ -403,7 +403,7 @@
     {
       "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
       "type": "authorized_local_foolad_chart_download_and_comparison",
-      "status": "AUTHORIZED_PENDING_LOCAL_EXECUTION",
+      "status": "ACQUIRED_SCHEMA_VALIDATED_COMPARISON_COMPLETED_PENDING_EVENT_RECONCILIATION",
       "started_at": "2026-11-20",
       "inputs": [
         "TSETMC chart endpoint candidate already registered in ARTIFACT_REGISTRY",
@@ -445,14 +445,68 @@
         "inspected existing PR #3, its branch and changed files; no duplicate PR or merge",
         "confirmed existing candidate endpoint and tse-client method reference are already registered on PR #3 branch",
         "recorded owner's fresh authorization and local DNS/HTTPS evidence",
-        "prepared limited local execution scope; no data request has yet been made by assistant"
+        "prepared limited local execution scope; no data request has yet been made by assistant",
+        "مالک دقیقاً دو پاسخ TSETMC را از لپ‌تاپ با VPN خاموش دریافت و خروجی را ارائه کرد؛ هر دو HTTP 200 و curl exit 0",
+        "هش و اندازهٔ بایت‌های خام طبق خروجی مالک ثبت شد؛ هر دو پاسخ gzip بودند و فقط در حافظه بازگشایی شدند؛ فایل‌های خام تغییر نکردند",
+        "هر دو سری پس از بازگشایی با schema هفت‌ستونی و تاریخ‌های یکتا parse شدند: 4271 ردیف از 2007-03-11 تا 2026-11-18",
+        "مقایسهٔ آفلاین روی 4271 تاریخ مشترک: 73 ردیف کاملاً یکسان و 4198 ردیف متفاوت؛ هر شش ستون قیمتی در 4198 ردیف متفاوت، tvol در همهٔ ردیف‌ها یکسان",
+        "اندازهٔ محتوای بازشدهٔ a=1 برابر 150754 بایت و با اندازهٔ Financial.csv ثبت‌شده برابر است؛ تطبیق هویت فقط پس از مقایسهٔ SHA-256 محتوای بازشده مجاز است"
       ],
-      "data_access": false,
-      "acquisition_performed": false,
+      "data_access": true,
+      "acquisition_performed": true,
       "adjustment_performed": false,
-      "live_source_probe_performed": false,
-      "final_status": "AUTHORIZED_PENDING_LOCAL_EXECUTION",
-      "next_permitted_action": "Owner executes the two-request local download/compare script with VPN OFF and returns the generated manifest and comparison summary. Do not retry automatically or expand scope."
+      "live_source_probe_performed": true,
+      "final_status": "ACQUIRED_SCHEMA_VALIDATED_COMPARISON_COMPLETED_PENDING_EVENT_RECONCILIATION",
+      "next_permitted_action": "فقط پردازش آفلاین: محاسبهٔ SHA-256 محتوای gzip بازشدهٔ a=1 و مقایسه با هش ثبت‌شدهٔ Financial.csv (888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31)؛ سپس در صورت عدم تطبیق، تطبیق رویدادهای شرکتی با شواهد رسمی موجود. هیچ دریافت شبکه‌ای، نماد دیگر، پذیرش منبع یا تحلیل سرمایه‌گذاری مجاز نیست.",
+      "evidence": {
+        "local_output_directory": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z",
+        "owner_reported_execution": true,
+        "vpn": "OFF",
+        "responses": {
+          "a=0": {
+            "http_status": 200,
+            "curl_exit": 0,
+            "raw_size_bytes": 70762,
+            "raw_sha256": "c3299d6c4ddf02ec2aa5734bcfb78d3ec5572516b1f434d438bd0bd9a6e92554",
+            "gzip": true,
+            "decoded_size_bytes": 185348,
+            "rows": 4271,
+            "first_date": "2007-03-11",
+            "last_date": "2026-11-18",
+            "raw_immutable": true
+          },
+          "a=1": {
+            "http_status": 200,
+            "curl_exit": 0,
+            "raw_size_bytes": 51131,
+            "raw_sha256": "89c06b21d59627781e9e965ceaf24bbd95a7fbcb20e35ddcfe576d9cc6bc706e",
+            "gzip": true,
+            "decoded_size_bytes": 150754,
+            "rows": 4271,
+            "first_date": "2007-03-11",
+            "last_date": "2026-11-18",
+            "raw_immutable": true
+          }
+        },
+        "comparison": {
+          "status": "COMPARED",
+          "common_dates": 4271,
+          "a0_only_dates": 0,
+          "a1_only_dates": 0,
+          "identical_rows": 73,
+          "different_rows": 4198,
+          "field_differences": {
+            "pmax": 4198,
+            "pmin": 4198,
+            "pf": 4198,
+            "pl": 4198,
+            "tvol": 0,
+            "pc": 4198
+          },
+          "economic_correctness": "NOT_ESTABLISHED"
+        },
+        "time_provenance_note": "manifest timestamps were emitted using local Persian calendar; filesystem mtimes reported by owner as 2026-11-20T09:10:23.356751Z and 09:10:24.284774Z; original request timestamp not independently reconstructed"
+      }
     }
   ]
 }
