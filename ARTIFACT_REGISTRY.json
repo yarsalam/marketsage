@@ -120,9 +120,12 @@
       "reason": "مالک صریحاً داده‌ها و خروجی‌های قبلی را از ورودی خط لولهٔ جدید کنار گذاشت.",
       "offline_audit_authorized": true,
       "general_pipeline_input": false,
-      "bytes_accessible_in_current_project": false,
-      "hash_recomputed": false,
-      "note": "مالک در ۲۰۲۶-۱۱-۱۹ صریحاً ممیزی آفلاین و فقط‌خواندنی همین فایل را درخواست کرد. کنارگذاری از خط لوله عمومی برقرار است؛ فایل Library پیدا شد اما materialization بایت‌ها مجاز نبود و هش ثبت‌شده هنوز باز‌محاسبه نشده است."
+      "bytes_accessible_in_current_project": true,
+      "hash_recomputed": true,
+      "note": "هش فایل دریافت‌شده باز‌محاسبه و با هش ثبت‌شده برابر شد. مالک فایل پیوست فعلی را تعدیل‌نشده معرفی کرده، اما نسخهٔ تعدیل‌شدهٔ متمایز که قبلاً ارسال شده در دسترس نیست؛ تا رفع تعارض، مقایسه متوقف است.",
+      "content_inspected": true,
+      "owner_identified_uploaded_copy_as": "unadjusted",
+      "identity_conflict": "Uploaded Financial (1)(2).csv and earlier current attachment are byte-identical and match this registered SHA-256; distinct adjusted counterpart not available."
     }
   ],
   "artifacts": [
@@ -142,7 +145,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "8fb6d575fb28c2f719ca1857099f50b63989b414",
+      "git_blob_sha": "2526e910149152d09cb85190b7035f1660a2b997",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -152,7 +155,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "c3ff97904b47c79ba58dd6088b4a97536f26f30b",
+      "git_blob_sha": "c9034620c3bca495a2b095f11551d80d02bdc229",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
