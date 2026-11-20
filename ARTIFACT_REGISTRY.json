@@ -145,7 +145,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "2526e910149152d09cb85190b7035f1660a2b997",
+      "git_blob_sha": "e218ba509471249c0a36e3ab3c83dacbcba5c356",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -155,7 +155,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "6533078e1e734348e4659a811064d86e472fb811",
+      "git_blob_sha": "fabf0e9848e2a60f15efeba75b6ea39fe9af5eb9",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -194,9 +194,9 @@
       "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
       "immutable": true,
       "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود.",
-      "current_access_status": "PATH_UNRESOLVED",
-      "current_access_check": "در جست‌وجوی فعلی Library و conversation، فایل ZIP واقعی با این نام پیدا نشد؛ فقط اسناد متنیِ اشاره‌کننده به آن پیدا شدند. این وضعیت به معنی حذف فایل نیست.",
-      "recovery_policy": "ابتدا باید همان آرشیو ثبت‌شده با SHA-256 مورد انتظار 81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea بازیابی/ارائه شود؛ دریافت مجدد از منبع ممنوع."
+      "current_access_status": "RECOVERED_HASH_VERIFIED_READ_ONLY",
+      "current_access_check": "در Library با مسیر /marketsage-three-symbols-review.zip بازیابی شد؛ بایت‌ها در محیط کاری فقط‌خواندنی materialize شدند؛ اندازه 1244637 و SHA-256 کل آرشیو و هش اعضای کلیدی دقیقاً با رجیستری برابر است.",
+      "recovery_policy": "همان آرشیو ثبت‌شده بازیابی و hash-verified شد؛ دریافت مجدد ممنوع و غیرضروری است. فقط از همین بایت‌های immutable برای ممیزی آفلاین استفاده شود."
     },
     {
       "artifact_id": "MS-FOOLAD-TSETMC-A0-RAW-20261120-001",
@@ -254,6 +254,39 @@
       "immutable": false,
       "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
       "note": "آمار مقایسه در RUN_LEDGER ثبت شده؛ hash خروجی مقایسه هنوز ارائه نشده است."
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-SCRIPT-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit.py",
+      "type": "offline_audit_script",
+      "status": "stored_sha256_verified",
+      "size_bytes": 21754,
+      "sha256": "254fa01db2220d06ba972d49189a3d0c6f17963fbda0f8a7d28b5d8c4f79bf0a",
+      "library_file_id": "libfile_e6b401249aa081918b3f5c074e0a8cfc",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-REPORT-MD-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit_20261120.md",
+      "type": "offline_audit_report",
+      "status": "stored_sha256_verified",
+      "size_bytes": 4559,
+      "sha256": "ac1981056f1f460062a1098add5b1ec5a8f8aceef837e6d8482b91bab61904e3",
+      "library_file_id": "libfile_80a7263b795481918ed19fa8ce885bc2",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-REPORT-JSON-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit_20261120.json",
+      "type": "offline_audit_report",
+      "status": "stored_sha256_verified",
+      "size_bytes": 14778,
+      "sha256": "8f90a47500d82b23866c5b10d8eb2988525c196e1aa04db758b4c96267bc0426",
+      "library_file_id": "libfile_e55bd13a982c8191b309df35bcd53148",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
     }
   ],
   "sources": [
