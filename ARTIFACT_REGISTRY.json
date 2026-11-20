@@ -195,5 +195,62 @@
       "immutable": true,
       "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود."
     }
+  ],
+  "sources": [
+    {
+      "source_id": "MS-SRC-TSETMC-CHART-ADJUSTMENT-CANDIDATE-001",
+      "status": "CANDIDATE_NOT_ACCEPTED",
+      "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
+      "provider": "TSETMC",
+      "source_type": "public_chart_history_endpoint",
+      "endpoint_template": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i={insCode}&t=ph&a={adjustment_mode}",
+      "instrument_scope": {
+        "symbol": "فولاد",
+        "insCode": "46348559193224090"
+      },
+      "parameters": {
+        "t": "ph",
+        "a": {
+          "0": "unadjusted/raw",
+          "1": "adjusted/vendor-series"
+        }
+      },
+      "method": "HTTP GET; one instrument only; one request per adjustment mode; no pagination or bulk acquisition",
+      "response_format": "semicolon-delimited chart series; schema to be validated from actual response",
+      "terms_status": "REVIEW_REQUIRED",
+      "redistribution_rights": "UNKNOWN_NOT_AUTHORIZED",
+      "limitations": [
+        "public reachability is not a license",
+        "adjustment semantics and completeness are not accepted until independently validated",
+        "no other symbols or bulk requests"
+      ],
+      "authorization": {
+        "owner_approved_limited_probe": true,
+        "approved_on": "2026-11-20",
+        "vpn_state": "OFF"
+      },
+      "acceptance_status": "NOT_ACCEPTED_PENDING_PROBE_AND_RECONCILIATION"
+    },
+    {
+      "source_id": "MS-METHOD-TSE-CLIENT-ADJUSTMENT-001",
+      "status": "REFERENCE_METHOD_NOT_ACCEPTED_SOURCE",
+      "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
+      "provider": "m-ahmadi/tse-client",
+      "repository": "https://github.com/m-ahmadi/tse-client",
+      "role": "independent_methodology_reference",
+      "adjustment_modes": {
+        "0": "unadjusted",
+        "1": "capital_increase_and_cash_dividend",
+        "2": "capital_increase_only"
+      },
+      "related_method": "getAdjustInfo",
+      "terms_status": "REVIEW_REQUIRED",
+      "redistribution_rights": "UNKNOWN_NOT_AUTHORIZED",
+      "limitations": [
+        "not a data source registration",
+        "library output is not accepted as ground truth",
+        "event and OHLC validation required"
+      ]
+    }
   ]
 }
