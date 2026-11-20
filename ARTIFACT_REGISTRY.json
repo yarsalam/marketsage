@@ -287,6 +287,31 @@
       "library_file_id": "libfile_e55bd13a982c8191b309df35bcd53148",
       "immutable": true,
       "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-SCRIPT-V2-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit_v2.py",
+      "type": "offline_audit_script",
+      "status": "stored_sha256_verified",
+      "size_bytes": 24671,
+      "sha256": "f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99",
+      "library_file_id": "libfile_85a23bd0309c8191a7c427f37a49dc0d",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01",
+      "supersedes_for_execution": "MS-FOOLAD-SIX-POINT-AUDIT-SCRIPT-20261120-001",
+      "note": "نسخهٔ اصلاح‌شدهٔ parser؛ رکوردهای هفت‌فیلدی comma-delimited با جداکنندهٔ رکورد semicolon را می‌خواند، CSV سطری را نیز حفظ می‌کند، ورودی بدون ردیف معتبر را fail-closed رد می‌کند و گزارش وضعیت a0/a1 را پویا تولید می‌کند."
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-PARSER-TESTS-20261120-001",
+      "path": "Library/MarketSage/test_foolad_chart_parser_v2.py",
+      "type": "offline_parser_test",
+      "status": "stored_sha256_verified",
+      "size_bytes": 3407,
+      "sha256": "dbcf45175d7f535f374b237a191e4b2b48fba6a54d9632d0227591a0bee78d58",
+      "library_file_id": "libfile_7aa91d5e15488191a50d271ea0e7f294",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01",
+      "note": "پنج آزمون شامل semicolon stream تک‌خطی، gzip، CSV سطری، fail-closed و نبود ستون volume_adjusted."
     }
   ],
   "sources": [
