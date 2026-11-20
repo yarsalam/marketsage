@@ -193,7 +193,10 @@
       },
       "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
       "immutable": true,
-      "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود."
+      "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود.",
+      "current_access_status": "PATH_UNRESOLVED",
+      "current_access_check": "در جست‌وجوی فعلی Library و conversation، فایل ZIP واقعی با این نام پیدا نشد؛ فقط اسناد متنیِ اشاره‌کننده به آن پیدا شدند. این وضعیت به معنی حذف فایل نیست.",
+      "recovery_policy": "ابتدا باید همان آرشیو ثبت‌شده با SHA-256 مورد انتظار 81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea بازیابی/ارائه شود؛ دریافت مجدد از منبع ممنوع."
     },
     {
       "artifact_id": "MS-FOOLAD-TSETMC-A0-RAW-20261120-001",
