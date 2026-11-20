@@ -145,7 +145,7 @@
       "type": "governance",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "2526e910149152d09cb85190b7035f1660a2b997",
+      "git_blob_sha": "e218ba509471249c0a36e3ab3c83dacbcba5c356",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -155,7 +155,7 @@
       "type": "execution_ledger",
       "language": "fa",
       "status": "verified",
-      "git_blob_sha": "6533078e1e734348e4659a811064d86e472fb811",
+      "git_blob_sha": "fabf0e9848e2a60f15efeba75b6ea39fe9af5eb9",
       "immutable": false,
       "work_id": "MS-BATCH-DATA-PIPELINE-20261119-01"
     },
@@ -193,7 +193,194 @@
       },
       "work_id": "MS-FOOLAD-FINANCIAL-CSV-GAP-AUDIT-20261119-01",
       "immutable": true,
-      "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود."
+      "note": "آرشیو موجود بازبینی شد؛ فایل Financial.csv داخل این آرشیو نیست و candidate موجود جایگزین آن محسوب نمی‌شود.",
+      "current_access_status": "RECOVERED_HASH_VERIFIED_READ_ONLY",
+      "current_access_check": "در Library با مسیر /marketsage-three-symbols-review.zip بازیابی شد؛ بایت‌ها در محیط کاری فقط‌خواندنی materialize شدند؛ اندازه 1244637 و SHA-256 کل آرشیو و هش اعضای کلیدی دقیقاً با رجیستری برابر است.",
+      "recovery_policy": "همان آرشیو ثبت‌شده بازیابی و hash-verified شد؛ دریافت مجدد ممنوع و غیرضروری است. فقط از همین بایت‌های immutable برای ممیزی آفلاین استفاده شود."
+    },
+    {
+      "artifact_id": "MS-FOOLAD-TSETMC-A0-RAW-20261120-001",
+      "path": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z/a0.raw",
+      "type": "immutable_raw_provider_response",
+      "provider": "TSETMC",
+      "instrument": "فولاد",
+      "insCode": "46348559193224090",
+      "adjustment_mode": "a=0",
+      "content_encoding": "gzip",
+      "size_bytes": 70762,
+      "sha256": "c3299d6c4ddf02ec2aa5734bcfb78d3ec5572516b1f434d438bd0bd9a6e92554",
+      "hash_status": "owner_reported_from_local_execution_output_not_independently_recomputed_here",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "decoded_content": {
+        "size_bytes": 185348,
+        "sha256": "372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999",
+        "hash_status": "owner_reported_from_local_gzip_decompression_output"
+      }
+    },
+    {
+      "artifact_id": "MS-FOOLAD-TSETMC-A1-RAW-20261120-001",
+      "path": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z/a1.raw",
+      "type": "immutable_raw_provider_response",
+      "provider": "TSETMC",
+      "instrument": "فولاد",
+      "insCode": "46348559193224090",
+      "adjustment_mode": "a=1",
+      "content_encoding": "gzip",
+      "size_bytes": 51131,
+      "sha256": "89c06b21d59627781e9e965ceaf24bbd95a7fbcb20e35ddcfe576d9cc6bc706e",
+      "hash_status": "owner_reported_from_local_execution_output_not_independently_recomputed_here",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "decoded_content": {
+        "size_bytes": 150754,
+        "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+        "hash_status": "owner_reported_from_local_gzip_decompression_output"
+      },
+      "identity_match": {
+        "reference": "previously registered Financial.csv content hash",
+        "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+        "byte_identity_confirmed": true,
+        "semantic_interpretation": "unresolved; owner previously described Financial.csv as unadjusted"
+      }
+    },
+    {
+      "artifact_id": "MS-FOOLAD-TSETMC-COMPARISON-20261120-001",
+      "path": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z/comparison.csv",
+      "type": "derived_comparison",
+      "size_bytes": null,
+      "sha256": null,
+      "status": "owner_reported_created_hash_not_yet_registered",
+      "immutable": false,
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "note": "آمار مقایسه در RUN_LEDGER ثبت شده؛ hash خروجی مقایسه هنوز ارائه نشده است."
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-SCRIPT-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit.py",
+      "type": "offline_audit_script",
+      "status": "stored_sha256_verified",
+      "size_bytes": 21754,
+      "sha256": "254fa01db2220d06ba972d49189a3d0c6f17963fbda0f8a7d28b5d8c4f79bf0a",
+      "library_file_id": "libfile_e6b401249aa081918b3f5c074e0a8cfc",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-REPORT-MD-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit_20261120.md",
+      "type": "offline_audit_report",
+      "status": "stored_sha256_verified",
+      "size_bytes": 4559,
+      "sha256": "ac1981056f1f460062a1098add5b1ec5a8f8aceef837e6d8482b91bab61904e3",
+      "library_file_id": "libfile_80a7263b795481918ed19fa8ce885bc2",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-REPORT-JSON-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit_20261120.json",
+      "type": "offline_audit_report",
+      "status": "stored_sha256_verified",
+      "size_bytes": 14778,
+      "sha256": "8f90a47500d82b23866c5b10d8eb2988525c196e1aa04db758b4c96267bc0426",
+      "library_file_id": "libfile_e55bd13a982c8191b309df35bcd53148",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01"
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-SCRIPT-V2-20261120-001",
+      "path": "Library/MarketSage/foolad_six_point_offline_audit_v2.py",
+      "type": "offline_audit_script",
+      "status": "stored_sha256_verified",
+      "size_bytes": 24671,
+      "sha256": "f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99",
+      "library_file_id": "libfile_85a23bd0309c8191a7c427f37a49dc0d",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01",
+      "supersedes_for_execution": "MS-FOOLAD-SIX-POINT-AUDIT-SCRIPT-20261120-001",
+      "note": "نسخهٔ اصلاح‌شدهٔ parser؛ رکوردهای هفت‌فیلدی comma-delimited با جداکنندهٔ رکورد semicolon را می‌خواند، CSV سطری را نیز حفظ می‌کند، ورودی بدون ردیف معتبر را fail-closed رد می‌کند و گزارش وضعیت a0/a1 را پویا تولید می‌کند."
+    },
+    {
+      "artifact_id": "MS-FOOLAD-SIX-POINT-AUDIT-PARSER-TESTS-20261120-001",
+      "path": "Library/MarketSage/test_foolad_chart_parser_v2.py",
+      "type": "offline_parser_test",
+      "status": "stored_sha256_verified",
+      "size_bytes": 3407,
+      "sha256": "dbcf45175d7f535f374b237a191e4b2b48fba6a54d9632d0227591a0bee78d58",
+      "library_file_id": "libfile_7aa91d5e15488191a50d271ea0e7f294",
+      "immutable": true,
+      "work_id": "MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01",
+      "note": "پنج آزمون شامل semicolon stream تک‌خطی، gzip، CSV سطری، fail-closed و نبود ستون volume_adjusted."
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "MS-SRC-TSETMC-CHART-ADJUSTMENT-CANDIDATE-001",
+      "status": "CANDIDATE_NOT_ACCEPTED",
+      "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
+      "provider": "TSETMC",
+      "source_type": "public_chart_history_endpoint",
+      "endpoint_template": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i={insCode}&t=ph&a={adjustment_mode}",
+      "instrument_scope": {
+        "symbol": "فولاد",
+        "insCode": "46348559193224090"
+      },
+      "parameters": {
+        "t": "ph",
+        "a": {
+          "0": "semantics not independently established; decoded content differs from registered Financial.csv",
+          "1": "decoded content is byte-identical to registered Financial.csv; owner previously described Financial.csv as unadjusted, so adjusted-mode semantics are unresolved"
+        }
+      },
+      "method": "HTTP GET; one instrument only; one request per adjustment mode; no pagination or bulk acquisition",
+      "response_format": "gzip-compressed semicolon-delimited chart series; decompressed schema: date plus six numeric fields (pmax,pmin,pf,pl,tvol,pc)",
+      "terms_status": "REVIEW_REQUIRED",
+      "redistribution_rights": "UNKNOWN_NOT_AUTHORIZED",
+      "limitations": [
+        "public reachability is not a license",
+        "adjustment semantics and completeness are not accepted until independently validated",
+        "no other symbols or bulk requests"
+      ],
+      "authorization": {
+        "owner_approved_limited_probe": true,
+        "approved_on": "2026-11-20",
+        "vpn_state": "OFF",
+        "followup_owner_approved_on": "2026-11-20",
+        "followup_vpn_state": "OFF",
+        "followup_scope": "exactly two GET requests from owner's laptop for Foolad insCode 46348559193224090, a=0 and a=1; no bulk, retry, VPN, or other symbols"
+      },
+      "acceptance_status": "CANDIDATE_NOT_ACCEPTED_PENDING_EVENT_RECONCILIATION_AND_TERMS_REVIEW",
+      "authorized_followup_work_ids": [
+        "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
+      ],
+      "identity_findings": {
+        "a1_matches_registered_financial_csv": true,
+        "matched_sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+        "economic_correctness": "NOT_ESTABLISHED",
+        "parameter_semantics": "UNRESOLVED"
+      }
+    },
+    {
+      "source_id": "MS-METHOD-TSE-CLIENT-ADJUSTMENT-001",
+      "status": "REFERENCE_METHOD_NOT_ACCEPTED_SOURCE",
+      "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
+      "provider": "m-ahmadi/tse-client",
+      "repository": "https://github.com/m-ahmadi/tse-client",
+      "role": "independent_methodology_reference",
+      "adjustment_modes": {
+        "0": "unadjusted",
+        "1": "capital_increase_and_cash_dividend",
+        "2": "capital_increase_only"
+      },
+      "related_method": "getAdjustInfo",
+      "terms_status": "REVIEW_REQUIRED",
+      "redistribution_rights": "UNKNOWN_NOT_AUTHORIZED",
+      "limitations": [
+        "not a data source registration",
+        "library output is not accepted as ground truth",
+        "event and OHLC validation required"
+      ]
     }
   ]
 }

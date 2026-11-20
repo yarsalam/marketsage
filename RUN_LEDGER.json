@@ -322,6 +322,577 @@
       "live_source_probe_performed": false,
       "final_status": "PARTIALLY_COMPLETED_BLOCKED_ON_DISTINCT_ADJUSTED_COUNTERPART",
       "next_permitted_action": "بایت‌های نسخهٔ تعدیل‌شدهٔ متمایز که مالک قبلاً ارسال کرده بازیابی شود؛ هش و تاریخ‌های آن تطبیق داده شود. تا حل تعارض هویت، مقایسه و راستی‌آزمایی تعدیل انجام نشود؛ دانلود زنده ممنوع."
+    },
+    {
+      "work_id": "MS-FOOLAD-CHART-ENDPOINT-PROBE-20261120-01",
+      "type": "single_instrument_chart_adjustment_probe",
+      "status": "SOURCE_FAILED",
+      "started_at": "2026-11-20",
+      "inputs": [
+        "TSETMC chart endpoint candidate for Foolad insCode 46348559193224090",
+        "tse-client adjustment methodology reference",
+        "owner authorization in current conversation",
+        "VPN state reported OFF by owner"
+      ],
+      "actions": [
+        "re-read current governance protocol, state, registry and ledger",
+        "inspect current main commit, open PR #1, branches and related issues",
+        "register TSETMC chart endpoint as CANDIDATE_NOT_ACCEPTED",
+        "register tse-client as REFERENCE_METHOD_NOT_ACCEPTED_SOURCE",
+        "attempted exactly two authorized GET requests from the available execution environment, with VPN reported OFF by owner",
+        "both requests failed before HTTP response because DNS resolution for members.tsetmc.com failed (curl exit 6); browser fetch also reported endpoint inaccessible"
+      ],
+      "owner_authorization": {
+        "limited_foolad_probe": true,
+        "temporary_candidate_registration": true,
+        "vpn_state": "OFF",
+        "other_symbols": false,
+        "bulk_acquisition": false,
+        "overwrite_raw": false,
+        "investment_scoring": false,
+        "merge_or_deploy": false
+      },
+      "scope": {
+        "symbol": "فولاد",
+        "insCode": "46348559193224090",
+        "requests_planned": 2,
+        "adjustment_modes": [
+          "a=0",
+          "a=1"
+        ],
+        "endpoint": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i={insCode}&t=ph&a={0|1}"
+      },
+      "acceptance_criteria": [
+        "HTTP response successfully retrieved for each authorized mode or a documented reachability failure",
+        "raw response bytes saved immutable with URL, timestamp, parameters, size and SHA-256",
+        "response schema and date coverage validated",
+        "a=0 and a=1 compared on common dates",
+        "comparison against existing archived candidate and independent tse-client methodology performed only where evidence bytes and hashes are available",
+        "no claims of economic correctness without event-level reconciliation"
+      ],
+      "data_access": false,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "live_source_probe_performed": true,
+      "final_status": "SOURCE_FAILED_DNS_RESOLUTION",
+      "next_permitted_action": "No retry or alternate source is permitted in this work item. Resume only after an explicit new authorization and a reachable execution environment; preserve candidate status and do not accept adjusted data.",
+      "evidence": {
+        "attempted_requests": [
+          {
+            "mode": "a=0",
+            "url": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i=46348559193224090&t=ph&a=0",
+            "http_status": null,
+            "network_error": "DNS_RESOLUTION_FAILED",
+            "curl_exit": 6,
+            "bytes_received": 0
+          },
+          {
+            "mode": "a=1",
+            "url": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i=46348559193224090&t=ph&a=1",
+            "http_status": null,
+            "network_error": "DNS_RESOLUTION_FAILED",
+            "curl_exit": 6,
+            "bytes_received": 0
+          }
+        ],
+        "response_hashes": null,
+        "raw_data_acquired": false,
+        "environment_note": "The request was made from the available cloud execution environment, not from the user's laptop; the user's VPN state was reported OFF."
+      }
+    },
+    {
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "type": "authorized_local_foolad_chart_download_and_comparison",
+      "status": "IDENTITY_MATCH_CONFIRMED_EVENT_RECONCILIATION_BLOCKED_ARCHIVE_PATH_UNRESOLVED",
+      "started_at": "2026-11-20",
+      "inputs": [
+        "TSETMC chart endpoint candidate already registered in ARTIFACT_REGISTRY",
+        "Foolad insCode 46348559193224090",
+        "owner's explicit fresh authorization for exactly two local GET requests",
+        "owner-provided local evidence: DNS resolution to 212.16.73.247 and successful TLSv1.3/HTTP2 handshake to members.tsetmc.com with VPN OFF"
+      ],
+      "owner_authorization": {
+        "local_two_request_download": true,
+        "vpn_state": "OFF",
+        "symbol_only": "فولاد",
+        "insCode": "46348559193224090",
+        "modes": [
+          "a=0",
+          "a=1"
+        ],
+        "bulk_acquisition": false,
+        "automatic_retry": false,
+        "vpn_or_proxy": false,
+        "overwrite_existing_raw": false,
+        "merge_or_deploy": false,
+        "investment_scoring": false
+      },
+      "scope": {
+        "endpoint": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i=46348559193224090&t=ph&a={0|1}",
+        "requests_exactly": 2,
+        "output_policy": "new immutable raw files with SHA-256 and provenance manifest"
+      },
+      "acceptance_criteria": [
+        "both HTTP GET responses retrieved successfully or a documented per-request failure recorded",
+        "raw response bytes saved to a new run directory without overwriting existing files",
+        "URL, UTC timestamp, HTTP status, content length, and SHA-256 recorded per response",
+        "response schema and date coverage validated",
+        "a=0 and a=1 compared over common dates with exact and numeric-difference summary",
+        "no economic correctness claim without event-level reconciliation"
+      ],
+      "actions": [
+        "verified latest protocol, state, registry and run ledger",
+        "inspected existing PR #3, its branch and changed files; no duplicate PR or merge",
+        "confirmed existing candidate endpoint and tse-client method reference are already registered on PR #3 branch",
+        "recorded owner's fresh authorization and local DNS/HTTPS evidence",
+        "prepared limited local execution scope; no data request has yet been made by assistant",
+        "مالک دقیقاً دو پاسخ TSETMC را از لپ‌تاپ با VPN خاموش دریافت و خروجی را ارائه کرد؛ هر دو HTTP 200 و curl exit 0",
+        "هش و اندازهٔ بایت‌های خام طبق خروجی مالک ثبت شد؛ هر دو پاسخ gzip بودند و فقط در حافظه بازگشایی شدند؛ فایل‌های خام تغییر نکردند",
+        "هر دو سری پس از بازگشایی با schema هفت‌ستونی و تاریخ‌های یکتا parse شدند: 4271 ردیف از 2007-03-11 تا 2026-11-18",
+        "مقایسهٔ آفلاین روی 4271 تاریخ مشترک: 73 ردیف کاملاً یکسان و 4198 ردیف متفاوت؛ هر شش ستون قیمتی در 4198 ردیف متفاوت، tvol در همهٔ ردیف‌ها یکسان",
+        "اندازهٔ محتوای بازشدهٔ a=1 برابر 150754 بایت و با اندازهٔ Financial.csv ثبت‌شده برابر است؛ تطبیق هویت فقط پس از مقایسهٔ SHA-256 محتوای بازشده مجاز است",
+        "مالک SHA-256 محتوای gzip بازشده را آفلاین محاسبه کرد: a=0 برابر 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 (185348 بایت) و a=1 برابر 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31 (150754 بایت).",
+        "هش محتوای بازشدهٔ a=1 دقیقاً با هش ثبت‌شدهٔ Financial.csv برابر است؛ این تطبیق هویت محتوایی را ثابت می‌کند، نه صحت اقتصادی یا معنای پارامتر a=1.",
+        "به‌دلیل اینکه Financial.csv قبلاً از سوی مالک تعدیل‌نشده توصیف شده، برچسب فرضی a=1 به‌عنوان adjusted با شواهد موجود ناسازگار/حل‌نشده است؛ هیچ‌یک از دو mode به‌عنوان سری تعدیل‌شدهٔ معتبر پذیرفته نشد.",
+        "برای اقدام بعدی مجاز، Library و conversation با نام دقیق marketsage-three-symbols-review.zip و هش event ledger جست‌وجو شد؛ فایل ZIP واقعی پیدا نشد و فقط اسناد متنیِ حاوی اشاره به آرشیو یافت شدند. حذف فایل فرض نشده است.",
+        "مسیر آرشیو ثبت‌شده برای این محیط PATH_UNRESOLVED شد؛ هیچ materialization، دریافت مجدد یا پردازش event-level بدون بایت‌های آرشیو انجام نشد."
+      ],
+      "data_access": true,
+      "acquisition_performed": true,
+      "adjustment_performed": false,
+      "live_source_probe_performed": true,
+      "final_status": "IDENTITY_MATCH_CONFIRMED_EVENT_RECONCILIATION_BLOCKED_ARCHIVE_PATH_UNRESOLVED",
+      "next_permitted_action": "توقف پردازش. فقط همان آرشیو ثبت‌شده با SHA-256 مورد انتظار 81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea را از محل موجود بازیابی/در گفتگو ارائه کن تا hash آن تطبیق داده شود؛ دانلود مجدد ممنوع. پس از تطبیق، event ledger و candidate موجود به‌صورت آفلاین بررسی شوند. هیچ درخواست شبکه‌ای جدید، نماد دیگر، پذیرش منبع، ADJUSTED_VERIFIED یا تحلیل سرمایه‌گذاری مجاز نیست.",
+      "evidence": {
+        "local_output_directory": "/home/nima/marketsage-data/tsetmc-foolad-chart/MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01-14050829T091022Z",
+        "owner_reported_execution": true,
+        "vpn": "OFF",
+        "responses": {
+          "a=0": {
+            "http_status": 200,
+            "curl_exit": 0,
+            "raw_size_bytes": 70762,
+            "raw_sha256": "c3299d6c4ddf02ec2aa5734bcfb78d3ec5572516b1f434d438bd0bd9a6e92554",
+            "gzip": true,
+            "decoded_size_bytes": 185348,
+            "rows": 4271,
+            "first_date": "2007-03-11",
+            "last_date": "2026-11-18",
+            "raw_immutable": true
+          },
+          "a=1": {
+            "http_status": 200,
+            "curl_exit": 0,
+            "raw_size_bytes": 51131,
+            "raw_sha256": "89c06b21d59627781e9e965ceaf24bbd95a7fbcb20e35ddcfe576d9cc6bc706e",
+            "gzip": true,
+            "decoded_size_bytes": 150754,
+            "rows": 4271,
+            "first_date": "2007-03-11",
+            "last_date": "2026-11-18",
+            "raw_immutable": true
+          }
+        },
+        "comparison": {
+          "status": "COMPARED",
+          "common_dates": 4271,
+          "a0_only_dates": 0,
+          "a1_only_dates": 0,
+          "identical_rows": 73,
+          "different_rows": 4198,
+          "field_differences": {
+            "pmax": 4198,
+            "pmin": 4198,
+            "pf": 4198,
+            "pl": 4198,
+            "tvol": 0,
+            "pc": 4198
+          },
+          "economic_correctness": "NOT_ESTABLISHED"
+        },
+        "time_provenance_note": "manifest timestamps were emitted using local Persian calendar; filesystem mtimes reported by owner as 2026-11-20T09:10:23.356751Z and 09:10:24.284774Z; original request timestamp not independently reconstructed",
+        "decoded_hashes": {
+          "a=0": {
+            "size_bytes": 185348,
+            "sha256": "372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999"
+          },
+          "a=1": {
+            "size_bytes": 150754,
+            "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+            "matches_registered_Financial_csv": true
+          }
+        },
+        "semantic_conflict": {
+          "financial_csv_owner_description": "unadjusted",
+          "a1_content_identity": "byte-identical to registered Financial.csv",
+          "a1_adjusted_semantics": "UNRESOLVED",
+          "economic_correctness": "NOT_ESTABLISHED"
+        },
+        "archive_recovery": {
+          "registered_archive": "marketsage-three-symbols-review.zip",
+          "expected_sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+          "search_scope": [
+            "Library",
+            "conversation"
+          ],
+          "result": "PATH_UNRESOLVED",
+          "actual_zip_found": false,
+          "only_textual_references_found": true,
+          "deleted": false,
+          "redownload_authorized": false
+        }
+      }
+    },
+    {
+      "work_id": "MS-FOOLAD-SIX-POINT-OFFLINE-AUDIT-20261120-01",
+      "type": "foolad_six_point_offline_adjustment_and_coverage_audit",
+      "status": "PARTIAL_OFFLINE_AUDIT_BLOCKED_ON_A0_BYTES_OFFICIAL_DISCLOSURES_AND_TRADING_CALENDAR",
+      "started_at": "2026-11-20",
+      "completed_at": null,
+      "inputs": [
+        "مالک: تأیید صریح ازسرگیری ممیزی آفلاین فولاد پیش از تکمیل Goal 1؛ بدون مجوز پژوهش عمومی یا دریافت زنده",
+        "آرشیو ثبت‌شده marketsage-three-symbols-review.zip؛ size=1244637؛ SHA-256=81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea؛ هش داخلی اعضا تطبیق داده شد",
+        "candidate فولاد 4680 ردیف، 2007-03-11 تا 2026-11-11؛ SHA-256=97c600e4470de55a23d0df3691c274d911c020bdf0dfcedaf443bfc300554d41",
+        "event ledger و دو snapshot خام GetPriceAdjustList و GetInstrumentShareChange با هش‌های ثبت‌شده و باز‌محاسبه‌شده",
+        "خلاصهٔ قبلی مالک از a=0/a=1؛ بایت‌های محلی a0.raw/a1.raw در این محیط قابل materialize/read نیستند",
+        "هیچ تقویم رسمی جلسات یا مجموعه اطلاعیه‌های رسمی CODAL در آرشیو بازیابی‌شده وجود ندارد"
+      ],
+      "owner_authorization": {
+        "resume_offline_foolad_audit_before_goal1": true,
+        "scope": "فقط ممیزی آفلاین فولاد و شواهد موجود",
+        "reuse_registered_archive": true,
+        "new_live_downloads": false,
+        "network_search_or_probe": false,
+        "overwrite_raw_files": false,
+        "infer_or_apply_unverified_factors": false,
+        "scoring_or_backtest": false,
+        "merge_or_deploy": false
+      },
+      "scope": {
+        "instrument": "فولاد مبارکه اصفهان",
+        "insCode": "46348559193224090",
+        "checks": [
+          "معنای a=0 و مقایسه با a=1/داده خام",
+          "کامل‌بودن رویدادهای شرکتی",
+          "صحت ضرایب و تاریخ مؤثر",
+          "جهش‌های غیرعادی سری a=0",
+          "شکاف در برابر تقویم واقعی جلسات معاملاتی",
+          "گزارش یکپارچه و اسکریپت واحد"
+        ]
+      },
+      "acceptance_criteria": [
+        "هش آرشیو و هش اعضای ثبت‌شده دقیقاً تطبیق کند",
+        "مقایسه a=0/a=1 و آزمون جهش‌ها بدون تکرار دریافت انجام شود",
+        "رویدادهای price-adjust و share-change با هم‌پوشانی‌ها و نسبت‌ها گزارش شوند",
+        "سازگاری حسابی از صحت اقتصادی ضرایب تفکیک شود",
+        "جهش‌ها با رویدادها و شکاف‌ها به‌صورت تشخیصی بررسی شوند",
+        "هر شکاف فقط با تقویم یا سند رسمی طبقه‌بندی شود",
+        "خام تغییر نکند؛ شبکه صفر؛ پذیرش منبع/تحلیل/بک‌تست صادر نشود"
+      ],
+      "actions": [
+        "خواندن WORK_PROTOCOL.md، WORK_STATE.md، ARTIFACT_REGISTRY.json و RUN_LEDGER.json از شاخهٔ PR #3 و بررسی PR/branch/commit مرتبط",
+        "جست‌وجوی Library و بازیابی همان marketsage-three-symbols-review.zip ثبت‌شده؛ بدون دانلود مجدد",
+        "محاسبهٔ SHA-256 آرشیو و همهٔ اعضای کلیدی؛ تطبیق کامل با رجیستری",
+        "ممیزی آفلاین candidate و event ledger فولاد؛ محاسبهٔ رویدادهای هم‌پوشان، نسبت‌ها، factor transitions، سازگاری close×factor، نقض OHLC، بازده‌های پرت و شکاف‌های تقویمی",
+        "ساخت اسکریپت یکپارچهٔ آفلاین با ورودی‌های اختیاری a0.raw/a1.raw و تقویم رسمی؛ اجرای آن روی آرشیو ثبت‌شده",
+        "ثبت اسکریپت و گزارش JSON/Markdown در Library",
+        "توقف بخش‌های نیازمند بایت‌های a0/a1، اطلاعیه‌های رسمی و تقویم معاملاتی؛ هیچ درخواست شبکه‌ای انجام نشد"
+      ],
+      "findings": [
+        "آرشیو ثبت‌شده بازیابی شد؛ SHA-256 کل آرشیو و هش manifest/event ledger/candidate/raw event snapshots دقیقاً با رجیستری برابر است.",
+        "candidate دارای 4680 ردیف از 2007-03-11 تا 2026-11-11 است؛ 23 price-adjust و 12 share-change دارد.",
+        "6 رویداد share-change در فاصله حداکثر 7 روز از price-adjust قرار گرفته‌اند و در روش قبلی به‌عنوان overlap کنار گذاشته شده‌اند؛ نزدیکی زمانی به‌تنهایی هم‌رویدادی را اثبات نمی‌کند.",
+        "هم‌پوشانی 2013-07-27 دو رویداد قیمت ممکن در پنجره ±7 روز دارد؛ نسبت share=0.7166667 در برابر price=0.86997399 و 0.74338928 است؛ طبقه‌بندی مبهم.",
+        "رویداد share-change مورخ 2022-08-09 با نسبت 0.55283019 شش روز با price-adjust مورخ 2022-08-03 با نسبت 0.84780662 فاصله دارد؛ اختلاف نسبی نسبت‌ها 34.79% است؛ افت close حدود 42.34% در 2022-08-09 در candidate adjusted باقی مانده و باید با سند رسمی بررسی شود.",
+        "هر 23 رکورد price-adjust در snapshot خام corporateTypeCode=null دارند؛ آرشیو اطلاعیه‌های رسمی CODAL برای اثبات نوع/کامل‌بودن رویدادها ندارد.",
+        "در candidate تعداد factor transitions برابر 29 است؛ خطای close_adjusted=close_raw×factor صفر و بیشینه خطا 5e-37 است؛ این صرفاً سازگاری حسابی است.",
+        "نقض close خارج از high/low در raw و adjusted هر دو 285 ردیف و مجموعه تاریخ‌ها برابر است؛ این نقض‌ها با ضریب یکنواخت منتقل شده‌اند.",
+        "414 روز حجم صفر در candidate ثبت شده است.",
+        "candidate چهار فاصله بیش از 10 روز تقویمی دارد؛ بزرگ‌ترین فاصله 43 روز از 2008-09-13 تا 2008-10-26 است.",
+        "سری a=0 طبق اجرای قبلی مالک 4271 ردیف، 4198 ردیف متفاوت با a=1 و 16 فاصله بیش از 10 روز دارد؛ این آمار در این محیط مستقلاً بازحساب نشد، زیرا بایت a0.raw قابل materialize/read نبود.",
+        "معنای a=0، کامل‌بودن رویدادها، صحت اقتصادی ضرایب و پوشش نسبت به تقویم رسمی هنوز اثبات نشده‌اند."
+      ],
+      "evidence": {
+        "archive": {
+          "path": "/MarketSage/marketsage-three-symbols-review.zip",
+          "size_bytes": 1244637,
+          "sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+          "read_only": true,
+          "hash_verified": true
+        },
+        "archive_members": {
+          "manifest_sha256": "65658b218332b694ae690287946b229627b19b2f4fd70e7a76da64ac2094c4b4",
+          "event_ledger_sha256": "0f251fcf97714ee65a885f53b036b53f1d3668e5d2fbccc9dc0613422dc894fe",
+          "candidate_sha256": "97c600e4470de55a23d0df3691c274d911c020bdf0dfcedaf443bfc300554d41",
+          "price_adjust_raw_sha256": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+          "share_change_raw_sha256": "1b389841c646f4c7f03dc9a953280b476453dd0918d273f0c13d13fa716de063"
+        },
+        "candidate": {
+          "rows": 4680,
+          "first_date": "2007-03-11",
+          "last_date": "2026-11-11",
+          "price_adjust_events": 23,
+          "share_change_events": 12,
+          "overlaps": 6,
+          "standalone_share_events": 6,
+          "ambiguous_overlaps": 1,
+          "factor_transitions": 29,
+          "close_factor_mismatches": 0,
+          "max_abs_error": "5.000E-37",
+          "factor_product_abs_error": "1.77936579866309307098E-42",
+          "raw_ohlc_close_violations": 285,
+          "adjusted_ohlc_close_violations": 285,
+          "violation_date_sets_equal": true,
+          "zero_volume_rows": 414,
+          "gaps_over_10_days": 4,
+          "raw_returns_abs_ge_10pct": 29,
+          "raw_returns_abs_ge_20pct": 14,
+          "raw_returns_abs_ge_30pct": 4,
+          "adjusted_returns_abs_ge_10pct": 17,
+          "adjusted_returns_abs_ge_20pct": 2,
+          "adjusted_returns_abs_ge_30pct": 2
+        },
+        "chart_comparison_prior_owner_report": {
+          "status": "OWNER_REPORTED_NOT_RECOMPUTED_IN_THIS_ENVIRONMENT",
+          "a0_rows": 4271,
+          "a1_rows": 4271,
+          "common_dates": 4271,
+          "identical_rows": 73,
+          "different_rows": 4198,
+          "a0_only_dates": 0,
+          "a1_only_dates": 0,
+          "price_fields_different_rows": 4198,
+          "volume_different_rows": 0,
+          "a0_decoded_sha256": "372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999",
+          "a1_decoded_sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+          "a1_matches_registered_financial_csv": true,
+          "a0_gaps_over_10_days": 16,
+          "largest_gap_days": 164,
+          "largest_gap": "2026-02-25..2026-08-08"
+        },
+        "output_files": {
+          "script": {
+            "library_path": "/MarketSage/foolad_six_point_offline_audit.py",
+            "library_file_id": "libfile_e6b401249aa081918b3f5c074e0a8cfc",
+            "size_bytes": 21754,
+            "sha256": "254fa01db2220d06ba972d49189a3d0c6f17963fbda0f8a7d28b5d8c4f79bf0a"
+          },
+          "report_md": {
+            "library_path": "/MarketSage/foolad_six_point_offline_audit_20261120.md",
+            "library_file_id": "libfile_80a7263b795481918ed19fa8ce885bc2",
+            "size_bytes": 4559,
+            "sha256": "ac1981056f1f460062a1098add5b1ec5a8f8aceef837e6d8482b91bab61904e3"
+          },
+          "report_json": {
+            "library_path": "/MarketSage/foolad_six_point_offline_audit_20261120.json",
+            "library_file_id": "libfile_e55bd13a982c8191b309df35bcd53148",
+            "size_bytes": 14778,
+            "sha256": "8f90a47500d82b23866c5b10d8eb2988525c196e1aa04db758b4c96267bc0426"
+          }
+        }
+      },
+      "data_access": true,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "network_requests": 0,
+      "raw_files_modified": false,
+      "source_approved": false,
+      "adjusted_verified": false,
+      "scoring_or_backtest_approved": false,
+      "merge_or_deploy": false,
+      "final_status": "PARTIAL_OFFLINE_AUDIT_BLOCKED_ON_A0_BYTES_OFFICIAL_DISCLOSURES_AND_TRADING_CALENDAR",
+      "next_permitted_action": "مالک همان فایل‌های خام موجود a0.raw و a1.raw را از پوشهٔ قبلی، بدون دریافت مجدد، بارگذاری کند؛ اگر تقویم رسمی جلسات و اطلاعیه‌های رسمی فولاد نیز در آرشیو/پشتیبان موجود است همان فایل‌ها ارائه شوند. سپس اسکریپت واحد روی همین ورودی‌های hash-verified اجرا شود. هیچ دانلود زنده یا حدس تقویمی/ضریب مجاز نیست."
+    },
+    {
+      "work_id": "MS-FOOLAD-SIX-POINT-PARSER-FIX-20261120-01",
+      "type": "offline_parser_correction_and_fixture_validation",
+      "status": "PARSER_FIX_VERIFIED_FIXTURE_TESTS_5_OF_5_ACTUAL_OWNER_FILES_PENDING",
+      "started_at": "2026-11-20",
+      "completed_at": "2026-11-20",
+      "inputs": [
+        "ثبت canonical WORK_PROTOCOL.md، WORK_STATE.md، ARTIFACT_REGISTRY.json و RUN_LEDGER.json از شاخه PR #3",
+        "اسکریپت قبلی با SHA-256=254fa01db2220d06ba972d49189a3d0c6f17963fbda0f8a7d28b5d8c4f79bf0a",
+        "آرشیو موجود marketsage-three-symbols-review.zip با SHA-256=81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+        "خروجی مالک برای Financial.csv و Financial (1).csv؛ هش‌ها به‌ترتیب 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 و 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31؛ پیش‌نمایش بایت‌ها قالب رکورد semicolon-delimited را نشان داد"
+      ],
+      "owner_authorization": {
+        "scope": "اصلاح parser و ادامهٔ ممیزی آفلاین فولاد با همان فایل‌های موجود",
+        "network_requests": false,
+        "new_downloads": false,
+        "raw_overwrite": false,
+        "factor_inference_or_adjustment": false,
+        "scoring_or_backtest": false,
+        "merge_or_deploy": false
+      },
+      "acceptance_criteria": [
+        "parser باید هر رکورد هفت‌فیلدی را از stream تک‌خطی semicolon-delimited بخواند",
+        "پشتیبانی قبلی از gzip و CSV سطری حفظ شود",
+        "ورودی بدون هیچ ردیف معتبر fail-closed شود",
+        "مقایسه با candidate فاقد volume_adjusted بدون exception اجرا شود",
+        "آزمون‌های fixture و اجرای یکپارچه با آرشیو hash-verified موفق شوند",
+        "فایل‌های واقعی a0/a1 فقط با هش‌های ثبت‌شده پردازش شوند و هیچ دانلود مجددی انجام نشود"
+      ],
+      "actions": [
+        "علت صفر شدن ردیف‌ها شناسایی شد: csv.reader به‌صورت newline-delimited خوانده بود، اما دادهٔ provider یک خط با رکوردهای جداشده از هم با semicolon است",
+        "نسخهٔ جدید parser ساخته شد؛ اسکریپت قبلی immutable باقی ماند",
+        "پنج آزمون parser اجرا شد",
+        "اجرای یکپارچهٔ اسکریپت روی آرشیو ثبت‌شده و fixtureهای کوچک a0/a1 انجام شد"
+      ],
+      "findings": [
+        "نسخهٔ قبلی هر فایل را یک ردیف نامعتبر می‌دید؛ آمار صفر ردیف معتبر و صفر اختلاف قبلی برای a0/a1 نامعتبر است",
+        "نسخهٔ جدید قالب semicolon_records را تشخیص می‌دهد و رکوردها را به‌درستی parse می‌کند",
+        "اجرای یکپارچه ابتدا یک defect دوم را در comparison کشف کرد: candidate ستون volume_adjusted ندارد؛ نسخهٔ جدید این مورد را به‌صورت null/بدون مقایسه مدیریت می‌کند",
+        "پنج آزمون از پنج آزمون موفق شدند",
+        "اجرای یکپارچه با آرشیو hash-verified و دو fixture موفق شد؛ 4680 ردیف candidate، 23 رویداد price-adjust، 12 share-change، 29 factor transitions، 285 نقض OHLC در هر دو سری و 4 فاصلهٔ candidate بیش از 10 روز گزارش شد",
+        "فایل‌های واقعی Financial.csv و Financial (1).csv در محیط اجرای اسکریپت اصلاح‌شده موجود نبودند؛ بنابراین مقایسهٔ واقعی هنوز انجام نشده است",
+        "هیچ درخواست شبکه‌ای، دانلود، تغییر خام، تعدیل، scoring، backtest، merge یا deploy انجام نشد"
+      ],
+      "evidence": {
+        "script_v2": {
+          "library_path": "/MarketSage/foolad_six_point_offline_audit_v2.py",
+          "library_file_id": "libfile_85a23bd0309c8191a7c427f37a49dc0d",
+          "size_bytes": 24671,
+          "sha256": "f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99"
+        },
+        "parser_tests": {
+          "library_path": "/MarketSage/test_foolad_chart_parser_v2.py",
+          "library_file_id": "libfile_7aa91d5e15488191a50d271ea0e7f294",
+          "size_bytes": 3407,
+          "sha256": "dbcf45175d7f535f374b237a191e4b2b48fba6a54d9632d0227591a0bee78d58"
+        },
+        "fixture_test": {
+          "tests_passed": 5,
+          "tests_failed": 0
+        },
+        "integration_fixture": {
+          "archive_sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+          "status": "SUCCESS",
+          "fixture_a0_rows": 2,
+          "fixture_a1_rows": 2,
+          "common_dates": 2,
+          "differing_rows": 2,
+          "network_requests": 0,
+          "raw_files_modified": false
+        }
+      },
+      "data_access": true,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "network_requests": 0,
+      "raw_files_modified": false,
+      "source_approved": false,
+      "adjusted_verified": false,
+      "scoring_or_backtest_approved": false,
+      "merge_or_deploy": false,
+      "final_status": "PARSER_FIX_VERIFIED_FIXTURE_TESTS_5_OF_5_ACTUAL_OWNER_FILES_PENDING",
+      "next_permitted_action": "مالک همان فایل‌های موجود Financial.csv و Financial (1).csv را با نسخهٔ v2 و آرشیو ثبت‌شده اجرا کند؛ سپس report.json را ارائه کند. هش ورودی‌ها باید دقیقاً با 372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999 و 888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31 برابر باشد. هیچ دانلود زنده، تغییر فایل خام، پذیرش منبع یا ادعای صحت اقتصادی مجاز نیست."
+    },
+    {
+      "work_id": "MS-FOOLAD-SIX-POINT-REAL-CHART-COMPARISON-20261120-01",
+      "type": "owner_executed_offline_a0_a1_comparison_with_corrected_parser",
+      "status": "REAL_INPUTS_PARSED_COMPARISON_COMPLETE_EVENT_AND_CALENDAR_RECONCILIATION_PENDING",
+      "started_at": "2026-11-20",
+      "completed_at": "2026-11-20",
+      "inputs": [
+        "اسکریپت v2 ثبت‌شده با SHA-256=f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99",
+        "آرشیو marketsage-three-symbols-review.zip با SHA-256=81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+        "Financial.csv به‌عنوان a0 با SHA-256=372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999، 185348 بایت",
+        "Financial (1).csv به‌عنوان a1 با SHA-256=888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31، 150754 بایت",
+        "خروجی report.json و خلاصهٔ چاپ‌شده توسط مالک از /tmp/foolad_audit_v2_20261120"
+      ],
+      "owner_authorization": {
+        "scope": "ممیزی آفلاین فولاد و مقایسهٔ دو پاسخ موجود؛ فقط‌خواندنی",
+        "network_requests": false,
+        "new_downloads": false,
+        "raw_overwrite": false,
+        "factor_inference_or_adjustment": false,
+        "scoring_or_backtest": false,
+        "merge_or_deploy": false
+      },
+      "acceptance_criteria": [
+        "هر دو پاسخ با هش ثبت‌شده parse شوند و تعداد ردیف معتبر بیش از صفر باشد",
+        "مقایسهٔ تاریخ‌ها، ردیف‌های برابر/متفاوت و ستون‌های متفاوت ثبت شود",
+        "نسبت‌های قیمتی و جهش‌ها به‌صورت تشخیصی محاسبه شوند",
+        "محدودیت‌های اسناد رسمی رویداد و تقویم معاملاتی حفظ شوند"
+      ],
+      "findings": [
+        "نسخهٔ اصلاح‌شده هر دو فایل را در قالب semicolon_records با 4271 ردیف معتبر، صفر ردیف نامعتبر و صفر تاریخ تکراری parse کرد؛ بازه هر دو 2007-03-11 تا 2026-11-18 است.",
+        "4271 تاریخ مشترک؛ صفر تاریخ منحصر به a0 یا a1؛ 73 ردیف کاملاً یکسان؛ 4198 ردیف متفاوت.",
+        "در هر 4198 ردیف متفاوت، pmax,pmin,pf,pl,pc متفاوت‌اند؛ tvol در هیچ ردیفی متفاوت نیست.",
+        "میانه نسبت a0/a1: pmax=52.5925925926، pmin=52.9230769231، pf=52.76، pl=52.6923076923، pc=52.5769230769؛ دامنه‌های نسبت از 1 تا حدود 690-725 بسته به فیلد. این الگو تفاوت مقیاس/قیمت را نشان می‌دهد اما معنای پارامتر یا روش تعدیل را اثبات نمی‌کند.",
+        "اسکن بازده a0: 24 حرکت با قدر مطلق حداقل 10٪، 13 حرکت حداقل 20٪ و 7 حرکت حداقل 30٪؛ به‌ترتیب 16،11،5 مورد در فاصله هفت‌روزه از رویداد ثبت‌شده‌اند.",
+        "a0 دارای 16 فاصله بیش از 10 روز تقویمی است؛ این موارد بدون تقویم رسمی به تعطیلی/دادهٔ مفقود طبقه‌بندی نمی‌شوند.",
+        "گزارش کلی: PARTIAL_OFFLINE_AUDIT_WITH_UNRESOLVED_EVIDENCE. بررسی کامل بودن اطلاعیه‌های شرکتی، صحت اقتصادی عوامل و پوشش نسبت به تقویم رسمی همچنان باز است."
+      ],
+      "evidence": {
+        "owner_reported_execution": true,
+        "report_json_path_on_owner_machine": "/tmp/foolad_audit_v2_20261120/report.json",
+        "script_sha256": "f197bd2ff408d55696eb2c7ca869ed1555e1f375a6686ef79ad9648c9d106e99",
+        "archive_sha256": "81c4e831fcc3fd4fe7767f71f58c57b40bbf2b5bd9cd12ba241ae4513551baea",
+        "a0": {
+          "filename": "Financial.csv",
+          "sha256": "372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999",
+          "rows": 4271,
+          "invalid_rows": 0,
+          "duplicates": 0,
+          "first_date": "2007-03-11",
+          "last_date": "2026-11-18"
+        },
+        "a1": {
+          "filename": "Financial (1).csv",
+          "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+          "rows": 4271,
+          "invalid_rows": 0,
+          "duplicates": 0,
+          "first_date": "2007-03-11",
+          "last_date": "2026-11-18"
+        },
+        "comparison": {
+          "common_dates": 4271,
+          "a0_only_dates": 0,
+          "a1_only_dates": 0,
+          "identical_full_rows": 73,
+          "differing_rows": 4198,
+          "field_differences": {
+            "pmax": 4198,
+            "pmin": 4198,
+            "pf": 4198,
+            "pl": 4198,
+            "tvol": 0,
+            "pc": 4198
+          }
+        },
+        "a0_ratio_medians": {
+          "pmax": "52.592592592592595",
+          "pmin": "52.92307692307692",
+          "pf": "52.76",
+          "pl": "52.69230769230769",
+          "pc": "52.57692307692308"
+        },
+        "a0_outliers": {
+          "abs_return_ge_10pct": 24,
+          "abs_return_ge_20pct": 13,
+          "abs_return_ge_30pct": 7,
+          "within_7_calendar_days_of_event": {
+            "abs_10pct": 16,
+            "abs_20pct": 11,
+            "abs_30pct": 5
+          }
+        },
+        "a0_gaps_over_10_calendar_days": 16,
+        "final_report_status": "PARTIAL_OFFLINE_AUDIT_WITH_UNRESOLVED_EVIDENCE"
+      },
+      "data_access": true,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "network_requests": 0,
+      "raw_files_modified": false,
+      "source_approved": false,
+      "adjusted_verified": false,
+      "scoring_or_backtest_approved": false,
+      "merge_or_deploy": false,
+      "final_status": "REAL_INPUTS_PARSED_COMPARISON_COMPLETE_EVENT_AND_CALENDAR_RECONCILIATION_PENDING",
+      "next_permitted_action": "از report.json موجود فقط فهرست دقیق 16 فاصلهٔ a0، تاریخ/مقدار 24/13/7 جهش و جزئیات هم‌ترازی هر جهش با رویدادهای event ledger استخراج شود؛ هیچ اجرای مجدد parser یا دریافت جدید انجام نشود. سپس فقط با اسناد رسمی/تقویم موجود در آرشیو و hash-verified می‌توان طبقه‌بندی کرد. اگر سند رسمی/تقویم در آرشیو نیست، این دو محور با وضعیت unresolved باقی می‌مانند."
     }
   ]
 }
