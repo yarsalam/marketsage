@@ -157,7 +157,7 @@
           "bytes_accessible": true,
           "hash_recomputed": true,
           "content_inspected": true,
-          "status": "PROJECT_FILE_BYTES_UNAVAILABLE",
+          "status": "BYTES_ACCESSED_HASH_VERIFIED_IDENTITY_CONFLICT",
           "sha256_recomputed": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
           "owner_identified_as": "unadjusted",
           "identity_conflict": "current unadjusted upload has the exact same SHA-256 as the previously registered Financial.csv; both current uploads are byte-identical",
