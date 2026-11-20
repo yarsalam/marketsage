@@ -399,6 +399,60 @@
         "raw_data_acquired": false,
         "environment_note": "The request was made from the available cloud execution environment, not from the user's laptop; the user's VPN state was reported OFF."
       }
+    },
+    {
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "type": "authorized_local_foolad_chart_download_and_comparison",
+      "status": "AUTHORIZED_PENDING_LOCAL_EXECUTION",
+      "started_at": "2026-11-20",
+      "inputs": [
+        "TSETMC chart endpoint candidate already registered in ARTIFACT_REGISTRY",
+        "Foolad insCode 46348559193224090",
+        "owner's explicit fresh authorization for exactly two local GET requests",
+        "owner-provided local evidence: DNS resolution to 212.16.73.247 and successful TLSv1.3/HTTP2 handshake to members.tsetmc.com with VPN OFF"
+      ],
+      "owner_authorization": {
+        "local_two_request_download": true,
+        "vpn_state": "OFF",
+        "symbol_only": "فولاد",
+        "insCode": "46348559193224090",
+        "modes": [
+          "a=0",
+          "a=1"
+        ],
+        "bulk_acquisition": false,
+        "automatic_retry": false,
+        "vpn_or_proxy": false,
+        "overwrite_existing_raw": false,
+        "merge_or_deploy": false,
+        "investment_scoring": false
+      },
+      "scope": {
+        "endpoint": "https://members.tsetmc.com/tsev2/chart/data/Financial.aspx?i=46348559193224090&t=ph&a={0|1}",
+        "requests_exactly": 2,
+        "output_policy": "new immutable raw files with SHA-256 and provenance manifest"
+      },
+      "acceptance_criteria": [
+        "both HTTP GET responses retrieved successfully or a documented per-request failure recorded",
+        "raw response bytes saved to a new run directory without overwriting existing files",
+        "URL, UTC timestamp, HTTP status, content length, and SHA-256 recorded per response",
+        "response schema and date coverage validated",
+        "a=0 and a=1 compared over common dates with exact and numeric-difference summary",
+        "no economic correctness claim without event-level reconciliation"
+      ],
+      "actions": [
+        "verified latest protocol, state, registry and run ledger",
+        "inspected existing PR #3, its branch and changed files; no duplicate PR or merge",
+        "confirmed existing candidate endpoint and tse-client method reference are already registered on PR #3 branch",
+        "recorded owner's fresh authorization and local DNS/HTTPS evidence",
+        "prepared limited local execution scope; no data request has yet been made by assistant"
+      ],
+      "data_access": false,
+      "acquisition_performed": false,
+      "adjustment_performed": false,
+      "live_source_probe_performed": false,
+      "final_status": "AUTHORIZED_PENDING_LOCAL_EXECUTION",
+      "next_permitted_action": "Owner executes the two-request local download/compare script with VPN OFF and returns the generated manifest and comparison summary. Do not retry automatically or expand scope."
     }
   ]
 }
