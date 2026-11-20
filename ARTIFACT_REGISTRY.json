@@ -208,7 +208,12 @@
       "sha256": "c3299d6c4ddf02ec2aa5734bcfb78d3ec5572516b1f434d438bd0bd9a6e92554",
       "hash_status": "owner_reported_from_local_execution_output_not_independently_recomputed_here",
       "immutable": true,
-      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "decoded_content": {
+        "size_bytes": 185348,
+        "sha256": "372f16c55436242cef9c2365762d0d0b3f460a383344a969a815d52942eca999",
+        "hash_status": "owner_reported_from_local_gzip_decompression_output"
+      }
     },
     {
       "artifact_id": "MS-FOOLAD-TSETMC-A1-RAW-20261120-001",
@@ -223,7 +228,18 @@
       "sha256": "89c06b21d59627781e9e965ceaf24bbd95a7fbcb20e35ddcfe576d9cc6bc706e",
       "hash_status": "owner_reported_from_local_execution_output_not_independently_recomputed_here",
       "immutable": true,
-      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
+      "work_id": "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01",
+      "decoded_content": {
+        "size_bytes": 150754,
+        "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+        "hash_status": "owner_reported_from_local_gzip_decompression_output"
+      },
+      "identity_match": {
+        "reference": "previously registered Financial.csv content hash",
+        "sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+        "byte_identity_confirmed": true,
+        "semantic_interpretation": "unresolved; owner previously described Financial.csv as unadjusted"
+      }
     },
     {
       "artifact_id": "MS-FOOLAD-TSETMC-COMPARISON-20261120-001",
@@ -252,8 +268,8 @@
       "parameters": {
         "t": "ph",
         "a": {
-          "0": "unadjusted/raw",
-          "1": "adjusted/vendor-series"
+          "0": "semantics not independently established; decoded content differs from registered Financial.csv",
+          "1": "decoded content is byte-identical to registered Financial.csv; owner previously described Financial.csv as unadjusted, so adjusted-mode semantics are unresolved"
         }
       },
       "method": "HTTP GET; one instrument only; one request per adjustment mode; no pagination or bulk acquisition",
@@ -276,7 +292,13 @@
       "acceptance_status": "CANDIDATE_NOT_ACCEPTED_PENDING_EVENT_RECONCILIATION_AND_TERMS_REVIEW",
       "authorized_followup_work_ids": [
         "MS-FOOLAD-CHART-DOWNLOAD-COMPARE-20261120-01"
-      ]
+      ],
+      "identity_findings": {
+        "a1_matches_registered_financial_csv": true,
+        "matched_sha256": "888c8c528c7c353dcf31865d4280454278fd645a41a1fc4004cf46bac2ec3f31",
+        "economic_correctness": "NOT_ESTABLISHED",
+        "parameter_semantics": "UNRESOLVED"
+      }
     },
     {
       "source_id": "MS-METHOD-TSE-CLIENT-ADJUSTMENT-001",
