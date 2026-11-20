@@ -1,0 +1,52 @@
+name: MarketSage Infrastructure CI
+
+on:
+  push:
+    branches:
+      - main
+      - "infra/**"
+    paths:
+      - ".github/workflows/infra-*.yml"
+      - "scripts/automation/**"
+      - "tests/automation/**"
+      - "docs/GITHUB_AUTOMATION_OPERATIONS.md"
+      - "WORK_STATE.md"
+      - "WORK_PROTOCOL.md"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/infra-*.yml"
+      - "scripts/automation/**"
+      - "tests/automation/**"
+      - "docs/GITHUB_AUTOMATION_OPERATIONS.md"
+      - "WORK_STATE.md"
+      - "WORK_PROTOCOL.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketsage-infra-ci-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  infra-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify Python runtime
+        run: python3 --version
+      - name: Run infrastructure unit and policy tests
+        run: python3 -m unittest discover -s tests/automation -v
+      - name: Write sanitized failure summary
+        if: failure()
+        run: |
+          {
+            echo "## MarketSage infrastructure CI"
+            echo "- Result: failed"
+            echo "- No artifacts or raw data were uploaded."
+            echo "- Inspect the failing step; this workflow does not print secrets."
+          } >> "$GITHUB_STEP_SUMMARY"
