@@ -67,17 +67,6 @@ def assess_health(
 
     for run in relevant:
         status = run.get("status")
-        if status == "queued":
-            age = _age_seconds(run.get("created_at"), now)
-            if age is not None and age > MAX_QUEUE_AGE_MINUTES * 60:
-                stale_queued += 1
-        elif status == "in_progress":
-            age = _age_seconds(run.get("run_started_at") or run.get("created_at"), now)
-            if age is not None and age > MAX_RUN_AGE_MINUTES * 60:
-                stale_running += 1
-
-    for run in relevant:
-        status = run.get("status")
         if status in {"queued", "waiting", "pending", "requested"}:
             age = _age_seconds(run.get("created_at"), now)
             if age is not None and age > MAX_QUEUE_AGE_MINUTES * 60:
