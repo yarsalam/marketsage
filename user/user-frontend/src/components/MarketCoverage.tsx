@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CorporateActionEvidence } from "./CorporateActionEvidence";
+import { FooladMarketPanel } from "./FooladMarketPanel";
+import { MarketTabs, type MarketTabId } from "./MarketTabs";
 
 type ScopeFilter = "all" | "iran" | "global";
 
@@ -288,6 +290,7 @@ function SourceCard({ source, runtime }: { source: Source; runtime?: RuntimeSour
 export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const [payload, setPayload] = useState<CoveragePayload | null>(null);
   const [scope, setScope] = useState<ScopeFilter>("all");
+  const [activeMarket, setActiveMarket] = useState<MarketTabId>("iran_equities");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
@@ -374,6 +377,24 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
   }
 
   const summary = payload.catalog.summary;
+  const providerMarketId = activeMarket === "global"
+    ? "crypto_global"
+    : activeMarket === "iran_crypto"
+      ? "crypto_local"
+      : activeMarket;
+  const activeProvider = payload.iran.markets.find((provider) => provider.market === providerMarketId);
+  const emptyUniverseId = activeMarket === "iran_crypto" ? "iran_crypto" : activeMarket;
+  const activeEmptyUniverse = payload.instruments.empty_universes.find(
+    (universe) => universe.market_universe === emptyUniverseId,
+  );
+  const marketTitles: Record<MarketTabId, string> = {
+    iran_equities: "بورس و فرابورس ایران",
+    iran_gold_coin: "طلا و سکه",
+    iran_fx: "ارز و نرخ‌های بازار ایران",
+    iran_fixed_income: "صندوق‌ها و درآمد ثابت",
+    iran_crypto: "رمزارز صرافی‌های ایران",
+    global: "بازارهای جهانی",
+  };
   return (
     <section className="space-y-6 p-4 md:p-6">
       <header className="space-y-2">
