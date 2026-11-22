@@ -52,4 +52,8 @@ export class MarketsService {
   getIranProviders() {
     return this.getAnalysis('/iran-market/providers');
   }
+
+  getFooladPreview() {
+    return this.getAnalysis('/iran-market/equities/foolad/preview');
+  }
 }
