@@ -1,7 +1,7 @@
 "use client";
 
 const tabs = [
-  { id: "coverage", label: "🧭 پوشش بازار و کیفیت داده" },
+  { id: "coverage", label: "🧭 بازارها و کیفیت داده" },
   { id: "decision", label: "🎯 تصمیم پژوهشی · غیرفعال" },
   { id: "momentum", label: "📈 مومنتوم · غیرفعال" },
   { id: "regime", label: "🌍 رژیم بازار · غیرفعال" },
