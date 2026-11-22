@@ -15,6 +15,7 @@ COPY --chown=app:app source_registry.py ./source_registry.py
 COPY --chown=app:app instrument_registry.py ./instrument_registry.py
 COPY --chown=app:app temporal_data.py ./temporal_data.py
 COPY --chown=app:app research ./research
+COPY --chown=app:app data ./data
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
