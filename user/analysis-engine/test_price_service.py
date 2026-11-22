@@ -22,7 +22,7 @@ def provider_frame():
     return pd.DataFrame(values, index=dates, columns=columns)
 
 
-def test_foolad_preview_is_quarantined_and_has_versioned_monthly_data():
+def test_foolad_preview_is_quarantined_and_has_versioned_quarterly_data():
     response = client.get("/iran-market/equities/foolad/preview")
     assert response.status_code == 200
     payload = response.json()
