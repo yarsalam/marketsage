@@ -346,7 +346,7 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
   );
 
   if (loading) {
-    return <section className="space-y-4 p-6"><h1 className="text-2xl font-bold">پوشش بازار و کیفیت داده</h1><p className="animate-pulse text-text-secondary">در حال دریافت رجیستری منابع و وضعیت مخزن...</p></section>;
+    return <section className="space-y-4 p-6"><h1 className="text-2xl font-bold">بازارها و کیفیت داده</h1><p className="animate-pulse text-text-secondary">در حال دریافت رجیستری منابع و وضعیت مخزن...</p></section>;
   }
 
   if (error || !payload) {
@@ -467,7 +467,6 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="ml-2 text-sm text-text-secondary">فیلتر رجیستری منابع:</span>
-        <span className="ml-2 text-sm text-text-secondary">نمایش بازار:</span>
         {([
           ["all", "همه"],
           ["iran", "ایران"],
