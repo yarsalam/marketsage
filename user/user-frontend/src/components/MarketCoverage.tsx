@@ -428,7 +428,45 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
         <SummaryCard title="نسخه رکوردهای ذخیره‌شده" value={payload.quality.storage.record_versions.toLocaleString("fa-IR")} detail={`تعداد سری‌ها: ${payload.quality.storage.series_count}`} />
       </div>
 
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-bold">داده و ابزارهای هر بازار</h2>
+          <p className="mt-1 text-xs text-text-secondary">تب‌ها بر اساس خانواده دارایی جدا شده‌اند؛ وجود داده یا نمودار به معنی تأیید منبع یا مجوز تحلیل نیست.</p>
+        </div>
+        <MarketTabs activeTab={activeMarket} onChange={setActiveMarket} />
+        {activeMarket === "iran_equities" ? (
+          <div className="space-y-4">
+            <FooladMarketPanel />
+            <CorporateActionEvidence />
+          </div>
+        ) : (
+          <section className="space-y-3 rounded-2xl border border-border bg-surface p-4">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 className="font-semibold">{marketTitles[activeMarket]}</h3>
+                <p className="mt-1 text-xs text-text-secondary">
+                  {activeProvider?.source ?? "ارائه‌دهنده تأییدشده‌ای در رجیستری ثبت نشده است."}
+                </p>
+              </div>
+              <span className="rounded-full border border-border px-3 py-1 text-xs">
+                {label(activeProvider?.status ?? activeEmptyUniverse?.status ?? "provider_not_selected")}
+              </span>
+            </div>
+            <p className="text-sm leading-7 text-text-secondary">
+              {activeProvider?.notes ?? activeEmptyUniverse?.reason ?? "برای این خانواده هنوز ابزار دارای هویت و داده قابل استفاده ثبت نشده است."}
+            </p>
+            {activeMarket === "global" && (
+              <p className="text-xs text-text-secondary">
+                ابزارهای پروکسی جهانی در بخش رجیستری هویت ابزارها فهرست شده‌اند؛ این موارد معادل دارایی قابل معامله در بورس ایران نیستند.
+              </p>
+            )}
+            <p className="text-xs font-semibold text-amber-700">اتصال به امتیازدهی سرمایه‌گذاری: مسدود تا تأیید منبع، پوشش و کیفیت داده</p>
+          </section>
+        )}
+      </section>
+
       <div className="flex flex-wrap items-center gap-2">
+        <span className="ml-2 text-sm text-text-secondary">فیلتر رجیستری منابع:</span>
         <span className="ml-2 text-sm text-text-secondary">نمایش بازار:</span>
         {([
           ["all", "همه"],
@@ -456,8 +494,6 @@ export function MarketCoverage({ onNavigate }: { onNavigate: (tab: string) => vo
       {filteredSources.length === 0 && (
         <div className="rounded-xl border border-border bg-surface p-4 text-sm text-text-secondary">برای این فیلتر منبعی در رجیستری ثبت نشده است.</div>
       )}
-
-      {(scope === "all" || scope === "iran") && <CorporateActionEvidence />}
 
       {(scope === "all" || scope === "iran") && (
         <section className="space-y-4">
