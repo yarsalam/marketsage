@@ -11,6 +11,7 @@ describe('MarketsController', () => {
     getSources: jest.fn(),
     getDataQuality: jest.fn(),
     getIranProviders: jest.fn(),
+    getFooladPreview: jest.fn(),
   };
   let controller: MarketsController;
   const originalResearchOutputsFlag = process.env.MARKETSAGE_RESEARCH_OUTPUTS_ENABLED;
@@ -61,5 +62,7 @@ describe('MarketsController', () => {
     expect(marketsService.getDataQuality).toHaveBeenCalledTimes(1);
     expect(marketsService.getIranProviders).toHaveBeenCalledTimes(1);
     expect(marketsService.getInstruments).toHaveBeenCalledTimes(1);
+    controller.getFooladPreview();
+    expect(marketsService.getFooladPreview).toHaveBeenCalledTimes(1);
   });
 });
