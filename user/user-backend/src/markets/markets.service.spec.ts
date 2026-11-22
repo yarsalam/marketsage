@@ -53,5 +53,6 @@ describe('MarketsService source observability endpoints', () => {
     await expect(service.getInstruments()).rejects.toBeInstanceOf(ServiceUnavailableException);
     await expect(service.getDataQuality()).rejects.toBeInstanceOf(ServiceUnavailableException);
     await expect(service.getIranProviders()).rejects.toBeInstanceOf(ServiceUnavailableException);
+    await expect(service.getFooladPreview()).rejects.toBeInstanceOf(ServiceUnavailableException);
   });
 });
