@@ -64,6 +64,11 @@ export class MarketsController {
     return this.marketsService.getIranProviders();
   }
 
+  @Get('iran-equities/foolad/preview')
+  getFooladPreview() {
+    return this.marketsService.getFooladPreview();
+  }
+
   private assertResearchOutputsEnabled(): void {
     if (process.env.MARKETSAGE_RESEARCH_OUTPUTS_ENABLED !== 'true') {
       throw new ServiceUnavailableException(
