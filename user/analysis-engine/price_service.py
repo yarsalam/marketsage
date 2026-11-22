@@ -612,6 +612,19 @@ def get_scores() -> dict:
     }
 
 
+@app.get("/iran-market/equities/foolad/preview")
+def get_foolad_adjusted_preview() -> dict:
+    """Serve a fixed, quarantined quarterly preview; never feed it into scoring."""
+    preview_path = Path(__file__).resolve().parent / "data" / "foolad_quarterly_preview.json"
+    try:
+        payload = json.loads(preview_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=503, detail="Foolad preview is unavailable.") from exc
+    if payload.get("dataset", {}).get("scoring_eligible") is not False:
+        raise HTTPException(status_code=503, detail="Foolad preview failed its research-only gate.")
+    return payload
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8000")))
