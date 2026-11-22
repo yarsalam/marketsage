@@ -22,6 +22,21 @@ def provider_frame():
     return pd.DataFrame(values, index=dates, columns=columns)
 
 
+def test_foolad_preview_is_quarantined_and_has_versioned_monthly_data():
+    response = client.get("/iran-market/equities/foolad/preview")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["instrument"]["symbol"] == "فولاد"
+    assert payload["dataset"]["daily_rows"] == 4680
+    assert payload["dataset"]["display_points"] == 80
+    assert payload["dataset"]["scoring_eligible"] is False
+    assert payload["dataset"]["backtest_approved"] is False
+    assert payload["dataset"]["ohlc_violations"] == 285
+    assert len(payload["points"]) == 80
+    assert payload["points"][0][0] == "2007-03-31"
+    assert payload["points"][-1][0] == "2026-11-11"
+
+
 def test_extract_close_preserves_missing_values_and_expected_universe():
     raw = provider_frame()
     raw.loc[raw.index[50], ("Close", "BTC-USD")] = np.nan
