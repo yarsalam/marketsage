@@ -60,6 +60,16 @@ def build_report(payload: dict[str, Any], generated_at: str | None = None) -> di
                 })
                 continue
             key = str(item.get("series_key", "unknown"))
+            if item.get("price_basis_status") == "legacy_mismatch":
+                alerts.append({
+                    "severity": "warning",
+                    "code": "series_price_basis_mismatch",
+                    "source_id": source_id,
+                    "series_key": key,
+                    "expected_data_kind": item.get("expected_data_kind"),
+                    "stored_data_kind": item.get("data_kind"),
+                    "message": f"Series {source_id}/{key} has legacy price semantics that differ from the instrument registry.",
+                })
             freshness = item.get("freshness", "unknown")
             if freshness == "stale":
                 alerts.append({

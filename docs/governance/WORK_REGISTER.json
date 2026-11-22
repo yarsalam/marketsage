@@ -1,0 +1,346 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-09",
+  "allowed_statuses": [
+    "PROPOSED",
+    "READY",
+    "IN_PROGRESS",
+    "VALIDATION",
+    "ACCEPTED",
+    "BLOCKED",
+    "REWORK",
+    "REJECTED",
+    "STOPPED",
+    "ARCHIVED"
+  ],
+  "items": [
+    {
+      "id": "MS-OPS-001",
+      "title": "Project operating system and evidence validator",
+      "track": "governance",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "strategy/project-operating-system-parallel-2026-11",
+      "pull_request": 78,
+      "depends_on": [],
+      "timebox_hours": 4,
+      "objective": "Create enforceable, machine-checked strategy, task, decision, evidence and release records.",
+      "user_problem": "The project repeatedly produces activity without an auditable user outcome or stop decision.",
+      "deliverables": [
+        "Strategy charter",
+        "Product roadmap",
+        "Machine-readable work register, decision policy, evidence ledger and release gates",
+        "Validator, tests and read-only GitHub workflow"
+      ],
+      "acceptance_criteria": [
+        "All governance JSON records pass the validator",
+        "Invalid status, missing evidence, unknown dependency and dependency cycle are rejected by tests",
+        "GitHub workflow runs on the exact branch head and is read-only"
+      ],
+      "stop_conditions": [
+        "Do not enable code-authoring agent or paid services",
+        "Do not weaken existing branch or runner boundaries"
+      ],
+      "evidence_refs": [
+        "EV-PR78-CI"
+      ],
+      "requires_user_flow_proof": false
+    },
+    {
+      "id": "MS-PROD-001",
+      "title": "Truthful research-only product shell and safe outputs",
+      "track": "product",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "safety/research-only-output-gates-2026-11",
+      "pull_request": 77,
+      "depends_on": [],
+      "timebox_hours": 6,
+      "objective": "Remove unvalidated decision outputs and fake chatbot claims from the user experience.",
+      "user_problem": "The user could be shown invented market metrics, confidence and allocation claims as though they were live analysis.",
+      "deliverables": [
+        "Default-closed backend output gate",
+        "Research-only decision state",
+        "Disabled unvalidated tabs",
+        "Truthful product guide instead of fabricated AI answers"
+      ],
+      "acceptance_criteria": [
+        "Exact PR head CI passes",
+        "No default-capital decision call or automatic scoring/backtest fetch remains in the user flow",
+        "Chat helper never invents live values or claims to be an LLM",
+        "After integration, browser/API smoke confirms blocked outputs return unavailable and no fabricated metrics appear"
+      ],
+      "stop_conditions": [
+        "Keep scoring, ranking, probability and backtest approval disabled",
+        "Do not enable gate via deployment environment"
+      ],
+      "evidence_refs": [
+        "EV-PR77-CI"
+      ],
+      "requires_user_flow_proof": true
+    },
+    {
+      "id": "MS-DATA-001",
+      "title": "Market coverage and canonical instrument registry",
+      "track": "data-product",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "research/market-coverage-workspace-2026-11",
+      "pull_request": 73,
+      "depends_on": [],
+      "timebox_hours": 8,
+      "objective": "Make source coverage and data readiness visible without treating candidate feeds as accepted.",
+      "user_problem": "The user cannot tell which markets have usable data, which sources are candidates, and why analysis is unavailable.",
+      "deliverables": [
+        "Market Coverage landing page",
+        "Read-only source/data-quality/provider/instrument APIs",
+        "Provider-neutral registry and temporal price-basis controls"
+      ],
+      "acceptance_criteria": [
+        "Exact PR head CI and container smoke pass",
+        "Iranian universes remain quarantined until full acceptance",
+        "Unknown instruments cannot be persisted",
+        "After integration, a browser/API scenario shows source status, data quality and instrument availability without fabricated values"
+      ],
+      "stop_conditions": [
+        "No unapproved source in scoring, labels or investment reports",
+        "No raw/private dataset or price values in CI logs"
+      ],
+      "evidence_refs": [
+        "EV-PR73-CI"
+      ],
+      "requires_user_flow_proof": true
+    },
+    {
+      "id": "MS-INFRA-001",
+      "title": "Provider-neutral control-plane foundation",
+      "track": "infrastructure",
+      "owner": "execution-lead",
+      "status": "IN_PROGRESS",
+      "branch": "infra/provider-neutral-control-plane-2026-11",
+      "pull_request": 74,
+      "depends_on": [],
+      "timebox_hours": 8,
+      "objective": "Provide durable task contracts and isolated provider execution primitives needed for resilient automation.",
+      "user_problem": "Long-running provider work cannot be safely resumed, observed or recovered from a task ledger.",
+      "deliverables": [
+        "Task registry and contract",
+        "SQLite coordinator",
+        "Worker lifecycle and sandbox boundaries",
+        "Health observer and runbooks"
+      ],
+      "acceptance_criteria": [
+        "Exact-head CI passes",
+        "State transitions and cancellation/retry bounds have deterministic tests",
+        "No laptop Runner dependency or paid resource is introduced"
+      ],
+      "stop_conditions": [
+        "No deployment or always-on host provisioning",
+        "No privileged or untrusted execution"
+      ],
+      "evidence_refs": [],
+      "requires_user_flow_proof": false
+    },
+    {
+      "id": "MS-INFRA-002",
+      "title": "Durable provider dispatch outbox",
+      "track": "infrastructure",
+      "owner": "execution-lead",
+      "status": "BLOCKED",
+      "branch": "infra/durable-provider-dispatch-outbox-2026-11",
+      "pull_request": 71,
+      "depends_on": [
+        "MS-INFRA-001"
+      ],
+      "timebox_hours": 6,
+      "objective": "Make dispatch durable across restart and reconcile queued work.",
+      "user_problem": "A dispatched background task could be lost or left ambiguous after process restart.",
+      "deliverables": [
+        "Durable outbox",
+        "Recovery/watchdog",
+        "Worker lifecycle integration"
+      ],
+      "acceptance_criteria": [
+        "PR #74 integration prerequisite is satisfied",
+        "Exactly-once-or-idempotent dispatch behavior is covered by restart tests",
+        "Recovery is bounded and observable"
+      ],
+      "stop_conditions": [
+        "Do not merge stacked branch out of dependency order",
+        "Do not turn the owner's laptop into an assumed always-on worker"
+      ],
+      "evidence_refs": [],
+      "requires_user_flow_proof": false
+    },
+    {
+      "id": "MS-INFRA-003",
+      "title": "Provider-neutral parallel workstream decomposition",
+      "track": "infrastructure",
+      "owner": "execution-lead",
+      "status": "BLOCKED",
+      "branch": "docs/parallel-workstream-decomposition-2026-11",
+      "pull_request": 61,
+      "depends_on": [
+        "MS-INFRA-001"
+      ],
+      "timebox_hours": 3,
+      "objective": "Split the provider-neutral architecture into non-overlapping, independently testable tasks.",
+      "user_problem": "Infrastructure work is difficult to parallelize without conflicting changes.",
+      "deliverables": [
+        "Workstream contracts and dependency graph"
+      ],
+      "acceptance_criteria": [
+        "Dependency graph has no cycles",
+        "Each workstream has owner, bounded scope, acceptance and stop rules"
+      ],
+      "stop_conditions": [
+        "Do not duplicate the main work register",
+        "Do not stack dependent PRs as parallel merge candidates"
+      ],
+      "evidence_refs": [],
+      "requires_user_flow_proof": false
+    },
+    {
+      "id": "MS-SEC-001",
+      "title": "User authentication and API authorization",
+      "track": "security",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "security/user-authentication-2026-11",
+      "pull_request": 79,
+      "depends_on": [],
+      "timebox_hours": 8,
+      "objective": "Implement safe sign-in, route guarding and backend API authorization with fail-closed configuration.",
+      "user_problem": "The current user app has no wired authentication path, so user research data is not safely isolated.",
+      "deliverables": [
+        "Backend auth module and tests",
+        "Frontend AuthProvider wired into app",
+        "Login/logout/expired-session path",
+        "Authenticated API client wrapper"
+      ],
+      "acceptance_criteria": [
+        "Missing secrets/configuration fail closed",
+        "No credentials/secrets committed",
+        "Unauthenticated private API requests are rejected",
+        "Browser E2E verifies sign-in, protected navigation and logout"
+      ],
+      "stop_conditions": [
+        "No plaintext credential defaults",
+        "No admin privilege implied by user login",
+        "Do not expose deployment until owner-provided secrets are configured securely"
+      ],
+      "evidence_refs": [
+        "EV-PR79-CI"
+      ],
+      "requires_user_flow_proof": true
+    },
+    {
+      "id": "MS-ADMIN-001",
+      "title": "Read-only admin operations workspace",
+      "track": "admin",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "admin/read-only-operations-workspace-2026-11",
+      "pull_request": 80,
+      "depends_on": [],
+      "timebox_hours": 8,
+      "objective": "Replace starter admin surfaces with a truthful, read-only operations workspace.",
+      "user_problem": "There is no usable operator view of service health, provider readiness or recent system events.",
+      "deliverables": [
+        "Admin dashboard UI",
+        "Read-only health/source API contracts",
+        "Explicit auth/role boundary and audit event model"
+      ],
+      "acceptance_criteria": [
+        "No placeholder/demo health data",
+        "No unauthenticated admin endpoints",
+        "Browser/API smoke covers health and source status",
+        "Admin remains out of public deployment until security gates pass"
+      ],
+      "stop_conditions": [
+        "No destructive admin actions in first slice",
+        "No exposure through public Compose before authentication and authorization pass"
+      ],
+      "evidence_refs": [
+        "EV-PR80-CI"
+      ],
+      "requires_user_flow_proof": true
+    },
+    {
+      "id": "MS-USER-001",
+      "title": "End-to-end market research dossier",
+      "track": "product",
+      "owner": "execution-lead",
+      "status": "PROPOSED",
+      "branch": null,
+      "pull_request": null,
+      "depends_on": [
+        "MS-PROD-001",
+        "MS-DATA-001",
+        "MS-SEC-001"
+      ],
+      "timebox_hours": 10,
+      "objective": "Deliver one end-to-end market selection to evidence dossier journey using only data that passed its own source gate.",
+      "user_problem": "The user cannot currently complete a grounded six-month research workflow inside the application.",
+      "deliverables": [
+        "Market selection",
+        "Source-linked data coverage and quality",
+        "Evidence-linked observations and uncertainty",
+        "Unavailable-analysis explanation and saved dossier history"
+      ],
+      "acceptance_criteria": [
+        "One browser journey passes from login through dossier view",
+        "Every displayed observation links to source/time/units",
+        "No unsupported recommendation or confidence claim",
+        "User-facing acceptance scenario is reproducible"
+      ],
+      "stop_conditions": [
+        "If no eligible data exists, show an honest unavailable state rather than substituting a candidate provider",
+        "Do not enable scoring or allocation"
+      ],
+      "evidence_refs": [],
+      "requires_user_flow_proof": true
+    },
+    {
+      "id": "MS-INTEGRATION-001",
+      "title": "Integrated authenticated market-coverage and operations workflow",
+      "track": "product-integration",
+      "owner": "execution-lead",
+      "status": "VALIDATION",
+      "branch": "integration/market-coverage-auth-safety-2026-11",
+      "pull_request": 81,
+      "depends_on": [
+        "MS-OPS-001",
+        "MS-PROD-001",
+        "MS-DATA-001",
+        "MS-SEC-001",
+        "MS-ADMIN-001"
+      ],
+      "timebox_hours": 8,
+      "objective": "Integrate the market coverage, research-only safety, owner authentication, read-only admin operations and machine-checked project governance into one coherent, testable candidate.",
+      "user_problem": "The user cannot currently enter a protected workspace and reliably inspect source coverage, data quality and service status in one truthful workflow.",
+      "deliverables": [
+        "Unified authenticated market-coverage workspace",
+        "Protected read-only source and data-quality APIs",
+        "Fail-closed investment-output controls",
+        "Separate read-only admin operations surface, not publicly exposed",
+        "Machine-checked strategy, work, evidence and release records"
+      ],
+      "acceptance_criteria": [
+        "Exact integration-head CI passes across application, backend, admin and production-image checks",
+        "Project operating-system validator and negative tests pass",
+        "Unauthenticated private API requests are rejected and authenticated requests include the session cookie",
+        "No investment output is enabled and no candidate source is promoted",
+        "Owner completes browser login, logout and market-coverage acceptance on an isolated local environment"
+      ],
+      "stop_conditions": [
+        "Do not merge into main or deploy without separate explicit approval",
+        "Do not expose admin workspace publicly before admin authentication, authorization and audit logging",
+        "Do not enable investment outputs or approve sources",
+        "Do not require paid resources or local Runner dispatch"
+      ],
+      "evidence_refs": [],
+      "requires_user_flow_proof": true
+    }
+  ]
+}

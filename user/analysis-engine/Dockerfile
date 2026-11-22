@@ -11,7 +11,11 @@ COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=app:app price_service.py ./price_service.py
 COPY --chown=app:app iran_market_data.py ./iran_market_data.py
+COPY --chown=app:app source_registry.py ./source_registry.py
+COPY --chown=app:app instrument_registry.py ./instrument_registry.py
+COPY --chown=app:app temporal_data.py ./temporal_data.py
 COPY --chown=app:app research ./research
+COPY --chown=app:app data ./data
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

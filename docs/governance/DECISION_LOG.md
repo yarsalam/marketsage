@@ -179,3 +179,27 @@ The GitHub-side workflow gate is now implemented separately: PR #27 merged to `m
 - PR #6 remains open; no source acceptance, scoring, backtest approval, production, broker or trading authorization changes.
 
 **Capital-risk impact:** None. This remains an offline data-audit workload.
+
+
+## 2026-11-09 — Owner-directed parallel execution and product-value gate
+
+**Authority:** Explicit owner instruction in the conversation on 2026-11-09.  
+**Decision:** CONTINUE the MarketSage mission using parallel, bounded workstreams; do not keep the former infrastructure-only sequence as a blanket block on product execution.
+
+**Reason**
+- The owner explicitly directed that the strategy be documented in GitHub and that parallel execution begin, with strict adherence to the project constitution.
+- The previous Copilot prompt imposed an infrastructure-only sequence that prevented independent product work. This narrow execution-policy conflict is superseded by the owner's current instruction.
+- The original six-month, Iranian-and-global investment research mission remains unchanged. No asset-universe narrowing, source approval or capital-risk authorization is implied.
+
+**Execution effect**
+- Product, data-quality, backend/security, admin/operations, research-methodology and engineering-infrastructure streams may proceed in parallel only when dependencies and file ownership are isolated.
+- PR #73 and #77 remain open drafts and must be reconciled because they both modify the user landing-page/Sidebar paths.
+- PR #74 is a separate infrastructure stream. PR #71 and #61 remain dependent on #74.
+- A product task cannot be accepted from a branch CI result. It requires integration and a reproducible real user/API flow.
+- The owner receives no routine progress narration; report only an evidenced project decision or a user-value capability that resolves a real user problem.
+
+**Non-changes**
+- PR #6 must not be merged without separate explicit owner approval.
+- No self-hosted/laptop Runner dispatch, paid resources, production deployment, source approval, investment scoring/ranking, probability calibration, backtest approval, broker, trading or capital allocation is authorized.
+
+**Evidence:** `STRATEGY_CHARTER.md`, `PRODUCT_ROADMAP.md`, `WORK_REGISTER.json`, `DECISION_POLICY.json`, `RELEASE_GATES.json`, `EVIDENCE_LEDGER.json` and `PROJECT_STATE.json` on branch `strategy/project-operating-system-parallel-2026-11`.

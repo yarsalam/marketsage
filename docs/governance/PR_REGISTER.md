@@ -1,5 +1,35 @@
 # MarketSage — Pull Request Register
 
+## Live register override — 2026-11-09
+
+Repository: `yarsalam/marketsage` (public). Default branch: `main`.  
+Main HEAD at snapshot: `4c4b032196137af4658ea2c28e38a21605ee923b`.
+
+| PR | Base | Head branch | Exact head | State | Handling |
+|---|---|---|---|---|---|
+| [#81](https://github.com/yarsalam/marketsage/pull/81) | main | integration/market-coverage-auth-safety-2026-11 | Live head tracked in GitHub PR | Open, Draft; governance validator passes; full CI incomplete on latest attempt | Combined candidate for #73/#77/#78/#79/#80; not merged/deployed; browser acceptance pending |
+| [#80](https://github.com/yarsalam/marketsage/pull/80) | main | admin/read-only-operations-workspace-2026-11 | `241241ee91f2dc944e0dc407bb6c5d1c409bc520` | Open, Draft; exact-head CI passed | Admin read-only workspace copied into #81; still not safe for public exposure |
+| [#79](https://github.com/yarsalam/marketsage/pull/79) | main | security/user-authentication-2026-11 | `14001bdb5a03775b9772bf9cfea1d169a68f8113` | Open, Draft; exact-head CI passed | Owner login/auth routes copied into #81; browser and deployment security acceptance pending |
+| [#78](https://github.com/yarsalam/marketsage/pull/78) | main | strategy/project-operating-system-parallel-2026-11 | `47030f24d2d0491cb53eac5b089ff1dd4a15eccc` | Open, Draft; exact-head CI passed | Strategy charter, work/evidence registers and read-only validator copied into #81 |
+| [#77](https://github.com/yarsalam/marketsage/pull/77) | main | safety/research-only-output-gates-2026-11 | `67356939f65224a580c915fd2caa0ea52d8d09a9` | Open, Draft; exact-head CI passed | Fail-closed investment-output controls copied into #81 |
+| [#74](https://github.com/yarsalam/marketsage/pull/74) | main | infra/provider-neutral-control-plane-2026-11 | `237af3ba7e0473aaa94e3fc5512d7f3b172d1c10` | Open, Draft | Provider-neutral infra foundation; independent track |
+| [#73](https://github.com/yarsalam/marketsage/pull/73) | main | research/market-coverage-workspace-2026-11 | `72c57608e8270d999d1e9f2005b47ea56cb893a7` | Open, Draft; exact-head CI passed | Market coverage UI/API copied into #81 |
+| [#71](https://github.com/yarsalam/marketsage/pull/71) | infra/provider-neutral-control-plane-2026-11 | infra/durable-provider-dispatch-outbox-2026-11 | `e8785b177f93a569ce031496d1043026979828d3` | Open, Draft | Stacked; blocked on #74 integration |
+| [#61](https://github.com/yarsalam/marketsage/pull/61) | infra/provider-neutral-control-plane-2026-11 | docs/parallel-workstream-decomposition-2026-11 | `25ce24283e35dd7e55eb8545c590a047606643ee` | Open, Draft | Stacked; blocked on #74 integration |
+| [#6](https://github.com/yarsalam/marketsage/pull/6) | main | feat/tindex-free-data-connector | Existing integration head | Open | Do not merge without separate explicit owner approval |
+
+Exact-head CI evidence recorded:
+- PR #73: [run 42621965739](https://github.com/yarsalam/marketsage/actions/runs/42621965739) — passed on head `72c57608...`.
+- PR #77: [run 42624038512](https://github.com/yarsalam/marketsage/actions/runs/42624038512) — passed on head `67356939...`.
+
+Other open PRs must be reconciled from the live GitHub list before acting. PR #51, #41, #8 and #62 remain visible in GitHub; their current bases and intended dispositions must be verified before integration. Do not infer merge readiness from their existence.
+
+**Integration constraints:** PR #81 is the combined candidate for market coverage (#73), fail-closed output safety (#77), project operating system (#78), user authentication (#79) and read-only admin operations (#80). It remains Draft/open and must pass exact-head CI plus owner-run browser acceptance. PR #71 and #61 depend on #74 and cannot be integrated first. Keep required approvals/rulesets intact. No PR is merged into main or deployed by this register update.
+
+---
+
+## Historical register (2026-11-05; superseded for live status)
+
 **Snapshot date:** 2026-11-05  
 **Repository:** yarsalam/marketsage (Private)  
 **Main HEAD:** 554fe2200ccb3a523442b0e241e81a748becfa44  

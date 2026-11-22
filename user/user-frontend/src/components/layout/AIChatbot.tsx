@@ -1,235 +1,160 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+
+import { useEffect, useRef, useState } from "react";
 
 type Message = { role: "user" | "assistant"; content: string };
+type GuideAnswer = { content: string; destination?: string };
 
-/* ─────────────────────────────────────────────────────────────────
-   Knowledge base — all answers are traceable to ranking numbers.
-   When the backend starts returning ranking data, pull these values
-   from the API response instead of hardcoding them here.
-───────────────────────────────────────────────────────────────── */
-const KB = {
-  dollar: `Dollar Bullish به دلایل زیر در رتبه اول قرار گرفته:
+function getGuideAnswer(question: string): GuideAnswer {
+  const text = question.trim().toLowerCase();
 
-• مومنتوم ۴ ماهه: +۶.۲٪ — رتبه ۱ از ۹ دارایی
-• نسبت Sharpe ۱۲ ماهه: ۱.۱۸ — رتبه ۲
-• نوسان ماهانه: ۴.۵٪ — رتبه ۱ (کمترین نوسان)
+  if (/قیمت|خرید|فروش|پیشنهاد|رتبه|دلار|طلا|بورس|ناسداک|سود|بازده/.test(text)) {
+    return {
+      content: "در این نسخه، خروجی رتبه‌بندی و تخصیص سرمایه تا زمان تأیید منابع و روش پژوهشی غیرفعال است. من هم به قیمت زنده یا یک مدل زبانی متصل نیستم؛ بنابراین عدد یا پیشنهاد خرید و فروش تولید نمی‌کنم. برای دیدن وضعیت منابع و داده‌های ثبت‌شده، بخش «وضعیت داده» را باز کن.",
+      destination: "settings",
+    };
+  }
 
-در ۴ ماه اخیر بالاترین بازده تعدیل‌شده به ریسک را داشته است.`,
+  if (/ریسک|افت|ضرر|var|شارپ|نوسان|پرتفوی|سرمایه/.test(text)) {
+    return {
+      content: "نمایش معیارهای ریسک و وزن پرتفوی فعلاً بسته است؛ اعداد تاریخی نمونه نباید به‌عنوان ریسک فعلی یا پیشنهاد تخصیص تلقی شوند. بازگشایی به دادهٔ زمان‌مند، هزینه و نقدشوندگی معتبر و ارزیابی خارج از نمونه نیاز دارد.",
+      destination: "decision",
+    };
+  }
 
-  nasdaq: `Nasdaq ETF به دلایل زیر انتخاب شده:
+  if (/خبر|سیاسی|احساسات|سنتیمنت|کلان|تورم|نرخ بهره|رژیم بازار/.test(text)) {
+    return {
+      content: "خط لولهٔ عملیاتی و قابل ممیزی برای خبر، رویداد سیاسی، احساسات و دادهٔ کلان هنوز در نسخهٔ اجرایی متصل نشده است. این بخش‌ها تا زمان داشتن منبع، زمان انتشار و تاریخچهٔ قابل بازپخش، خروجی تحلیلی ارائه نمی‌کنند.",
+    };
+  }
 
-• مومنتوم ۴ ماهه: +۵.۱٪ — رتبه ۲ از ۹ دارایی
-• نسبت Sharpe ۱۲ ماهه: ۱.۰۵ — رتبه ۳
-• نوسان ماهانه: ۸.۲٪ — رتبه ۴
+  if (/منبع|داده|کیفیت|تازگی|اتصال|ایران|tsetmc|codal|fred/.test(text)) {
+    return {
+      content: "موتور فعلی فقط یک نمونهٔ محدود از پروکسی‌های جهانی را به جریان پژوهش متصل کرده است. منابع ایران، از جمله بورس، طلا و ارز، هنوز تأیید و وارد محاسبات نشده‌اند. وضعیت واقعی ثبت داده، اتصال منابع و محدودیت‌ها را از بخش «وضعیت داده» بررسی کن.",
+      destination: "settings",
+    };
+  }
 
-بازده خوبی داشته اما نوسان آن بیشتر از دلار است.`,
+  if (/ادمین|مدیریت|کاربر|ورود|حساب/.test(text)) {
+    return {
+      content: "پنل ادمین هنوز سرویس عملیاتی کامل نیست؛ احراز هویت، سطح دسترسی، ثبت ممیزی، ذخیره‌سازی و عملیات واقعی مدیریت باید تکمیل و امن‌سازی شوند. فعلاً نباید از آن برای مدیریت کاربران یا منابع استفاده کرد.",
+    };
+  }
 
-  spx: `S&P 500 ETF به دلایل زیر انتخاب شده:
+  if (/هوش مصنوعی|چت.?بات|مدل زبانی|ai/.test(text)) {
+    return {
+      content: "این پنجره در حال حاضر فقط راهنمای ثابت محصول است، نه دستیار هوش مصنوعی متصل به مدل زبانی. برای تبدیل آن به تحلیلگر واقعی باید API مدل، بازیابی شواهد از داده‌های تأییدشده، ارجاع هر ادعا و کنترل پاسخ بدون مدرک ساخته شود.",
+    };
+  }
 
-• مومنتوم ۴ ماهه: +۴.۳٪ — رتبه ۳ از ۹ دارایی
-• نسبت Sharpe ۱۲ ماهه: ۰.۹۸ — رتبه ۴
-• نوسان ماهانه: ۷.۱٪ — رتبه ۳
-
-پایه‌ای محافظه‌کارانه برای تنوع‌بخشی به پرتفوی.`,
-
-  risk: `ریسک پرتفوی فعلی:
-
-• VaR 95٪ = ۳.۲٪
-  در ۹۵٪ مواقع افت هفتگی کمتر از این خواهد بود.
-
-• Max Drawdown = ۵.۱٪
-  بیشترین افت تاریخی ثبت‌شده.
-
-• Sharpe = ۱.۴
-  به ازای هر واحد ریسک، ۱.۴ واحد بازده اضافی.
-
-پرتفوی در مجموع محافظه‌کارانه طراحی شده (بتا = ۰.۸۵).`,
-
-  confidence: `سطح اطمینان مدل «متوسط» (۶۲/۱۰۰) است.
-
-مدل فعلی فقط از مومنتوم قیمتی استفاده می‌کند.
-عواملی که هنوز در مدل لحاظ نشده‌اند:
-• اخبار و احساسات بازار
-• داده‌های کلان اقتصادی واقعی
-• Walk-Forward Validation کامل
-
-این پیشنهاد نقطه شروع است، نه توصیه قطعی.`,
-
-  algo: `مدل بر اساس سه معیار رتبه‌بندی می‌کند:
-
-۱. مومنتوم — بازده قیمتی ۴ ماه گذشته
-۲. Sharpe — بازده تعدیل‌شده به نوسان (۱۲ ماهه)
-۳. نوسان — پایداری قیمت ماهانه (کمتر بهتر)
-
-دارایی‌هایی که در هر سه معیار رتبه بالاتری دارند
-وزن بیشتری در پرتفوی می‌گیرند.`,
-
-  default: `می‌توانم در این موارد کمک کنم:
-
-• «چرا دلار انتخاب شد؟»
-• «چرا ناسداک انتخاب شد؟»
-• «چرا S&P 500 انتخاب شد؟»
-• «ریسک پرتفوی چقدر است؟»
-• «سطح اطمینان مدل چیست؟»
-• «الگوریتم چطور کار می‌کند؟»`,
-} as const;
-
-/* ── Keyword router ── */
-function getAnswer(q: string): string {
-  const t = q.toLowerCase();
-  if (t.includes("دلار") || t.includes("dollar")) return KB.dollar;
-  if (t.includes("ناسداک") || t.includes("nasdaq")) return KB.nasdaq;
-  if (
-    t.includes("s&p") ||
-    t.includes("spx") ||
-    t.includes("اس اند") ||
-    t.includes("اس‌اند")
-  )
-    return KB.spx;
-  if (
-    t.includes("ریسک") ||
-    t.includes("var") ||
-    t.includes("drawdown") ||
-    t.includes("sharpe") ||
-    t.includes("بتا")
-  )
-    return KB.risk;
-  if (
-    t.includes("اطمینان") ||
-    t.includes("confidence") ||
-    t.includes("دقت مدل")
-  )
-    return KB.confidence;
-  if (
-    t.includes("الگوریتم") ||
-    t.includes("معیار") ||
-    t.includes("چطور") ||
-    t.includes("چرا") ||
-    t.includes("مومنتوم")
-  )
-    return KB.algo;
-  return KB.default;
+  return {
+    content: "می‌توانم وضعیت فعلی قابلیت‌ها و محدودیت‌های MarketSage را توضیح بدهم، اما قیمت، رتبه، ریسک یا توصیهٔ سرمایه‌گذاری تولید نمی‌کنم. موضوعت را دربارهٔ منابع داده، کیفیت داده، موتور تحلیل، اخبار، ریسک یا پنل ادمین مشخص کن.",
+  };
 }
 
-/* ── Component ── */
-export const AIChatbot = () => {
+export const AIChatbot = ({ onNavigate }: { onNavigate: (tab: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "سلام! می‌توانم دلایل عددی هر پیشنهاد را توضیح دهم.\n\nمثلاً بپرسید:\n• «چرا دلار انتخاب شد؟»\n• «ریسک پرتفوی چقدر است؟»\n• «سطح اطمینان مدل چیست؟»",
+      content: "سلام. من فعلاً راهنمای ثابت MarketSage هستم، نه مدل هوش مصنوعی یا تحلیلگر متصل به دادهٔ زنده. می‌توانم قابلیت‌های موجود و بخش‌های تکمیل‌نشده را توضیح بدهم.",
     },
   ]);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages, isOpen]);
 
   const handleSend = () => {
-    const text = input.trim();
-    if (!text) return;
-    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    const question = input.trim();
+    if (!question) return;
+    const answer = getGuideAnswer(question);
+    setMessages((current) => [
+      ...current,
+      { role: "user", content: question },
+      { role: "assistant", content: answer.content },
+    ]);
     setInput("");
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: getAnswer(text) },
-      ]);
-    }, 420);
+    if (answer.destination) onNavigate(answer.destination);
   };
 
   return (
     <>
-      {/* Floating button */}
       {!isOpen && (
         <button
+          type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 left-4 bg-primary text-white p-4 rounded-full shadow-lg z-50 hover:bg-primary/80 transition-colors"
-          title="تحلیلگر AI"
+          className="fixed bottom-4 left-4 z-50 rounded-full bg-primary p-4 text-white shadow-lg transition-colors hover:bg-primary/80"
+          title="راهنمای MarketSage"
+          aria-label="باز کردن راهنمای MarketSage"
         >
-          🤖
+          ?
         </button>
       )}
 
-      {/* Chat panel */}
       {isOpen && (
-        <div className="fixed bottom-4 left-4 w-96 h-[530px] bg-surface border border-border rounded-2xl shadow-2xl z-50 flex flex-col">
-          {/* Header */}
-          <div className="flex justify-between items-start p-3 border-b border-border">
+        <section
+          className="fixed bottom-4 left-4 z-50 flex h-[530px] w-[min(24rem,calc(100vw-2rem))] flex-col rounded-2xl border border-border bg-surface shadow-2xl"
+          aria-label="راهنمای MarketSage"
+        >
+          <header className="flex items-start justify-between border-b border-border p-3">
             <div>
-              <p className="font-bold">🤖 تحلیلگر MarketSage</p>
-              <p className="text-xs text-text-secondary">
-                پاسخ‌ها بر اساس داده‌های مومنتوم
-              </p>
+              <p className="font-bold">راهنمای MarketSage</p>
+              <p className="text-xs text-text-secondary">راهنمای ثابت محصول · بدون مدل زبانی یا دادهٔ زنده</p>
             </div>
             <button
+              type="button"
               onClick={() => setIsOpen(false)}
-              className="text-text-secondary hover:text-text mt-0.5"
+              className="mt-0.5 text-text-secondary hover:text-text"
               aria-label="بستن"
             >
               ✕
             </button>
-          </div>
+          </header>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            {messages.map((m, i) => (
+          <div className="flex-1 space-y-3 overflow-y-auto p-3">
+            {messages.map((message, index) => (
               <div
-                key={i}
-                className={`flex ${
-                  m.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                key={message.role + "-" + index}
+                className={"flex " + (message.role === "user" ? "justify-end" : "justify-start")}
               >
-                <div
-                  className={`max-w-[85%] p-3 rounded-xl text-sm whitespace-pre-line leading-relaxed ${
-                    m.role === "user"
-                      ? "bg-primary text-white"
-                      : "bg-background border border-border"
-                  }`}
+                <p
+                  className={
+                    "max-w-[88%] whitespace-pre-line rounded-xl p-3 text-sm leading-relaxed " +
+                    (message.role === "user" ? "bg-primary text-white" : "border border-border bg-background")
+                  }
                 >
-                  {m.content}
-                </div>
+                  {message.content}
+                </p>
               </div>
             ))}
-
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-background border border-border px-4 py-3 rounded-xl text-sm text-text-secondary">
-                  در حال تایپ...
-                </div>
-              </div>
-            )}
             <div ref={endRef} />
           </div>
 
-          {/* Input */}
-          <div className="p-3 border-t border-border flex gap-2">
+          <form
+            className="flex gap-2 border-t border-border p-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSend();
+            }}
+          >
             <input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && !e.shiftKey && handleSend()
-              }
-              placeholder="چرا این دارایی انتخاب شد؟"
-              className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="دربارهٔ وضعیت واقعی محصول بپرس..."
+              className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
             />
             <button
-              onClick={handleSend}
+              type="submit"
               disabled={!input.trim()}
-              className="bg-primary text-white px-4 rounded-xl disabled:opacity-40 transition-opacity"
+              className="rounded-xl bg-primary px-4 text-white transition-opacity disabled:opacity-40"
             >
-              ➤
+              ارسال
             </button>
-          </div>
-        </div>
+          </form>
+        </section>
       )}
     </>
   );

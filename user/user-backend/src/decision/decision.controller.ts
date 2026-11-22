@@ -17,6 +17,12 @@ export class DecisionController {
     @Query('capital') capitalInput = '500000000',
     @Query('top_n') topNInput = '5',
   ) {
+    if (process.env.MARKETSAGE_RESEARCH_OUTPUTS_ENABLED !== 'true') {
+      throw new ServiceUnavailableException(
+        'Research decision outputs are disabled until source and methodology validation is approved.',
+      );
+    }
+
     if (!ALLOWED_HORIZONS.has(horizon)) {
       throw new BadRequestException('Unsupported horizon. Use 1W, 1M, 3M, or 6M.');
     }

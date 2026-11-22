@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-09",
+  "project_decisions": [
+    "CONTINUE",
+    "PIVOT",
+    "HOLD",
+    "STOP",
+    "ARCHIVE"
+  ],
+  "task_statuses": [
+    "PROPOSED",
+    "READY",
+    "IN_PROGRESS",
+    "VALIDATION",
+    "ACCEPTED",
+    "BLOCKED",
+    "REWORK",
+    "REJECTED",
+    "STOPPED",
+    "ARCHIVED"
+  ],
+  "principles": [
+    "User value is the primary product outcome; activity, PR count and CI pass are not user value.",
+    "Only independent workstreams may execute in parallel; dependent PRs must integrate in order.",
+    "An unapproved or unverified source remains unavailable for investment analysis.",
+    "A project-wide mission change or permanent abandonment requires explicit owner authority."
+  ],
+  "rules": [
+    {
+      "id": "DP-001",
+      "when": "task_has_no_acceptance_criteria",
+      "action": "REJECT",
+      "reason": "No measurable completion contract."
+    },
+    {
+      "id": "DP-002",
+      "when": "task_has_no_user_problem_or_release_blocker",
+      "action": "REJECT",
+      "reason": "No demonstrable user or release value."
+    },
+    {
+      "id": "DP-003",
+      "when": "dependency_is_open_or_failed",
+      "action": "BLOCK_DEPENDENT_ONLY",
+      "reason": "Independent tracks continue."
+    },
+    {
+      "id": "DP-004",
+      "when": "same_root_cause_fails_twice",
+      "action": "STOP_APPROACH",
+      "reason": "No unbounded retries."
+    },
+    {
+      "id": "DP-005",
+      "when": "no_user_observable_outcome_after_two_cycles",
+      "action": "REPLAN_OR_STOP_SCOPE",
+      "reason": "Prevent disconnected engineering."
+    },
+    {
+      "id": "DP-006",
+      "when": "data_rights_or_integrity_unknown",
+      "action": "FAIL_CLOSED",
+      "reason": "Unknown is not pass."
+    },
+    {
+      "id": "DP-007",
+      "when": "security_gate_fails",
+      "action": "BLOCK_RELEASE",
+      "reason": "No public release with critical security gaps."
+    },
+    {
+      "id": "DP-008",
+      "when": "task_requires_local_runner_or_paid_resource",
+      "action": "HOLD_FOR_OWNER",
+      "reason": "No local dispatch, spending or provisioning without approval."
+    },
+    {
+      "id": "DP-009",
+      "when": "product_task_claims_accepted",
+      "action": "REQUIRE_USER_FLOW_EVIDENCE",
+      "reason": "Integrated end-to-end proof is required."
+    }
+  ],
+  "cycle_policy": {
+    "max_attempts_same_root_cause": 2,
+    "max_open_prs_per_objective": 1,
+    "max_unbounded_retries": 0,
+    "default_task_timebox_hours": 8
+  },
+  "authority": {
+    "execution_lead": [
+      "create_branches",
+      "implement_scoped_changes",
+      "run_bounded_free_ci",
+      "stop_or_archive_task_scope",
+      "open_prs"
+    ],
+    "owner_required": [
+      "change_product_mission",
+      "change_asset_universe_or_horizon",
+      "approve_new_paid_resources",
+      "approve_local_runner_dispatch",
+      "enable_investment_outputs",
+      "approve_source_for_investment_use",
+      "authorize_broker_or_trading",
+      "abandon_entire_project"
+    ]
+  },
+  "report_contract": [
+    "project_decision_only_when_decision_changes_or_is_due",
+    "user_value_only_after_reproducible_real_user_flow",
+    "owner_action_only_when_a_specific_blocker_requires_it"
+  ]
+}
