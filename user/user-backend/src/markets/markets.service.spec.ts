@@ -29,6 +29,7 @@ describe('MarketsService source observability endpoints', () => {
     ['getInstruments', '/instruments'],
     ['getDataQuality', '/data-quality'],
     ['getIranProviders', '/iran-market/providers'],
+    ['getFooladPreview', '/iran-market/equities/foolad/preview'],
   ] as const)('forwards %s to the matching analysis endpoint', async (method, path) => {
     const response = { data: { source: path, verified: false } };
     mockedAxios.get.mockResolvedValue(response as never);
