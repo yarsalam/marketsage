@@ -18,7 +18,7 @@ The existing required contexts are retained: analysis, user-backend, user-fronte
 
 For an allowlisted Goal 1 change, the five product/build contexts are skipped (GitHub treats skipped jobs as successful); the two automation test contexts run. For every other scope, the five contexts fail immediately with fixed messages and do not run product commands.
 
-All CI jobs have explicit timeouts. Actions are pinned to immutable commit SHAs. Default permissions are contents:read; only the two trusted notification/provenance jobs receive job-scoped issues:write. Checkout credentials are not persisted. No artifact upload/download is configured.
+All CI jobs have explicit timeouts. Actions are pinned to immutable commit SHAs. Default permissions are contents:read; only the trusted notification/provenance jobs receive job-scoped issues:write, and the CI failure-notice job is further restricted to main and infra/** refs. Checkout credentials are not persisted. No artifact upload/download is configured.
 
 ## Queue, cancellation, retry, and recovery
 
@@ -35,6 +35,9 @@ The watchdog runs every 15 minutes and after a MarketSage CI run completes. It r
 - In-progress CI older than 35 minutes.
 - Missing/stale daily schedule (26-hour threshold).
 - Latest trusted infrastructure/main CI failure.
+- Latest completed scheduled CI run must conclude successfully; a failed/cancelled schedule is reported even if a newer push succeeds.
+- Workflow-run history is read with a five-page (500-run) bound; if the API reports more history than the observer inspected, health is Degraded rather than silently treating a partial scan as complete.
+- The latest watchdog state is selected from the newest issue comments.
 
 The report contains only aggregate state, counts, and fixed reason codes. It excludes run IDs, commit identifiers, logs, artifacts, raw data, prices, private paths, credentials, and secret values. Issue #49 is updated only when the state or reason set changes.
 
