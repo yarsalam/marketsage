@@ -117,6 +117,12 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertNotRegex(WATCHDOG, r"(?m)^\s*cancel-in-progress:")
         self.assertNotIn("workflow_dispatch:", WATCHDOG)
 
+    def test_issue_write_failure_notice_is_restricted_to_trusted_refs(self):
+        self.assertIn(
+            "if: ${{ always() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/infra/')) && contains(needs.*.result, 'failure') }}",
+            CI,
+        )
+
     def test_watchdog_uses_only_read_actions_and_issue_handoff(self):
         self.assertIn("actions: read", WATCHDOG)
         self.assertIn("contents: read", WATCHDOG)
