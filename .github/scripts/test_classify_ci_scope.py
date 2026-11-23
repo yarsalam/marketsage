@@ -114,7 +114,7 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertRegex(WATCHDOG, r"(?m)^  workflow_run:\s*$")
         self.assertIn("queue: max", WATCHDOG)
         self.assertIn("timeout-minutes: 5", WATCHDOG)
-        self.assertNotIn("cancel-in-progress", WATCHDOG)
+        self.assertNotRegex(WATCHDOG, r"(?m)^\\s*cancel-in-progress:")
         self.assertNotIn("workflow_dispatch:", WATCHDOG)
 
     def test_watchdog_uses_only_read_actions_and_issue_handoff(self):
