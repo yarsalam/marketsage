@@ -132,11 +132,15 @@ class SanitizedHandoffTests(unittest.TestCase):
         comments = [
             {
                 "created_at": "2026-11-23T10:00:00Z",
-                "body": "<!-- marketsage-goal1-watchdog-state -->\\nState: healthy\\nReasons: none",
+                "body": """<!-- marketsage-goal1-watchdog-state -->
+State: healthy
+Reasons: none""",
             },
             {
                 "created_at": "2026-11-23T09:45:00Z",
-                "body": "<!-- marketsage-goal1-watchdog-state -->\\nState: degraded\\nReasons: schedule_stale",
+                "body": """<!-- marketsage-goal1-watchdog-state -->
+State: degraded
+Reasons: schedule_stale""",
             },
         ]
         self.assertEqual(latest_state(comments), ("healthy", ()))
