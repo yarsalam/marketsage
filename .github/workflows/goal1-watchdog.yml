@@ -1,0 +1,36 @@
+name: MarketSage Goal 1 Watchdog
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_run:
+    workflows: ["MarketSage CI"]
+    types: [completed]
+    branches: [main, "infra/**"]
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+# This monitor is serialized and bounded. queue:max allows up to 100 pending
+# observations; it is intentionally not combined with cancel-in-progress.
+concurrency:
+  group: marketsage-goal1-watchdog
+  queue: max
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Assess recent CI health and report state transitions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          API_URL: ${{ github.api_url }}
+          REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: "49"
+        run: python3 .github/scripts/goal1_watchdog.py

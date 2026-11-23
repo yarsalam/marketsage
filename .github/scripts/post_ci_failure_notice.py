@@ -6,7 +6,6 @@ from __future__ import annotations
 import json
 import os
 import re
-import sys
 import urllib.parse
 import urllib.request
 from typing import Any
@@ -18,7 +17,6 @@ _DIGITS = re.compile(r"^[0-9]+$")
 
 
 def failed_job_names(needs: dict[str, Any]) -> list[str]:
-    """Return only syntactically safe job identifiers whose result is failure."""
     if not isinstance(needs, dict):
         raise ValueError("needs must be an object")
     names = []
@@ -42,7 +40,7 @@ def build_comment(
     run_number: str,
     run_attempt: str,
 ) -> str | None:
-    """Build a minimal notice; never serialize job outputs, logs, or exceptions."""
+    """Build a minimal notice; never serialize run IDs, logs, outputs, or exceptions."""
     failures = failed_job_names(needs)
     if not failures:
         return None
@@ -55,20 +53,19 @@ def build_comment(
     if parsed.scheme != "https" or not parsed.netloc or parsed.path:
         raise ValueError("invalid GitHub server URL")
 
-    run_url = f"{server_url.rstrip('/')}/{repository}/actions/runs/{run_id}"
-    jobs = ", ".join(f"`{name}`" for name in failures)
+    jobs = ", ".join(chr(96) + name + chr(96) for name in failures)
+    actions_url = f"{server_url.rstrip('/')}/{repository}/actions"
     return (
         "### Automated CI failure notice\n\n"
-        f"Run: [#{run_number}]({run_url}) (attempt {run_attempt})\n"
-        f"Failed jobs: {jobs}\n\n"
-        "This notice contains job names only. It does not attach logs, artifacts, "
-        "raw market data, prices, credentials, or local paths. Inspect the linked "
-        "run and redact sensitive material before sharing."
+        f"Failed jobs: {jobs}\n"
+        f"Actions overview: {actions_url}\n\n"
+        "This notice contains aggregate job names only. It does not include run or "
+        "commit identifiers, logs, artifacts, raw market data, prices, credentials, "
+        "local paths, or unfiltered exception text."
     )
 
 
 def post_comment(*, api_url: str, token: str, repository: str, body: str) -> None:
-    """Create one GitHub issue comment using the job-scoped GITHUB_TOKEN."""
     parsed = urllib.parse.urlparse(api_url)
     if parsed.scheme != "https" or not parsed.netloc or parsed.path:
         raise ValueError("invalid GitHub API URL")
@@ -120,7 +117,6 @@ def main() -> int:
         print("Sanitized failure notice posted to infrastructure issue.")
         return 0
     except Exception:
-        # Do not print exception objects: they may contain request metadata.
         print("Sanitized failure notice could not be delivered.")
         return 1
 

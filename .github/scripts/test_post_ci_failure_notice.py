@@ -20,17 +20,11 @@ class FailureNoticeTests(unittest.TestCase):
             "user-backend": {"result": "success", "outputs": {"token": "SECRET"}},
             "admin-workspace": {"result": "failure"},
         }
-        self.assertEqual(
-            failed_job_names(needs),
-            ["admin-workspace", "analysis"],
-        )
+        self.assertEqual(failed_job_names(needs), ["admin-workspace", "analysis"])
 
-    def test_comment_contains_only_sanitized_status(self):
-        needs = {
-            "analysis": {"result": "failure", "outputs": {"private": "RAW-DATA"}},
-        }
+    def test_comment_contains_only_aggregate_sanitized_status(self):
         comment = build_comment(
-            needs=needs,
+            needs={"analysis": {"result": "failure", "outputs": {"private": "RAW-DATA"}}},
             server_url="https://github.com",
             repository="yarsalam/marketsage",
             run_id="12345",
@@ -38,10 +32,13 @@ class FailureNoticeTests(unittest.TestCase):
             run_attempt="1",
         )
         self.assertIn("analysis", comment)
-        self.assertIn("https://github.com/yarsalam/marketsage/actions/runs/12345", comment)
+        self.assertIn("https://github.com/yarsalam/marketsage/actions", comment)
         self.assertNotIn("RAW-DATA", comment)
         self.assertNotIn("SECRET", comment)
         self.assertNotIn("outputs", comment)
+        self.assertNotIn("/actions/runs/", comment)
+        self.assertNotIn("12345", comment)
+        self.assertNotIn("67", comment)
 
     def test_no_failure_produces_no_comment(self):
         self.assertIsNone(

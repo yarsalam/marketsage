@@ -2,15 +2,14 @@
 """Detect main-branch pushes whose commits are not associated with merged PRs.
 
 This is detection, not prevention. It never rewrites refs or attempts to block a
-push. It uses read-only commit/PR metadata and posts a sanitized Issue #49 notice
-when provenance cannot be verified or a commit lacks a merged PR into main.
+push. It uses read-only commit/PR metadata and posts only fixed reason codes to
+Issue #49 when provenance cannot be verified.
 """
 from __future__ import annotations
 
 import json
 import os
 import re
-import sys
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -32,7 +31,6 @@ def classify_main_update(
     compare: dict[str, Any],
     pulls_by_sha: dict[str, list[dict[str, Any]]],
 ) -> list[str]:
-    """Return safe reason codes; an empty list means all commits map to merged PRs."""
     reasons: list[str] = []
     if not _SHA.fullmatch(before_sha) or not _SHA.fullmatch(after_sha):
         return ["invalid_push_range"]
@@ -145,7 +143,7 @@ def post_sanitized_notice(
     after_sha: str,
     reasons: list[str],
 ) -> None:
-    """Post only run URL, commit range and fixed reason codes."""
+    """Post only fixed reason codes and a repository-level Actions link."""
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
         raise VerificationError("repository_invalid")
     allowed = {
@@ -157,20 +155,17 @@ def post_sanitized_notice(
         "commit_sha_invalid",
         "commit_without_merged_main_pr",
         "invalid_push_range",
-        "commit_range_unverifiable",
     }
     safe_reasons = sorted(set(reason for reason in reasons if reason in allowed))
     if not safe_reasons:
         safe_reasons = ["commit_range_unverifiable"]
     body = (
         "### Main-branch provenance warning\n\n"
-        f"Run: {run_url}\n"
-        f"Before: {before_sha[:40]}\n"
-        f"After: {after_sha[:40]}\n"
+        "Status: main update provenance could not be verified.\n"
         f"Reason codes: {', '.join(safe_reasons)}\n\n"
-        "This is a detection/alert only; it does not prevent or revert the update. "
-        "Review the commit range and verify that every change entered through an "
-        "approved pull request. No commit messages, diffs, logs, tokens or secrets "
+        f"Actions overview: https://github.com/{repository}/actions\n\n"
+        "This is a detection/alert only; it does not prevent or revert an update. "
+        "No run IDs, commit identifiers, messages, diffs, logs, tokens, or secrets "
         "are included in this notice."
     )
     payload = json.dumps({"body": body}).encode("utf-8")
@@ -226,7 +221,6 @@ def main() -> int:
         print("Main update provenance warning posted to Issue #49.")
         return 1
     except VerificationError:
-        # Do not print exception details or request metadata.
         try:
             post_sanitized_notice(
                 api_url=env["API_URL"],

@@ -125,7 +125,7 @@ class GitHubApiTests(unittest.TestCase):
         self.assertIn("/compare/", mocked.call_args_list[0].args[0])
         self.assertIn(f"/commits/{SHA_B}/pulls", mocked.call_args_list[1].args[0])
 
-    def test_sanitized_notice_does_not_include_token_or_commit_messages(self) -> None:
+    def test_sanitized_notice_contains_no_run_or_commit_identifiers(self) -> None:
         class Response:
             status = 201
             def __enter__(self):
@@ -147,6 +147,9 @@ class GitHubApiTests(unittest.TestCase):
         body = json.loads(request.data.decode("utf-8"))["body"]
         self.assertNotIn("SECRET_TOKEN", body)
         self.assertNotIn("DO_NOT_LEAK_COMMIT_TITLE", body)
+        self.assertNotIn(SHA_A, body)
+        self.assertNotIn(SHA_B, body)
+        self.assertNotIn("/actions/runs/", body)
         self.assertIn("commit_without_merged_main_pr", body)
 
 

@@ -2,119 +2,126 @@ name: MarketSage CI
 
 on:
   push:
-    branches: [main, "deploy/**", "research/**", "ci/**", "infra/**"]
+    branches: ["**"]
   pull_request:
-    branches: [main, "deploy/**", "infra/**"]
-  # GitHub scheduled workflows run from the default branch after this PR is merged.
-  # A daily full validation provides a bounded unattended health signal.
+    branches: [main]
   schedule:
     - cron: "17 3 * * *"
-  workflow_dispatch:
 
 permissions:
   contents: read
 
-# Keep only the newest validation for the same PR/ref. A newer commit supersedes
-# an older queued run; independent branches remain isolated.
+# CI is replaceable/read-only: a newer commit supersedes an older validation
+# for the same PR/ref. Stateful work is not permitted in this workflow.
 concurrency:
-  group: marketsage-ci-${{ github.event.pull_request.number || github.ref }}
+  group: marketsage-goal1-ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  analysis:
+  classify-change-scope:
+    name: Classify change scope
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 5
+    outputs:
+      infra_only: ${{ steps.scope.outputs.infra_only }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: user/analysis-engine/requirements-dev.txt
-      - name: Install analysis dependencies
-        working-directory: user/analysis-engine
-        run: python -m pip install -r requirements-dev.txt
-      - name: Test analysis API and research backtests
-        working-directory: user/analysis-engine
-        run: pytest -q
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Classify without printing changed paths
+        id: scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: python3 .github/scripts/classify_ci_scope.py
+
+  # Preserve every existing required-check context. During Goal 1, these jobs
+  # are skipped for the allowlisted automation-only scope and fail immediately
+  # for all other/unknown scopes without executing product or research commands.
+  analysis:
+    needs: [classify-change-scope]
+    if: ${{ always() && needs.classify-change-scope.outputs.infra_only != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Block analysis and backtest execution during Goal 1
+        run: |
+          echo "::error::Goal 1 freeze: analysis and backtest execution are paused."
+          exit 1
 
   user-backend:
+    needs: [classify-change-scope]
+    if: ${{ always() && needs.classify-change-scope.outputs.infra_only != 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: user/user-backend
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-        with:
-          version: 9
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm build
-      - name: Test
-        run: pnpm exec jest --runInBand
+      - name: Block product backend validation during Goal 1
+        run: |
+          echo "::error::Goal 1 freeze: product backend validation is paused."
+          exit 1
 
   user-frontend:
+    needs: [classify-change-scope]
+    if: ${{ always() && needs.classify-change-scope.outputs.infra_only != 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: user/user-frontend
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-        with:
-          version: 10
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        env:
-          NEXT_PUBLIC_API_URL: ""
-        run: pnpm build
+      - name: Block product frontend validation during Goal 1
+        run: |
+          echo "::error::Goal 1 freeze: product frontend validation is paused."
+          exit 1
 
   admin-workspace:
+    needs: [classify-change-scope]
+    if: ${{ always() && needs.classify-change-scope.outputs.infra_only != 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: admin-panel
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-        with:
-          version: 9
-      - name: Install admin workspace dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build admin web
-        run: pnpm --filter web build
-      - name: Build admin API starter
-        run: pnpm --filter server build
-      - name: Test admin API starter
-        run: pnpm --filter server exec jest --runInBand
+      - name: Block product admin validation during Goal 1
+        run: |
+          echo "::error::Goal 1 freeze: product admin validation is paused."
+          exit 1
 
   production-images:
-    needs: [analysis, user-backend, user-frontend]
+    needs: [classify-change-scope]
+    if: ${{ always() && needs.classify-change-scope.outputs.infra_only != 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 2
+    steps:
+      - name: Block production image builds during Goal 1
+        run: |
+          echo "::error::Goal 1 freeze: production image builds are paused."
+          exit 1
+
+  provider-neutral-control-plane-tests:
+    name: Test provider-neutral control plane
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Validate production Compose configuration
+        with:
+          persist-credentials: false
+      - name: Test CI scope, health assessment, and workflow safety contracts
         run: |
-          cp .env.production.example .env.production
-          docker compose --env-file .env.production -f docker-compose.production.yml config -q
-      - name: Build all production images
-        run: docker compose --env-file .env.production -f docker-compose.production.yml build
+          python3 .github/scripts/test_classify_ci_scope.py -v
+          python3 .github/scripts/test_goal1_watchdog.py -v
+
+  ci-infra-tests:
+    name: Test CI automation helpers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test sanitized failure notice and main provenance helpers
+        run: |
+          python3 .github/scripts/test_post_ci_failure_notice.py -v
+          python3 .github/scripts/test_detect_direct_main_update.py -v
 
   detect-direct-main-update:
     name: Detect direct main updates
@@ -141,29 +148,19 @@ jobs:
           RUN_ID: ${{ github.run_id }}
         run: python3 .github/scripts/detect_direct_main_update.py
 
-  ci-infra-tests:
-    name: Test CI automation helpers
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Test CI and main provenance helpers
-        run: |
-          python3 .github/scripts/test_post_ci_failure_notice.py -v
-          python3 .github/scripts/test_detect_direct_main_update.py -v
-
   notify-failure:
     name: Post sanitized failure notice
     needs:
+      - classify-change-scope
       - analysis
       - user-backend
       - user-frontend
       - admin-workspace
       - production-images
+      - provider-neutral-control-plane-tests
       - ci-infra-tests
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
+      - detect-direct-main-update
+    if: ${{ always() && github.event_name != 'pull_request' && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -173,7 +170,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Post job-level status to infrastructure issue
+      - name: Post aggregate failure status to infrastructure issue
         env:
           GH_TOKEN: ${{ github.token }}
           NEEDS_JSON: ${{ toJSON(needs) }}
