@@ -16,6 +16,7 @@ from typing import Any
 _MARKER = "<!-- marketsage-goal1-watchdog-state -->"
 _REPOSITORY = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 _FAILURES = {"failure", "timed_out", "startup_failure", "action_required"}
+MAX_RUN_PAGES = 5
 
 
 class WatchdogError(RuntimeError):
@@ -39,10 +40,14 @@ def trusted_run(run: dict[str, Any]) -> bool:
     )
 
 
-def assess_runs(runs: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
+def assess_runs(
+    runs: list[dict[str, Any]], now: datetime, history_complete: bool = True
+) -> dict[str, Any]:
     if not isinstance(runs, list):
         raise ValueError("invalid workflow run collection")
     reasons: set[str] = set()
+    if not history_complete:
+        reasons.add("workflow_history_truncated")
     queued = 0
     running = 0
     trusted: list[dict[str, Any]] = []
@@ -87,6 +92,8 @@ def assess_runs(runs: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
             schedule_age = now - parse_time(latest_schedule["created_at"])
             if schedule_age > timedelta(hours=26):
                 reasons.add("schedule_stale")
+            if latest_schedule.get("conclusion") != "success":
+                reasons.add("latest_schedule_not_successful")
         except (KeyError, TypeError, ValueError):
             reasons.add("schedule_timestamp_unverifiable")
 
@@ -140,7 +147,7 @@ def build_comment(assessment: dict[str, Any], repository: str) -> str:
 
 
 def latest_state(comments: list[dict[str, Any]]) -> tuple[str, tuple[str, ...]] | None:
-    for item in reversed(comments):
+    for item in comments:
         body = item.get("body", "") if isinstance(item, dict) else ""
         if _MARKER not in body:
             continue
@@ -181,6 +188,34 @@ def request_json(url: str, token: str) -> Any:
                 continue
             raise WatchdogError("github_api_unavailable") from exc
     raise WatchdogError("github_api_unavailable")
+
+
+def fetch_workflow_runs(
+    api_url: str, repository: str, token: str, max_pages: int = MAX_RUN_PAGES
+) -> tuple[list[dict[str, Any]], bool]:
+    if not isinstance(max_pages, int) or max_pages < 1:
+        raise ValueError("max_pages must be positive")
+    collected: list[dict[str, Any]] = []
+    total_count: int | None = None
+    for page in range(1, max_pages + 1):
+        data = request_json(
+            f"{api_url.rstrip('/')}/repos/{repository}/actions/workflows/ci.yml/runs"
+            f"?per_page=100&page={page}",
+            token,
+        )
+        if not isinstance(data, dict) or not isinstance(data.get("workflow_runs"), list):
+            raise WatchdogError("workflow_run_response_invalid")
+        if total_count is None:
+            total_count = data.get("total_count")
+            if not isinstance(total_count, int) or total_count < 0:
+                raise WatchdogError("workflow_run_count_invalid")
+        batch = data["workflow_runs"]
+        collected.extend(item for item in batch if isinstance(item, dict))
+        if len(collected) >= total_count:
+            return collected, True
+        if len(batch) < 100:
+            return collected, False
+    return collected, len(collected) >= (total_count if total_count is not None else 0)
 
 
 def post_comment(api_url: str, repository: str, issue_number: str, token: str, body: str) -> None:
@@ -224,16 +259,13 @@ def main() -> int:
         return 2
 
     try:
-        run_data = request_json(
-            f"{api_url.rstrip('/')}/repos/{repository}/actions/workflows/ci.yml/runs?per_page=100",
-            token,
+        runs, history_complete = fetch_workflow_runs(api_url, repository, token)
+        assessment = assess_runs(
+            runs, datetime.now(timezone.utc), history_complete=history_complete
         )
-        runs = run_data.get("workflow_runs") if isinstance(run_data, dict) else None
-        if not isinstance(runs, list):
-            raise WatchdogError("workflow_run_response_invalid")
-        assessment = assess_runs(runs, datetime.now(timezone.utc))
         comments_data = request_json(
-            f"{api_url.rstrip('/')}/repos/{repository}/issues/{issue_number}/comments?per_page=100",
+            f"{api_url.rstrip('/')}/repos/{repository}/issues/{issue_number}/comments"
+            "?per_page=100&sort=created&direction=desc",
             token,
         )
         if not isinstance(comments_data, list):
