@@ -64,6 +64,12 @@ class ScopeClassifierTests(unittest.TestCase):
 
 
 class WorkflowPolicyTests(unittest.TestCase):
+    def test_push_schedule_and_pr_runs_do_not_cancel_across_event_types(self):
+        self.assertIn(
+            "group: marketsage-goal1-ci-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}",
+            CI,
+        )
+
     def test_event_driven_and_daily_schedule_are_present(self):
         self.assertRegex(CI, r"(?m)^  push:\s*$")
         self.assertRegex(CI, r"(?m)^  pull_request:\s*$")
