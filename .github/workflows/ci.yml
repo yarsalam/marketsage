@@ -14,7 +14,7 @@ permissions:
 # CI is replaceable/read-only: a newer commit supersedes an older validation
 # for the same PR/ref. Stateful work is not permitted in this workflow.
 concurrency:
-  group: marketsage-goal1-ci-${{ github.event.pull_request.number || github.ref }}
+  group: marketsage-goal1-ci-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
