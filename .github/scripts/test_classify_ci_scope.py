@@ -144,7 +144,7 @@ class WorkflowPolicyTests(unittest.TestCase):
 
     def test_issue_write_failure_notice_is_restricted_to_trusted_refs(self):
         self.assertIn(
-            "if: ${{ always() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/infra/')) && contains(needs.*.result, 'failure') }}",
+            "if: ${{ always() && needs.classify-change-scope.result != 'cancelled' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/infra/')) && contains(needs.*.result, 'failure') }}",
             CI,
         )
 
