@@ -98,10 +98,29 @@ class WorkflowPolicyTests(unittest.TestCase):
             self.assertIsNotNone(match)
             job = match.group(1)
             self.assertIn("needs: [classify-change-scope]", job)
-            self.assertIn("needs.classify-change-scope.outputs.infra_only != 'true'", job)
+            self.assertIn("needs.classify-change-scope.result == 'success' && needs.classify-change-scope.outputs.infra_only != 'true'", job)
             self.assertIn("exit 1", job)
             for forbidden in ("pytest ", "pnpm ", "docker compose", "upload-artifact"):
                 self.assertNotIn(forbidden, job)
+
+    def test_required_control_plane_check_fails_closed_when_scope_classification_fails(self):
+        match = re.search(
+            r"(?ms)^  provider-neutral-control-plane-tests:\\n(.*?)(?=^  [A-Za-z0-9_-]+:\\n|\\Z)",
+            CI,
+        )
+        self.assertIsNotNone(match)
+        job = match.group(1)
+        self.assertIn("needs: [classify-change-scope]", job)
+        self.assertIn("if: ${{ always() }}", job)
+        self.assertIn("CLASSIFIER_RESULT: ${{ needs.classify-change-scope.result }}", job)
+        self.assertIn("INFRA_ONLY: ${{ needs.classify-change-scope.outputs.infra_only }}", job)
+        self.assertIn('exit 1', job)
+
+    def test_cancelled_superseded_classifier_does_not_emit_failure_notice(self):
+        self.assertIn(
+            "needs.classify-change-scope.result != 'cancelled'",
+            CI,
+        )
 
     def test_no_self_hosted_runner_artifact_or_secret_reference_in_ci(self):
         self.assertNotIn("runs-on: self-hosted", CI)
