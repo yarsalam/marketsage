@@ -22,7 +22,7 @@ All CI jobs have explicit timeouts. Actions are pinned to immutable commit SHAs.
 
 ## Queue, cancellation, retry, and recovery
 
-The CI concurrency group is per PR/ref with cancel-in-progress enabled. This is appropriate only because CI is read-only and replaceable: a newer commit supersedes an older validation.
+The CI concurrency group is per PR/ref and event type with cancel-in-progress enabled. A newer push supersedes an older push for the same ref, and a newer pull-request event supersedes the older run for that PR; a scheduled validation is isolated and cannot cancel event-driven validation. This is appropriate only because CI is read-only and replaceable. If scope classification fails or is cancelled, the required `Test provider-neutral control plane` context fails closed; product/build jobs do not run. Expected cancellation of a superseded classifier does not generate a failure notice.
 
 The watchdog uses a separate concurrency group with queue:max and no cancellation. GitHub permits up to 100 pending runs in a queue:max group; additional runs are canceled when full. queue:max cannot be combined with cancel-in-progress. This is bounded queueing, not an unlimited durable FIFO job broker.
 
