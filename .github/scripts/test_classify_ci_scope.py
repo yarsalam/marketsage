@@ -105,7 +105,7 @@ class WorkflowPolicyTests(unittest.TestCase):
 
     def test_required_control_plane_check_fails_closed_when_scope_classification_fails(self):
         match = re.search(
-            r"(?ms)^  provider-neutral-control-plane-tests:\\n(.*?)(?=^  [A-Za-z0-9_-]+:\\n|\\Z)",
+            r"(?ms)^  provider-neutral-control-plane-tests:\n(.*?)(?=^  [A-Za-z0-9_-]+:\n|\Z)",
             CI,
         )
         self.assertIsNotNone(match)
