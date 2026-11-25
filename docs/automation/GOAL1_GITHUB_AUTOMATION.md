@@ -39,6 +39,8 @@ The watchdog runs every 15 minutes and after a MarketSage CI run completes. It r
 - Workflow-run history is read with a five-page (500-run) bound; if the API reports more history than the observer inspected, health is Degraded rather than silently treating a partial scan as complete.
 - The latest watchdog state is selected from the newest issue comments.
 
+The observer trusts only runs whose `head_repository.full_name` equals this repository and whose event/branch pair is explicitly allowed: scheduled runs on `main`, pushes to `main` or `infra/**`, and same-repository pull requests from `infra/**`. Fork-originated PR runs are excluded even if their source branch is named `main` or `infra/**`. The `workflow_run` observer job independently skips events whose source repository is not this repository.
+
 The report contains only aggregate state, counts, and fixed reason codes. It excludes run IDs, commit identifiers, logs, artifacts, raw data, prices, private paths, credentials, and secret values. Issue #49 is updated only when the state or reason set changes.
 
 **Important limitation:** the watchdog runs on the same GitHub Actions service/hosted-runner pool it observes. It cannot detect its own missed schedule or a GitHub-wide outage. It is not an independent 24/7 heartbeat. An external observer and alert channel remain required before claiming continuous availability.
