@@ -164,8 +164,13 @@ def build_comment(assessment: dict[str, Any], repository: str) -> str:
 
 def latest_state(comments: list[dict[str, Any]]) -> tuple[str, tuple[str, ...]] | None:
     for item in comments:
-        body = item.get("body", "") if isinstance(item, dict) else ""
-        if _MARKER not in body:
+        if not isinstance(item, dict):
+            continue
+        author = item.get("user")
+        if not isinstance(author, dict) or author.get("login") != "github-actions[bot]":
+            continue
+        body = item.get("body", "")
+        if not isinstance(body, str) or _MARKER not in body:
             continue
         state_match = re.search(r"(?m)^State: (healthy|degraded)$", body)
         reasons_match = re.search(r"(?m)^Reasons: (.*)$", body)
