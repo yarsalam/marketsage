@@ -32,16 +32,32 @@ def parse_time(value: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def trusted_run(run: dict[str, Any]) -> bool:
+def trusted_run(run: dict[str, Any], repository: str) -> bool:
+    """Trust only same-repository CI runs from explicitly supported events/branches."""
+    if not isinstance(run, dict):
+        return False
+    head_repository = run.get("head_repository")
+    if not isinstance(head_repository, dict) or head_repository.get("full_name") != repository:
+        return False
+
     event = run.get("event")
     branch = run.get("head_branch", "")
-    return event == "schedule" or branch == "main" or (
-        isinstance(branch, str) and branch.startswith("infra/")
-    )
+    if not isinstance(branch, str):
+        return False
+    if event == "schedule":
+        return branch == "main"
+    if event == "push":
+        return branch == "main" or branch.startswith("infra/")
+    if event == "pull_request":
+        return branch.startswith("infra/")
+    return False
 
 
 def assess_runs(
-    runs: list[dict[str, Any]], now: datetime, history_complete: bool = True
+    runs: list[dict[str, Any]],
+    now: datetime,
+    repository: str,
+    history_complete: bool = True,
 ) -> dict[str, Any]:
     if not isinstance(runs, list):
         raise ValueError("invalid workflow run collection")
@@ -54,7 +70,7 @@ def assess_runs(
     schedules: list[dict[str, Any]] = []
 
     for run in runs:
-        if not isinstance(run, dict) or not trusted_run(run):
+        if not isinstance(run, dict) or not trusted_run(run, repository):
             continue
         trusted.append(run)
         event = run.get("event")
@@ -261,7 +277,7 @@ def main() -> int:
     try:
         runs, history_complete = fetch_workflow_runs(api_url, repository, token)
         assessment = assess_runs(
-            runs, datetime.now(timezone.utc), history_complete=history_complete
+            runs, datetime.now(timezone.utc), repository, history_complete=history_complete
         )
         comments_data = request_json(
             f"{api_url.rstrip('/')}/repos/{repository}/issues/{issue_number}/comments"
