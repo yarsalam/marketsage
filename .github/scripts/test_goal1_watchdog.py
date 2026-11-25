@@ -192,12 +192,14 @@ class SanitizedHandoffTests(unittest.TestCase):
         comments = [
             {
                 "created_at": "2026-11-23T10:00:00Z",
+                "user": {"login": "github-actions[bot]"},
                 "body": """<!-- marketsage-goal1-watchdog-state -->
 State: healthy
 Reasons: none""",
             },
             {
                 "created_at": "2026-11-23T09:45:00Z",
+                "user": {"login": "github-actions[bot]"},
                 "body": """<!-- marketsage-goal1-watchdog-state -->
 State: degraded
 Reasons: schedule_stale""",
@@ -205,9 +207,36 @@ Reasons: schedule_stale""",
         ]
         self.assertEqual(latest_state(comments), ("healthy", ()))
 
+    def test_latest_state_ignores_forged_human_comment(self):
+        comments = [
+            {
+                "user": {"login": "untrusted-user"},
+                "body": """<!-- marketsage-goal1-watchdog-state -->
+State: healthy
+Reasons: none""",
+            },
+            {
+                "user": {"login": "github-actions[bot]"},
+                "body": """<!-- marketsage-goal1-watchdog-state -->
+State: degraded
+Reasons: schedule_stale""",
+            },
+        ]
+        self.assertEqual(latest_state(comments), ("degraded", ("schedule_stale",)))
+
+    def test_latest_state_ignores_comments_without_author_metadata(self):
+        comments = [
+            {
+                "body": """<!-- marketsage-goal1-watchdog-state -->
+State: healthy
+Reasons: none""",
+            }
+        ]
+        self.assertIsNone(latest_state(comments))
+
     def test_latest_state_reads_only_status_and_reason_codes(self):
         comments = [
-            {"body": "<!-- marketsage-goal1-watchdog-state -->\nState: degraded\nReasons: queued_run_overdue, schedule_stale"}
+            {"user": {"login": "github-actions[bot]"}, "body": "<!-- marketsage-goal1-watchdog-state -->\nState: degraded\nReasons: queued_run_overdue, schedule_stale"}
         ]
         self.assertEqual(
             latest_state(comments),
