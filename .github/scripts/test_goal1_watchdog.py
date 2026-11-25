@@ -58,7 +58,7 @@ class WatchdogAssessmentTests(unittest.TestCase):
         self.assertNotIn("latest_trusted_ci_failed", result["reasons"])
 
     def test_truncated_workflow_history_fails_closed(self):
-        result = assess_runs([run()], NOW, history_complete=False)
+        result = assess_runs([run()], NOW, repository="owner/repo", history_complete=False)
         self.assertIn("workflow_history_truncated", result["reasons"])
 
     def test_old_queued_run_is_detected(self):
