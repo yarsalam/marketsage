@@ -1,0 +1,29 @@
+name: Adjustment Contracts CI
+
+on:
+  push:
+    branches:
+      - "feature/adjustment-contracts-*"
+  pull_request:
+    branches: [main]
+    paths:
+      - "marketsage_adjustment_engine_v7/**"
+      - "tests/test_v7_contracts.py"
+      - ".github/workflows/adjustment-contracts.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run v7 contract tests
+        run: python3 -m unittest tests.test_v7_contracts -v
+      - name: Compile v7 package
+        run: python3 -m compileall -q marketsage_adjustment_engine_v7
