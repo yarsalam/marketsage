@@ -5,8 +5,9 @@ from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from enum import Enum
 import hashlib, json, re
-from typing import Any, Mapping, Tuple
+from collections.abc import Mapping
 from types import MappingProxyType
+from typing import Any, Tuple
 
 _SHA = re.compile(r"^[0-9a-f]{64}$")
 
@@ -30,14 +31,28 @@ def _decimal(value: Any, name: str) -> Decimal:
         raise ValueError(f"{name} must be finite")
     return result
 
+def _freeze(value: Any) -> Any:
+    """Recursively freeze JSON-like decision payloads to prevent post-review mutation."""
+    if isinstance(value, Mapping):
+        return MappingProxyType({str(k): _freeze(v) for k, v in value.items()})
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze(v) for v in value)
+    if isinstance(value, set):
+        return frozenset(_freeze(v) for v in value)
+    return value
+
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, Decimal): return format(value, "f")
+    if isinstance(value, (date, datetime)): return value.isoformat()
+    if isinstance(value, Enum): return value.value
+    if isinstance(value, Mapping): return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (tuple, list)): return [_jsonable(v) for v in value]
+    if isinstance(value, (set, frozenset)): return sorted(_jsonable(v) for v in value)
+    if hasattr(value, "to_dict"): return _jsonable(value.to_dict())
+    raise TypeError(f"Unsupported canonical JSON value: {type(value).__name__}")
+
 def canonical_json(value: Any) -> str:
-    def default(obj: Any) -> Any:
-        if isinstance(obj, Decimal): return format(obj, "f")
-        if isinstance(obj, (date, datetime)): return obj.isoformat()
-        if isinstance(obj, Enum): return obj.value
-        if hasattr(obj, "to_dict"): return obj.to_dict()
-        raise TypeError(f"Unsupported canonical JSON value: {type(obj).__name__}")
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=default)
+    return json.dumps(_jsonable(value), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 def canonical_hash(value: Any) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
@@ -95,8 +110,8 @@ class EvidenceReference:
         object.__setattr__(self,"locator",_text(self.locator,"locator"))
         object.__setattr__(self,"sha256",_hash(self.sha256))
         if not isinstance(self.source_kind,SourceKind): object.__setattr__(self,"source_kind",SourceKind(self.source_kind))
-        if not isinstance(self.retrieved_at,datetime) or self.retrieved_at.tzinfo is None:
-            raise ValueError("retrieved_at must be timezone-aware")
+        if not isinstance(self.retrieved_at,datetime) or self.retrieved_at.tzinfo is None or self.retrieved_at.utcoffset() is None:
+            raise ValueError("retrieved_at must be timezone-aware with a valid UTC offset")
         object.__setattr__(self,"publisher",self.publisher.strip())
 
 @dataclass(frozen=True, slots=True)
@@ -114,8 +129,10 @@ class SourceObservation:
         object.__setattr__(self,"payload_sha256",_hash(self.payload_sha256,"payload_sha256"))
         object.__setattr__(self,"source_locator",_text(self.source_locator,"source_locator"))
         if not isinstance(self.source_kind,SourceKind): object.__setattr__(self,"source_kind",SourceKind(self.source_kind))
+        if not isinstance(self.instrument,InstrumentIdentity): raise ValueError("instrument must be InstrumentIdentity")
         if self.provider_date is not None and (not isinstance(self.provider_date,date) or isinstance(self.provider_date,datetime)): raise ValueError("provider_date must be a date, not a datetime")
         object.__setattr__(self,"native_key",self.native_key.strip())
+        if not isinstance(self.native_id_usable,bool): raise ValueError("native_id_usable must be bool")
 
 @dataclass(frozen=True, slots=True)
 class TypedEventDate:
@@ -127,8 +144,9 @@ class TypedEventDate:
         if not isinstance(self.value,date) or isinstance(self.value,datetime): raise ValueError("value must be a date, not a datetime")
         if not isinstance(self.kind,EventDateKind): object.__setattr__(self,"kind",EventDateKind(self.kind))
         refs=tuple(_text(x,"evidence_id") for x in self.evidence_ids)
-        if not refs: raise ValueError("typed event dates require evidence references")
+        if not refs or len(set(refs)) != len(refs): raise ValueError("typed event dates require unique evidence references")
         object.__setattr__(self,"evidence_ids",refs)
+        object.__setattr__(self,"notes",self.notes.strip())
 
 @dataclass(frozen=True, slots=True)
 class EventRelationship:
@@ -153,7 +171,10 @@ class CorporateActionEvent:
         object.__setattr__(self,"event_type",_text(self.event_type,"event_type").upper())
         object.__setattr__(self,"source_observation_ids",tuple(_text(x,"source_observation_id") for x in self.source_observation_ids))
         object.__setattr__(self,"typed_dates",tuple(self.typed_dates))
-        if not self.source_observation_ids: raise ValueError("event must reference source observations")
+        if not self.source_observation_ids or len(set(self.source_observation_ids)) != len(self.source_observation_ids):
+            raise ValueError("event must reference unique source observations")
+        if not isinstance(self.instrument,InstrumentIdentity): raise ValueError("instrument must be InstrumentIdentity")
+        if any(not isinstance(d,TypedEventDate) for d in self.typed_dates): raise ValueError("typed_dates must contain TypedEventDate values")
 
 @dataclass(frozen=True, slots=True)
 class DecisionRecord:
@@ -170,12 +191,16 @@ class DecisionRecord:
         for n in ("decision_id","subject_id","actor","rationale"): object.__setattr__(self,n,_text(getattr(self,n),n))
         if not isinstance(self.dimension,DecisionDimension): object.__setattr__(self,"dimension",DecisionDimension(self.dimension))
         if not isinstance(self.outcome,DecisionOutcome): object.__setattr__(self,"outcome",DecisionOutcome(self.outcome))
-        object.__setattr__(self,"evidence_ids",tuple(_text(x,"evidence_id") for x in self.evidence_ids))
-        object.__setattr__(self,"supersedes",tuple(_text(x,"supersedes") for x in self.supersedes))
-        if self.outcome is DecisionOutcome.MANUALLY_VERIFIED and not self.evidence_ids:
+        evidence=tuple(_text(x,"evidence_id") for x in self.evidence_ids)
+        supersedes=tuple(_text(x,"supersedes") for x in self.supersedes)
+        if len(set(evidence)) != len(evidence): raise ValueError("evidence_ids must be unique")
+        if len(set(supersedes)) != len(supersedes): raise ValueError("supersedes must be unique")
+        object.__setattr__(self,"evidence_ids",evidence)
+        object.__setattr__(self,"supersedes",supersedes)
+        if self.outcome is DecisionOutcome.MANUALLY_VERIFIED and not evidence:
             raise ValueError("MANUALLY_VERIFIED decisions require evidence_ids")
         if not isinstance(self.payload,Mapping): raise ValueError("payload must be a mapping")
-        object.__setattr__(self,"payload",MappingProxyType(dict(self.payload)))
+        object.__setattr__(self,"payload",_freeze(self.payload))
 
 @dataclass(frozen=True, slots=True)
 class ApprovedPriceFactor:
@@ -183,12 +208,21 @@ class ApprovedPriceFactor:
     factor: Decimal
     decision_id: str
     instrument_hash: str
+    observation_id: str
+    effective_date: date
+    evidence_hashes: Tuple[str,...]
+    policy_version: str = "v7.1"
     def __post_init__(self):
         object.__setattr__(self,"event_id",_text(self.event_id,"event_id"))
         object.__setattr__(self,"factor",_decimal(self.factor,"factor"))
         if self.factor<=0: raise ValueError("price factor must be positive")
         object.__setattr__(self,"decision_id",_text(self.decision_id,"decision_id"))
         object.__setattr__(self,"instrument_hash",_hash(self.instrument_hash,"instrument_hash"))
+        object.__setattr__(self,"observation_id",_text(self.observation_id,"observation_id"))
+        if not isinstance(self.effective_date,date) or isinstance(self.effective_date,datetime): raise ValueError("effective_date must be date")
+        object.__setattr__(self,"evidence_hashes",tuple(_hash(x,"evidence_hash") for x in self.evidence_hashes))
+        if not self.evidence_hashes: raise ValueError("approved factor requires evidence hashes")
+        object.__setattr__(self,"policy_version",_text(self.policy_version,"policy_version"))
 
 @dataclass(frozen=True, slots=True)
 class ApprovedVolumeFactor:
@@ -196,12 +230,21 @@ class ApprovedVolumeFactor:
     factor: Decimal
     decision_id: str
     instrument_hash: str
+    observation_id: str
+    effective_date: date
+    evidence_hashes: Tuple[str,...]
+    policy_version: str = "v7.1"
     def __post_init__(self):
         object.__setattr__(self,"event_id",_text(self.event_id,"event_id"))
         object.__setattr__(self,"factor",_decimal(self.factor,"factor"))
         if self.factor<=0: raise ValueError("volume factor must be positive")
         object.__setattr__(self,"decision_id",_text(self.decision_id,"decision_id"))
         object.__setattr__(self,"instrument_hash",_hash(self.instrument_hash,"instrument_hash"))
+        object.__setattr__(self,"observation_id",_text(self.observation_id,"observation_id"))
+        if not isinstance(self.effective_date,date) or isinstance(self.effective_date,datetime): raise ValueError("effective_date must be date")
+        object.__setattr__(self,"evidence_hashes",tuple(_hash(x,"evidence_hash") for x in self.evidence_hashes))
+        if not self.evidence_hashes: raise ValueError("approved factor requires evidence hashes")
+        object.__setattr__(self,"policy_version",_text(self.policy_version,"policy_version"))
 
 @dataclass(frozen=True, slots=True)
 class VerifiedCashflow:
@@ -223,5 +266,5 @@ class VerifiedCashflow:
         if not isinstance(self.payment_date,date) or isinstance(self.payment_date,datetime): raise ValueError("payment_date must be a date, not a datetime")
         object.__setattr__(self,"decision_id",_text(self.decision_id,"decision_id"))
         refs=tuple(_text(x,"evidence_id") for x in self.evidence_ids)
-        if not refs: raise ValueError("cashflow requires evidence references")
+        if not refs or len(set(refs)) != len(refs): raise ValueError("cashflow requires unique evidence references")
         object.__setattr__(self,"evidence_ids",refs)
