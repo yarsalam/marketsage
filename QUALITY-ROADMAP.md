@@ -560,3 +560,47 @@ External discovery/reference URLs captured during this pass:
 - Codal360 aggregator records for 800 Rial (AGM 1399/12/25), 1,930 Rial (AGM 1400/12/23), 2,350 Rial (AGM 1402/01/31), 3,000 Rial (AGM 1403/01/28) and 1,170 Rial (AGM 1403/12/08): https://t.me/s/Codal360_ir?q=%23وغدیر
 
 The external archive/aggregator entries are discovery evidence; the original CODAL documents or contemporaneous issuer notices remain preferred for acceptance. BourseEye is a useful cross-check of TSETMC-derived event history, not a primary issuer source.
+
+
+### 10.9 Strategy learning from Vaghdir — distinguish capital coverage from full PA completion
+
+This section corrects any reading of the phrase “only two cases remain” as meaning that the entire Vaghdir event history is nearly complete. The two standout exceptions previously highlighted (2010 unsupported PA candidate and 1403 SC-only/market-state gap) are **not** the complete remaining event list.
+
+The operating strategy is:
+1. acquire immutable TSETMC daily/PA/SC/identity data;
+2. obtain CODAL capital-increase lifecycle documents first (AGM decision, authorization/permission, board implementation, rights/subscription/allotment stages, registration, corrections);
+3. reconcile old/new share counts and funding components against SC and PA observations;
+4. for PA observations not explained by capital increases, search CODAL annual ordinary AGM decisions and dividend notices;
+5. only when the relevant CODAL event/document cannot be found or is incomplete, search official gazette/company registry, newspapers and contemporary press;
+6. reconcile the exchange session/suspension/no-trade chronology separately;
+7. only then test engines on the resulting frozen event ledger. This stage is strategy discovery; it does not require calculating or publishing a final adjusted series yet.
+
+#### Exact count from the currently imported Vaghdir TSETMC PA/SC snapshots
+
+- **SC:** 7 share-change rows; all 7 connect to one of the seven CODAL capital-increase chains in the uploaded ZIP. No SC row currently lacks issuer-level capital-event terms.
+- **PA:** 25 raw PA rows. The current event-level interpretation is approximately:
+  - 7 capital-effect observations (including two capital-related price bases around the mixed 1390 event);
+  - 1 reciprocal/display-like observation, not an independent economic factor;
+  - 17 dividend-effect candidates (including the 500-Rial dividend component in the 1390 mixed event).
+- Six of the seven capital increases have corresponding PA observations; the 1403/05/13 SC event has no PA row. This is not a missing CODAL capital event: its 72bn→216bn increase is documented from retained earnings and reserves. It is a provider PA-coverage / market chronology exception.
+- The 49-calendar-day gap from the last daily row on 1403/05/01 (2024-07-22) to the next on 1403/06/19 (2024-09-09) is a separate market-state/source-coverage question. It is not proof of a suspension or proof of a missing corporate action.
+
+#### Status of the 17 dividend candidates in the currently visible evidence
+
+This is an inventory of what is presently evidenced in the imported source bundle, **not** a claim that all other records are absent from CODAL:
+
+- **Primary CODAL AGM evidence already identified:** 1390 dividend decision (500 Rial; reference mismatch between 38803 and 38448 still to resolve), 1390/11/30 AGM decision TracingNo 66259 (510 Rial), and 1391/12/08 AGM decision TracingNo 108468 (500 Rial).
+- **CODAL record identified, original decision attachment still missing from staged material:** 1392/12/25 AGM, TracingNo 155748; this is the leading document to inspect for the 630-Rial PA candidate dated 1393/12/26.
+- **Not yet demonstrated with primary CODAL source in the inspected bundle:** PA candidates dated 2009-04-19 (250), 2010-04-21 (310), 2015-03-17 (500), 2016-03-16 (400), 2017-03-18 (160), 2018-03-17 (190), 2019-03-17 (250), 2021-03-15 (800), 2022-03-14 (1,930), 2023-04-24 (2,350), 2024-04-16 (3,000), 2025-02-26 (1,170), and 2026-04-18 (1,500). Some have secondary contemporary press or aggregator leads; those leads must not be mistaken for completed CODAL searches.
+- A 490-Rial payment schedule around 1399/02 is an additional secondary lead without a corresponding PA row in the imported TSETMC list. It belongs in a CODAL disclosure search queue, not as an automatically accepted adjustment event.
+
+**Next evidence pass for dividends:** query/reuse existing CODAL captures by issuer and each AGM year; prioritize “تصمیمات مجمع عمومی عادی سالیانه” and attached AGM resolutions, then dividend-payment notices and amended notices. Match by issuer identity, meeting date/fiscal year, DPS per share, entitlement/ex-date and document lineage. Do not create 17 separate factors from PA differences until the original event decisions and date semantics are verified. Deep-search only the records where a relevant CODAL decision cannot be found or the document chain is incomplete.
+
+#### What remains, stated precisely
+
+1. **Capital-increase terms:** all seven SC rows have CODAL capital chains and funding components identified. The 1391 authorization/two-tranche relationship and 1403 SC-only case are now represented as reusable event patterns.
+2. **Capital/provider/market exceptions:** reconcile the 1390 date/reference conflict; obtain official 1403 symbol-status/session chronology; explain the absence of a 1403 PA row without forcing a synthetic provider event.
+3. **Dividend event coverage:** complete the CODAL AGM/dividend-document pass for the 17 PA dividend candidates; several are already documented, one 1392/1393 attachment is missing in the staged bundle, and 13 listed rows still have no primary CODAL evidence demonstrated in the material inspected.
+4. **Only after item 3:** run targeted archive/press search for the genuinely absent or incomplete dividend decisions, starting with the 2009/2010 and 2014/2015 historical leads.
+
+**Learning for engine design:** CODAL capital notices explain all seven SC transitions here and six capital-event price observations, but PA is a mixed stream containing dividend effects and provider display/reciprocal artifacts. Therefore the engine must have separate capital-increase and dividend discovery/handler paths, plus a provider-observation relationship model. “SC matched to CODAL” is a successful capital-coverage milestone, not whole-symbol adjustment acceptance.
