@@ -77,7 +77,8 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertIn('    - cron: "17 3 * * *"', CI)
         self.assertNotIn("workflow_dispatch:", CI)
 
-    def test_required_main_ruleset_contexts_are_preserved(self):
+    def test_expected_ci_check_contexts_are_present(self):
+        # Presence in workflow YAML does not prove branch protection requires these checks.
         for name in (
             "  analysis:",
             "  user-backend:",
@@ -142,11 +143,13 @@ class WorkflowPolicyTests(unittest.TestCase):
         self.assertNotRegex(WATCHDOG, r"(?m)^\s*cancel-in-progress:")
         self.assertNotIn("workflow_dispatch:", WATCHDOG)
 
-    def test_issue_write_failure_notice_is_restricted_to_trusted_refs(self):
+    def test_issue_write_failure_notice_is_main_only(self):
         self.assertIn(
-            "if: ${{ always() && needs.classify-change-scope.result != 'cancelled' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/infra/')) && contains(needs.*.result, 'failure') }}",
+            "if: ${{ always() && needs.classify-change-scope.result != 'cancelled' && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure') }}",
             CI,
         )
+        self.assertNotIn("startsWith(github.ref, 'refs/heads/infra/')", CI)
+        self.assertIn("          ref: main", CI[CI.index("  notify-failure:"):])
 
     def test_watchdog_uses_only_read_actions_and_issue_handoff(self):
         self.assertIn("actions: read", WATCHDOG)
