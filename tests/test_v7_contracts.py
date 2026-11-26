@@ -48,6 +48,7 @@ class V7ContractsTests(unittest.TestCase):
         self.assertEqual(result.factor, Decimal("0.8"))
         self.assertEqual(result.approved_output.observation_id, "pa-1")
         self.assertEqual(result.approved_output.effective_date, date(2024, 1, 3))
+        self.assertEqual(result.approved_output.evidence_ids, ("evidence-1", "evidence-date"))
         self.assertEqual(len(result.approved_output.evidence_hashes), 2)
         self.assertEqual(result.approved_output.policy_version, "v7.1")
 
