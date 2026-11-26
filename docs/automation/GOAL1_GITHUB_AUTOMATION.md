@@ -4,7 +4,7 @@
 
 ## Scope and safety boundary
 
-This change is limited to GitHub automation. Until Goal 1 is accepted, CI does not execute product analysis, data acquisition, backtests, scoring/ranking, probability calibration, production-image builds, deployments, broker/trading access, or capital allocation. The existing required status-check names are preserved so the active main-protection ruleset remains compatible.
+This change is limited to GitHub automation. Until Goal 1 is accepted, CI does not execute product analysis, data acquisition, backtests, scoring/ranking, probability calibration, production-image builds, deployments, broker/trading access, or capital allocation. The expected CI job/check names remain present in the workflow, and the provider-neutral control-plane test is explicit. This is not proof that branch protection requires those contexts. The API-visible `main-protection` ruleset currently contains only deletion and non-fast-forward restrictions; the classic branch-protection endpoint is not accessible to this integration, so required status checks and review-approval requirements remain unverified.
 
 The repository is currently reported by GitHub as **public**, despite the owner request describing it as private. Treat all committed content and history as public. No visibility change is included.
 
@@ -18,7 +18,7 @@ The existing required contexts are retained: analysis, user-backend, user-fronte
 
 For an allowlisted Goal 1 change, the five product/build contexts are skipped (GitHub treats skipped jobs as successful); the two automation test contexts run. For every other scope, the five contexts fail immediately with fixed messages and do not run product commands.
 
-All CI jobs have explicit timeouts. Actions are pinned to immutable commit SHAs. Default permissions are contents:read; only the trusted notification/provenance jobs receive job-scoped issues:write, and the CI failure-notice job is further restricted to main and infra/** refs. Checkout credentials are not persisted. No artifact upload/download is configured.
+All CI jobs have explicit timeouts. Actions are pinned to immutable commit SHAs. Default permissions are contents:read. The direct-main-provenance job receives job-scoped `issues:write` only on `main`. The CI failure-notice job is also restricted to `main` and explicitly checks out `main`; PR and `infra/**` failures are left to the default-branch watchdog's `workflow_run` observer after that workflow is active. PR CI jobs do not receive issue-write permission. Checkout credentials are not persisted. No artifact upload/download is configured.
 
 ## Queue, cancellation, retry, and recovery
 
@@ -76,6 +76,6 @@ This PR does not by itself prove Goal 1. After human review/merge, acceptance st
 5. At least 24 hours of observed operation is recorded.
 6. An independent heartbeat/alert channel is deployed and tested.
 7. The runner inventory and costs are verified from repository/account settings.
-8. The main-protection ruleset remains active and the seven required contexts are verified.
+8. The active ruleset and classic branch-protection settings are inspected with sufficient administrative access; required status checks and review approvals are explicitly verified rather than inferred from workflow job names.
 
 No automatic merge, release, deployment, provider activation, secret creation, or local workflow dispatch is authorized.
