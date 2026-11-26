@@ -401,3 +401,7 @@ Prefer a pipeline with explicit contracts and handlers:
 - [ ] Run comparative same-input engine replay and identify general vs symbol-specific failure causes.
 - [ ] Implement minimal reusable handler/contract corrections with tests; replay three symbols and quantify unresolved intervals.
 - [ ] Expand to additional symbols only after pilot regression gates pass.
+
+
+### 10.6 Targeted external search — Foolad 1387 (lead, not economic-event proof)
+A first web search found contemporary 1387 press coverage about Foolad market suspension/price volatility, and BourseEye's 1387 price history confirms non-zero trade records around the long gap. The current search results do **not** yet identify a specific 1387 corporate-action notice or prove the user's remembered newspaper event. The 1387 lead is therefore split into two separate queues: (a) market-state chronology for the Sep–Oct 2008 gap, and (b) a corporate-action/issuer-notice search over the whole 1387 year. Do not treat the suspension story as the missing corporate action. Search archive candidates by year, company name, meeting, dividend, capital increase, rights, registration, and Gazette/company registry; then cross-check the user's local evidence store before acquiring anything.
