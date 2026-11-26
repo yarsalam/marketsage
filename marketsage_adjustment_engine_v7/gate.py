@@ -205,10 +205,12 @@ class EvidenceGate:
         evidence_ids = set()
         for dimension in (*self.COMMON, factor_dimension):
             evidence_ids.update(accepted[dimension].evidence_ids)
-        evidence_hashes = tuple(sorted({evidence_by_id[eid].sha256 for eid in evidence_ids}))
+        ordered_evidence_ids = tuple(sorted(evidence_ids))
+        evidence_hashes = tuple(sorted({evidence_by_id[eid].sha256 for eid in ordered_evidence_ids}))
         output = output_type(
             event.event_id, factor, factor_decision.decision_id, event.instrument.identity_hash,
-            observation.observation_id, effective_date, evidence_hashes, self.POLICY_VERSION,
+            observation.observation_id, effective_date, ordered_evidence_ids, evidence_hashes,
+            self.POLICY_VERSION,
         )
         return GateResult(True, event.event_id, factor_dimension, (), output.factor,
                           output.decision_id, output)
