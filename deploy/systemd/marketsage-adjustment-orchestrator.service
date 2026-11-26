@@ -1,0 +1,10 @@
+[Unit]
+Description=MarketSage Iranian equity data and adjustment orchestrator
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/projects/marketsage
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 %h/projects/marketsage/scripts/research/adjustment_orchestrator.py run --config %h/projects/marketsage/configs/adjustment_orchestrator.foolad.json
