@@ -7,4 +7,5 @@ After=network-online.target
 Type=oneshot
 WorkingDirectory=%h/projects/marketsage
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/python3 %h/projects/marketsage/scripts/research/adjustment_orchestrator.py run --config %h/projects/marketsage/configs/adjustment_orchestrator.foolad.json
+# Safe on a first run too; on an interrupted same-day run it lets CODAL resume its own run id.
+ExecStart=/usr/bin/python3 %h/projects/marketsage/scripts/research/adjustment_orchestrator.py run --config %h/projects/marketsage/configs/adjustment_orchestrator.foolad.json --resume
