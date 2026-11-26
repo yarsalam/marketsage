@@ -2,13 +2,23 @@
 
 Status: research foundation only. This package is not a price, volume, or total-return engine and is not production-approved.
 
-The package defines immutable contracts for instrument identity, source observations, evidence references, typed event dates, corporate-action events, event relationships, decision records, separately approved price and volume factors, and verified cashflows.
+## V7.1 integrity hardening
 
-Price-factor approval requires manually verified decisions for EVENT_CLASSIFICATION, SOURCE_LINK, LEGAL_DATE_MAPPING, EVIDENCE_QUALITY, and PRICE_FACTOR, plus a PA observation linked to the event and matching instrument identity. Volume-factor approval requires the common dimensions plus VOLUME_FACTOR and an SC observation. PA and SC are never interchangeable.
+The gate requires a PA observation for price factors and an SC observation for volume factors. The two source kinds are independent and are never interchangeable.
 
-Only MANUALLY_VERIFIED passes. Missing, rejected, conflicting, insufficient, or quarantined decisions fail closed. Multiple active decisions are ambiguous; the gate does not use last-write-wins. Supersession-chain integrity must be validated by the append-only decision-log reader before records are supplied to this gate.
+Approval requires manually verified decisions for EVENT_CLASSIFICATION, SOURCE_LINK, LEGAL_DATE_MAPPING, EVIDENCE_QUALITY, and the relevant factor dimension. Decision payloads are checked against the exact event type and source observation. The legal-date decision must point to exactly one typed FIRST_AFFECTED_SESSION date, and its evidence references must include the evidence attached to that typed date. Other legal dates (publication, meeting, record, ex-date, rights dates, registration and payment) remain distinct and are not silently substituted.
 
-No legal-date inference, same-date PA/SC linking, raw tuple factor derivation, adjusted OHLCV calculation, Total Return calculation, or publication approval is implemented.
+Decision supersession is validated for duplicate IDs, unknown targets, cross-subject/dimension references, unverified superseding decisions, forks and cycles. Last-write-wins is never used. Decision payloads are recursively frozen. Evidence IDs must resolve to hashed evidence objects.
+
+Approved factor outputs retain event ID, instrument identity hash, exact source observation ID, approved first affected session, evidence hashes, decision ID and policy version. Raw provider tuples do not directly enter calculation engines.
+
+## Explicit limitations
+
+- The gate does not establish authenticity of the human reviewer or legal authenticity of a document; SHA-256 establishes byte identity/integrity only.
+- It does not calculate provider factors or infer event relationships.
+- It does not yet provide a separate approved cashflow gate.
+- It does not calculate adjusted OHLCV, normalized volume, Total Return, or publish production data.
+- A manually verified decision is still only as sound as its cited evidence and review process.
 
 Run:
 
