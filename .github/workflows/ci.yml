@@ -171,7 +171,7 @@ jobs:
       - provider-neutral-control-plane-tests
       - ci-infra-tests
       - detect-direct-main-update
-    if: ${{ always() && needs.classify-change-scope.result != 'cancelled' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/infra/')) && contains(needs.*.result, 'failure') }}
+    if: ${{ always() && needs.classify-change-scope.result != 'cancelled' && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -180,6 +180,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
           persist-credentials: false
       - name: Post aggregate failure status to infrastructure issue
         env:
