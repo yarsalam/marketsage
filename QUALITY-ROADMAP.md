@@ -358,3 +358,46 @@ For فولاد، وغدیر، پارسیان, the next research runs should ther
 Do not begin by downloading the same TSETMC data again or hand-reviewing every price gap. Reacquire only when a specific source-coverage or revision gap has been demonstrated.
 
 **Gate consequence:** Gate 3 cannot pass merely because an engine reproduces a chart or matches provider ratios. It must demonstrate event-led classification, CODAL/market chronology, correct event-specific economics, safe handling of unknowns, and reproducible output for all three symbols.
+
+
+## 10. Event-first tri-symbol investigation — initial evidence inventory (2026-11-26)
+
+This section records the first inspection pass only; it is **not** the completed reconciliation.
+
+### 10.1 CODAL-first status from currently imported evidence
+
+- **Foolad:** current event ledger has 23 TSETMC price-adjust records and 12 SC/share-change records, but its rows are all labeled PROVISIONAL/existence-only and are not yet joined to a complete issuer-document timeline. The imported shared CODAL metadata index spans only 1388/01/01–1405/08/21 and is not evidence of full history; the user's estimate of >98% local Foolad evidence coverage remains a user-reported local-store estimate until a local manifest/coverage calculation is inspected. Older years—especially 1387—must be audited against the local evidence store and external archive/press, not presumed absent.
+- **Vaghdir:** 25 PA + 7 SC rows. One event (2011) already has CODAL tracing 38805/59965 plus dividend tracing 38448, but is still provisional: capital source/terms need component-level reading, and the four PA rows require reconstruction as two economically distinct factors and two reciprocal/display records, not blindly multiplied. 2010-04-21 PA factor 0.8881 remains BLOCKED/NO_SOURCE. 2024-08-03 share change 72B→216B is a known CODAL registration lead, but original chain and financing/terms must be verified before the engine treats it as free.
+- **Parsian:** 18 PA + 9 SC rows. The exact primary InsCode identity is verified for all captured feeds, but the imported event ledger remains TSETMC-only provisional. CODAL event coverage and original documents are not yet demonstrated by the imported files.
+
+### 10.2 Immediate evidence priorities
+
+1. Build an event-coverage matrix by symbol: every PA/SC row with source values, event date, identity, candidate relation, exact CODAL tracing(s), original/attachment/amendment state, effective/first-trading-session evidence, terms, confidence and disposition.
+2. Inspect local owner-side CODAL inventory and manifests first, because the PR import may be incomplete and cannot establish what is locally held. Do not re-download already captured originals.
+3. For gaps, targeted deep-search archive sources: issuer and exchange notices, official newspapers/announcements, reputable contemporary market publications, and accessible original scanned ads. Record source URL, publication date, archive/page, exact quoted facts, hash if locally saved, source rank and conflicts. Search is event-specific, not a blanket web scrape.
+4. Reconcile the 3 market histories with official session/state evidence after the event timeline exists. The long-gap review already has unresolved cases: Vaghdir 173d and 121d gaps, Parsian largest 10d, and Foolad 43d in 1387. Foolad's gap has secondary reports suggesting suspension and reopening around 23 Shahrivar–5 Aban 1387, but one report conflicts with the observed 23 Shahrivar trade; primary exchange state evidence is still required. This is a market-state gap, not automatically a corporate action.
+5. Only after the event ledger is reconciled, run engines V2/V6 and prior versions on the same frozen inputs; explain failures by shared-contract versus symbol-specific fields and event-family support. No engine result is accepted merely because it matches provider/chart output.
+
+### 10.3 Cross-symbol differences already visible (hypotheses to verify)
+
+- **Foolad:** PA feed coverage is complete against TSE Client's captured diagnostic rows (23/23 candidate matches), but SC feed and chronology are not same-date; dates shift by 1–3 sessions in several matches. The 1387 history/status gap and local CODAL evidence coverage need priority.
+- **Vaghdir:** mixed 2011 dividend + capital action creates multiple PA records and reciprocal/display rows; the 2024 +200% SC-only event is a potential handler blind spot; one 2010 PA row remains source-blocked. PA matching to TSE Client is only 13/25 in the diagnostic.
+- **Parsian:** primary InsCode was initially mishandled by JavaScript Number precision, now corrected to exact string/BigInt. PA/SC matching is partial (12/18 and 7/9) in the ±7-day diagnostic; this may reflect event-feed semantics/coverage rather than missing actions and must be investigated row-by-row.
+
+### 10.4 Engine architecture direction (not implemented/approved yet)
+
+Prefer a pipeline with explicit contracts and handlers:
+- **Source Snapshot/Identity** → **CODAL Document Graph** (originals, amendments, attachments, withdrawal/correction chains) → **Canonical Event Components** (economic subcomponents, exact units, dates, provenance, confidence) → **Market Session/Instrument State Reconciliation** → **Independent Factor Calculation** → **Series Builder (price-basis and total-return separated)** → **QA/Validation/Quarantine** → **Versioned Publication**.
+- Shared core owns stable contracts, identity precision, immutable snapshots, chronology graph, factor chain, invalidation/reproducibility and validation. Handlers own event-family logic (cash dividend; free/retained-earnings/reserve increase; cash/receivables rights; mixed increases; split/reverse; merger/demerger/conversion; spin-off/in-kind; rights lifecycle). Instrument adapters supply exact ID lifecycle, source coverage, calendar/status quirks and mappings.
+- Unknown handler, ambiguous document relation, unresolved units or conflicting chronology must emit a review case and quarantine only the affected event/interval. New symbol support is earned through replayable fixtures and regression tests, not a symbol-name special case.
+
+### 10.5 Status
+
+- [x] Read the current PR-imported ledgers and shared event-coverage / market-gap audit artifacts.
+- [x] Confirm current event feeds are still provisional and that no pilot symbol has final acceptance.
+- [ ] Inspect full owner-side CODAL inventory and coverage manifest (not visible from GitHub-only context).
+- [ ] Complete row-by-row PA/SC ↔ CODAL/other-source ↔ market-session reconciliation for all three symbols.
+- [ ] Targeted deep-search and archive retrieval for each genuinely unsupported event, beginning with Foolad 1387 and Vaghdir 2010 / mixed 2011 / 2024.
+- [ ] Run comparative same-input engine replay and identify general vs symbol-specific failure causes.
+- [ ] Implement minimal reusable handler/contract corrections with tests; replay three symbols and quantify unresolved intervals.
+- [ ] Expand to additional symbols only after pilot regression gates pass.
