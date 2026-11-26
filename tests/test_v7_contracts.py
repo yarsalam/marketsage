@@ -49,4 +49,19 @@ class V7ContractsTests(unittest.TestCase):
         self.assertEqual(flow.direction,"TO_INVESTOR")
         with self.assertRaises(ValueError): VerifiedCashflow("evt-1",Decimal("500"),"IRR","UNKNOWN",date(2024,2,1),"d1",("doc-1",))
 
+    def test_volume_factor_requires_sc_and_separate_decision_dimension(self):
+        event=CorporateActionEvent("evt-volume",self.instrument,"CAPITAL_INCREASE",("sc-1",))
+        sc=SourceObservation("sc-1",SourceKind.SC,self.instrument,date(2024,1,2),"b"*64,"raw/sc.json")
+        dims=(DecisionDimension.EVENT_CLASSIFICATION,DecisionDimension.SOURCE_LINK,DecisionDimension.LEGAL_DATE_MAPPING,DecisionDimension.EVIDENCE_QUALITY,DecisionDimension.VOLUME_FACTOR)
+        rows=[DecisionRecord(f"v{i}","evt-volume",d,DecisionOutcome.MANUALLY_VERIFIED,"reviewer","reviewed evidence",("evidence-1",),{"factor":"1.25"} if d is DecisionDimension.VOLUME_FACTOR else {}) for i,d in enumerate(dims)]
+        result=EvidenceGate().approve_volume_factor(event,sc,rows,self.evidence)
+        self.assertTrue(result.approved); self.assertEqual(result.factor,Decimal("1.25"))
+        self.assertFalse(EvidenceGate().approve_price_factor(event,sc,rows,self.evidence).approved)
+
+    def test_instrument_identity_mismatch_fails(self):
+        other=InstrumentIdentity("فولاد","99999999999999999")
+        observation=SourceObservation("pa-1",SourceKind.PA,other,date(2024,1,2),"a"*64,"raw/pa.json")
+        result=EvidenceGate().approve_price_factor(self.event,observation,self.decisions(),self.evidence)
+        self.assertFalse(result.approved); self.assertIn("INSTRUMENT_IDENTITY_MISMATCH",result.reasons)
+
 if __name__=="__main__": unittest.main()
