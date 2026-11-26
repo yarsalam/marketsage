@@ -1,0 +1,52 @@
+{
+  "symbol": "وغدیر",
+  "task_id": "MS-DATA-002",
+  "generated_at": "2026-11-19T09:51:45.900735+00:00",
+  "engine_version": "1.0",
+  "manifest_hash": "2691d7524175b40bfdb7394bff664fb07c2e967f067d50f53369f0e14c61b5d5",
+  "status": "PROVISIONAL_VERIFIED",
+  "status_reason": "Verified vs TSE Client adjustInfo (F7): median 6.60%, p95 63.65%, max 64.94%",
+  "counts": {
+    "price_adjust_records": 25,
+    "forward_events": 24,
+    "share_change_only_events": 1,
+    "daily_rows": 5386,
+    "adjusted_rows": 5386
+  },
+  "accepted_ranges": [
+    {
+      "from": "2009-06-23",
+      "to": "2026-08-03",
+      "provisional": true
+    }
+  ],
+  "quarantined_ranges": [],
+  "blockers": [
+    "CODAL re-verification unavailable"
+  ],
+  "next_steps": [
+    "Compare adjusted_close with TSETMC official chart",
+    "Verify capital increase funding sources via CODAL"
+  ],
+  "panel_visibility": {
+    "raw_prices": "VISIBLE",
+    "corporate_events": "VISIBLE_WITH_LABEL",
+    "adjusted_series": "RESEARCH_ONLY",
+    "total_return": "NOT_YET_COMPUTED"
+  },
+  "release_gates": {
+    "RG-03": "NOT_PASSED",
+    "RG-04": "NOT_PASSED",
+    "investment_outputs": "DISABLED"
+  },
+  "verification": {
+    "method": "TSE Client 2.27.6 adjustInfo",
+    "file": "validation/official_chart_adjusted.csv",
+    "compared_dates": 5386,
+    "stats": {
+      "median_err_pct": 6.6,
+      "p95_err_pct": 63.65,
+      "max_err_pct": 64.94
+    }
+  }
+}

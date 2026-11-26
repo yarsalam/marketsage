@@ -1,0 +1,19 @@
+{
+  "run_id": "20261112T194429Z",
+  "base": "/home/nima/marketsage-data/tsetmc-three-adjusted",
+  "self_tests": {
+    "event_coverage": "PASS",
+    "factor_diagnostics": "PASS"
+  },
+  "factor_diagnostics_exit_code": 0,
+  "factor_symbol_status": {
+    "فولاد": "ok",
+    "وغدیر": "ok",
+    "پارسیان": "ok"
+  },
+  "all_source_inputs_unchanged": true,
+  "changed_inputs": [],
+  "network_access": false,
+  "acceptance_or_approval": false,
+  "run_directory": "/home/nima/marketsage-data/tsetmc-three-adjusted/three_symbol_audit_runs/20261112T194429Z"
+}

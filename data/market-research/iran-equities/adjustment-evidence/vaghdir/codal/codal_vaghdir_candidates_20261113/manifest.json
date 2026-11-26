@@ -1,0 +1,23 @@
+[
+  {
+    "window": "dividend_1390_esfand",
+    "page": 1,
+    "http_status": 200,
+    "sha256": "48ce266464b640a758ed96d98ad72d5852b27f96d1929b6807fcbd79b048ac95",
+    "bytes": 17322
+  },
+  {
+    "window": "capital_1391_azar",
+    "page": 1,
+    "http_status": 200,
+    "sha256": "d5901443b7455bf4408659887a140dea62a4295f5434ece857b404c5db9d154d",
+    "bytes": 18761
+  },
+  {
+    "window": "agm_and_capital_1391_12_to_1392_02",
+    "page": 1,
+    "http_status": 200,
+    "sha256": "790a25eefc233e1ce59c6987895f08d0d79589952f2590a55f04261fced2059e",
+    "bytes": 16922
+  }
+]

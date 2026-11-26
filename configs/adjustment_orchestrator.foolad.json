@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "repo_root": "..",
+  "evidence_root": "data/market-research/iran-equities/adjustment-evidence",
+  "run_root": "data/market-research/iran-equities/adjustment-evidence/_shared/orchestrator/runs",
+  "review_approvals_file": "data/market-research/iran-equities/adjustment-evidence/_shared/orchestrator/review_approvals.jsonl",
+  "timeout_seconds": 7200,
+  "identity_glob": "*identity*.json",
+  "symbols": [
+    {
+      "symbol": "فولاد",
+      "slug": "foolad",
+      "ins_code": "46348559193224090"
+    }
+  ],
+  "collectors": {
+    "codal": {
+      "symbols_file": "data/market-research/iran-equities/adjustment-evidence/_shared/orchestrator/codal_symbols.txt",
+      "resume_safe": true,
+      "timeout_seconds": 7200,
+      "argv": [
+        "python3",
+        "scripts/research/adjustment/acquisition/download_codal_corporate_actions.py",
+        "--symbols-file", "{symbols_file}",
+        "--scope", "corporate-actions",
+        "--output-root", "{output_dir}",
+        "--run-id", "{run_id}",
+        "--max-search-requests", "120",
+        "--timeout", "30"
+      ]
+    },
+    "tsetmc": {
+      "resume_safe": false,
+      "timeout_seconds": 3600,
+      "argv": [
+        "python3",
+        "scripts/research/adjustment/acquisition/marketsage_tsetmc_historical_downloader.py",
+        "--symbol", "{symbol}",
+        "--ins-code", "{ins_code}",
+        "--out", "{output_dir}",
+        "--timeout", "25",
+        "--retries", "3",
+        "--pace", "0.5"
+      ]
+    }
+  },
+  "adjustment_input_files": [
+    "{slug}/event-ledger.csv"
+  ],
+  "record_comparison": [
+    {
+      "source_key": "tsetmc:{slug}",
+      "glob": "*_daily_raw.json",
+      "array_path": "closingPriceDaily",
+      "key_field": "dEven"
+    }
+  ],
+  "reconcile": {
+    "argv": []
+  },
+  "adjustment": {
+    "argv": []
+  }
+}

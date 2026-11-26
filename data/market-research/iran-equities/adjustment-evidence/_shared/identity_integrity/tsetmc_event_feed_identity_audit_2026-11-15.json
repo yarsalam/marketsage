@@ -1,0 +1,126 @@
+{
+  "audit_version": "1.1.0",
+  "observed_from": "literal decimal tokens in the imported raw TSETMC JSON files; checked without JavaScript Number parsing",
+  "audit_date": "2026-11-15",
+  "method": {
+    "raw_token_match": "Compare the exact decimal token after the JSON key insCode with the exact primary InsCode string in the instrument identity record.",
+    "numeric_precision": "All InsCode values in this pilot exceed JavaScript Number.MAX_SAFE_INTEGER (2^53-1). JavaScript Number parsing can round them. Preserve IDs as decimal strings or BigInt. Python json.loads parses JSON integer tokens into arbitrary-precision int and preserves these values.",
+    "aliases": "insCode2/3/4 are retained as related identifiers and are not needed to explain these three feed matches."
+  },
+  "symbols": {
+    "vaghdir": {
+      "ticker": "وغدیر",
+      "primary_insCode": "26014913469567886",
+      "related_ids_unverified": {
+        "insCode2": "49373621277888271",
+        "insCode3": "48925462829697327",
+        "insCode4": "7173358342361500"
+      },
+      "instrument_search_exact_ticker_records": 1,
+      "instrument_search_total_records": 41,
+      "price_adjust": {
+        "rows": 25,
+        "unique_raw_insCode_tokens": [
+          "26014913469567886"
+        ],
+        "primary_match_rows": 25,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
+      },
+      "share_change": {
+        "rows": 7,
+        "unique_raw_insCode_tokens": [
+          "26014913469567886"
+        ],
+        "primary_match_rows": 7,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
+      },
+      "previous_false_mismatch_explanation": "A JavaScript JSON.parse/Number inspection rounded 26014913469567886 to 26014913469567890. The raw GitHub file contains the exact primary decimal token in all 25 price-adjust rows."
+    },
+    "foolad": {
+      "ticker": "فولاد",
+      "primary_insCode": "46348559193224090",
+      "related_ids_unverified": {
+        "insCode2": "61934586397353104",
+        "insCode3": "53809308236531169",
+        "insCode4": "61318276340211749"
+      },
+      "instrument_search_exact_ticker_records": 1,
+      "instrument_search_total_records": 41,
+      "price_adjust": {
+        "rows": 23,
+        "unique_raw_insCode_tokens": [
+          "46348559193224090"
+        ],
+        "primary_match_rows": 23,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
+      },
+      "share_change": {
+        "rows": 12,
+        "unique_raw_insCode_tokens": [
+          "46348559193224090"
+        ],
+        "primary_match_rows": 12,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
+      }
+    },
+    "parsian": {
+      "ticker": "پارسیان",
+      "primary_insCode": "9481703061634967",
+      "related_ids_unverified": {
+        "insCode2": "47581393692926162",
+        "insCode3": "26748728514541238",
+        "insCode4": "41368943333312933"
+      },
+      "instrument_search_exact_ticker_records": 1,
+      "instrument_search_total_records": 41,
+      "price_adjust": {
+        "rows": 18,
+        "unique_raw_insCode_tokens": [
+          "9481703061634967"
+        ],
+        "primary_match_rows": 18,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
+      },
+      "share_change": {
+        "rows": 9,
+        "unique_raw_insCode_tokens": [
+          "9481703061634967"
+        ],
+        "primary_match_rows": 9,
+        "unresolved_rows": 0,
+        "status": "matched_primary"
+      },
+      "previous_false_mismatch_explanation": "A JavaScript JSON.parse/Number inspection rounded 9481703061634967 to 9481703061634968. The raw GitHub file contains the exact primary decimal token in all 18 price-adjust rows."
+    }
+  },
+  "summary": {
+    "symbol_count": 3,
+    "symbols_with_price_adjust_feed_primary_match": 3,
+    "symbols_with_share_change_feed_primary_match": 3,
+    "unresolved_feed_identity_mismatches": 0,
+    "total_price_adjust_rows": 66,
+    "total_share_change_rows": 28,
+    "event_unique_count": "not assessed by this identity audit"
+  },
+  "limitations": [
+    "Counts are provider feed rows, not unique economic events.",
+    "Identity matching does not prove event terms, economic classification, first affected trading session, formula or factor.",
+    "This does not authorize use of an external adjusted series or approval of any adjusted interval."
+  ],
+  "source_hashes_sha256": {
+    "vaghdir_instrument_search": "36874856886ce22dc2808e40145facf5a51a537b82b660ca8ac8e7ea185d8f06",
+    "vaghdir_price_adjust": "1fadcc07e1a4b1da95f2a687aba527d1a1bc50e265d0c465543afeb8cd086a3d",
+    "vaghdir_share_change": "a3c3c94a0f53b7bd8cc369b1d71c2d8b47df3f8efb1c4474c42ff96d8cc9729f",
+    "foolad_instrument_search": "39c5b42166570c75cd7a19439f571c8a513a46ce21d0fe592a8d2136f4193db2",
+    "foolad_price_adjust": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+    "foolad_share_change": "1b389841c646f4c7f03dc9a953280b476453dd0918d273f0c13d13fa716de063",
+    "parsian_instrument_search": "69c4b3f76024f2ba5b0b49f777c674dfa569ba61057e3cdaef6914809b9be8ad",
+    "parsian_price_adjust": "66160ec454c4f077fae7ba308118f24fb7fc615c79a11343362365d310a55118",
+    "parsian_share_change": "01b8ca99d5fa84cb9d71c28429ce7b9961b603361b3250a6e622151811bcc8f4"
+  }
+}

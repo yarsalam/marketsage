@@ -37,3 +37,6 @@ env/
 *.onnx
 data/
 logs/
+
+# Do not commit installed dependencies inside research evidence bundles.
+**/node_modules/

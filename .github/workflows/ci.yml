@@ -34,6 +34,8 @@ jobs:
       - name: Install analysis dependencies
         working-directory: user/analysis-engine
         run: python -m pip install -r requirements-dev.txt
+      - name: Test daily Iranian equity adjustment orchestrator
+        run: python -m pytest -q tests/test_adjustment_orchestrator.py
       - name: Test analysis API and research backtests
         working-directory: user/analysis-engine
         run: pytest -q

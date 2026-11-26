@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily MarketSage Iranian equity data check
+
+[Timer]
+OnCalendar=*-*-* 18:15:00 Asia/Tehran
+Persistent=true
+RandomizedDelaySec=300
+Unit=marketsage-adjustment-orchestrator.service
+
+[Install]
+WantedBy=timers.target
