@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 from enum import Enum
 import hashlib, json, re
 from typing import Any, Mapping, Tuple
+from types import MappingProxyType
 
 _SHA = re.compile(r"^[0-9a-f]{64}$")
 
@@ -123,7 +124,7 @@ class TypedEventDate:
     evidence_ids: Tuple[str,...]
     notes: str = ""
     def __post_init__(self):
-        if not isinstance(self.value,date): raise ValueError("value must be a date")
+        if not isinstance(self.value,date) or isinstance(self.value,datetime): raise ValueError("value must be a date, not a datetime")
         if not isinstance(self.kind,EventDateKind): object.__setattr__(self,"kind",EventDateKind(self.kind))
         refs=tuple(_text(x,"evidence_id") for x in self.evidence_ids)
         if not refs: raise ValueError("typed event dates require evidence references")
@@ -174,7 +175,7 @@ class DecisionRecord:
         if self.outcome is DecisionOutcome.MANUALLY_VERIFIED and not self.evidence_ids:
             raise ValueError("MANUALLY_VERIFIED decisions require evidence_ids")
         if not isinstance(self.payload,Mapping): raise ValueError("payload must be a mapping")
-        object.__setattr__(self,"payload",dict(self.payload))
+        object.__setattr__(self,"payload",MappingProxyType(dict(self.payload)))
 
 @dataclass(frozen=True, slots=True)
 class ApprovedPriceFactor:
@@ -219,7 +220,7 @@ class VerifiedCashflow:
         direction=_text(self.direction,"direction").upper()
         if direction not in {"TO_INVESTOR","FROM_INVESTOR"}: raise ValueError("invalid cashflow direction")
         object.__setattr__(self,"direction",direction)
-        if not isinstance(self.payment_date,date): raise ValueError("payment_date must be a date")
+        if not isinstance(self.payment_date,date) or isinstance(self.payment_date,datetime): raise ValueError("payment_date must be a date, not a datetime")
         object.__setattr__(self,"decision_id",_text(self.decision_id,"decision_id"))
         refs=tuple(_text(x,"evidence_id") for x in self.evidence_ids)
         if not refs: raise ValueError("cashflow requires evidence references")
