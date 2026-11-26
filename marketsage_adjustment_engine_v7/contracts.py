@@ -114,7 +114,7 @@ class SourceObservation:
         object.__setattr__(self,"payload_sha256",_hash(self.payload_sha256,"payload_sha256"))
         object.__setattr__(self,"source_locator",_text(self.source_locator,"source_locator"))
         if not isinstance(self.source_kind,SourceKind): object.__setattr__(self,"source_kind",SourceKind(self.source_kind))
-        if self.provider_date is not None and not isinstance(self.provider_date,date): raise ValueError("provider_date must be a date or None")
+        if self.provider_date is not None and (not isinstance(self.provider_date,date) or isinstance(self.provider_date,datetime)): raise ValueError("provider_date must be a date, not a datetime")
         object.__setattr__(self,"native_key",self.native_key.strip())
 
 @dataclass(frozen=True, slots=True)
