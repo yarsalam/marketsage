@@ -541,3 +541,22 @@ A shared engine should therefore keep distinct entities for issuer authorization
 - [ ] Run all existing Vaghdir engine versions on the same frozen inputs and produce event-level before/after outputs; do not approve any output yet.
 
 **Current Vaghdir result:** all seven capital/share-change events are documented and economically classifiable at component level to the extent above; dividend and effective-session history remains partially open. No Vaghdir adjusted series is accepted by this investigation.
+
+
+#### H. Source/date conflicts and external-source register
+
+Do not resolve these by picking the date that best matches TSETMC:
+
+- The uploaded registration notice TracingNo 61220 states EGM date **1390/01/29**. The existing Vaghdir README for CODAL 38805 describes the EGM as **1390/01/31**. The event pack also refers to dividend TracingNo **38803**, while the historical event ledger cites **38448** for the 500-Rial dividend. Preserve both alternatives and inspect the original signed EGM/codal records before canonicalizing the meeting date and dividend-document link.
+- The CODAL HTML/AGM source for TracingNo 155748 (financial year ended 1392/09/30; AGM 1392/12/25) has an attachments page, but its underlying PDF was not present in the staged downloaded documents. It is the likely source chain to inspect for the 630-Rial candidate on 1393/12/26; until the PDF is obtained, this candidate remains unverified.
+- A secondary dividend schedule reports a 490-Rial Vaghdir distribution around Ordibehesht 1399. The originally scheduled 1398/12/26 AGM was cancelled, and no 2020 PA row appears in the imported PA list. This may be a provider omission, delayed ex-date or a different dividend chain; do not synthesize a PA factor from the payment schedule alone.
+- The 2026 PA difference of 1,500 Rials has not yet been tied to the corresponding original AGM decision in the evidence inspected.
+
+External discovery/reference URLs captured during this pass:
+- BourseEye Vaghdir capital/PA history (seven SC changes, 25 PA rows, and explicit warning not to infer event cause from PA): https://bourseeye.com/stocks/137/وغدیر-سرمایه-گذاری-غدیر-هلدینگ/capital-increases
+- Contemporary 1388 archive noting Vaghdir DPS of 25 Toman / 250 Rial: https://homanbourse.blogfa.com/1388/01
+- Contemporary 1389 archive quoting Vaghdir CEO on DPS 310 Rial and payment timing: https://homanbourse.blogfa.com/1389/02
+- Dividend archive for DPS 400 in AGM 1394/12/25 and 160 in AGM 1395/12/25: https://t.me/s/dpsiran?q=%23وغدیر
+- Codal360 aggregator records for 800 Rial (AGM 1399/12/25), 1,930 Rial (AGM 1400/12/23), 2,350 Rial (AGM 1402/01/31), 3,000 Rial (AGM 1403/01/28) and 1,170 Rial (AGM 1403/12/08): https://t.me/s/Codal360_ir?q=%23وغدیر
+
+The external archive/aggregator entries are discovery evidence; the original CODAL documents or contemporaneous issuer notices remain preferred for acceptance. BourseEye is a useful cross-check of TSETMC-derived event history, not a primary issuer source.
