@@ -1,7 +1,0 @@
-╭────────────────────────────── iranquant error ───────────────────────────────╮
-│ HTTP 429 for                                                                 │
-│ https://search.codal.ir/api/search/v2/q?Symbol=%D9%88%D8%BA%D8%AF%DB%8C%D8%B │
-│ 1&LetterType=58&Category=-1&CompanyState=-1&CompanyType=-1&PageNumber=1&Audi │
-│ ted=true&NotAudited=true&Mains=true&Childs=true&Consolidatable=true&NotConso │
-│ lidatable=true&Publisher=false&search=true                                   │
-╰──────────────────────────────────────────────────────────────────────────────╯
