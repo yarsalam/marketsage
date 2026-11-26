@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Iterable, Tuple
 from .contracts import (ApprovedPriceFactor, ApprovedVolumeFactor, CorporateActionEvent,
-    DecisionDimension, DecisionOutcome, DecisionRecord, SourceKind, SourceObservation)
+    DecisionDimension, DecisionOutcome, DecisionRecord, EvidenceReference, SourceKind, SourceObservation)
 
 @dataclass(frozen=True, slots=True)
 class GateResult:
@@ -34,15 +34,15 @@ class EvidenceGate:
         if not record.evidence_ids: return None,[f"MISSING_EVIDENCE:{dimension.value}"]
         return record,[]
 
-    def approve_price_factor(self,event,observation,records):
-        return self._approve(event,observation,records,SourceKind.PA,DecisionDimension.PRICE_FACTOR,ApprovedPriceFactor)
+    def approve_price_factor(self,event,observation,records,evidence_refs=()):
+        return self._approve(event,observation,records,evidence_refs,SourceKind.PA,DecisionDimension.PRICE_FACTOR,ApprovedPriceFactor)
 
-    def approve_volume_factor(self,event,observation,records):
-        return self._approve(event,observation,records,SourceKind.SC,DecisionDimension.VOLUME_FACTOR,ApprovedVolumeFactor)
+    def approve_volume_factor(self,event,observation,records,evidence_refs=()):
+        return self._approve(event,observation,records,evidence_refs,SourceKind.SC,DecisionDimension.VOLUME_FACTOR,ApprovedVolumeFactor)
 
-    def _approve(self,event: CorporateActionEvent,observation: SourceObservation,records,
+    def _approve(self,event: CorporateActionEvent,observation: SourceObservation,records,evidence_refs,
                  source_kind: SourceKind,factor_dimension: DecisionDimension,output_type):
-        records=tuple(records); reasons=[]
+        records=tuple(records); evidence_by_id={e.evidence_id:e for e in evidence_refs}; reasons=[]
         if observation.source_kind is not source_kind: reasons.append(f"WRONG_SOURCE_KIND:EXPECTED_{source_kind.value}")
         if observation.observation_id not in event.source_observation_ids: reasons.append("OBSERVATION_NOT_LINKED_TO_EVENT")
         if observation.instrument!=event.instrument: reasons.append("INSTRUMENT_IDENTITY_MISMATCH")
@@ -50,7 +50,12 @@ class EvidenceGate:
         for dimension in (*self.COMMON,factor_dimension):
             decision,errors=self._check(records,event.event_id,dimension)
             reasons.extend(errors)
-            if decision is not None: accepted[dimension]=decision
+            if decision is not None:
+                missing_refs=[ref for ref in decision.evidence_ids if ref not in evidence_by_id]
+                if missing_refs:
+                    reasons.append(f"UNRESOLVED_EVIDENCE_REFERENCES:{dimension.value}")
+                else:
+                    accepted[dimension]=decision
         factor_decision=accepted.get(factor_dimension); factor=None
         if factor_decision is not None:
             try:
