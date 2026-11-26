@@ -1,0 +1,32 @@
+{
+  "155153": {
+    "http_status": 200,
+    "content_type": "application/pdf",
+    "content_disposition": "attachment;filename=\"pardakht sod.pdf\"",
+    "bytes": 71697,
+    "sha256": "2ce75eedf51194ce9cf558170a7ecd9b62030b2f20fa7871b92674592bd89a56",
+    "detected_signature": "PDF",
+    "final_url": "https://codal.ir/Reports/DownloadFile.aspx?id=VQQQaQQQFJUJuSnizu6HiO1DYegA%3D%3D",
+    "saved_file": "/home/nima/marketsage-data/tsetmc-three-adjusted/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/155153.pdf"
+  },
+  "155748": {
+    "http_status": 200,
+    "content_type": "application/pdf",
+    "content_disposition": "attachment;filename=\"sorat jalase majma1.pdf\"",
+    "bytes": 421148,
+    "sha256": "c42e88df58cf71c8fbe20509573b86d61df8dd94c516f14ea7ad402df67d6a84",
+    "detected_signature": "PDF",
+    "final_url": "https://codal.ir/Reports/DownloadFile.aspx?id=A6QQQaQQQKQLq6vo3PRXZDDbx55Q%3D%3D",
+    "saved_file": "/home/nima/marketsage-data/tsetmc-three-adjusted/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/155748.pdf"
+  },
+  "156803": {
+    "http_status": 200,
+    "content_type": "application/msword",
+    "content_disposition": "attachment;filename=\"ÙØµÙØ¨Ø§Øª ÙØ¬ÙØ¹ 92.doc\"",
+    "bytes": 146432,
+    "sha256": "1b46a7607f7b00cc5397221fd49e67e1d15b0261c87f2c8def58babbfef81aae",
+    "detected_signature": "OLE/legacy Office",
+    "final_url": "https://codal.ir/Reports/DownloadFile.aspx?id=HyuEQOOObOOOVX1Z4bAWEwVTKscg%3D%3D",
+    "saved_file": "/home/nima/marketsage-data/tsetmc-three-adjusted/codal_vaghdir_dividend_20261114/downloaded_attachments_20261114/156803.doc"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "symbol_dir": "data/market-research/iran-equities/adjustment-evidence/foolad",
+  "generated_at": "2026-11-18T20:00:19.465456+00:00",
+  "engine_version": "1.0",
+  "input_hashes": {
+    "price_adjust": "29d25461c61306fc716e44dedb0e98200cf1159de4f17eeb18667741df6263ae",
+    "raw_prices": "07b5a80c675d324fb0c30973ad9f6ecfe8d210a3f5cb7a3d2091e62911c5d53f"
+  },
+  "output_hashes": {
+    "adjusted_close": "b8dac0b951eb0f12b98aabfd57f1b74060ed4a8f70a8726fa3dd8b6fc4cfe828"
+  },
+  "counts": {
+    "price_adjust_records": 23,
+    "forward_events": 30,
+    "share_change_only_events": 7,
+    "daily_rows": 4269,
+    "adjusted_rows": 4269
+  }
+}

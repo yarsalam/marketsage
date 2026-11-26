@@ -1,0 +1,35 @@
+{
+  "symbol": "foolad",
+  "ticker": "فولاد",
+  "issuer_or_instrument_name": "فولاد مباركه اصفهان",
+  "primary_insCode": "46348559193224090",
+  "cIsin": null,
+  "instrumentID": null,
+  "related_ids": {
+    "insCode2": "61934586397353104",
+    "insCode3": "53809308236531169",
+    "insCode4": "61318276340211749"
+  },
+  "related_id_status": "unverified_aliases_not_used_for_matching",
+  "identity_source": "raw_provider_snapshots/foolad_instrument_search.json",
+  "exact_ticker_record": {
+    "insCode2": "61934586397353104",
+    "insCode3": "53809308236531169",
+    "insCode4": "61318276340211749",
+    "insCode": "46348559193224090",
+    "lVal30": "فولاد مباركه اصفهان",
+    "lVal18AFC": "فولاد",
+    "flow": 1,
+    "cIsin": null,
+    "zTitad": 0.0,
+    "baseVol": 0,
+    "instrumentID": null,
+    "cgrValCot": "N1",
+    "cComVal": null,
+    "lastDate": 1,
+    "sourceID": 1,
+    "flowTitle": "بازار بورس",
+    "cgrValCotTitle": ""
+  },
+  "identity_checked_at_utc": "2026-11-14T20:22:50+00:00"
+}

@@ -1,0 +1,11 @@
+{
+  "http_status": 200,
+  "content_type": "text/csv; charset=utf-8",
+  "content_encoding": "gzip",
+  "content_length_header": "51039",
+  "response_bytes": 51039,
+  "response_prefix_hex": "1f8b0800bab3f56a00ff645d5796243908bc507d48c8bfb9",
+  "response_sha256": "c1f77c887483fcc7c82340e5defc36bd3374b26604ac49daf56c554fbc32850e",
+  "decoder_used": "gzip",
+  "decoded_bytes": 150529
+}

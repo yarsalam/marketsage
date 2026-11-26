@@ -1,0 +1,1152 @@
+{
+  "created_at": "2026-11-12T14:11:18.639Z",
+  "status": "diagnostic_only_not_acceptance",
+  "library": {
+    "name": "tse-client",
+    "version": "2.27.6",
+    "expected_version": "2.27.6"
+  },
+  "settings": {
+    "daysWithoutTrade": false,
+    "mergeSimilarSymbols": false,
+    "cache": false,
+    "adjusted_modes": [
+      1,
+      2
+    ]
+  },
+  "symbols": {
+    "فولاد": {
+      "instrument_matches": [
+        {
+          "Symbol": "فولاد",
+          "Name": "فولاد مباركه اصفهان",
+          "InsCode": "46348559193224090",
+          "CIsin": "IRO1FOLD0009",
+          "CompanyCode": "FOLD",
+          "YVal": "300"
+        }
+      ],
+      "expected_insCode": "46348559193224090",
+      "identity_status": "exact_symbol_and_insCode_match",
+      "validGPLRatio": true,
+      "adjustInfo_present": true,
+      "event_count": 31,
+      "event_type_counts": {
+        "dividend": 19,
+        "capital increase": 12
+      },
+      "events": [
+        {
+          "date": "20260803",
+          "type": "dividend",
+          "priceBeforeEvent": "2604.00",
+          "priceAfterEvent": "2549.00",
+          "priceRatio": 0.9788786482334869,
+          "dividend": "55",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20260329",
+          "type": "capital increase",
+          "priceBeforeEvent": "3359.00",
+          "priceAfterEvent": "2604.00",
+          "priceRatio": 0.7752307234295921,
+          "dividend": null,
+          "increasePct": "0.29",
+          "oldShares": "1500000000000",
+          "newShares": "1935000000000",
+          "shareRatio": 0.7751937984496124
+        },
+        {
+          "date": "20250804",
+          "type": "dividend",
+          "priceBeforeEvent": "2860.00",
+          "priceAfterEvent": "2580.00",
+          "priceRatio": 0.9020979020979021,
+          "dividend": "280",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20250311",
+          "type": "capital increase",
+          "priceBeforeEvent": "5530.00",
+          "priceAfterEvent": "3982.00",
+          "priceRatio": 0.7200723327305606,
+          "dividend": null,
+          "increasePct": "0.3888888888888888888888888888888888888889",
+          "oldShares": "1080000000000",
+          "newShares": "1500000000000",
+          "shareRatio": 0.72
+        },
+        {
+          "date": "20240721",
+          "type": "dividend",
+          "priceBeforeEvent": "5200.00",
+          "priceAfterEvent": "4800.00",
+          "priceRatio": 0.9230769230769231,
+          "dividend": "400",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20240226",
+          "type": "capital increase",
+          "priceBeforeEvent": "5930.00",
+          "priceAfterEvent": "4393.00",
+          "priceRatio": 0.7408094435075885,
+          "dividend": null,
+          "increasePct": "0.35",
+          "oldShares": "800000000000",
+          "newShares": "1080000000000",
+          "shareRatio": 0.7407407407407407
+        },
+        {
+          "date": "20230722",
+          "type": "dividend",
+          "priceBeforeEvent": "5460.00",
+          "priceAfterEvent": "4960.00",
+          "priceRatio": 0.9084249084249084,
+          "dividend": "500",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20230318",
+          "type": "capital increase",
+          "priceBeforeEvent": "7940.00",
+          "priceAfterEvent": "5260.00",
+          "priceRatio": 0.6624685138539043,
+          "dividend": null,
+          "increasePct": "0.5094339622641509433962264150943396226415",
+          "oldShares": "530000000000",
+          "newShares": "800000000000",
+          "shareRatio": 0.6625
+        },
+        {
+          "date": "20220806",
+          "type": "capital increase",
+          "priceBeforeEvent": "9470.00",
+          "priceAfterEvent": "5240.00",
+          "priceRatio": 0.5533262935586061,
+          "dividend": null,
+          "increasePct": "0.8088737201365187713310580204778156996587",
+          "oldShares": "293000000000",
+          "newShares": "530000000000",
+          "shareRatio": 0.5528301886792453
+        },
+        {
+          "date": "20220803",
+          "type": "dividend",
+          "priceBeforeEvent": "11170.00",
+          "priceAfterEvent": "9470.00",
+          "priceRatio": 0.8478066248880931,
+          "dividend": "1700",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20210803",
+          "type": "dividend",
+          "priceBeforeEvent": "10950.00",
+          "priceAfterEvent": "10550.00",
+          "priceRatio": 0.9634703196347032,
+          "dividend": "400",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20210523",
+          "type": "capital increase",
+          "priceBeforeEvent": "12440.00",
+          "priceAfterEvent": "8870.00",
+          "priceRatio": 0.7130225080385852,
+          "dividend": null,
+          "increasePct": "0.4019138755980861244019138755980861244019",
+          "oldShares": "209000000000",
+          "newShares": "293000000000",
+          "shareRatio": 0.7133105802047781
+        },
+        {
+          "date": "20200805",
+          "type": "dividend",
+          "priceBeforeEvent": "20940.00",
+          "priceAfterEvent": "20720.00",
+          "priceRatio": 0.9894937917860553,
+          "dividend": "220",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20200523",
+          "type": "dividend",
+          "priceBeforeEvent": "8811.00",
+          "priceAfterEvent": "8808.00",
+          "priceRatio": 0.9996595165134491,
+          "dividend": "3",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20200111",
+          "type": "capital increase",
+          "priceBeforeEvent": "5715.00",
+          "priceAfterEvent": "3555.00",
+          "priceRatio": 0.6220472440944882,
+          "dividend": null,
+          "increasePct": "0.6076923076923076923076923076923076923077",
+          "oldShares": "130000000000",
+          "newShares": "209000000000",
+          "shareRatio": 0.6220095693779905
+        },
+        {
+          "date": "20190721",
+          "type": "dividend",
+          "priceBeforeEvent": "4297.00",
+          "priceAfterEvent": "3997.00",
+          "priceRatio": 0.9301838491971143,
+          "dividend": "300",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20190218",
+          "type": "capital increase",
+          "priceBeforeEvent": "4888.00",
+          "priceAfterEvent": "2820.00",
+          "priceRatio": 0.5769230769230769,
+          "dividend": null,
+          "increasePct": "0.7333333333333333333333333333333333333333",
+          "oldShares": "75000000000",
+          "newShares": "130000000000",
+          "shareRatio": 0.5769230769230769
+        },
+        {
+          "date": "20180722",
+          "type": "dividend",
+          "priceBeforeEvent": "3790.00",
+          "priceAfterEvent": "3540.00",
+          "priceRatio": 0.9340369393139841,
+          "dividend": "250",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20170722",
+          "type": "dividend",
+          "priceBeforeEvent": "1583.00",
+          "priceAfterEvent": "1483.00",
+          "priceRatio": 0.9368288060644346,
+          "dividend": "100",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20160720",
+          "type": "dividend",
+          "priceBeforeEvent": "1262.00",
+          "priceAfterEvent": "1212.00",
+          "priceRatio": 0.9603803486529319,
+          "dividend": "50",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20151017",
+          "type": "capital increase",
+          "priceBeforeEvent": "1162.00",
+          "priceAfterEvent": "1041.00",
+          "priceRatio": 0.8958691910499139,
+          "dividend": null,
+          "increasePct": "0.5",
+          "oldShares": "50000000000",
+          "newShares": "75000000000",
+          "shareRatio": 0.6666666666666666
+        },
+        {
+          "date": "20150722",
+          "type": "dividend",
+          "priceBeforeEvent": "1845.00",
+          "priceAfterEvent": "1395.00",
+          "priceRatio": 0.7560975609756098,
+          "dividend": "450",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20140805",
+          "type": "capital increase",
+          "priceBeforeEvent": "3362.00",
+          "priceAfterEvent": "2670.00",
+          "priceRatio": 0.7941701368233195,
+          "dividend": null,
+          "increasePct": "0.3888888888888888888888888888888888888889",
+          "oldShares": "36000000000",
+          "newShares": "50000000000",
+          "shareRatio": 0.72
+        },
+        {
+          "date": "20140720",
+          "type": "dividend",
+          "priceBeforeEvent": "3970.00",
+          "priceAfterEvent": "3310.00",
+          "priceRatio": 0.8337531486146096,
+          "dividend": "660",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20130724",
+          "type": "capital increase",
+          "priceBeforeEvent": "4349.00",
+          "priceAfterEvent": "3233.00",
+          "priceRatio": 0.7433892848930789,
+          "dividend": null,
+          "increasePct": "0.3953488372093023255813953488372093023256",
+          "oldShares": "25800000000",
+          "newShares": "36000000000",
+          "shareRatio": 0.7166666666666667
+        },
+        {
+          "date": "20130721",
+          "type": "dividend",
+          "priceBeforeEvent": "4999.00",
+          "priceAfterEvent": "4349.00",
+          "priceRatio": 0.8699739947989598,
+          "dividend": "650",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20120728",
+          "type": "dividend",
+          "priceBeforeEvent": "2424.00",
+          "priceAfterEvent": "2124.00",
+          "priceRatio": 0.8762376237623762,
+          "dividend": "300",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20110719",
+          "type": "dividend",
+          "priceBeforeEvent": "3028.00",
+          "priceAfterEvent": "2728.00",
+          "priceRatio": 0.9009247027741083,
+          "dividend": "300",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20110213",
+          "type": "capital increase",
+          "priceBeforeEvent": "3241.00",
+          "priceAfterEvent": "2291.00",
+          "priceRatio": 0.7068805924097501,
+          "dividend": null,
+          "increasePct": "0.6329113924050632911392405063291139240506",
+          "oldShares": "15800000000",
+          "newShares": "25800000000",
+          "shareRatio": 0.6124031007751938
+        },
+        {
+          "date": "20100706",
+          "type": "dividend",
+          "priceBeforeEvent": "2416.00",
+          "priceAfterEvent": "1916.00",
+          "priceRatio": 0.793046357615894,
+          "dividend": "500",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20090622",
+          "type": "dividend",
+          "priceBeforeEvent": "2122.00",
+          "priceAfterEvent": "1522.00",
+          "priceRatio": 0.7172478793590952,
+          "dividend": "600",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        }
+      ],
+      "chart": {
+        "raw_rows": 4266,
+        "adjusted_rows": 4266,
+        "metadata": {
+          "raw": {
+            "status": 200,
+            "bytes": 70680,
+            "content_encoding": "gzip",
+            "raw_sha256": "d70d421911b6a2d1394effd5e8f43044ab85236d5e1f83eade96afc5a8fd89ef",
+            "decoded_sha256": "b5913e8f78f9ad0ac6f8ddf023835ec81cbee4d32690e3c2d99d2191426e9a11"
+          },
+          "adjusted": {
+            "status": 200,
+            "bytes": 51039,
+            "content_encoding": "gzip",
+            "raw_sha256": "c3ba35bf36aabc73f095da4d843eb45f80306486eedb66cc3fb18ecabd492bdd",
+            "decoded_sha256": "6779a9e137edfb049c859adafb981165fb6065e9ca8eb78f978edd5f1b05b28e"
+          }
+        }
+      },
+      "tse_client_rows": {
+        "raw": 4266,
+        "adjust1": 4266,
+        "adjust2": 4266
+      },
+      "comparisons": {
+        "tse_client_raw_vs_chart_raw": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 100,
+          "median_relative_error_pct": 0,
+          "p95_relative_error_pct": 0,
+          "max_relative_error_pct": 0,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust1_vs_chart_adjusted": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 2.555086732301922,
+          "median_relative_error_pct": 0.39548162859980307,
+          "p95_relative_error_pct": 7.333333333333347,
+          "max_relative_error_pct": 16.666666666666675,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust2_vs_chart_adjusted": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 1.5939990623534928,
+          "median_relative_error_pct": 102.98000000000003,
+          "p95_relative_error_pct": 408.2222222222223,
+          "max_relative_error_pct": 469.66666666666663,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        },
+        "candidate_raw_vs_chart_raw": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 100,
+          "median_relative_error_pct": 0,
+          "p95_relative_error_pct": 0,
+          "max_relative_error_pct": 0,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        },
+        "candidate_adjusted_vs_chart_adjusted": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 1.7346460384435067,
+          "median_relative_error_pct": 80.4821997670786,
+          "p95_relative_error_pct": 91.01794855324101,
+          "max_relative_error_pct": 110.89567637607888,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust1_vs_candidate_adjusted": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 1.5939990623534928,
+          "median_relative_error_pct": 44.67835107342193,
+          "p95_relative_error_pct": 44.70743007014819,
+          "max_relative_error_pct": 44.76926259637831,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust2_vs_candidate_adjusted": {
+          "common": 4266,
+          "anchor_scale": 1,
+          "exact_rate_pct": 1.5939990623534928,
+          "median_relative_error_pct": 18.19059663661203,
+          "p95_relative_error_pct": 170.44385648553467,
+          "max_relative_error_pct": 170.53289519052046,
+          "first_common_date": "2007-03-11",
+          "last_common_date": "2026-11-11"
+        }
+      },
+      "status": "ok"
+    },
+    "وغدیر": {
+      "instrument_matches": [
+        {
+          "Symbol": "وغدیر",
+          "Name": "سرمايه‌گذاري‌غدير(هلدينگ‌",
+          "InsCode": "26014913469567886",
+          "CIsin": "IRO1GDIR0000",
+          "CompanyCode": "GDIR",
+          "YVal": "300"
+        }
+      ],
+      "expected_insCode": "26014913469567886",
+      "identity_status": "exact_symbol_and_insCode_match",
+      "validGPLRatio": true,
+      "adjustInfo_present": true,
+      "event_count": 15,
+      "event_type_counts": {
+        "dividend": 12,
+        "capital increase": 3
+      },
+      "events": [
+        {
+          "date": "20260418",
+          "type": "dividend",
+          "priceBeforeEvent": "15070.00",
+          "priceAfterEvent": "13570.00",
+          "priceRatio": 0.900464499004645,
+          "dividend": "1500",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20250226",
+          "type": "dividend",
+          "priceBeforeEvent": "11890.00",
+          "priceAfterEvent": "10720.00",
+          "priceRatio": 0.9015979814970564,
+          "dividend": "1170",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20240731",
+          "type": "capital increase",
+          "priceBeforeEvent": "22000.00",
+          "priceAfterEvent": "7330.00",
+          "priceRatio": 0.3331818181818182,
+          "dividend": null,
+          "increasePct": "2",
+          "oldShares": "72000000000",
+          "newShares": "216000000000",
+          "shareRatio": 0.3333333333333333
+        },
+        {
+          "date": "20240416",
+          "type": "dividend",
+          "priceBeforeEvent": "24700.00",
+          "priceAfterEvent": "21700.00",
+          "priceRatio": 0.8785425101214575,
+          "dividend": "3000",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20230424",
+          "type": "dividend",
+          "priceBeforeEvent": "29590.00",
+          "priceAfterEvent": "27240.00",
+          "priceRatio": 0.9205812774586009,
+          "dividend": "2350",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20220314",
+          "type": "dividend",
+          "priceBeforeEvent": "14460.00",
+          "priceAfterEvent": "12530.00",
+          "priceRatio": 0.8665283540802213,
+          "dividend": "1930",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20210315",
+          "type": "dividend",
+          "priceBeforeEvent": "12350.00",
+          "priceAfterEvent": "11550.00",
+          "priceRatio": 0.9352226720647774,
+          "dividend": "800",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20200426",
+          "type": "dividend",
+          "priceBeforeEvent": "8113.00",
+          "priceAfterEvent": "7623.00",
+          "priceRatio": 0.9396031061259706,
+          "dividend": "490",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20190316",
+          "type": "dividend",
+          "priceBeforeEvent": "1904.00",
+          "priceAfterEvent": "1654.00",
+          "priceRatio": 0.8686974789915967,
+          "dividend": "250",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20180314",
+          "type": "dividend",
+          "priceBeforeEvent": "1329.00",
+          "priceAfterEvent": "1139.00",
+          "priceRatio": 0.8570353649360422,
+          "dividend": "190",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20170315",
+          "type": "dividend",
+          "priceBeforeEvent": "1270.00",
+          "priceAfterEvent": "1110.00",
+          "priceRatio": 0.8740157480314961,
+          "dividend": "160",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20161122",
+          "type": "capital increase",
+          "priceBeforeEvent": "1862.00",
+          "priceAfterEvent": "1313.00",
+          "priceRatio": 0.7051557465091299,
+          "dividend": null,
+          "increasePct": "0.5625",
+          "oldShares": "46080000000",
+          "newShares": "72000000000",
+          "shareRatio": 0.64
+        },
+        {
+          "date": "20160315",
+          "type": "dividend",
+          "priceBeforeEvent": "2666.00",
+          "priceAfterEvent": "2266.00",
+          "priceRatio": 0.8499624906226556,
+          "dividend": "400",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20151102",
+          "type": "capital increase",
+          "priceBeforeEvent": "2362.00",
+          "priceAfterEvent": "2064.00",
+          "priceRatio": 0.8738357324301439,
+          "dividend": null,
+          "increasePct": "0.28",
+          "oldShares": "36000000000",
+          "newShares": "46080000000",
+          "shareRatio": 0.78125
+        },
+        {
+          "date": "20150316",
+          "type": "dividend",
+          "priceBeforeEvent": "3065.00",
+          "priceAfterEvent": "2565.00",
+          "priceRatio": 0.8368678629690048,
+          "dividend": "500",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        }
+      ],
+      "chart": {
+        "raw_rows": 5383,
+        "adjusted_rows": 5383,
+        "metadata": {
+          "raw": {
+            "status": 200,
+            "bytes": 84990,
+            "content_encoding": "gzip",
+            "raw_sha256": "548bb586d0f52b9752bd1cf24c73de138a1cd25682171dae6e97f7bbef68aa16",
+            "decoded_sha256": "763cc268719bdda15708024cd2dafed9905b41564be0481f04918c12fc8be9b6"
+          },
+          "adjusted": {
+            "status": 200,
+            "bytes": 66300,
+            "content_encoding": "gzip",
+            "raw_sha256": "dc96bc4cb938f34d8af0e0b3dc0a821990ea0309dd46f84b20d14fcf01ee2237",
+            "decoded_sha256": "86d560d0f858a5d30e0ffebf7bfa4c87cd125407c773594c6942e4f9b01863b8"
+          }
+        }
+      },
+      "tse_client_rows": {
+        "raw": 5383,
+        "adjust1": 5383,
+        "adjust2": 5383
+      },
+      "comparisons": {
+        "tse_client_raw_vs_chart_raw": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 100,
+          "median_relative_error_pct": 0,
+          "p95_relative_error_pct": 0,
+          "max_relative_error_pct": 0,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust1_vs_chart_adjusted": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 2.5264722273825004,
+          "median_relative_error_pct": 0.3311258278145601,
+          "p95_relative_error_pct": 598.7058823529412,
+          "max_relative_error_pct": 629,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust2_vs_chart_adjusted": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 1.9505851755526658,
+          "median_relative_error_pct": 250.69444444444446,
+          "p95_relative_error_pct": 2351,
+          "max_relative_error_pct": 2457.4444444444443,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        },
+        "candidate_raw_vs_chart_raw": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 100,
+          "median_relative_error_pct": 0,
+          "p95_relative_error_pct": 0,
+          "max_relative_error_pct": 0,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        },
+        "candidate_adjusted_vs_chart_adjusted": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 2.006316180568456,
+          "median_relative_error_pct": 6.606297134316064,
+          "p95_relative_error_pct": 30.988812400094712,
+          "max_relative_error_pct": 33.43368527968702,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust1_vs_candidate_adjusted": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 8.396804755712427,
+          "median_relative_error_pct": 6.085245920366356,
+          "p95_relative_error_pct": 886.3877581791021,
+          "max_relative_error_pct": 886.434793459122,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust2_vs_candidate_adjusted": {
+          "common": 5383,
+          "anchor_scale": 1,
+          "exact_rate_pct": 1.9505851755526658,
+          "median_relative_error_pct": 229.4653091899716,
+          "p95_relative_error_pct": 3360.2322800456386,
+          "max_relative_error_pct": 3360.2591308792016,
+          "first_common_date": "2001-03-25",
+          "last_common_date": "2026-11-11"
+        }
+      },
+      "status": "ok"
+    },
+    "پارسیان": {
+      "instrument_matches": [
+        {
+          "Symbol": "پارسیان",
+          "Name": "بيمه پارسيان",
+          "InsCode": "9481703061634967",
+          "CIsin": "IRO1IPAR0002",
+          "CompanyCode": "IPAR",
+          "YVal": "300"
+        }
+      ],
+      "expected_insCode": "9481703061634967",
+      "identity_status": "exact_symbol_and_insCode_match",
+      "validGPLRatio": true,
+      "adjustInfo_present": true,
+      "event_count": 18,
+      "event_type_counts": {
+        "dividend": 11,
+        "capital increase": 7
+      },
+      "events": [
+        {
+          "date": "20260530",
+          "type": "dividend",
+          "priceBeforeEvent": "1312.00",
+          "priceAfterEvent": "1072.00",
+          "priceRatio": 0.8170731707317073,
+          "dividend": "240",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20251007",
+          "type": "capital increase",
+          "priceBeforeEvent": "4396.00",
+          "priceAfterEvent": "1407.00",
+          "priceRatio": 0.3200636942675159,
+          "dividend": null,
+          "increasePct": "2.125",
+          "oldShares": "16000000000",
+          "newShares": "50000000000",
+          "shareRatio": 0.32
+        },
+        {
+          "date": "20250510",
+          "type": "dividend",
+          "priceBeforeEvent": "4880.00",
+          "priceAfterEvent": "4255.00",
+          "priceRatio": 0.8719262295081968,
+          "dividend": "625",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20240218",
+          "type": "capital increase",
+          "priceBeforeEvent": "3716.00",
+          "priceAfterEvent": "3019.00",
+          "priceRatio": 0.81243272335845,
+          "dividend": null,
+          "increasePct": "0.2307692307692307692307692307692307692308",
+          "oldShares": "13000000000",
+          "newShares": "16000000000",
+          "shareRatio": 0.8125
+        },
+        {
+          "date": "20230603",
+          "type": "dividend",
+          "priceBeforeEvent": "4149.00",
+          "priceAfterEvent": "3999.00",
+          "priceRatio": 0.9638467100506146,
+          "dividend": "150",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20220912",
+          "type": "capital increase",
+          "priceBeforeEvent": "3367.00",
+          "priceAfterEvent": "3185.00",
+          "priceRatio": 0.9459459459459459,
+          "dividend": null,
+          "increasePct": "0.08333333333333333333333333333333333333333",
+          "oldShares": "12000000000",
+          "newShares": "13000000000",
+          "shareRatio": 0.9230769230769231
+        },
+        {
+          "date": "20220606",
+          "type": "dividend",
+          "priceBeforeEvent": "3517.00",
+          "priceAfterEvent": "3467.00",
+          "priceRatio": 0.9857833380722206,
+          "dividend": "50",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20220226",
+          "type": "capital increase",
+          "priceBeforeEvent": "8070.00",
+          "priceAfterEvent": "3360.00",
+          "priceRatio": 0.4163568773234201,
+          "dividend": null,
+          "increasePct": "1.4",
+          "oldShares": "5000000000",
+          "newShares": "12000000000",
+          "shareRatio": 0.4166666666666667
+        },
+        {
+          "date": "20210516",
+          "type": "dividend",
+          "priceBeforeEvent": "9050.00",
+          "priceAfterEvent": "8750.00",
+          "priceRatio": 0.9668508287292817,
+          "dividend": "300",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20200919",
+          "type": "capital increase",
+          "priceBeforeEvent": "13370.00",
+          "priceAfterEvent": "10900.00",
+          "priceRatio": 0.8152580403889305,
+          "dividend": null,
+          "increasePct": "0.25",
+          "oldShares": "4000000000",
+          "newShares": "5000000000",
+          "shareRatio": 0.8
+        },
+        {
+          "date": "20200620",
+          "type": "dividend",
+          "priceBeforeEvent": "17170.00",
+          "priceAfterEvent": "16920.00",
+          "priceRatio": 0.9854397204426325,
+          "dividend": "250",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20190811",
+          "type": "capital increase",
+          "priceBeforeEvent": "2468.00",
+          "priceAfterEvent": "2026.00",
+          "priceRatio": 0.8209076175040518,
+          "dividend": null,
+          "increasePct": "0.3333333333333333333333333333333333333333",
+          "oldShares": "3000000000",
+          "newShares": "4000000000",
+          "shareRatio": 0.75
+        },
+        {
+          "date": "20190602",
+          "type": "dividend",
+          "priceBeforeEvent": "1825.00",
+          "priceAfterEvent": "1542.00",
+          "priceRatio": 0.8449315068493151,
+          "dividend": "283",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20180704",
+          "type": "dividend",
+          "priceBeforeEvent": "1372.00",
+          "priceAfterEvent": "1222.00",
+          "priceRatio": 0.89067055393586,
+          "dividend": "150",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20170719",
+          "type": "dividend",
+          "priceBeforeEvent": "2005.00",
+          "priceAfterEvent": "1855.00",
+          "priceRatio": 0.9251870324189526,
+          "dividend": "150",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20161210",
+          "type": "capital increase",
+          "priceBeforeEvent": "2840.00",
+          "priceAfterEvent": "1993.00",
+          "priceRatio": 0.7017605633802817,
+          "dividend": null,
+          "increasePct": "0.5",
+          "oldShares": "2000000000",
+          "newShares": "3000000000",
+          "shareRatio": 0.6666666666666666
+        },
+        {
+          "date": "20160619",
+          "type": "dividend",
+          "priceBeforeEvent": "2984.00",
+          "priceAfterEvent": "2734.00",
+          "priceRatio": 0.9162198391420912,
+          "dividend": "250",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        },
+        {
+          "date": "20150510",
+          "type": "dividend",
+          "priceBeforeEvent": "2125.00",
+          "priceAfterEvent": "1925.00",
+          "priceRatio": 0.9058823529411765,
+          "dividend": "200",
+          "increasePct": null,
+          "oldShares": null,
+          "newShares": null,
+          "shareRatio": null
+        }
+      ],
+      "chart": {
+        "raw_rows": 3539,
+        "adjusted_rows": 3539,
+        "metadata": {
+          "raw": {
+            "status": 200,
+            "bytes": 54566,
+            "content_encoding": "gzip",
+            "raw_sha256": "c2c08968b72d0a43b62feb0abc70248ac26d52aeebb1b78ca16d59e8078f21fe",
+            "decoded_sha256": "5c51e5d0110b76a3880c3adb9b8722f4e618f07db392b433d7492f491b7725a0"
+          },
+          "adjusted": {
+            "status": 200,
+            "bytes": 40976,
+            "content_encoding": "gzip",
+            "raw_sha256": "07ffe2178b63e05fef8ca99a18ff7426ed6d66a83856f2137f5c49260097fc13",
+            "decoded_sha256": "9f4ebf4bd84641fc5baf40745675c44c842be5f0377b5339e3566bd963258876"
+          }
+        }
+      },
+      "tse_client_rows": {
+        "raw": 3539,
+        "adjust1": 3539,
+        "adjust2": 3539
+      },
+      "comparisons": {
+        "tse_client_raw_vs_chart_raw": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 100,
+          "median_relative_error_pct": 0,
+          "p95_relative_error_pct": 0,
+          "max_relative_error_pct": 0,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust1_vs_chart_adjusted": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 3.984176320994631,
+          "median_relative_error_pct": 0.20754716981131738,
+          "p95_relative_error_pct": 130.1071428571429,
+          "max_relative_error_pct": 137.78571428571428,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust2_vs_chart_adjusted": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 3.16473580107375,
+          "median_relative_error_pct": 61.21739130434782,
+          "p95_relative_error_pct": 413.42857142857144,
+          "max_relative_error_pct": 430.5714285714286,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        },
+        "candidate_raw_vs_chart_raw": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 100,
+          "median_relative_error_pct": 0,
+          "p95_relative_error_pct": 0,
+          "max_relative_error_pct": 0,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        },
+        "candidate_adjusted_vs_chart_adjusted": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 3.4755580672506357,
+          "median_relative_error_pct": 2.4008081636022527,
+          "p95_relative_error_pct": 4.806722580383638,
+          "max_relative_error_pct": 14.96789089337761,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust1_vs_candidate_adjusted": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 5.114439107092399,
+          "median_relative_error_pct": 2.8447644475139366,
+          "p95_relative_error_pct": 136.14373795689878,
+          "max_relative_error_pct": 165.04116859244346,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        },
+        "tse_client_adjust2_vs_candidate_adjusted": {
+          "common": 3539,
+          "anchor_scale": 1,
+          "exact_rate_pct": 3.16473580107375,
+          "median_relative_error_pct": 65.21743049247625,
+          "p95_relative_error_pct": 426.86834850754394,
+          "max_relative_error_pct": 491.34524430392173,
+          "first_common_date": "2010-11-14",
+          "last_common_date": "2026-11-11"
+        }
+      },
+      "status": "ok"
+    }
+  },
+  "failures": []
+}
