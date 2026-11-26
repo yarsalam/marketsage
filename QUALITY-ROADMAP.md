@@ -405,3 +405,29 @@ Prefer a pipeline with explicit contracts and handlers:
 
 ### 10.6 Targeted external search — Foolad 1387 (lead, not economic-event proof)
 A first web search found contemporary 1387 press coverage about Foolad market suspension/price volatility, and BourseEye's 1387 price history confirms non-zero trade records around the long gap. The current search results do **not** yet identify a specific 1387 corporate-action notice or prove the user's remembered newspaper event. The 1387 lead is therefore split into two separate queues: (a) market-state chronology for the Sep–Oct 2008 gap, and (b) a corporate-action/issuer-notice search over the whole 1387 year. Do not treat the suspension story as the missing corporate action. Search archive candidates by year, company name, meeting, dividend, capital increase, rights, registration, and Gazette/company registry; then cross-check the user's local evidence store before acquiring anything.
+
+
+### 10.7 Owner-side directory evidence and revised CODAL-first priority (2026-11-26)
+
+The owner has now shown the actual local directory listing under `~/projects/marketsage/data/market-research/iran-equities/adjustment-evidence/`:
+
+- **Foolad:** `event-ledger.csv`, `identity.json`, `source-register.csv`, `raw/`, `runs/`, `derived/`, `validation/`, scripts, and local `engine-v2` through `engine-v6` directories are present. No top-level `codal/` directory appeared in the shown listing. This is not proof that CODAL evidence is absent: it may be stored in `runs/`, `raw/`, shared evidence roots or another local archive. The owner reports that more than 98% of Foolad evidence is already available locally; treat this as a high-priority owner-reported coverage estimate to validate against actual manifests and file contents, not as an independently measured percentage.
+- **Vaghdir:** `event-ledger.csv`, `identity.json`, `source-register.csv`, `raw/`, `derived/`, `diagnostics/`, `validation/`, scripts and a dedicated `codal/` directory are present. The imported branch visibly contains original CODAL PDFs 38803, 38805 and 40620 plus dated CODAL acquisition subdirectories. Inspect all originals, attachments, amendments and manifests before deciding whether any 2011/2024 chain is complete.
+- **Parsian:** `event-ledger.csv`, `identity.json`, `source-register.csv`, `raw/`, `derived/` and `validation/` are present. No top-level `codal/` directory appeared in the shown listing; inspect nested/local/shared stores and manifests before concluding CODAL coverage is missing.
+
+The owner reports a practical Foolad finding: more than 90% of the observed adjustment gaps can be explained by CODAL capital-increase notices and the preceding/following issuer-document chain (including extraordinary-meeting decisions). This is a strong operational hypothesis that changes search priority, but it is not yet a measured cross-symbol statistic. The first pass must therefore prioritize capital-increase lifecycles and their linked documents rather than generic news searches:
+
+1. proposal/explanatory report and audit opinion;
+2. board recommendation and statutory/audit reports where available;
+3. extraordinary general meeting decision/approval;
+4. regulatory permission/registration notices where applicable;
+5. subscription-rights notice and subscription window;
+6. extension, correction and unused-rights notices;
+7. result/allocation notices;
+8. final legal registration of the capital increase.
+
+Treat these as linked stages/components of one canonical capital-action case, not as eight independent price adjustments. Preserve each document and date, distinguish proposed/approved/implemented amounts, identify each funding source (retained earnings, reserves, cash, receivables, mixed), and establish the first affected trading session independently. Search newspapers, official gazettes/company-registration records and other archives only for stages or terms not evidenced by CODAL or for historical periods where CODAL coverage is incomplete (including the known Foolad 1387 lead).
+
+**Immediate local inventory request:** produce a read-only listing of every CODAL-related manifest, TracingNo, original HTML/PDF/attachment, and source hash across the three symbol folders plus the known shared/local CODAL roots. Do not download again until this inventory identifies a specific missing document or revision. Compare the local file inventory with `source-register.csv`, `event-ledger.csv`, `import_manifest.json` and SHA256 manifests; a directory name or search-result count alone is not a coverage proof.
+
+This owner-side directory listing is a first-hand snapshot of top-level folders only. It does not expose nested contents or the wider `~/marketsage-data` archive and must not be misrepresented as a complete CODAL inventory.
