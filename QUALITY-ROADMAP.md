@@ -257,3 +257,104 @@ Status key: [x] verified for the stated limited scope; [~] partial/diagnostic; [
 5. Fix the existing engines incrementally, then rerun the frozen three-symbol replay before any full-universe rollout.
 
 **Current release boundary:** no daily scheduler activation, no automatic ledger approval, no production scoring/backtest, no adjustment-series promotion and no wholesale PR merge until the relevant gate has passed.
+
+
+## 9. Operating correction — event-centred reconciliation is the primary workflow
+
+This section clarifies and takes precedence over any interpretation of the earlier diagnostic tables as a proposal to compare raw price differences first.
+
+**TSETMC observations must not be interpreted in isolation.** The normal workflow is to acquire TSETMC and CODAL evidence for the same instrument/history window, establish issuer events and market operating states, then interpret the TSETMC observations in that documented context. Repeated manual inspection of unexplained price gaps is not the operating model.
+
+### 9.1 Parallel acquisition, joined interpretation
+
+Acquisition may run in parallel because the sources are independent:
+
+1. **TSETMC capture:** immutable daily observations, raw/adjusted chart captures where available, PA and SC feeds, instrument identity/security master and instrument/trading status observations.
+2. **CODAL capture:** issuer disclosures across the full available history, original letters and attachments, publication/update metadata, linked notices, amendments, corrections, withdrawals and registration/subscription documents.
+3. **Market-calendar/status capture:** official exchange sessions, holidays, closures, suspensions, reopening and no-trade context from the appropriate market sources.
+
+The outputs are not interpreted independently. They are joined using canonical instrument identity, document/event relationships and verified chronology. A missing CODAL filing is not proof that no event occurred; a TSETMC PA/SC row is not proof of issuer terms.
+
+### 9.2 Build the event timeline before factor calculation
+
+For each instrument, produce a dated timeline containing:
+- original CODAL document and amendment chain;
+- issuer decision and all economic components;
+- record/eligibility date and ex-date where established;
+- rights, subscription, allocation and registration stages where applicable;
+- first affected exchange session, established using market-session and instrument-status evidence;
+- TSETMC PA/SC raw observations associated with the candidate event, without silently merging them;
+- pre-event and post-event traded observations, no-trade/stale observations, suspension and reopening context;
+- evidence references, source hashes, unresolved claims and confidence/review state.
+
+CODAL establishes issuer decisions and economic terms. It does not, by itself, establish whether the exchange was closed, whether the symbol was suspended, or which session was the first affected trading session. Those require market-calendar/status evidence.
+
+### 9.3 Classify the cause before explaining a price change
+
+Every relevant interval or apparent discontinuity should be classified into one or more evidence-backed categories:
+
+| Cause category | Main evidence | Treatment |
+|---|---|---|
+| Exchange holiday / non-session | Exchange calendar | No price factor; no synthetic observation |
+| Instrument suspension / reopening | Official instrument-status and market observations | Preserve state and first real traded session; no automatic corporate-action factor |
+| No trade / stale close | Trade count, last traded price, previous close and daily fields | Do not treat stale pClosing as an executed price |
+| Cash dividend / distribution | CODAL AGM decision and distribution terms | Apply only the verified price-basis or total-return policy |
+| Capital increase | CODAL decision, funding components, rights and registration chain | Calculate each verified economic component; do not assume all share-count growth is free |
+| Rights / subscription / allocation | CODAL notices and related security/market evidence | Track rights lifecycle separately; apply only a verified economic method |
+| Split / reverse split / conversion / merger / spin-off | Original legal/issuer documents and market implementation evidence | Use a dedicated event-family handler |
+| Ordinary market repricing | Traded market observations without an evidenced corporate/operational event | Retain as market return; do not adjust |
+| Provider correction / backfill / schema change | Versioned TSETMC snapshots and semantic diff | Revalidate source observations and invalidate dependent outputs as necessary |
+| Unknown / conflicting cause | Missing or contradictory evidence | Quarantine the affected interval and open a targeted exception |
+
+A daily gap is a symptom to classify, not a cause. A price discontinuity alone must never create an event or factor.
+
+### 9.4 Reconcile TSETMC only after the event is understood
+
+For every verified or candidate event, compare:
+- CODAL economic terms and each funding component;
+- the event's chronology and first affected trading session;
+- TSETMC PA raw tuples, including reciprocal, repeated, correction-like or display-like records;
+- TSETMC SC old/new share counts and any temporary/round-trip behavior;
+- pre/post market observations, traded close versus stale close, previous close, trade count and volume;
+- independent chart/provider output, after its adjustment definition, field mapping, units, rounding and anchor are established.
+
+The reconciliation asks whether the observed market/provider behavior is compatible with the documented event and its timing. It does not decide the issuer event type from a matching ratio. Date proximity is permitted to generate candidate links but cannot prove identity, causality, deduplication or correction.
+
+### 9.5 Separate event discovery from unexplained residual detection
+
+The primary pass is document/event-led across the full available history. A secondary residual pass finds:
+- provider PA/SC records not explained by a known issuer event;
+- CODAL events with no corresponding provider/market observation;
+- market discontinuities not explained by a corporate event or market state;
+- contradictory event chronology or economic terms;
+- corrected/removed historical source records.
+
+These become specific exception tasks with symbol, date range, event/document IDs, source snapshots, exact discrepancy and required evidence. Do not repeatedly compare arbitrary rows by hand when the same question can be expressed as a reusable event rule or test.
+
+### 9.6 Event-centred calculation and invalidation
+
+The adjustment engine consumes a reviewed event ledger and market-session mapping, not an unstructured list of price jumps. Each calculation step references:
+- a canonical event/component ID;
+- accepted source-document and source-payload hashes;
+- verified economic inputs and units;
+- event-family handler and formula version;
+- first affected session and factor application convention;
+- PA/SC records used as reconciliation evidence, not automatically as economic inputs;
+- resulting factor, direction, scope and QA outcome.
+
+When a CODAL amendment, corrected decision, changed market-effective session, TSETMC historical revision or identity change arrives, the dependency graph identifies every event and historical row affected. The system creates a new output version; it never overwrites the earlier raw capture or accepted result.
+
+### 9.7 Practical three-symbol workflow
+
+For فولاد، وغدیر، پارسیان, the next research runs should therefore proceed in this order:
+
+1. inventory the already acquired CODAL documents and event ledgers for all three symbols; identify missing history and amendments before launching new downloads;
+2. connect each documented issuer event to its dates, components and market-session implementation;
+3. add the applicable TSETMC PA/SC and daily records to that event timeline;
+4. identify which engine version currently handles that event and exactly what it calculated;
+5. replay the existing engine on the same frozen inputs and compare the result with the event-specific expected economics;
+6. record the root cause for each failure and add a regression case before modifying shared code.
+
+Do not begin by downloading the same TSETMC data again or hand-reviewing every price gap. Reacquire only when a specific source-coverage or revision gap has been demonstrated.
+
+**Gate consequence:** Gate 3 cannot pass merely because an engine reproduces a chart or matches provider ratios. It must demonstrate event-led classification, CODAL/market chronology, correct event-specific economics, safe handling of unknowns, and reproducible output for all three symbols.
