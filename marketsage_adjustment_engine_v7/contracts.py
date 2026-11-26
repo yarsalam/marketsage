@@ -210,6 +210,7 @@ class ApprovedPriceFactor:
     instrument_hash: str
     observation_id: str
     effective_date: date
+    evidence_ids: Tuple[str,...]
     evidence_hashes: Tuple[str,...]
     policy_version: str = "v7.1"
     def __post_init__(self):
@@ -220,6 +221,9 @@ class ApprovedPriceFactor:
         object.__setattr__(self,"instrument_hash",_hash(self.instrument_hash,"instrument_hash"))
         object.__setattr__(self,"observation_id",_text(self.observation_id,"observation_id"))
         if not isinstance(self.effective_date,date) or isinstance(self.effective_date,datetime): raise ValueError("effective_date must be date")
+        object.__setattr__(self,"evidence_ids",tuple(_text(x,"evidence_id") for x in self.evidence_ids))
+        if not self.evidence_ids or len(set(self.evidence_ids)) != len(self.evidence_ids):
+            raise ValueError("approved factor requires unique evidence IDs")
         object.__setattr__(self,"evidence_hashes",tuple(_hash(x,"evidence_hash") for x in self.evidence_hashes))
         if not self.evidence_hashes: raise ValueError("approved factor requires evidence hashes")
         object.__setattr__(self,"policy_version",_text(self.policy_version,"policy_version"))
