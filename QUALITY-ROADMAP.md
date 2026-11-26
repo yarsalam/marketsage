@@ -431,3 +431,113 @@ Treat these as linked stages/components of one canonical capital-action case, no
 **Immediate local inventory request:** produce a read-only listing of every CODAL-related manifest, TracingNo, original HTML/PDF/attachment, and source hash across the three symbol folders plus the known shared/local CODAL roots. Do not download again until this inventory identifies a specific missing document or revision. Compare the local file inventory with `source-register.csv`, `event-ledger.csv`, `import_manifest.json` and SHA256 manifests; a directory name or search-result count alone is not a coverage proof.
 
 This owner-side directory listing is a first-hand snapshot of top-level folders only. It does not expose nested contents or the wider `~/marketsage-data` archive and must not be misrepresented as a complete CODAL inventory.
+
+
+### 10.8 Vaghdir capital-action reconciliation — uploaded CODAL registration bundle plus existing TSETMC snapshots (2026-11-26)
+
+**Scope clarification:** the owner-uploaded `va-ghadir.zip` contains issuer/CODAL capital-increase notices and supporting registry/Gazette documents, not TSETMC payloads. TSETMC PA/SC and daily observations below are read from the already-imported immutable project snapshots. Do not claim the ZIP itself contains market data.
+
+#### A. Seven capital increases: all seven SC rows linked to an issuer-document chain
+
+The uploaded `وغدیر.txt` and attached CODAL PDFs/registry records show the following capital lifecycles. Amount columns below are million Rials; share counts are billions of shares. The first date is the TSETMC SC `dEven`, not necessarily the first executable market session.
+
+| TSETMC SC date (Jalali) | Shares old → new (bn) | CODAL decision / implementation | Funding mix (million Rials) | Legal registration |
+|---|---:|---|---:|---|
+| 1390/02/03 | 6.075 → 12 | EGM 1390/01/29 | claims/cash 1,794,000; retained earnings 1,410,000; reserve 2,721,000 | 1390/10/12; tracing 61220 |
+| 1391/09/18 | 12 → 16 | EGM 1391/09/14 | retained earnings 4,000,000 | 1391/10/17; tracing 100404 |
+| 1392/01/20 | 16 → 18 | Board 1392/01/08 under delegation granted by EGM 1391/09/14 | retained earnings 2,000,000 | 1392/03/11; tracing 118368 |
+| 1393/07/22 | 18 → 36 | EGM 1393/07/19 | claims/cash 11,340,000; reserve 6,660,000 | 1393/12/06; tracing 200959 |
+| 1394/08/12 | 36 → 46.08 | EGM 1394/08/07 | claims/cash 10,080,000 | 1394/12/03; tracing 249128 |
+| 1395/09/03 | 46.08 → 72 | EGM 1395/08/24 | claims/cash 8,750,000; reserve 17,170,000 | 1395/12/14; tracing 334274 |
+| 1403/05/13 | 72 → 216 | Regulator permission 1403/03/26; EGM 1403/05/03 | retained earnings 83,324,420; reserve 60,675,580; no cash/receivables component shown | 1403/06/11; tracing 1242530 → correction 1242885 → latest 1242963 |
+
+All seven TSETMC share-change rows map to these seven capital transitions. This is event existence/terms reconciliation; the table does not by itself approve all first affected sessions or adjusted output.
+
+The 1391/09/14 EGM is a parent authorization with two tranches: 4,000,000 retained earnings executed under the EGM and a further 2,000,000 retained-earnings tranche delegated to the Board, later implemented by the 1392/01/08 Board decision. Model this as one authorization/case with two implementation tranches, not as two unrelated issuers' events.
+
+The 1403 registration record has three CODAL tracing numbers, but the uploaded source index identifies the later numbers as corrections/updates, not three capital increases. The latest 1242963 follows 1242885, which corrects 1242530 after publication of the official Gazette notice. Preserve the amendment chain and select the latest accepted version without double-counting the capital increase.
+
+The uploaded ZIP also contains a text file whose filename suggests Vaghdir registration details but whose contents clearly identify ** فولاد مبارکه (فولاد)** and list its capital registration notices. It is misfiled/mislabeled in the Vaghdir bundle; preserve it as a future Foolad source and do not attach those notices to Vaghdir.
+
+#### B. Independent arithmetic checks against PA observations
+
+Use issuer capital terms, not a K inferred from the provider tuple. For a simple par-value increase, the diagnostic theoretical post price is:
+
+`P_{post} = (P_{pre} \times S_{old} + 1000 \times S_{paid,new}) / S_{new}`
+
+where `S_paid,new` is the new share count paid at 1,000 Rial nominal value. Retained-earnings/reserve shares add zero cash in this price-only equation. This formula is a documented-event diagnostic for the simple capital cases below; it is not a universal corporate-action handler.
+
+| Case | TSETMC PA input | CODAL-term theoretical post | TSETMC PA post | Difference |
+|---|---:|---:|---:|---:|
+| 1390 capital before DPS | 7,252 | 3,820.825 | 3,820 | -0.825 Rial |
+| 1391 fully from retained earnings | 5,106 | 3,829.500 | 3,829 | -0.500 Rial |
+| 1392 fully from retained earnings | 4,065 | 3,613.333 | 3,613 | -0.333 Rial |
+| 1393 mixed: 11.34T claims/cash + 6.66T reserve | 6,530 | 3,580.000 | 3,580 | 0 |
+| 1394 fully paid claims/cash | 2,362 | 2,064.063 | 2,064 | -0.063 Rial |
+| 1395 mixed: 8.75T claims/cash + 17.17T reserve | 1,862 | 1,313.208 | 1,313 | -0.208 Rial |
+
+The 1393 official registry scan included in the upload independently records the 18T→36T increase and a Bank Saderat certificate for the 11,340,000 million Rial paid component (certificate no. 72/4339/362 dated 1393/11/29). This agrees with the CODAL split; it is not an unresolved mismatch.
+
+For 1390, CODAL's cash/claims component of 1.794T Rial implies 1.794bn newly paid shares at par. Based on `P_pre=7252`, `S_old=6.075bn`, `S_new=12bn`, the issuer-terms calculation is 3820.825, versus provider PA 3820. After the separate 500-Rial DPS component, the capital calculation is (6752×6.075+1794×1000)/12 = 3567.700; the first daily TSETMC traded close in the available history is 3569 on 2011-04-26 (difference 1.3 Rial). This is near the issuer-term calculation, not an exact equality.
+
+**Correction to the older Vaghdir 2011 audit interpretation:** its `K=301.113924` was inferred from the TSETMC PA tuple and then inserted back into a reconstruction of the same tuple. That is a provider-implied parameter, not an independent CODAL validation of K. The issuer-terms calculation above replaces the circular claim of exact factor proof. Retain the small difference and any unit/rounding/tick convention as a documented residual.
+
+#### C. Vaghdir 2011 is a mixed event; PA observations are not four independent price factors
+
+The issuer evidence includes:
+- EGM/capital case 6.075bn → 12bn, with 1.794T claims/cash, 1.410T retained earnings, and 2.721T reserve;
+- cash dividend DPS = 500 Rial (CODAL evidence in the existing Vaghdir source pack; verify the original meeting TracingNo linkage where source indexes contain both 38803 and 38448);
+- TSETMC provider PA observations: 2011-04-23 7252→3820; on 2011-04-26, 7252→6752, 6752→3567, and 3820→7252 (reciprocal/display-like record).
+
+The 2011-04-26 ledger line previously labelled `dividend` with factor about 0.4919 is semantically composite: it reflects the DPS and capital components, not a dividend-only factor. The reciprocal 3820→7252 is not another event factor. The 2011-04-23 PA observation and the 2011-04-26 tuples must be represented as provider observations related to one mixed economic case, with explicit component/reciprocal relationships. Do not multiply every tuple and double-apply the capital effect.
+
+The daily CSV contains no 2011-04-23 trade row; 2011-04-26 is the first observed traded row, with final price 3569, previous price 3820, volume 11,274,132 and 1,131 trades. Preserve this market chronology separately from the issuer decision and PA dates.
+
+#### D. 1403 is the high-value SC-only and market-state test
+
+The 1403 capital increase is all from retained earnings and reserve, 72bn→216bn shares (a 200% increase); CODAL registration is 1403/06/11. TSETMC has SC at 1403/05/13 but **no matching PA row** in its 25-record PA list. The existing daily CSV's last pre-gap record is 2024-07-22 / 1403/05/01; the next row is 2024-09-09 / 1403/06/19 — a 49-calendar-day interval without a daily observation. It is therefore not yet proven whether this was a suspension, no-trade interval, symbol-specific technical halt or source coverage gap; official exchange/symbol-status records are required. The first observed post-gap trade at 7,150 versus 22,000 on 2024-07-22 is broadly consistent with a one-third price basis after a tripling of shares, but the price path across a 49-day absence cannot be used as proof of an adjustment factor.
+
+This case demonstrates that an event engine cannot rely exclusively on PA rows. A CODAL-confirmed all-free increase plus SC can establish the economic share conversion; the first affected session still requires market-status evidence. An SC-only event must not be ignored simply because the PA endpoint has no row.
+
+#### E. Dividend PA coverage: mixed evidence, not yet a complete CODAL dividend ledger
+
+The existing PA feed contains 25 rows. Its pre/post price differences include 250 (2009), 310 (2010), 500 (2011), 510 (2012), 500 (2013), 630 (2014), 500 (2015), 400 (2016), 160 (2017), 190 (2018), 250 (2019), 800 (2021), 1,930 (2022), 2,350 (2023), 3,000 (2024), 1,170 (2025) and 1,500 (2026), plus capital/mixed/reciprocal tuples. These differences are provider observations, not accepted DPS values by themselves.
+
+CODAL/issuer evidence currently identified:
+- DPS 500 in 1390/2011 mixed case (existing CODAL PDF evidence; original TracingNo cross-reference still to reconcile because source packs mention 38803 and 38448).
+- DPS 510 for the AGM of 1390/11/30 (CODAL TracingNo 66259), consistent with PA 2012-02-20 4652→4142.
+- DPS 500 for the AGM of 1391/12/08 (CODAL TracingNo 108468), consistent with PA 2013-02-27 4643→4143.
+- 1392/12/25 AGM (existing CODAL source TracingNo 155748) has an attachments page but the PDF attachment itself is not present in the staged source directory; it must be retrieved/inspected before calling the 2014 PA difference of 630 a verified DPS.
+- Contemporary press archive records DPS 250 for Vaghdir in Farvardin 1388 (consistent with PA 2009-04-19); another contemporary archive quoting the CEO records DPS 310 in Ordibehesht 1389 (consistent with PA 2010-04-21). These are secondary contemporaneous sources, not substitutes for the original AGM/CODAL decision.
+- DPS 400 for AGM 1394/12/25 and DPS 160 for AGM 1395/12/25 are supported by a dividend-information archive; classify as secondary evidence until primary AGM/CODAL minutes are found.
+- Public CODAL aggregator records DPS 800 at AGM 1399/12/25, DPS 1,930 at AGM 1400/12/23, DPS 2,350 at AGM 1402/01/31, DPS 3,000 at AGM 1403/01/28, and DPS 1,170 at AGM 1403/12/08. The latter amounts and meeting dates align closely with PA observations, but originals and ex-date chronology should be captured.
+- A third-party dividend schedule reports 490 Rial payout in 1399/02, while the annual meeting scheduled for 1398/12/26 was cancelled and the PA feed has no 2020 PA row. Treat this as an important missing-provider-observation/document-chain candidate, not an automatic missing factor.
+- DPS/AGM evidence for the 2026 PA difference of 1,500 and several older amounts (630, 500, 190, 250, etc.) remains to be connected to original notices or reliable archived notices.
+
+The independent BourseEye page reproduces the same seven share-count changes and the PA history, and explicitly warns that PA observations alone do not reveal whether the cause was a dividend or a capital increase. It is a cross-check/discovery aid, not the issuer source of truth.
+
+#### F. Engine design/test implications
+
+Vaghdir now supplies at least these reusable regression patterns:
+1. Mixed capital + cash dividend, with repeated/reciprocal provider PA observations (1390).
+2. One EGM authorization producing multiple retained-earnings tranches, one later implemented by Board (1391–1392).
+3. Mixed claims/cash plus reserve, including one case with exact independent arithmetic and matching bank certificate (1393).
+4. Fully paid claims/cash capital increase (1394).
+5. Mixed paid + reserve capital increase (1395).
+6. All-free retained-earnings/reserve tripling with SC but no PA row, coinciding with a long market-data gap and delayed first observed session (1403).
+7. Duplicate/corrected/latest CODAL versions (1242530 → 1242885 → 1242963), which must remain one legal event with an amendment chain.
+
+A shared engine should therefore keep distinct entities for issuer authorization, approved tranche/component, legal registration, market-effective/first-traded session, provider PA observation and provider SC observation. It needs a capital-increase handler parameterized by funding components (paid subscription at nominal, non-cash retained earnings/reserve, rights/receivables) and a separate dividend handler. The 1391 authorization/tranche structure requires event parent/child relations. The 1403 case proves price-effect candidate discovery cannot require PA. The Vaghdir local V2 implementation was previously inventoried as PA-driven for price factors and SC-only for volume normalization; that design would miss a CODAL-confirmed SC-only price event unless a dedicated reviewed handler/reconciliation path is added. This is an architectural finding; full V2/V3/V4/V5/V6 offline replay against one frozen source snapshot is still required before selecting or changing the canonical engine.
+
+#### G. Remaining Vaghdir blockers (keep open)
+
+- [ ] Reconcile the 2011 DPS source reference (38803 vs 38448) and document the exact component/PA relationship.
+- [ ] Retrieve the missing PDF attachment for CODAL AGM TracingNo 155748 and verify the 630-Rial 1394-03-17 PA candidate.
+- [ ] Reconstruct primary CODAL AGM/dividend chain for all unresolved PA-only candidates; do not equate PA difference with DPS.
+- [ ] Resolve 2010-04-21 (2770→2460, 310 Rial) with the contemporary CEO quote plus primary AGM decision/market date; keep ledger status blocked until the source relationship is accepted.
+- [ ] Obtain official symbol status/suspension/reopening evidence for 1403/05/02 through 1403/06/19; do not label the 49-day data gap as a suspension until verified.
+- [ ] Inspect the exact original bank certificate pages for 1390 and 1393, preserving certificate amounts, issuer and relation to total subscription/claims.
+- [ ] Rebuild one canonical Vaghdir event timeline with exact CODAL tracing numbers, document amendments, components, PA/SC IDs and market dates.
+- [ ] Run all existing Vaghdir engine versions on the same frozen inputs and produce event-level before/after outputs; do not approve any output yet.
+
+**Current Vaghdir result:** all seven capital/share-change events are documented and economically classifiable at component level to the extent above; dividend and effective-session history remains partially open. No Vaghdir adjusted series is accepted by this investigation.
