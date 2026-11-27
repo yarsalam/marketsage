@@ -46,7 +46,7 @@ The separate Goal 1 Watchdog workflow:
 - Runs every 30 minutes from the default branch and after completion of the infrastructure CI workflow.
 - Uses GitHub-hosted ubuntu-latest, with a 3-minute timeout.
 - Uses actions: read and contents: read only.
-- Checks only main, infra, and ci branches; fork-originated workflow runs are excluded.
+- Checks only main, infra, and ci branches; fork-originated completion events are rejected, and fork-originated runs are excluded again when evaluating API history.
 - Reads at most five pages of workflow history (100 runs per page), retries each read-only GitHub API page at most three times with bounded request timeouts and short backoff, and marks truncated history as degraded instead of silently trusting a partial result.
 - Detects queued runs older than 15 minutes, running jobs older than 30 minutes, recent failed/timed-out runs, and a missing successful scheduled heartbeat older than 75 minutes.
 - Records aggregate status in the GitHub Actions run summary. It emits no raw logs, artifacts, commit hashes, branch names, run identifiers, market data, prices, private paths, credentials, or tokens.
