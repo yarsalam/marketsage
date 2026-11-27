@@ -8,10 +8,22 @@ This document defines the infrastructure-only automation boundary. It does not a
 - The latest observed main commit is dated 2026-11-26. The previous report that main had not changed since 2026-11-07 was stale.
 - PR #85 is **closed and unmerged**. Its proposed automation is not active on main. Do not treat its earlier successful checks as current infrastructure evidence.
 - PR #6 is **closed and unmerged**. It was not changed or merged.
-- The currently open PRs are #87, #86, and #81. They remain open; the two research/data PRs are outside the current execution scope and must not be advanced while Goal 1 is active.
+- The currently open PRs, verified 2026-11-27, are #88 (this Goal 1 infrastructure draft; open, Draft, mergeable, with no submitted reviews), #87 (Draft, mergeable), #86 (Draft, mergeable), and #81 (Draft, not mergeable). PRs #87, #86, and #81 are outside the current execution scope and must not be advanced while Goal 1 is active.
 - The active main ruleset exposes only branch-deletion and non-fast-forward protections, with no bypass actors. The classic branch-protection endpoint is not readable through the current GitHub connection. Required approvals and required status checks therefore remain unverified.
-- The latest 95 visible workflow runs contain no scheduled event. The latest visible runs include a successful MarketSage CI run and a failed Adjustment Contracts CI run on a research PR. Historical failures and cancellations are retained; cancellations are not automatically treated as failures.
+- The current GitHub connection exposes PR-triggered runs for a supplied commit, but not a complete repository-wide Actions run listing. Therefore actual scheduled-run completion and the latest global failure totals are **not independently verified** in this audit. The default-branch CI file does define a daily schedule; that configuration is not proof that the schedule executed.
 - Workflow YAML was inspected. No repository secret values were read. The current connection does not expose runner inventory or account billing/quota details.
+
+### Mainline freeze is not yet active — hard blocker
+
+The current `main` version of `.github/workflows/ci.yml` still defines a daily scheduled trigger (`17 3 * * *`) and `workflow_dispatch`. It also contains an analysis test job that runs the analysis-engine test suite, application/backend/frontend/admin build jobs, and a production-image build job. The exact current file was inspected on 2026-11-27.
+
+PR #88 replaces that workflow on its branch, but PR #88 is still Draft and unmerged. Therefore the Goal 1-only freeze is **not active on main**. The existing mainline schedule/manual trigger and its analysis/production jobs remain configured until an owner-reviewed change reaches main. Do not dispatch the existing workflow manually. No claim is made that the legacy scheduled workflow has or has not executed in the latest interval because the connected run-history action does not provide a complete repository-wide run list.
+
+The three local TSETMC workflows were separately inspected on main: each is manual-only (`workflow_dispatch`) and targets the dedicated self-hosted runner labels. They were not dispatched.
+
+### Current exact-head evidence boundary
+
+The connected run-history action returned one successful PR-triggered run for the current PR #88 head. Its only job completed successfully and the run has no artifacts. The PR description reports both push and pull-request success, but this audit interface filters commit workflow runs to PR-triggered events; the push-triggered run is therefore not independently confirmed here. No PR reviews have been submitted.
 
 ## Proposed cloud-native execution model in this branch
 
