@@ -64,7 +64,7 @@ The scheduled workflow is a best-effort monitor, not an SLA. GitHub scheduled ev
 6. If the Watchdog API read fails after three attempts, its run is marked failed with a sanitized summary. Verify Actions API permissions and GitHub service status.
 7. No artifact is uploaded. GitHub Actions run records and step summaries are the status ledger.
 
-ChatGPT's scheduled audit reports the latest main commit, open PRs, mergeability, recent workflow runs, and blockers in this conversation. Mobile push delivery is not guaranteed.
+ChatGPT's scheduled audit reports the latest main commit, open PRs, mergeability, recent workflow runs, and blockers in this conversation. The GitHub Watchdog itself writes only to the GitHub Actions step summary: the current integration has no supported callback that posts each 30-minute execution into this ChatGPT conversation. The separate ChatGPT audit is daily, so it cannot guarantee per-30-minute delivery or act as an independent 24/7 heartbeat. Mobile push and email delivery are not asserted as confirmed.
 
 ## Runner strategy
 
