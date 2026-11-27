@@ -66,6 +66,7 @@ def evaluate_runs(
     current_run_id: str | int | None = None,
     now: datetime | None = None,
     history_truncated: bool = False,
+    repository: str | None = None,
 ) -> dict[str, Any]:
     """Return aggregate metrics only; never return branch names, SHAs, or run IDs."""
     current = now or datetime.now(timezone.utc)
@@ -79,6 +80,13 @@ def evaluate_runs(
             continue
         if run.get("name") not in WATCHED_WORKFLOWS:
             continue
+        if repository is not None:
+            head_repository = run.get("head_repository")
+            if (
+                not isinstance(head_repository, dict)
+                or head_repository.get("full_name") != repository
+            ):
+                continue
         if not _is_relevant_branch(run.get("head_branch")):
             continue
         if current_run_id is not None and str(run.get("id")) == str(current_run_id):
@@ -327,6 +335,7 @@ def main() -> int:
             runs,
             current_run_id=os.environ.get("GITHUB_RUN_ID"),
             history_truncated=truncated,
+            repository=os.environ.get("GITHUB_REPOSITORY"),
         )
         _write_summary(build_summary(metrics))
         return 1 if metrics["status"] == "DEGRADED" else 0
