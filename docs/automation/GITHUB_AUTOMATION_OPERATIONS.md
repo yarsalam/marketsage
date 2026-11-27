@@ -78,7 +78,9 @@ ChatGPT's scheduled audit reports the latest main commit, open PRs, mergeability
 
 The repository is currently public. Standard GitHub-hosted runners for public repositories are generally free, but this must not be generalized to a future private repository or non-standard runner.
 
-The 30-minute schedule creates at most 48 watchdog runs per day. Each run has a 3-minute hard timeout; actual billed usage depends on runner billing rules and execution duration. Event-driven CI adds usage per push/PR. The account plan, remaining minutes, spending cap, and billing are not visible through this connection. Do not increase spending limits or provision paid infrastructure. If the repository becomes private, verify the plan quota and billing controls before relying on this cadence.
+The 30-minute schedule creates at most 48 scheduled watchdog runs per day. At the 3-minute hard timeout, the schedule-only theoretical ceiling is 144 runner-minutes per day, or 4,320 runner-minutes in a 30-day month; this excludes additional `workflow_run`-triggered watchdog executions and event-driven CI. Actual usage should be much lower when jobs complete quickly, but the schedule alone is not a fixed monthly cap on all workflow activity.
+
+GitHub currently reports this repository as public, where standard GitHub-hosted runners are free. If the repository is private, GitHub Free currently includes $12 of Actions compute per month; at the standard Linux x64 rate of $0.006/minute this is approximately 2,000 runner-minutes, with usage beyond the included amount billed if a payment method is available or blocked when no payment method is configured. The account plan, remaining quota, spending cap, and billing are not visible through this connection. Do not increase budgets or provision paid infrastructure. Re-check the plan and budget before relying on this cadence after any visibility change.
 
 ## Security and release boundary
 
