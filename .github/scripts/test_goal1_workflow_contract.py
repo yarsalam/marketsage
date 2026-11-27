@@ -54,6 +54,16 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertNotIn("secrets.", content)
         self.assertNotIn("upload-artifact", content)
 
+    def test_runbook_discloses_mainline_freeze_is_not_yet_active(self) -> None:
+        content = (ROOT / "docs" / "automation" / "GITHUB_AUTOMATION_OPERATIONS.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Mainline freeze is not yet active", content)
+        self.assertIn("workflow_dispatch", content)
+        self.assertIn("analysis/production jobs remain configured", content)
+        self.assertIn("not independently verified", content)
+        self.assertIn("PR #88", content)
+
     def test_external_actions_are_pinned_to_full_commit_shas(self) -> None:
         for path in (WORKFLOWS / "ci.yml", WORKFLOWS / "goal1-watchdog.yml"):
             content = path.read_text(encoding="utf-8")
