@@ -1,0 +1,183 @@
+from __future__ import annotations
+
+import unittest
+from datetime import datetime, timedelta, timezone
+
+from goal1_watchdog import build_summary, evaluate_runs
+
+
+NOW = datetime(2026, 11, 27, 7, 0, tzinfo=timezone.utc)
+
+
+def iso(value: datetime) -> str:
+    return value.isoformat().replace("+00:00", "Z")
+
+
+def make_run(
+    *,
+    run_id: int = 1,
+    name: str = "MarketSage CI",
+    event: str = "push",
+    branch: str = "infra/test",
+    status: str = "completed",
+    conclusion: str = "success",
+    created_minutes_ago: int = 5,
+    updated_minutes_ago: int = 4,
+    started_minutes_ago: int | None = None,
+) -> dict:
+    created = NOW - timedelta(minutes=created_minutes_ago)
+    updated = NOW - timedelta(minutes=updated_minutes_ago)
+    started = (
+        NOW - timedelta(minutes=started_minutes_ago)
+        if started_minutes_ago is not None
+        else None
+    )
+    return {
+        "id": run_id,
+        "name": name,
+        "event": event,
+        "head_branch": branch,
+        "status": status,
+        "conclusion": conclusion,
+        "created_at": iso(created),
+        "updated_at": iso(updated),
+        "run_started_at": iso(started) if started else None,
+    }
+
+
+class WatchdogEvaluationTests(unittest.TestCase):
+    def test_recent_successful_heartbeat_is_healthy(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(
+                    run_id=10,
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    updated_minutes_ago=20,
+                ),
+                make_run(run_id=11, updated_minutes_ago=5),
+            ],
+            now=NOW,
+            current_run_id=99,
+        )
+        self.assertEqual(metrics["status"], "HEALTHY")
+        self.assertEqual(metrics["recent_failures"], 0)
+        self.assertEqual(metrics["heartbeat_state"], "within_window")
+
+    def test_missing_heartbeat_is_initializing_not_false_success(self) -> None:
+        metrics = evaluate_runs([make_run()], now=NOW)
+        self.assertEqual(metrics["status"], "INITIALIZING")
+        self.assertEqual(metrics["heartbeat_state"], "not_yet_observed")
+
+    def test_stale_successful_heartbeat_degrades_health(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    updated_minutes_ago=90,
+                )
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["status"], "DEGRADED")
+        self.assertEqual(metrics["heartbeat_state"], "stale")
+
+    def test_queued_run_over_limit_is_detected(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(status="queued", conclusion=None, created_minutes_ago=20)
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["stale_queued"], 1)
+        self.assertEqual(metrics["status"], "DEGRADED")
+
+    def test_long_running_job_is_detected(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(
+                    status="in_progress",
+                    conclusion=None,
+                    created_minutes_ago=40,
+                    started_minutes_ago=35,
+                )
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["stale_running"], 1)
+        self.assertEqual(metrics["status"], "DEGRADED")
+
+    def test_recent_failure_is_detected(self) -> None:
+        metrics = evaluate_runs(
+            [make_run(conclusion="failure", updated_minutes_ago=30)],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 1)
+        self.assertEqual(metrics["status"], "DEGRADED")
+
+    def test_old_failure_is_outside_the_alert_window(self) -> None:
+        metrics = evaluate_runs(
+            [make_run(conclusion="failure", updated_minutes_ago=25 * 60)],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 0)
+
+    def test_cancelled_run_is_not_counted_as_failure(self) -> None:
+        metrics = evaluate_runs(
+            [make_run(conclusion="cancelled", updated_minutes_ago=10)],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 0)
+        self.assertEqual(metrics["recent_cancelled"], 1)
+
+    def test_unrelated_branches_are_excluded_from_goal1_health(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(
+                    branch="research/data-work",
+                    conclusion="failure",
+                    updated_minutes_ago=5,
+                )
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["inspected_runs"], 0)
+        self.assertEqual(metrics["recent_failures"], 0)
+
+    def test_current_watchdog_run_is_excluded(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(
+                    run_id=77,
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    status="in_progress",
+                    conclusion=None,
+                    created_minutes_ago=90,
+                    started_minutes_ago=90,
+                )
+            ],
+            now=NOW,
+            current_run_id="77",
+        )
+        self.assertEqual(metrics["inspected_runs"], 0)
+        self.assertEqual(metrics["status"], "INITIALIZING")
+
+    def test_summary_contains_aggregate_only(self) -> None:
+        metrics = evaluate_runs(
+            [make_run(conclusion="failure", updated_minutes_ago=10)],
+            now=NOW,
+        )
+        summary = build_summary(metrics)
+        for forbidden in ("SECRET_TOKEN", "private/path", "deadbeef", "research/data-work", "123456"):
+            self.assertNotIn(forbidden, summary)
+        self.assertIn("Recent failed or timed-out runs", summary)
+        self.assertIn("Human handoff", summary)
+
+
+if __name__ == "__main__":
+    unittest.main()
