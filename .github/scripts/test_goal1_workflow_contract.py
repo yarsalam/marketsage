@@ -47,6 +47,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("cancel-in-progress: false", content)
         self.assertIn("timeout-minutes: 3", content)
         self.assertIn("ref: main", content)
+        self.assertIn("head_repository.full_name == github.repository", content)
         self.assertIn("persist-credentials: false", content)
         self.assertNotIn("workflow_dispatch:", content)
         self.assertNotIn("issues: write", content)
