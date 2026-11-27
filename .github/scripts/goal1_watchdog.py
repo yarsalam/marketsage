@@ -16,6 +16,8 @@ from typing import Any
 
 API_ATTEMPTS = 3
 API_TIMEOUT_SECONDS = 8
+MAX_RUN_PAGES = 5
+PAGE_SIZE = 100
 RECENT_FAILURE_WINDOW = timedelta(hours=24)
 QUEUED_LIMIT = timedelta(minutes=15)
 RUNNING_LIMIT = timedelta(minutes=30)
@@ -63,6 +65,7 @@ def evaluate_runs(
     *,
     current_run_id: str | int | None = None,
     now: datetime | None = None,
+    history_truncated: bool = False,
 ) -> dict[str, Any]:
     """Return aggregate metrics only; never return branch names, SHAs, or run IDs."""
     current = now or datetime.now(timezone.utc)
@@ -142,6 +145,7 @@ def evaluate_runs(
         or stale_running
         or recent_failures
         or heartbeat_stale
+        or history_truncated
     )
     if degraded:
         status = "DEGRADED"
@@ -171,6 +175,7 @@ def evaluate_runs(
             if heartbeat_age is not None
             else None
         ),
+        "history_truncated": bool(history_truncated),
     }
 
 
@@ -193,6 +198,7 @@ def build_summary(metrics: dict[str, Any]) -> str:
         f"- Running jobs older than 30 minutes: {metrics['stale_running']}",
         f"- Cancelled or superseded runs (24h; not counted as failures): {metrics['recent_cancelled']}",
         f"- Scheduled heartbeat: {heartbeat}",
+        f"- Workflow history truncated at the safety limit: {'yes' if metrics['history_truncated'] else 'no'}",
         "",
     ]
     if status == "DEGRADED":
@@ -220,7 +226,12 @@ def build_summary(metrics: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _request_runs(api_url: str, repository: str, token: str) -> list[dict[str, Any]]:
+def _request_runs_page(
+    api_url: str,
+    repository: str,
+    token: str,
+    page: int,
+) -> dict[str, Any]:
     if not REPOSITORY_PATTERN.fullmatch(repository):
         raise ApiReadError("repository_invalid")
     if not token:
@@ -229,7 +240,10 @@ def _request_runs(api_url: str, repository: str, token: str) -> list[dict[str, A
     if parsed.scheme != "https" or not parsed.netloc or parsed.path:
         raise ApiReadError("api_url_invalid")
 
-    url = f"{api_url.rstrip('/')}/repos/{repository}/actions/runs?per_page=100"
+    url = (
+        f"{api_url.rstrip('/')}/repos/{repository}/actions/runs"
+        f"?per_page={PAGE_SIZE}&page={page}"
+    )
     request = urllib.request.Request(
         url,
         headers={
@@ -247,10 +261,9 @@ def _request_runs(api_url: str, repository: str, token: str) -> list[dict[str, A
                 if response.status != 200:
                     raise ApiReadError("api_non_200")
                 payload = json.loads(response.read(2 * 1024 * 1024).decode("utf-8"))
-            runs = payload.get("workflow_runs") if isinstance(payload, dict) else None
-            if not isinstance(runs, list):
+            if not isinstance(payload, dict) or not isinstance(payload.get("workflow_runs"), list):
                 raise ApiReadError("api_response_invalid")
-            return [run for run in runs if isinstance(run, dict)]
+            return payload
         except urllib.error.HTTPError as exc:
             retryable = exc.code == 429 or 500 <= exc.code <= 599
             if not retryable:
@@ -266,6 +279,34 @@ def _request_runs(api_url: str, repository: str, token: str) -> list[dict[str, A
     raise ApiReadError("api_unavailable_after_bounded_retries")
 
 
+def _request_runs(
+    api_url: str,
+    repository: str,
+    token: str,
+) -> tuple[list[dict[str, Any]], bool]:
+    """Read at most five pages; report truncation instead of silently trusting partial history."""
+    collected: list[dict[str, Any]] = []
+    total_count: int | None = None
+
+    for page in range(1, MAX_RUN_PAGES + 1):
+        payload = _request_runs_page(api_url, repository, token, page)
+        page_runs = [
+            run for run in payload["workflow_runs"] if isinstance(run, dict)
+        ]
+        collected.extend(page_runs)
+        raw_total = payload.get("total_count")
+        if isinstance(raw_total, int) and raw_total >= 0:
+            total_count = raw_total
+
+        if len(page_runs) < PAGE_SIZE:
+            return collected, False
+        if total_count is not None and len(collected) >= total_count:
+            return collected, False
+
+    truncated = total_count is None or len(collected) < total_count
+    return collected, truncated
+
+
 def _write_summary(summary: str) -> None:
     target = os.environ.get("GITHUB_STEP_SUMMARY")
     if target:
@@ -277,7 +318,7 @@ def _write_summary(summary: str) -> None:
 
 def main() -> int:
     try:
-        runs = _request_runs(
+        runs, truncated = _request_runs(
             os.environ.get("GITHUB_API_URL", ""),
             os.environ.get("GITHUB_REPOSITORY", ""),
             os.environ.get("GH_TOKEN", ""),
@@ -285,6 +326,7 @@ def main() -> int:
         metrics = evaluate_runs(
             runs,
             current_run_id=os.environ.get("GITHUB_RUN_ID"),
+            history_truncated=truncated,
         )
         _write_summary(build_summary(metrics))
         return 1 if metrics["status"] == "DEGRADED" else 0
