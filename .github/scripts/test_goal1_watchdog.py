@@ -175,6 +175,12 @@ class WatchdogEvaluationTests(unittest.TestCase):
         self.assertEqual(metrics["inspected_runs"], 0)
         self.assertEqual(metrics["status"], "INITIALIZING")
 
+    def test_truncated_history_fails_closed(self) -> None:
+        metrics = evaluate_runs([], now=NOW, history_truncated=True)
+        self.assertEqual(metrics["status"], "DEGRADED")
+        self.assertTrue(metrics["history_truncated"])
+        self.assertIn("truncated at the safety limit: yes", build_summary(metrics))
+
     def test_summary_contains_aggregate_only(self) -> None:
         metrics = evaluate_runs(
             [make_run(conclusion="failure", updated_minutes_ago=10)],
@@ -231,15 +237,33 @@ class WatchdogEvaluationTests(unittest.TestCase):
                 return False
 
             def read(self, limit: int) -> bytes:
-                return json.dumps({"workflow_runs": [{"id": 1}, {"id": 2}]}).encode()
+                return json.dumps(
+                    {"total_count": 2, "workflow_runs": [{"id": 1}, {"id": 2}]}
+                ).encode()
 
         with patch("goal1_watchdog.urllib.request.urlopen", return_value=Response()):
-            runs = _request_runs(
+            runs, truncated = _request_runs(
                 "https://api.github.com",
                 "yarsalam/marketsage",
                 "not-a-real-credential",
             )
         self.assertEqual(runs, [{"id": 1}, {"id": 2}])
+        self.assertFalse(truncated)
+
+    def test_history_pagination_is_bounded_and_truncation_is_reported(self) -> None:
+        pages = [
+            {"total_count": 600, "workflow_runs": [{"id": index} for index in range(100)]}
+            for _ in range(5)
+        ]
+        with patch("goal1_watchdog._request_runs_page", side_effect=pages) as mocked:
+            runs, truncated = _request_runs(
+                "https://api.github.com",
+                "yarsalam/marketsage",
+                "not-a-real-credential",
+            )
+        self.assertEqual(mocked.call_count, 5)
+        self.assertEqual(len(runs), 500)
+        self.assertTrue(truncated)
 
 
 if __name__ == "__main__":
