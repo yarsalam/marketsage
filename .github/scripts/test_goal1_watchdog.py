@@ -70,6 +70,7 @@ class WatchdogEvaluationTests(unittest.TestCase):
             ],
             now=NOW,
             current_run_id=99,
+            repository="yarsalam/marketsage",
         )
         self.assertEqual(metrics["status"], "HEALTHY")
         self.assertEqual(metrics["recent_failures"], 0)
@@ -164,7 +165,13 @@ class WatchdogEvaluationTests(unittest.TestCase):
                     conclusion="failure",
                     updated_minutes_ago=5,
                     head_repository_full_name="attacker/fork",
-                )
+                ),
+                make_run(
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    head_repository_full_name="attacker/fork",
+                ),
             ],
             now=NOW,
             repository="yarsalam/marketsage",
