@@ -58,7 +58,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         for path in (WORKFLOWS / "ci.yml", WORKFLOWS / "goal1-watchdog.yml"):
             content = path.read_text(encoding="utf-8")
             refs = re.findall(
-                r"(?m)^\\s*(?:-\\s*)?uses:\\s+[^@\\s]+@([0-9a-fA-F]+)",
+                r"(?m)^\s*(?:-\s*)?uses:\s+[^@\s]+@([0-9a-fA-F]+)",
                 content,
             )
             self.assertTrue(refs, f"expected a pinned action in {path.name}")
