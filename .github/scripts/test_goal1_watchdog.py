@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+import json
 import unittest
+import urllib.error
 from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 
-from goal1_watchdog import build_summary, evaluate_runs
+from goal1_watchdog import (
+    ApiReadError,
+    _request_runs,
+    build_summary,
+    evaluate_runs,
+)
 
 
 NOW = datetime(2026, 11, 27, 7, 0, tzinfo=timezone.utc)
@@ -177,6 +185,61 @@ class WatchdogEvaluationTests(unittest.TestCase):
             self.assertNotIn(forbidden, summary)
         self.assertIn("Recent failed or timed-out runs", summary)
         self.assertIn("Human handoff", summary)
+
+    def test_api_retry_is_limited_and_error_is_sanitized(self) -> None:
+        with patch(
+            "goal1_watchdog.urllib.request.urlopen",
+            side_effect=urllib.error.URLError("PRIVATE_RESPONSE_DETAIL"),
+        ) as mocked:
+            with patch("goal1_watchdog.time.sleep") as sleep:
+                with self.assertRaises(ApiReadError) as raised:
+                    _request_runs(
+                        "https://api.github.com",
+                        "yarsalam/marketsage",
+                        "not-a-real-credential",
+                    )
+        self.assertEqual(mocked.call_count, 3)
+        self.assertEqual(sleep.call_count, 2)
+        self.assertNotIn("PRIVATE_RESPONSE_DETAIL", str(raised.exception))
+        self.assertNotIn("not-a-real-credential", str(raised.exception))
+
+    def test_permission_error_is_not_retried(self) -> None:
+        denied = urllib.error.HTTPError(
+            "https://api.github.com", 403, "forbidden", None, None
+        )
+        with patch(
+            "goal1_watchdog.urllib.request.urlopen",
+            side_effect=denied,
+        ) as mocked:
+            with self.assertRaises(ApiReadError) as raised:
+                _request_runs(
+                    "https://api.github.com",
+                    "yarsalam/marketsage",
+                    "not-a-real-credential",
+                )
+        self.assertEqual(mocked.call_count, 1)
+        self.assertNotIn("not-a-real-credential", str(raised.exception))
+
+    def test_api_success_returns_workflow_runs(self) -> None:
+        class Response:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self, limit: int) -> bytes:
+                return json.dumps({"workflow_runs": [{"id": 1}, {"id": 2}]}).encode()
+
+        with patch("goal1_watchdog.urllib.request.urlopen", return_value=Response()):
+            runs = _request_runs(
+                "https://api.github.com",
+                "yarsalam/marketsage",
+                "not-a-real-credential",
+            )
+        self.assertEqual(runs, [{"id": 1}, {"id": 2}])
 
 
 if __name__ == "__main__":
