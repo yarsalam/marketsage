@@ -64,6 +64,9 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("analysis/production jobs remain configured", content)
         self.assertIn("not independently verified", content)
         self.assertIn("PR #88", content)
+        self.assertIn("no supported callback", content)
+        self.assertIn("per-30-minute delivery", content)
+        self.assertIn("independent 24/7 heartbeat", content)
 
     def test_external_actions_are_pinned_to_full_commit_shas(self) -> None:
         for path in (WORKFLOWS / "ci.yml", WORKFLOWS / "goal1-watchdog.yml"):
