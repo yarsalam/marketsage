@@ -32,6 +32,7 @@ def make_run(
     created_minutes_ago: int = 5,
     updated_minutes_ago: int = 4,
     started_minutes_ago: int | None = None,
+    head_repository_full_name: str = "yarsalam/marketsage",
 ) -> dict:
     created = NOW - timedelta(minutes=created_minutes_ago)
     updated = NOW - timedelta(minutes=updated_minutes_ago)
@@ -50,6 +51,7 @@ def make_run(
         "created_at": iso(created),
         "updated_at": iso(updated),
         "run_started_at": iso(started) if started else None,
+        "head_repository": {"full_name": head_repository_full_name},
     }
 
 
@@ -154,6 +156,22 @@ class WatchdogEvaluationTests(unittest.TestCase):
         )
         self.assertEqual(metrics["inspected_runs"], 0)
         self.assertEqual(metrics["recent_failures"], 0)
+
+    def test_fork_runs_are_excluded_from_repository_health_history(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(
+                    conclusion="failure",
+                    updated_minutes_ago=5,
+                    head_repository_full_name="attacker/fork",
+                )
+            ],
+            now=NOW,
+            repository="yarsalam/marketsage",
+        )
+        self.assertEqual(metrics["inspected_runs"], 0)
+        self.assertEqual(metrics["recent_failures"], 0)
+        self.assertEqual(metrics["status"], "INITIALIZING")
 
     def test_current_watchdog_run_is_excluded(self) -> None:
         metrics = evaluate_runs(
