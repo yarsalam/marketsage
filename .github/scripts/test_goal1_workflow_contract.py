@@ -71,6 +71,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("22 watchdog unit tests", content)
         self.assertIn("4 workflow contract tests", content)
         self.assertIn("PR #88", content)
+        self.assertIn("ready for review", content)
         self.assertIn("no supported callback", content)
         self.assertIn("per-30-minute delivery", content)
         self.assertIn("independent 24/7 heartbeat", content)
