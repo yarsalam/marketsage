@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 import urllib.error
+import urllib.parse
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
@@ -76,10 +77,88 @@ class WatchdogEvaluationTests(unittest.TestCase):
         self.assertEqual(metrics["recent_failures"], 0)
         self.assertEqual(metrics["heartbeat_state"], "within_window")
 
-    def test_missing_heartbeat_is_initializing_not_false_success(self) -> None:
+    def test_missing_heartbeat_is_degraded_not_false_success(self) -> None:
         metrics = evaluate_runs([make_run()], now=NOW)
-        self.assertEqual(metrics["status"], "INITIALIZING")
+        self.assertEqual(metrics["status"], "DEGRADED")
         self.assertEqual(metrics["heartbeat_state"], "not_yet_observed")
+        self.assertIn("do not treat this state as healthy", build_summary(metrics))
+
+    def test_failure_recovers_after_newer_success_on_same_workflow_branch(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(run_id=1, conclusion="failure", created_minutes_ago=35, updated_minutes_ago=30),
+                make_run(run_id=2, conclusion="success", created_minutes_ago=10, updated_minutes_ago=5),
+                make_run(
+                    run_id=3,
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    created_minutes_ago=25,
+                    updated_minutes_ago=20,
+                ),
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 0)
+        self.assertEqual(metrics["status"], "HEALTHY")
+
+    def test_newer_failure_is_not_cleared_by_older_success(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(run_id=1, conclusion="success", created_minutes_ago=35, updated_minutes_ago=30),
+                make_run(run_id=2, conclusion="failure", created_minutes_ago=10, updated_minutes_ago=5),
+                make_run(
+                    run_id=3,
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    created_minutes_ago=25,
+                    updated_minutes_ago=20,
+                ),
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 1)
+        self.assertEqual(metrics["status"], "DEGRADED")
+
+    def test_failure_on_another_branch_does_not_clear_unrecovered_failure(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(run_id=1, branch="infra/one", conclusion="failure", updated_minutes_ago=5),
+                make_run(run_id=2, branch="infra/two", conclusion="success", updated_minutes_ago=2),
+                make_run(
+                    run_id=3,
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    created_minutes_ago=25,
+                    updated_minutes_ago=20,
+                ),
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 1)
+        self.assertEqual(metrics["status"], "DEGRADED")
+
+    def test_cancelled_run_does_not_clear_a_prior_failure(self) -> None:
+        metrics = evaluate_runs(
+            [
+                make_run(run_id=1, conclusion="failure", created_minutes_ago=35, updated_minutes_ago=30),
+                make_run(run_id=2, conclusion="cancelled", created_minutes_ago=10, updated_minutes_ago=5),
+                make_run(
+                    run_id=3,
+                    name="MarketSage Goal 1 Watchdog",
+                    event="schedule",
+                    branch="main",
+                    created_minutes_ago=25,
+                    updated_minutes_ago=20,
+                ),
+            ],
+            now=NOW,
+        )
+        self.assertEqual(metrics["recent_failures"], 1)
+        self.assertEqual(metrics["recent_cancelled"], 1)
+        self.assertEqual(metrics["status"], "DEGRADED")
 
     def test_stale_successful_heartbeat_degrades_health(self) -> None:
         metrics = evaluate_runs(
@@ -178,7 +257,7 @@ class WatchdogEvaluationTests(unittest.TestCase):
         )
         self.assertEqual(metrics["inspected_runs"], 0)
         self.assertEqual(metrics["recent_failures"], 0)
-        self.assertEqual(metrics["status"], "INITIALIZING")
+        self.assertEqual(metrics["status"], "DEGRADED")
 
     def test_current_watchdog_run_is_excluded(self) -> None:
         metrics = evaluate_runs(
@@ -198,7 +277,7 @@ class WatchdogEvaluationTests(unittest.TestCase):
             current_run_id="77",
         )
         self.assertEqual(metrics["inspected_runs"], 0)
-        self.assertEqual(metrics["status"], "INITIALIZING")
+        self.assertEqual(metrics["status"], "DEGRADED")
 
     def test_truncated_history_fails_closed(self) -> None:
         metrics = evaluate_runs([], now=NOW, history_truncated=True)
@@ -250,6 +329,34 @@ class WatchdogEvaluationTests(unittest.TestCase):
                 )
         self.assertEqual(mocked.call_count, 1)
         self.assertNotIn("not-a-real-credential", str(raised.exception))
+
+    def test_api_query_is_bounded_to_recent_monitoring_window(self) -> None:
+        class Response:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self, limit: int) -> bytes:
+                return json.dumps({"total_count": 0, "workflow_runs": []}).encode()
+
+        with patch("goal1_watchdog.urllib.request.urlopen", return_value=Response()) as mocked:
+            from goal1_watchdog import _request_runs_page
+
+            _request_runs_page(
+                "https://api.github.com",
+                "yarsalam/marketsage",
+                "not-a-real-credential",
+                page=1,
+            )
+
+        request = mocked.call_args.args[0]
+        query = urllib.parse.parse_qs(urllib.parse.urlsplit(request.full_url).query)
+        self.assertEqual(query["per_page"], ["100"])
+        self.assertTrue(query["created"][0].endswith("..*"))
 
     def test_api_success_returns_workflow_runs(self) -> None:
         class Response:

@@ -97,6 +97,7 @@ def evaluate_runs(
     stale_running = 0
     recent_failures = 0
     recent_cancelled = 0
+    completed_by_stream: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
 
     for run in relevant:
         status = run.get("status")
@@ -114,12 +115,60 @@ def evaluate_runs(
         if status == "completed":
             updated = parse_timestamp(run.get("updated_at")) or created
             age = _age(current, updated)
+            conclusion = run.get("conclusion")
+            if age is not None and age <= RECENT_FAILURE_WINDOW and conclusion == "cancelled":
+                recent_cancelled += 1
+
+            head_repository = run.get("head_repository")
+            repository_name = (
+                head_repository.get("full_name")
+                if isinstance(head_repository, dict)
+                else ""
+            )
+            stream_key = (
+                str(run.get("name") or ""),
+                str(run.get("head_branch") or ""),
+                str(repository_name or ""),
+            )
+            completed_by_stream.setdefault(stream_key, []).append(run)
+
+    for stream_runs in completed_by_stream.values():
+        def completion_order(run: dict[str, Any]) -> tuple[datetime, int]:
+            timestamp = (
+                parse_timestamp(run.get("updated_at"))
+                or parse_timestamp(run.get("created_at"))
+                or datetime.min.replace(tzinfo=timezone.utc)
+            )
+            raw_id = str(run.get("id", ""))
+            numeric_id = int(raw_id) if raw_id.isdigit() else -1
+            return timestamp, numeric_id
+
+        latest_success_order = max(
+            (
+                completion_order(run)
+                for run in stream_runs
+                if run.get("conclusion") == "success"
+            ),
+            default=None,
+        )
+        unresolved_failures = [
+            run
+            for run in stream_runs
+            if run.get("conclusion") in BAD_CONCLUSIONS
+            and (
+                latest_success_order is None
+                or completion_order(run) > latest_success_order
+            )
+        ]
+        if unresolved_failures:
+            latest_failure = max(unresolved_failures, key=completion_order)
+            updated = (
+                parse_timestamp(latest_failure.get("updated_at"))
+                or parse_timestamp(latest_failure.get("created_at"))
+            )
+            age = _age(current, updated)
             if age is not None and age <= RECENT_FAILURE_WINDOW:
-                conclusion = run.get("conclusion")
-                if conclusion in BAD_CONCLUSIONS:
-                    recent_failures += 1
-                elif conclusion == "cancelled":
-                    recent_cancelled += 1
+                recent_failures += 1
 
     successful_heartbeats = [
         run
@@ -147,20 +196,17 @@ def evaluate_runs(
     heartbeat_age = _age(current, heartbeat_time)
     heartbeat_stale = heartbeat_age is not None and heartbeat_age > HEARTBEAT_LIMIT
     heartbeat_observed = heartbeat_age is not None
+    heartbeat_missing = not heartbeat_observed
 
     degraded = bool(
         stale_queued
         or stale_running
         or recent_failures
         or heartbeat_stale
+        or heartbeat_missing
         or history_truncated
     )
-    if degraded:
-        status = "DEGRADED"
-    elif not heartbeat_observed:
-        status = "INITIALIZING"
-    else:
-        status = "HEALTHY"
+    status = "DEGRADED" if degraded else "HEALTHY"
 
     heartbeat_state = (
         "stale"
@@ -192,7 +238,7 @@ def build_summary(metrics: dict[str, Any]) -> str:
     heartbeat = {
         "within_window": "A successful scheduled heartbeat was observed within the monitoring window.",
         "stale": "The last successful scheduled heartbeat is older than the allowed window.",
-        "not_yet_observed": "No successful scheduled heartbeat has been observed yet; the monitor is initializing.",
+        "not_yet_observed": "No successful scheduled heartbeat is present in the recent monitoring window; health remains degraded until a scheduled success is observed.",
     }.get(metrics["heartbeat_state"], "Heartbeat state is unknown.")
 
     lines = [
@@ -201,7 +247,7 @@ def build_summary(metrics: dict[str, Any]) -> str:
         f"Status: **{status}**",
         "",
         f"- Relevant workflow runs inspected: {metrics['inspected_runs']}",
-        f"- Recent failed or timed-out runs (24h): {metrics['recent_failures']}",
+        f"- Unrecovered latest failed or timed-out workflow results (24h): {metrics['recent_failures']}",
         f"- Queued runs older than 15 minutes: {metrics['stale_queued']}",
         f"- Running jobs older than 30 minutes: {metrics['stale_running']}",
         f"- Cancelled or superseded runs (24h; not counted as failures): {metrics['recent_cancelled']}",
@@ -209,19 +255,20 @@ def build_summary(metrics: dict[str, Any]) -> str:
         f"- Workflow history truncated at the safety limit: {'yes' if metrics['history_truncated'] else 'no'}",
         "",
     ]
-    if status == "DEGRADED":
+    if status == "DEGRADED" and metrics["heartbeat_state"] == "not_yet_observed":
+        lines.extend(
+            [
+                "Human handoff: no successful scheduled heartbeat is present in the recent window. "
+                "Verify that the Watchdog is enabled on the default branch and inspect its latest run; "
+                "do not treat this state as healthy.",
+                "",
+            ]
+        )
+    elif status == "DEGRADED":
         lines.extend(
             [
                 "Human handoff: inspect the latest relevant run in the GitHub Actions overview. "
                 "Do not blindly rerun a workflow; identify the failed step and retry only after review.",
-                "",
-            ]
-        )
-    elif status == "INITIALIZING":
-        lines.extend(
-            [
-                "Human handoff: no action is required for the first scheduled heartbeat. "
-                "A later scheduled run must confirm that the heartbeat is recurring.",
                 "",
             ]
         )
@@ -248,10 +295,16 @@ def _request_runs_page(
     if parsed.scheme != "https" or not parsed.netloc or parsed.path:
         raise ApiReadError("api_url_invalid")
 
-    url = (
-        f"{api_url.rstrip('/')}/repos/{repository}/actions/runs"
-        f"?per_page={PAGE_SIZE}&page={page}"
+    cutoff = datetime.now(timezone.utc) - RECENT_FAILURE_WINDOW
+    cutoff_text = cutoff.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    query = urllib.parse.urlencode(
+        {
+            "per_page": PAGE_SIZE,
+            "page": page,
+            "created": f"{cutoff_text}..*",
+        }
     )
+    url = f"{api_url.rstrip('/')}/repos/{repository}/actions/runs?{query}"
     request = urllib.request.Request(
         url,
         headers={

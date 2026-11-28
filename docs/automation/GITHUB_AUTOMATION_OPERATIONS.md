@@ -47,8 +47,9 @@ The separate Goal 1 Watchdog workflow:
 - Uses GitHub-hosted ubuntu-latest, with a 3-minute timeout.
 - Uses actions: read and contents: read only.
 - Checks only main, infra, and ci branches; fork-originated completion events are rejected, and fork-originated runs are excluded again when evaluating API history.
-- Reads at most five pages of workflow history (100 runs per page), retries each read-only GitHub API page at most three times with bounded request timeouts and short backoff, and marks truncated history as degraded instead of silently trusting a partial result.
-- Detects queued runs older than 15 minutes, running jobs older than 30 minutes, recent failed/timed-out runs, and a missing successful scheduled heartbeat older than 75 minutes.
+- Reads at most five pages of workflow history (100 runs per page) created within the last 24 hours, retries each read-only GitHub API page at most three times with bounded request timeouts and short backoff, and marks truncated history as degraded instead of silently trusting a partial result. This rolling filter prevents old repository history from permanently exhausting the five-page safety limit.
+- Detects queued runs older than 15 minutes, running jobs older than 30 minutes, the latest unrecovered failed/timed-out result per workflow and branch within 24 hours, and a missing or stale successful scheduled heartbeat older than 75 minutes.
+- A later successful completion on the same workflow and branch clears an earlier failure; a cancellation does not count as recovery and is reported separately. A missing successful scheduled heartbeat is a degraded state, not an implicit healthy initialization.
 - Records aggregate status in the GitHub Actions run summary. It emits no raw logs, artifacts, commit hashes, branch names, run identifiers, market data, prices, private paths, credentials, or tokens.
 - Does not automatically rerun failed jobs. A human inspects the failed step and decides whether a single bounded retry is justified.
 

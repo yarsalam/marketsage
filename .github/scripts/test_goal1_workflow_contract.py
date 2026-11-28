@@ -17,6 +17,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("branches: [main]", content)
         self.assertIn("cancel-in-progress: true", content)
         self.assertIn("timeout-minutes: 10", content)
+        self.assertIn('python-version: "3.12"', content)
         self.assertIn("ci-infra-tests:", content)
         self.assertIn("contents: read", content)
         self.assertNotIn("schedule:", content)
@@ -69,6 +70,9 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("independent 24/7 heartbeat", content)
         self.assertIn("4,320 runner-minutes", content)
         self.assertIn("$12 of Actions compute", content)
+        self.assertIn("created within the last 24 hours", content)
+        self.assertIn("same workflow and branch", content)
+        self.assertIn("no successful scheduled heartbeat is a degraded state", content)
 
     def test_external_actions_are_pinned_to_full_commit_shas(self) -> None:
         for path in (WORKFLOWS / "ci.yml", WORKFLOWS / "goal1-watchdog.yml"):
