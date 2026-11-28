@@ -2,7 +2,7 @@
 
 This document defines the infrastructure-only automation boundary. It does not authorize automatic merges, releases, deployments, product development, market-data acquisition, investment scoring/ranking, probability calibration, backtests, broker access, trading, or capital allocation.
 
-## Verified repository state — 2026-11-27
+## Verified repository state — 2026-11-28
 
 - GitHub reports the repository visibility as **public**, although the current owner instruction describes it as private. No visibility change was made. Treat all committed content, issues, PRs, and workflow summaries as public until the owner explicitly resolves this mismatch.
 - The latest observed main commit is dated 2026-11-26. The previous report that main had not changed since 2026-11-07 was stale.
@@ -10,20 +10,22 @@ This document defines the infrastructure-only automation boundary. It does not a
 - PR #6 is **closed and unmerged**. It was not changed or merged.
 - The currently open PRs, verified 2026-11-27, are #88 (this Goal 1 infrastructure draft; open, Draft, mergeable, with no submitted reviews), #87 (Draft, mergeable), #86 (Draft, mergeable), and #81 (Draft, not mergeable). PRs #87, #86, and #81 are outside the current execution scope and must not be advanced while Goal 1 is active.
 - The active main ruleset exposes only branch-deletion and non-fast-forward protections, with no bypass actors. The classic branch-protection endpoint is not readable through the current GitHub connection. Required approvals and required status checks therefore remain unverified.
-- The current GitHub connection exposes PR-triggered runs for a supplied commit, but not a complete repository-wide Actions run listing. Therefore actual scheduled-run completion and the latest global failure totals are **not independently verified** in this audit. The default-branch CI file does define a daily schedule; that configuration is not proof that the schedule executed.
+- Recent Actions history was inspected across the visible run pages. The latest three main-branch runs were: a successful scheduled run on 2026-11-27, a successful main push, and an older cancelled main push. No main-branch failure appeared in that visible history.
+- The latest main scheduled run on 2026-11-27 completed successfully but executed the legacy analysis/research-backtest job, backend/frontend/admin build-and-test jobs, and production-image build. This is direct evidence that the prohibited legacy path remains active; it is not Goal 1 health evidence.
+- No Goal 1 Watchdog scheduled run is present on main because the replacement Watchdog workflow exists only in PR #88.
 - Workflow YAML was inspected. No repository secret values were read. The current connection does not expose runner inventory or account billing/quota details.
 
 ### Mainline freeze is not yet active — hard blocker
 
-The current `main` version of `.github/workflows/ci.yml` still defines a daily scheduled trigger (`17 3 * * *`) and `workflow_dispatch`. It also contains an analysis test job that runs the analysis-engine test suite, application/backend/frontend/admin build jobs, and a production-image build job. The exact current file was inspected on 2026-11-27.
+The current `main` version of `.github/workflows/ci.yml` still defines a daily scheduled trigger (`17 3 * * *`) and `workflow_dispatch`. It also contains an analysis test job that runs the analysis-engine test suite, application/backend/frontend/admin build jobs, and a production-image build job. The exact current file was inspected on 2026-11-28.
 
-PR #88 replaces that workflow on its branch, but PR #88 is still Draft and unmerged. Therefore the Goal 1-only freeze is **not active on main**. The existing mainline schedule/manual trigger and its analysis/production jobs remain configured until an owner-reviewed change reaches main. Do not dispatch the existing workflow manually. No claim is made that the legacy scheduled workflow has or has not executed in the latest interval because the connected run-history action does not provide a complete repository-wide run list.
+PR #88 replaces that workflow on its branch, but PR #88 is still Draft and unmerged. Therefore the Goal 1-only freeze is **not active on main**. The existing mainline schedule/manual trigger and its analysis/production jobs remain configured until an owner-reviewed change reaches main. Do not dispatch the existing workflow manually. The 2026-11-27 scheduled run proves that the legacy analysis/backtest and production-image jobs have executed recently; no new legacy run was dispatched during this audit.
 
 The three local TSETMC workflows were separately inspected on main: each is manual-only (`workflow_dispatch`) and targets the dedicated self-hosted runner labels. They were not dispatched.
 
 ### Current exact-head evidence boundary
 
-The connected run-history action returned one successful PR-triggered run for the current PR #88 head. Its only job completed successfully and the run has no artifacts. The PR description reports both push and pull-request success, but this audit interface filters commit workflow runs to PR-triggered events; the push-triggered run is therefore not independently confirmed here. No PR reviews have been submitted.
+The current exact PR #88 head has both push-triggered and pull-request-triggered runs, and both completed successfully. Each run executed one infrastructure contract-test job: 22 watchdog unit tests and 4 workflow contract tests passed; neither run uploaded artifacts. Two earlier exact-head iterations failed on test assertions while the watchdog recovery and billing documentation were being corrected; the current exact head is green on both events. No PR reviews have been submitted.
 
 ## Proposed cloud-native execution model in this branch
 
@@ -95,7 +97,7 @@ GitHub currently reports this repository as public, where standard GitHub-hosted
 
 ## Goal 1 acceptance evidence still required
 
-- [ ] Exact-head push and pull-request CI pass on this infrastructure PR.
+- [x] Exact-head push and pull-request CI pass on this infrastructure PR (one infrastructure job per event; 22 unit tests and 4 workflow contract tests; zero artifacts).
 - [ ] The replacement workflows are reviewed and merged by the owner; no automated merge.
 - [ ] At least two successful scheduled Watchdog runs are observed on main.
 - [ ] At least 24 hours of post-merge scheduled observation is recorded.
