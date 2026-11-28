@@ -55,7 +55,7 @@ The separate Goal 1 Watchdog workflow:
 - Records aggregate status in the GitHub Actions run summary. It emits no raw logs, artifacts, commit hashes, branch names, run identifiers, market data, prices, private paths, credentials, or tokens.
 - Does not automatically rerun failed jobs. A human inspects the failed step and decides whether a single bounded retry is justified.
 
-The scheduled workflow is a best-effort monitor, not an SLA. GitHub scheduled events run from the default branch and may be delayed or dropped during service load. A GitHub-hosted workflow cannot independently alert if GitHub Actions itself is disabled, unavailable, or no longer schedules the workflow. The daily ChatGPT audit is an additional observer, not a 24/7 external heartbeat.
+The scheduled workflow is a best-effort monitor, not an SLA. GitHub scheduled events run from the default branch and may be delayed or dropped during service load. A GitHub-hosted workflow cannot independently alert if GitHub Actions itself is disabled, unavailable, or no longer schedules the workflow. The daily ChatGPT audit is an additional observer, not a 24/7 external heartbeat. Because this repository is currently public, GitHub also automatically disables scheduled workflows after 60 days without repository activity. After any such deactivation, an owner must re-enable the workflow and verify a fresh scheduled success. This is an additional reason that a GitHub-only schedule cannot provide an independent 24/7 guarantee.
 
 ## Failure handling and operator recovery
 
