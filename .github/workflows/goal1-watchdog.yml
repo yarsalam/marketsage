@@ -1,0 +1,45 @@
+name: MarketSage Goal 1 Watchdog
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_run:
+    workflows: ["MarketSage CI"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: marketsage-goal1-watchdog
+  cancel-in-progress: false
+
+jobs:
+  health-check:
+    if: >-
+      github.event_name == 'schedule' ||
+      (
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        (
+          github.event.workflow_run.head_branch == 'main' ||
+          startsWith(github.event.workflow_run.head_branch, 'infra/') ||
+          startsWith(github.event.workflow_run.head_branch, 'ci/')
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout main only
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+          clean: true
+      - name: Inspect bounded CI history and heartbeat
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/goal1_watchdog.py

@@ -1,89 +1,111 @@
-# MarketSage GitHub automation operations
+# MarketSage GitHub automation — Goal 1 operations
 
-This document describes the repository automation boundary. It does not authorize automatic merges, releases, deployments, data collection, investment scoring, backtesting approval, broker access, trading, or capital allocation.
+This document defines the infrastructure-only automation boundary. It does not authorize automatic merges, releases, deployments, product development, market-data acquisition, investment scoring/ranking, probability calibration, backtests, broker access, trading, or capital allocation.
 
-## Current cloud CI design
+## Verified repository state — 2026-11-28
 
-The `.github/workflows/ci.yml` workflow is intended to run on:
+- GitHub reports the repository visibility as **public**, although the current owner instruction describes it as private. No visibility change was made. Treat all committed content, issues, PRs, and workflow summaries as public until the owner explicitly resolves this mismatch.
+- The latest observed main commit is dated 2026-11-26. The previous report that main had not changed since 2026-11-07 was stale.
+- PR #85 is **closed and unmerged**. Its proposed automation is not active on main. Do not treat its earlier successful checks as current infrastructure evidence.
+- PR #6 is **closed and unmerged**. It was not changed or merged.
+- The currently open PRs, verified 2026-11-27, are #88 (this Goal 1 infrastructure PR; open, ready for review, mergeable, with no submitted reviews), #87 (Draft, mergeable), #86 (Draft, mergeable), and #81 (Draft, not mergeable). PRs #87, #86, and #81 are outside the current execution scope and must not be advanced while Goal 1 is active.
+- The active main ruleset exposes only branch-deletion and non-fast-forward protections, with no bypass actors. The classic branch-protection endpoint is not readable through the current GitHub connection. Required approvals and required status checks therefore remain unverified.
+- Recent Actions history was inspected across the visible run pages. The latest three main-branch runs were: a successful scheduled run on 2026-11-27, a successful main push, and an older cancelled main push. No main-branch failure appeared in that visible history.
+- The latest main scheduled run on 2026-11-27 completed successfully but executed the legacy analysis/research-backtest job, backend/frontend/admin build-and-test jobs, and production-image build. This is direct evidence that the prohibited legacy path remains active; it is not Goal 1 health evidence.
+- No Goal 1 Watchdog scheduled run is present on main because the replacement Watchdog workflow exists only in PR #88.
+- Workflow YAML was inspected. No repository secret values were read. The current connection does not expose runner inventory or account billing/quota details.
 
-- Pushes to `main`, `deploy/**`, `research/**`, `ci/**`, and `infra/**`.
-- Pull requests targeting `main`, `deploy/**`, or `infra/**`.
-- A daily scheduled run at 03:17 UTC.
-- Manual `workflow_dispatch`.
+### Mainline freeze is not yet active — hard blocker
 
-Scheduled workflows execute from the repository default branch. The daily schedule therefore becomes active only after this workflow change is merged into `main`. GitHub may delay scheduled events during periods of Actions load; this is a recurring health check, not a real-time uptime guarantee.
+The current `main` version of `.github/workflows/ci.yml` still defines a daily scheduled trigger (`17 3 * * *`) and `workflow_dispatch`. It also contains an analysis test job that runs the analysis-engine test suite, application/backend/frontend/admin build jobs, and a production-image build job. The exact current file was inspected on 2026-11-28.
 
-The workflow uses GitHub-hosted `ubuntu-latest` runners for cloud-native tests and builds. It does not use the owner's laptop runner. The job timeouts are:
+PR #88 replaces that workflow on its branch; it is now open and ready for review, but remains unmerged. Therefore the Goal 1-only freeze is **not active on main**. The existing mainline schedule/manual trigger and its analysis/production jobs remain configured until an owner-reviewed change reaches main. Do not dispatch the existing workflow manually. The 2026-11-27 scheduled run proves that the legacy analysis/backtest and production-image jobs have executed recently; no new legacy run was dispatched during this audit.
 
-| Job | Timeout |
-| --- | ---: |
-| analysis | 25 minutes |
-| user-backend | 30 minutes |
-| user-frontend | 30 minutes |
-| admin-workspace | 30 minutes |
-| production-images | 40 minutes |
-| ci-infra-tests | 5 minutes |
-| notify-failure | 5 minutes |
+The three local TSETMC workflows were separately inspected on main: each is manual-only (`workflow_dispatch`) and targets the dedicated self-hosted runner labels. They were not dispatched.
 
-The concurrency group is keyed by pull-request number when available, otherwise by Git ref. A newer run for the same PR/ref cancels its superseded run. Separate PRs remain independent. A cancelled run is not evidence of a test failure; inspect the newest run for that PR/ref.
+### Current exact-head evidence boundary
 
-The CI action references are pinned to full immutable commit SHAs, with the upstream release tag retained as a comment. Dependabot checks GitHub Actions weekly in one grouped PR. Review those PRs through CI before accepting an action update.
+The current exact PR #88 head has both push-triggered and pull-request-triggered runs, and both completed successfully. Each run executed one infrastructure contract-test job: 22 watchdog unit tests and 4 workflow contract tests passed; neither run uploaded artifacts. Two earlier exact-head iterations failed on test assertions while the watchdog recovery and billing documentation were being corrected; the current exact head is green on both events. No PR reviews have been submitted.
 
-A separate **Detect direct main updates** job runs only for push events to main. It compares the before/after SHAs and checks that each pushed commit is associated with a merged PR targeting main. A forced/non-fast-forward push, unassociated commit, oversized range, or unverifiable API response produces a sanitized warning on Issue #49 and a failed check. This is detection only; it does not prevent or revert a push and is not a substitute for a native ruleset/branch-protection rule. The check uses only read access to commit/PR metadata and issue-comment permission; it reports commit identifiers and fixed reason codes, not diffs, logs, or secrets.
+## Proposed cloud-native execution model in this branch
 
-The build/test jobs and the CI-helper unit-test job use only `contents: read` and do not require repository secrets. A separate failure-notification job uses `contents: read` to check out the small reporter script and `issues: write` to add a sanitized comment to Issue #49; it reports the run link and failed job names only. It does not read logs or artifacts, write repository contents, or expose credentials, raw datasets, prices, private paths, or unfiltered exception payloads.
+### Event-driven CI
 
-## Manual-only local workflows
+The replacement MarketSage CI workflow is intentionally limited to Goal 1 infrastructure contract tests.
 
-The TSETMC integrated acceptance and sanitized diagnostics workflows are deliberately manual-only. They require the dedicated self-hosted runner labels and explicit confirmation inputs. They must not be placed on a schedule or triggered by ordinary pushes/PRs. The laptop runner is not an always-on service and must never be assumed available.
+- Events: push to main/infra/ci branches and pull requests targeting main.
+- Runner: GitHub-hosted ubuntu-latest.
+- Permissions: contents: read only.
+- Concurrency: one group per PR/ref; a newer commit cancels the superseded run.
+- Timeout: 10 minutes.
+- External actions: immutable full commit SHAs.
+- No manual dispatch, no scheduled product workflow, no secrets, no artifacts, no application builds, no analysis/backtest job, and no production image job.
 
-Do not use the local runner for untrusted PR code. Any future server runner must be a separately managed, least-privilege environment with restricted network access, isolated workspaces, bounded concurrency, health monitoring, safe patching, and a documented recovery path. Keep private input data off GitHub and out of artifacts.
+### Scheduled health check
 
-## Daily operations and failure recovery
+The separate Goal 1 Watchdog workflow:
 
-On a failed CI run, the notification job attempts to add a sanitized comment to Issue #49. A missing comment means notification delivery may have failed; the Actions run remains the source of truth. GitHub Mobile push delivery still depends on the user's notification settings and is not guaranteed by this workflow.
+- Runs every 30 minutes from the default branch and after completion of the infrastructure CI workflow.
+- Uses GitHub-hosted ubuntu-latest, with a 3-minute timeout.
+- Uses actions: read and contents: read only.
+- Checks only main, infra, and ci branches; fork-originated completion events are rejected, and fork-originated runs are excluded again when evaluating API history.
+- Reads at most five pages of workflow history (100 runs per page) created within the last 24 hours, retries each read-only GitHub API page at most three times with bounded request timeouts and short backoff, and marks truncated history as degraded instead of silently trusting a partial result. This rolling filter prevents old repository history from permanently exhausting the five-page safety limit.
+- Detects queued runs older than 15 minutes, running jobs older than 30 minutes, the latest unrecovered failed/timed-out result per workflow and branch within 24 hours, and a missing or stale successful scheduled heartbeat older than 75 minutes.
+- A later successful completion on the same workflow and branch clears an earlier failure; a cancellation does not count as recovery and is reported separately. A missing successful scheduled heartbeat is a degraded state, not an implicit healthy initialization.
+- Records aggregate status in the GitHub Actions run summary. It emits no raw logs, artifacts, commit hashes, branch names, run identifiers, market data, prices, private paths, credentials, or tokens.
+- Does not automatically rerun failed jobs. A human inspects the failed step and decides whether a single bounded retry is justified.
 
+The scheduled workflow is a best-effort monitor, not an SLA. GitHub scheduled events run from the default branch and may be delayed or dropped during service load. A GitHub-hosted workflow cannot independently alert if GitHub Actions itself is disabled, unavailable, or no longer schedules the workflow. The daily ChatGPT audit is an additional observer, not a 24/7 external heartbeat. Because this repository is currently public, GitHub also automatically disables scheduled workflows after 60 days without repository activity. After any such deactivation, an owner must re-enable the workflow and verify a fresh scheduled success. This is an additional reason that a GitHub-only schedule cannot provide an independent 24/7 guarantee.
 
-1. Open the Actions tab and select **MarketSage CI**.
-2. For each PR, inspect the newest run for its exact head commit. Do not infer current success from an older run.
-3. If a run is queued or in progress, inspect its job list. If it is cancelled, check whether a newer run superseded it.
-4. For a failed job, inspect only the failing step needed to identify the cause. Redact credentials, paths, raw market values, and private source payloads before sharing any diagnostic output.
-5. Rerun failed jobs only after identifying a transient failure. Do not create unbounded retries or rerun expensive workflows repeatedly.
-6. A missing daily run is not proof of a healthy system. Check the latest successful run timestamp and the Actions workflow's enabled state.
-7. After a workflow change, validate the exact PR head before considering the change complete.
+## Failure handling and operator recovery
 
-GitHub's scheduled events can be delayed or dropped under heavy load. The schedule is intentionally not placed at the start of an hour; it is not an SLA or an always-on worker.
+1. Open the GitHub Actions overview and inspect the newest relevant run.
+2. Check whether a queued run exceeded 15 minutes or a running job exceeded 30 minutes.
+3. For a failed run, inspect only the failing step needed to identify the cause. Never copy raw logs into an issue or chat without sanitization.
+4. Do not automatically rerun the entire workflow. Retry only after confirming a transient cause, and prefer the failed job only.
+5. A cancelled run may have been superseded by a newer commit. Check the newest run for the same PR/ref before treating cancellation as failure.
+6. If the Watchdog API read fails after three attempts, its run is marked failed with a sanitized summary. Verify Actions API permissions and GitHub service status.
+7. No artifact is uploaded. GitHub Actions run records and step summaries are the status ledger.
 
-## Automation capabilities not yet enabled
+ChatGPT's scheduled audit reports the latest main commit, open PRs, mergeability, recent workflow runs, and blockers in this conversation. The GitHub Watchdog itself writes only to the GitHub Actions step summary: the current integration has no supported callback that posts each 30-minute execution into this ChatGPT conversation. The separate ChatGPT audit is daily, so it cannot guarantee per-30-minute delivery or act as an independent 24/7 heartbeat. Mobile push and email delivery are not asserted as confirmed.
 
-CI validates code; by itself it does not autonomously plan and write new engineering changes. A coding agent must be explicitly enabled and assigned bounded issues before this repository can have an unattended code-authoring loop.
+## Runner strategy
 
-GitHub Copilot cloud agent is one possible option for a personal repository, subject to a paid Copilot plan and the account's cloud-agent feature being enabled. Before using it:
+- Use GitHub-hosted runners for cloud-native, read-only CI and health checks.
+- The three TSETMC workflows on main remain manual-only and require dedicated self-hosted labels. They were not dispatched. The laptop runner is not an always-on service and must never be assumed available.
+- Runner inventory could not be verified through the current connection; no always-on server runner is proven to exist.
+- Do not provision a persistent runner until a separate server, budget, ownership, and security boundary are approved.
+- If a dedicated server runner is later necessary, prefer one-job ephemeral runners or disposable VMs/containers, a dedicated unprivileged OS account, no repository secrets, no fork PR execution, restricted outbound network, isolated workspaces, bounded concurrency, patching, heartbeat, and a documented kill/recovery procedure.
 
-- Confirm the account is eligible and cloud agent is enabled for this repository.
-- Keep its work issue-scoped and PR-based.
-- Require human review and checks; do not grant merge, release, deployment, secrets, or production permissions.
-- Do not assign data/research issues while the infrastructure-first priority is active.
+## Cost and account limits
 
-If cloud agent is unavailable, evaluate a separately budgeted coding-agent integration rather than placing an unbounded API key or a broad personal token in CI.
+The repository is currently public. Standard GitHub-hosted runners for public repositories are generally free, but this must not be generalized to a future private repository or non-standard runner.
 
-## Cost and account controls
+The 30-minute schedule creates at most 48 scheduled watchdog runs per day. At the 3-minute hard timeout, the schedule-only theoretical ceiling is 144 runner-minutes per day, or 4,320 runner-minutes in a 30-day month ($25.92 at the standard Linux x64 rate of $0.006/minute). GitHub rounds each job's partial minute up to a whole billable minute, so if every scheduled job completes in under one minute, the 48 daily runs still represent about 1,440 runner-minutes per 30-day month ($8.64). These are schedule-only estimates; additional `workflow_run`-triggered watchdog executions and event-driven CI are excluded. The 3-minute timeout is a per-run bound, not a monthly spending cap.
 
-GitHub-hosted runner usage is free for standard runners in public repositories and consumes the account's included Actions minutes in private repositories; usage beyond the applicable allowance may be billed. The account plan, remaining quota, and billing budget are not visible to this workflow. Before increasing run frequency or adding agent jobs, inspect GitHub Actions usage and configure a hard spending limit that stops additional usage. Prefer bounded daily validation plus event-driven PR checks over minute-level polling.
+GitHub currently reports this repository as public, where standard GitHub-hosted runners are free. If the repository is private on GitHub Free, the included Actions compute is $12 per month (about 2,000 standard Linux x64 minutes at $0.006/minute). At one billable minute per scheduled run, the schedule alone would use about $8.64 of that allowance and leave roughly 560 equivalent minutes for CI and `workflow_run` executions. If every scheduled run reached its 3-minute timeout, the schedule alone would exceed the included amount by about $13.92. Usage beyond the included amount is blocked when no valid payment method is configured; with a payment method, overage may be billed unless a budget stops it. The account plan, payment method, remaining quota, spending cap, and billing are not visible through this connection. Do not increase budgets or provision paid infrastructure. Re-check the plan and budget before relying on this cadence after any visibility change.
 
-## Protection and release boundary
+## Security and release boundary
 
-The current `main` branch must be protected before enabling any bot or workflow that can write repository contents. Require PR-based changes and the relevant CI checks; disable force-push and branch deletion. Keep merge/release/deploy authority with the repository owner. PR #6 remains subject to separate explicit owner approval.
+- No automatic merge, auto-merge, release, deployment, or production operation.
+- No repository secrets are read or required by these workflows.
+- The Watchdog uses only the ephemeral GitHub Actions token with read-only Actions/Contents permissions; the token is not printed or stored in artifacts.
+- No workflow uploads artifacts.
+- Fork-originated runs are excluded from the privileged monitoring path; the Watchdog checks out main only.
+- Keep PR #6 closed/unmerged unless the owner explicitly authorizes a separate action. Do not merge any sensitive PR automatically.
+- Do not change repository visibility, branch protection, secrets, or spending limits from this branch.
 
-## Acceptance evidence still required
+## Goal 1 acceptance evidence still required
 
-- Daily schedule is merged to the default branch and at least one scheduled run succeeds.
-- Exact-head CI passes after the schedule/concurrency/timeout changes.
-- Concurrency cancellation and timeout behavior have been verified with controlled runs.
-- Direct-main-update detection has unit coverage for merged-PR commits, unassociated commits, forced/non-fast-forward pushes, and bounded range handling; the live job must be confirmed on a post-merge main push.
-- Failure notification and stuck-run detection are observable and tested.
-- Branch protection and spending limits are verified in repository/account settings.
-- A coding agent is enabled with least privilege and demonstrates a bounded issue-to-PR cycle.
-- Any persistent server runner has a tested health/recovery process and is independent of the owner's laptop.
+- [x] Exact-head push and pull-request CI pass on this infrastructure PR (one infrastructure job per event; 22 unit tests and 4 workflow contract tests; zero artifacts).
+- [ ] The replacement workflows are reviewed and merged by the owner; no automated merge.
+- [ ] At least two successful scheduled Watchdog runs are observed on main.
+- [ ] At least 24 hours of post-merge scheduled observation is recorded.
+- [ ] A controlled test demonstrates stale-queue/stuck-run detection and bounded API retry without exposing raw output.
+- [ ] Concurrency cancellation and timeout behavior are practically verified on GitHub-hosted runners.
+- [ ] A failed check is observed and the documented human recovery path is exercised once.
+- [ ] Required reviews/checks and native branch protection are verified in repository settings.
+- [ ] Runner inventory, account plan, usage quota, and spending limits are confirmed.
+- [ ] An independent external heartbeat is evaluated if detection must continue when GitHub Actions itself is unavailable.
 
-Do not claim 24/7 readiness until these checks have evidence.
+Do not declare Goal 1 ready until the practical evidence above is complete. Goal 2 remains blocked.
