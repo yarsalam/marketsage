@@ -72,7 +72,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("1,440 runner-minutes", content)
         self.assertIn("$25.92", content)
         self.assertIn("$8.64", content)
-        self.assertIn("$12 of Actions compute", content)
+        self.assertIn("$12 per month", content)
         self.assertIn("created within the last 24 hours", content)
         self.assertIn("same workflow and branch", content)
         self.assertIn("A missing successful scheduled heartbeat is a degraded state", content)
