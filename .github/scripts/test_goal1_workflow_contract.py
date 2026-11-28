@@ -72,7 +72,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("$12 of Actions compute", content)
         self.assertIn("created within the last 24 hours", content)
         self.assertIn("same workflow and branch", content)
-        self.assertIn("no successful scheduled heartbeat is a degraded state", content)
+        self.assertIn("A missing successful scheduled heartbeat is a degraded state", content)
 
     def test_external_actions_are_pinned_to_full_commit_shas(self) -> None:
         for path in (WORKFLOWS / "ci.yml", WORKFLOWS / "goal1-watchdog.yml"):

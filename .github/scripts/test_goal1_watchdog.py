@@ -293,7 +293,7 @@ class WatchdogEvaluationTests(unittest.TestCase):
         summary = build_summary(metrics)
         for forbidden in ("SECRET_TOKEN", "private/path", "deadbeef", "research/data-work", "123456"):
             self.assertNotIn(forbidden, summary)
-        self.assertIn("Recent failed or timed-out runs", summary)
+        self.assertIn("Unrecovered latest failed or timed-out workflow results", summary)
         self.assertIn("Human handoff", summary)
 
     def test_api_retry_is_limited_and_error_is_sanitized(self) -> None:
