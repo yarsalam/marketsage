@@ -75,6 +75,7 @@ class Goal1WorkflowContractTests(unittest.TestCase):
         self.assertIn("no supported callback", content)
         self.assertIn("per-30-minute delivery", content)
         self.assertIn("independent 24/7 heartbeat", content)
+        self.assertIn("60 days without repository activity", content)
         self.assertIn("4,320 runner-minutes", content)
         self.assertIn("Exact-head push and pull-request CI pass", content)
         self.assertIn("1,440 runner-minutes", content)
